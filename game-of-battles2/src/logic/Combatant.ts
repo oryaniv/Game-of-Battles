@@ -3,6 +3,7 @@ import { Board } from "./Board";
 import { DamageType } from "./Damage";
 import { Position } from "./Position";
 import { SpecialMove } from "./SpecialMove";
+import { StatusEffect, StatusEffectHook, StatusEffectType } from "./StatusEffect";
 
 export interface CombatantStats {
     hp: number;
@@ -19,12 +20,15 @@ export interface CombatantStats {
   export abstract class Combatant {
     constructor(
       public name: string,
-      public stats: CombatantStats,
+      public baseStats: CombatantStats,
       public position: Position,
       public weaknesses: DamageType[],
       public resistances: DamageType[],
       public specialMoves: SpecialMove[]
-    ) {}
+    ) {this.stats = { ...this.baseStats };}
+
+    public stats: CombatantStats; // Current stats, can be modified by effects
+    public statusEffects: StatusEffect[] = [];
   
     abstract basicAttack(target: Combatant): Damage;
   
@@ -56,9 +60,16 @@ export interface CombatantStats {
       return false;
     }
   
-    defend(): number {
-      return this.stats.defensePower / 2;
-    }
+    defend() {
+        const defenseStatus: StatusEffect = {
+          name: StatusEffectType.DEFENDING,
+          duration: 1,
+          hooks: {
+            [StatusEffectHook.OnDamageTaken]: (combatant, damage: number) => damage / 2,
+          },
+        };
+        this.applyStatusEffect(defenseStatus);
+      }
   
     isKnockedOut(): boolean {
       return this.stats.hp <= 0;
@@ -95,4 +106,49 @@ export interface CombatantStats {
     calculateFumble(): boolean{
         return Math.random() < 0.05; // 5% chance of fumble
     }
+    
+    applyStatusEffect(effect: StatusEffect): void {
+        this.statusEffects.push(effect);
+        const onApplyHook = effect.hooks[StatusEffectHook.OnApply];
+        if (onApplyHook && typeof onApplyHook === 'function') {
+            onApplyHook(this);
+        }
+        this.applyStatModifiers();
+      }
+    
+      removeStatusEffect(effectName: StatusEffectType): void {
+        const effectToRemove = this.statusEffects.find((effect) => effect.name === effectName);
+
+        if (effectToRemove && effectToRemove.hooks[StatusEffectHook.OnRemove] !== undefined && typeof effectToRemove.hooks[StatusEffectHook.OnRemove] === 'function') {
+            effectToRemove.hooks[StatusEffectHook.OnRemove]?.(this);
+        }
+
+        this.statusEffects = this.statusEffects.filter((effect) => effect.name !== effectName);
+
+        this.applyStatModifiers();
+      }
+    
+      updateStatusEffects(): void {
+        for (let i = this.statusEffects.length - 1; i >= 0; i--) {
+            const effect = this.statusEffects[i];
+            if (effect.hooks[StatusEffectHook.OnTurnStart] !== undefined && typeof effect.hooks[StatusEffectHook.OnTurnStart] === 'function') {
+              effect.hooks[StatusEffectHook.OnTurnStart]?.(this);
+            }
+            effect.duration--;
+            if (effect.duration <= 0) {
+              this.removeStatusEffect(effect.name);
+            }
+          }
+          this.applyStatModifiers();
+      }
+    
+      applyStatModifiers(): void {
+        this.stats = { ...this.baseStats };
+    
+        for (const effect of this.statusEffects) {
+          if (effect.modifyStats) {
+            this.stats = effect.modifyStats(this.stats);
+          }
+        }
+      }
   }
