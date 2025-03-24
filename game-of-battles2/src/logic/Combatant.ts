@@ -4,6 +4,7 @@ import { DamageType } from "./Damage";
 import { Position } from "./Position";
 import { SpecialMove } from "./SpecialMove";
 import { StatusEffect, StatusEffectHook, StatusEffectType } from "./StatusEffect";
+import { Team } from "./Team";
 
 export interface CombatantStats {
     hp: number;
@@ -24,11 +25,13 @@ export interface CombatantStats {
       public position: Position,
       public weaknesses: DamageType[],
       public resistances: DamageType[],
-      public specialMoves: SpecialMove[]
-    ) {this.stats = { ...this.baseStats };}
+      public specialMoves: SpecialMove[],
+      public team: Team
+    ) {this.stats = { ...this.baseStats }; this.team = team;}
 
     public stats: CombatantStats; // Current stats, can be modified by effects
     public statusEffects: StatusEffect[] = [];
+    // private defending: boolean = false;
   
     abstract basicAttack(target: Combatant): Damage;
   
@@ -43,7 +46,7 @@ export interface CombatantStats {
   
       this.stats.stamina -= move.cost;
   
-      let damage = move.damage;
+      const damage = move.damage;
   
       // Apply special effect if any.
       if (move.effect) {
@@ -60,7 +63,7 @@ export interface CombatantStats {
       return false;
     }
   
-    defend() {
+    defend(): number {
         const defenseStatus: StatusEffect = {
           name: StatusEffectType.DEFENDING,
           duration: 1,
@@ -69,8 +72,15 @@ export interface CombatantStats {
           },
         };
         this.applyStatusEffect(defenseStatus);
+        // this.defending = true;
+        return 1;
       }
-  
+
+    isDefending(): boolean {
+        return this.statusEffects.some((effect) => effect.name === StatusEffectType.DEFENDING);
+        // return this.defending;
+    }
+
     isKnockedOut(): boolean {
       return this.stats.hp <= 0;
     }

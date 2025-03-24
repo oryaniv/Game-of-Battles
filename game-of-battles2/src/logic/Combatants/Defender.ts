@@ -5,9 +5,10 @@ import { Combatant } from "../Combatant";
 import { Damage, DamageType } from "../Damage";
 import { Position } from "../Position";
 import { StatusEffectHook, StatusEffectType } from "../StatusEffect";
+import { Team } from "../Team";
 
 export class Defender extends Combatant {
-    constructor(name: string, position: Position) {
+    constructor(name: string, position: Position, team: Team) {
       super(
         name,
         {
@@ -88,7 +89,7 @@ export class Defender extends Combatant {
               });
             },
           },
-        ]
+        ], team
       );
       this.lastStandTriggered = false;
     }
@@ -120,7 +121,7 @@ export class Defender extends Combatant {
         return super.move(newPosition, board);
     }
   
-    defend(): void {
+    defend(): number {
       return super.defend();
-    }
+    }   
   }

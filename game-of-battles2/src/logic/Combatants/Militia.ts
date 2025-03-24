@@ -1,9 +1,9 @@
 import { Combatant } from "../Combatant";
 import { Damage, DamageType } from "../Damage";
 import { Position } from "../Position";
-
+import { Team } from "../Team";
 export class Militia extends Combatant {
-    constructor(name: string, position: Position) {
+    constructor(name: string, position: Position, team: Team) {
       super(
         name,
         {
@@ -20,8 +20,8 @@ export class Militia extends Combatant {
         position,
         [], // No weaknesses
         [], // No resistances
-        []  // No special moves
-      );
+        [],  // No special moves
+      team);
     }
   
     basicAttack(target: Combatant): Damage {

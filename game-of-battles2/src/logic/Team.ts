@@ -1,7 +1,20 @@
 import { Combatant } from "./Combatant";
 
 export class Team {
-    constructor(public name: string, public combatants: Combatant[]) {}
+    public combatants: Combatant[] = [];
+    constructor(public name: string, public index: number) {}
+
+    addCombatant(combatant: Combatant) {
+        this.combatants.push(combatant);
+    }
+
+    getName(): string {
+        return this.name;
+    }
+
+    getIndex(): number {
+        return this.index;
+    }
   
     getAverageInitiative(): number {
       if (this.combatants.length === 0) return 0;

@@ -6,7 +6,10 @@ export class Game {
     private currentTeamIndex: number = 0;
     private currentCombatantIndex: number = 0;
     private actionsRemaining: number = 0;
-  
+    public getCurrentTeamIndex(): number {
+        return this.currentTeamIndex;
+    }
+
     constructor(
       public teams: Team[],
       public board: Board
@@ -19,9 +22,7 @@ export class Game {
     private setupCombatants(): void {
       this.teams.forEach((team, teamIndex) => {
         team.combatants.forEach((combatant, combatantIndex) => {
-          let x = teamIndex === 0 ? combatantIndex : this.board.width - 1 - combatantIndex;
-          let y = teamIndex === 0 ? 0 : this.board.height - 1;
-          this.board.placeCombatant(combatant, { x, y });
+          this.board.placeCombatant(combatant, combatant.position);
         });
       });
     }
@@ -38,19 +39,27 @@ export class Game {
       const aliveCombatants = this.teams[this.currentTeamIndex].getAliveCombatants();
       return aliveCombatants[this.currentCombatantIndex];
     }
+
+    getActionsRemaining(): number {
+      return this.actionsRemaining;
+    }
   
-    nextTurn(): void {
-        this.currentCombatantIndex++;
-        const aliveCombatants = this.teams[this.currentTeamIndex].getAliveCombatants();
-  
-        if (this.currentCombatantIndex >= aliveCombatants.length) {
-            this.currentCombatantIndex = 0;
-            this.actionsRemaining--;
-            if (this.actionsRemaining <= 0) {
-                this.currentTeamIndex = 1 - this.currentTeamIndex;
-                this.actionsRemaining = this.teams[this.currentTeamIndex].combatants.length;
-            }
+    nextTurn(turnCost: number = 0.5): void {
+
+        this.actionsRemaining -= turnCost;
+        if (this.actionsRemaining <= 0) {
+          this.currentTeamIndex = 1 - this.currentTeamIndex;
+          this.actionsRemaining = this.teams[this.currentTeamIndex].combatants.length;
         }
+
+        // pick next combatant
+        const aliveCombatants = this.teams[this.currentTeamIndex].getAliveCombatants();
+        if(this.currentCombatantIndex < aliveCombatants.length - 1) {
+          this.currentCombatantIndex++;
+        } else {
+          this.currentCombatantIndex = 0;
+        }
+        
     }
   
     isGameOver(): boolean {

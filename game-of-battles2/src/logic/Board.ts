@@ -23,6 +23,8 @@ export class Board {
   }
 
   getCombatantAtPosition(position: Position): Combatant | null {
+    // eslint-disable-next-line
+    // debugger;
     if (this.isValidPosition(position)) {
       return this.grid[position.y][position.x];
     }
