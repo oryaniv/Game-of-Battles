@@ -32,7 +32,13 @@ export interface CombatantStats {
     public stats: CombatantStats; // Current stats, can be modified by effects
     public statusEffects: StatusEffect[] = [];
     // private defending: boolean = false;
-  
+
+    startTurn(): void {
+        if(this.isDefending()) {
+            this.removeStatusEffect(StatusEffectType.DEFENDING);
+        }
+    }
+
     abstract basicAttack(target: Combatant): Damage;
   
     useSpecialMove(target: Combatant, moveName: string): Damage | null {
@@ -66,19 +72,17 @@ export interface CombatantStats {
     defend(): number {
         const defenseStatus: StatusEffect = {
           name: StatusEffectType.DEFENDING,
-          duration: 1,
+          duration: 0,
           hooks: {
             [StatusEffectHook.OnDamageTaken]: (combatant, damage: number) => damage / 2,
           },
         };
         this.applyStatusEffect(defenseStatus);
-        // this.defending = true;
         return 1;
       }
 
     isDefending(): boolean {
         return this.statusEffects.some((effect) => effect.name === StatusEffectType.DEFENDING);
-        // return this.defending;
     }
 
     isKnockedOut(): boolean {
@@ -123,7 +127,6 @@ export interface CombatantStats {
         if (onApplyHook && typeof onApplyHook === 'function') {
             onApplyHook(this);
         }
-        this.applyStatModifiers();
       }
     
       removeStatusEffect(effectName: StatusEffectType): void {
@@ -134,11 +137,9 @@ export interface CombatantStats {
         }
 
         this.statusEffects = this.statusEffects.filter((effect) => effect.name !== effectName);
-
-        this.applyStatModifiers();
       }
     
-      updateStatusEffects(): void {
+      updateStatusEffects(roundCount: number): void {
         for (let i = this.statusEffects.length - 1; i >= 0; i--) {
             const effect = this.statusEffects[i];
             if (effect.hooks[StatusEffectHook.OnTurnStart] !== undefined && typeof effect.hooks[StatusEffectHook.OnTurnStart] === 'function') {
@@ -149,10 +150,9 @@ export interface CombatantStats {
               this.removeStatusEffect(effect.name);
             }
           }
-          this.applyStatModifiers();
       }
     
-      applyStatModifiers(): void {
+      applyStatModifiers(roundCount: number): void {
         this.stats = { ...this.baseStats };
     
         for (const effect of this.statusEffects) {

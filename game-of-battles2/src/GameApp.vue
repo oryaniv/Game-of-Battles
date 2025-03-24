@@ -2,6 +2,7 @@
 <template>
   <div class="game-container">
     <div class="message">{{ turnMessage }}</div>
+    <div class="round-count">Round: {{ roundCount }}</div>
     <div class="board">
       <div
         v-for="y in 10"
@@ -85,7 +86,8 @@ export default defineComponent({
     const lastMove = ref<Position | null>(null);
 
     const currentCombatant = computed(() => game.value.getCurrentCombatant());
-    const currentTeam = computed(()=> game.value.teams[(game.value as Game).getCurrentTeamIndex()]);
+    const currentTeam = computed(()=> game.value.teams[(game.value as Game).getCurrentTeamIndex()]); 
+    const roundCount = computed(() => (game.value as Game).getRoundCount());
 
     onMounted(() => {
       updateTurnMessage();
@@ -200,7 +202,8 @@ export default defineComponent({
       skip,
       currentCombatant,
       canUndo,
-      isDefending
+      isDefending,
+      roundCount
     };
   },
 });

@@ -6,6 +6,12 @@ export class Game {
     private currentTeamIndex: number = 0;
     private currentCombatantIndex: number = 0;
     private actionsRemaining: number = 0;
+    private roundCount: number = 1;
+
+    public getRoundCount(): number {
+      return this.roundCount;
+    }
+
     public getCurrentTeamIndex(): number {
         return this.currentTeamIndex;
     }
@@ -45,11 +51,15 @@ export class Game {
     }
   
     nextTurn(turnCost: number = 0.5): void {
-
         this.actionsRemaining -= turnCost;
+        // next team
         if (this.actionsRemaining <= 0) {
           this.currentTeamIndex = 1 - this.currentTeamIndex;
           this.actionsRemaining = this.teams[this.currentTeamIndex].combatants.length;
+          // next round
+          if (this.currentTeamIndex === 0) {
+            this.nextRound();
+          }
         }
 
         // pick next combatant
@@ -59,7 +69,19 @@ export class Game {
         } else {
           this.currentCombatantIndex = 0;
         }
-        
+        this.getCurrentCombatant().startTurn();
+    }
+
+    nextRound(): void {
+      this.roundCount++;
+    }
+
+    updateStatusEffects(): void {
+      this.teams.forEach((team) => {
+        team.combatants.forEach((combatant) => {
+          combatant.updateStatusEffects(this.roundCount);
+        });
+      });
     }
   
     isGameOver(): boolean {
