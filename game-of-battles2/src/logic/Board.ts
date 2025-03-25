@@ -31,6 +31,47 @@ export class Board {
     return null;
   }
 
+  getValidMoves(combatant: Combatant): Position[] {
+    const validMoves: Position[] = [];
+    const { x, y } = combatant.position;
+    const speed = combatant.stats.movementSpeed;
+
+    const visited: { [key: string]: boolean } = {}; // Track visited positions
+    const queue: { position: Position; distance: number }[] = [{ position: { x, y }, distance: 0 }];
+
+    while (queue.length > 0) {
+      const { position, distance } = queue.shift()!;
+      const { x: currentX, y: currentY } = position;
+      const key = `${currentX},${currentY}`;
+
+      if (visited[key]) {
+        continue;
+      }
+      visited[key] = true;
+
+      if (distance > 0) {
+        validMoves.push(position);
+      }
+
+      if (distance < speed) {
+        const neighbors = [
+          { x: currentX, y: currentY - 1 }, // Up
+          { x: currentX, y: currentY + 1 }, // Down
+          { x: currentX - 1, y: currentY }, // Left
+          { x: currentX + 1, y: currentY }, // Right
+        ];
+
+        neighbors.forEach((neighbor) => {
+          if (this.isValidPosition(neighbor) && !this.getCombatantAtPosition(neighbor)) {
+            queue.push({ position: neighbor, distance: distance + 1 });
+          }
+        });
+      }
+    }
+
+    return validMoves;
+  }
+
   isValidPosition(position: Position): boolean {
     return (
       position.x >= 0 &&
@@ -40,24 +81,27 @@ export class Board {
     );
   }
 
-  isValidMove(from: Position, to: Position, speed: number): boolean {
+  isValidMove(from: Position, to: Position, maxDistance: number): boolean {
     const dx = Math.abs(to.x - from.x);
-    const dy = Math.abs(to.y - from.y);
-    const distance = dx + dy;
+      const dy = Math.abs(to.y - from.y);
+      const distance = dx + dy;
 
-    if (!this.isValidPosition(to)) {
-      return false;
-    }
+      if(distance > maxDistance){
+          return false;
+      }
 
-    if (distance > speed) {
-      return false;
-    }
+      if(dx > 0 && dy > 0){
+          return false;
+      }
 
-    if(this.getCombatantAtPosition(to) !== null){
-      return false;
-    }
+      if(!this.isValidPosition(to)){
+          return false;
+      }
 
-    return true;
+      if(this.getCombatantAtPosition(to)){
+          return false;
+      }
+      return true;
   }
 
   removeCombatant(combatant: Combatant): void {

@@ -13,9 +13,10 @@
           v-for="x in 10"
           :key="x"
           class="panel"
-          @click="panelClick({ x, y })"
+          :class="{ validMove: isMoveValid({ x, y }) }"
+          @click="moveCombatant({ x: x - 1, y:  y - 1})"
         >
-          <!--<div>{{x}},{{y}}</div> -->
+          <div>{{x -1}},{{y - 1}}</div>
           <div
             v-if="getCombatant({ x , y})"
             class="combatant"
@@ -40,9 +41,9 @@
         Actions Remaining: {{ actionsRemaining }}
         <button @click="attack">Attack</button>
         <button @click="defend">Defend</button>
-        <button @click="move">Move</button>
+        <button v-if="!hasMoved" @click="showMoveOptions">Move</button>
+        <button v-if="hasMoved" @click="undoMove">Undo</button>
         <button @click="specialSkill">Special Skill</button>
-        <button @click="undo" :disabled="!canUndo">Undo</button>
         <button @click="skip">Skip</button>
       </div>
     </div>
@@ -89,6 +90,10 @@ export default defineComponent({
     const currentTeam = computed(()=> game.value.teams[(game.value as Game).getCurrentTeamIndex()]); 
     const roundCount = computed(() => (game.value as Game).getRoundCount());
 
+    const validMoves = ref<Position[]>([]);
+    const hasMoved = ref(false);
+    const previousPosition = ref<Position | null>(null);
+
     onMounted(() => {
       updateTurnMessage();
 
@@ -113,28 +118,6 @@ export default defineComponent({
       return false;
     };
 
-    const panelClick = (position: Position) => {
-      if (selectedPosition.value && currentCombatant.value) {
-        if (currentCombatant.value.move(position, board.value as Board)) {
-          lastMove.value = currentCombatant.value.position;
-          canUndo.value = true;
-          selectedPosition.value = null;
-          actionsRemaining.value--;
-          if (actionsRemaining.value <= 0) {
-            game.value.nextTurn();
-            actionsRemaining.value = currentTeam.value.combatants.length;
-            updateTurnMessage();
-            canUndo.value = false;
-            lastMove.value = null;
-          }
-        }
-      } else {
-        const combatant = getCombatant(position);
-        if (combatant && combatant.team.getIndex() === (game.value as Game).getCurrentTeamIndex()) {
-          selectedPosition.value = position;
-        }
-      }
-    };
 
     const attack = () => {
       // Implement attack logic here
@@ -152,8 +135,35 @@ export default defineComponent({
       updateTurnOrder();
     };
 
-    const move = () => {
-      // Logic is handled in panelClick
+    const moveCombatant = (position: Position) => {
+      debugger;
+      if (isMoveValid(position) && currentCombatant.value) {
+        previousPosition.value = { ...currentCombatant.value.position };
+        currentCombatant.value.move(position, board.value as Board);
+        validMoves.value = [];
+        hasMoved.value = true;
+        actionsRemaining.value--;
+
+        if (actionsRemaining.value <= 0) {
+          game.value.nextTurn();
+          actionsRemaining.value = currentTeam.value.combatants.length;
+          updateTurnMessage();
+          hasMoved.value = false;
+        }
+      }
+    };
+
+    const showMoveOptions = () => {
+      if (currentCombatant.value) {
+        validMoves.value = board.value.getValidMoves(currentCombatant.value);
+      }
+    };
+
+    const isMoveValid = (position: Position): boolean => {
+      // debugger;
+      return validMoves.value.some(
+        (move) => move.x === (position.x - 1) && move.y === (position.y - 1)
+      );
     };
 
     const specialSkill = () => {
@@ -163,11 +173,11 @@ export default defineComponent({
       updateTurnOrder();
     };
 
-    const undo = () => {
-      if (lastMove.value && currentCombatant.value) {
-        currentCombatant.value.move(lastMove.value, board.value as Board);
-        lastMove.value = null;
-        canUndo.value = false;
+    const undoMove = () => {
+      if (previousPosition.value && currentCombatant.value) {
+        currentCombatant.value.move(previousPosition.value, board.value as Board);
+        previousPosition.value = null;
+        hasMoved.value = false;
       }
     };
 
@@ -191,19 +201,21 @@ export default defineComponent({
       teamColors,
       getCombatant,
       isCurrentCombatant,
-      panelClick,
       actionsRemaining,
       turnMessage,
       attack,
       defend,
-      move,
       specialSkill,
-      undo,
       skip,
       currentCombatant,
       canUndo,
       isDefending,
-      roundCount
+      roundCount,
+      showMoveOptions,
+      isMoveValid,
+      moveCombatant,
+      undoMove,
+      hasMoved,
     };
   },
 });
@@ -235,6 +247,10 @@ export default defineComponent({
   justify-content: center;
   align-items: center;
   border: 1px solid black;
+}
+
+.validMove {
+  background-color: #e8ef8d;
 }
 
 .combatant {
