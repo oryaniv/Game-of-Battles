@@ -2,7 +2,7 @@ import { StatusEffect } from "../StatusEffect";
 
 import { Board } from "../Board";
 import { Combatant } from "../Combatant";
-import { Damage, DamageType } from "../Damage";
+import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Position } from "../Position";
 import { StatusEffectHook, StatusEffectType } from "../StatusEffect";
 import { Team } from "../Team";
@@ -23,8 +23,16 @@ export class Defender extends Combatant {
           luck: 5,
         },
         position,
-        [DamageType.Fire, DamageType.Lightning],
-        [DamageType.Slash, DamageType.Pierce],
+        [
+          {type: DamageType.Slash, reaction: DamageReaction.RESISTANCE},
+          {type: DamageType.Pierce, reaction: DamageReaction.RESISTANCE},
+          {type: DamageType.Crush, reaction: DamageReaction.RESISTANCE},
+          {type: DamageType.Fire, reaction: DamageReaction.RESISTANCE},
+          {type: DamageType.Lightning, reaction: DamageReaction.RESISTANCE},
+          {type: DamageType.Blight, reaction: DamageReaction.RESISTANCE},
+          {type: DamageType.Holy, reaction: DamageReaction.RESISTANCE},
+          {type: DamageType.Dark, reaction: DamageReaction.RESISTANCE},
+        ],
         [
           {
             name: "Defensive Strike",
@@ -64,52 +72,40 @@ export class Defender extends Combatant {
               });
             },
           },
-          {
-            name: "Sentinel",
-            cost: 3,
-            range: 0,
-            damage: { amount: 0, type: DamageType.Unstoppable },
-            effect: (combatant: Combatant) => {
-              combatant.applyStatusEffect({
-                name: StatusEffectType.SENTINEL,
-                duration: Infinity,
-                hooks: {
-                  [StatusEffectHook.OnActionAttempt]: (combatant, actionType:string) => {
-                      if (actionType === "move" || actionType === "attack"){
-                          combatant.removeStatusEffect(StatusEffectType.SENTINEL);
-                      }
-                      return false;
-                  },
-                  [StatusEffectHook.OnAdjacentEnemyEnter]: (combatant:Combatant, enemy:Combatant, board:Board) => {
-                      if(board.getAdjacentCombatants(combatant, 1).includes(enemy)){
-                          combatant.basicAttack(enemy);
-                      }
-                  }
-                },
-              });
-            },
-          },
+          // {
+          //   name: "Sentinel",
+          //   cost: 3,
+          //   range: 0,
+          //   damage: { amount: 0, type: DamageType.Unstoppable },
+          //   effect: (combatant: Combatant) => {
+          //     combatant.applyStatusEffect({
+          //       name: StatusEffectType.SENTINEL,
+          //       duration: Infinity,
+          //       hooks: {
+          //         [StatusEffectHook.OnActionAttempt]: (combatant, actionType:string) => {
+          //             if (actionType === "move" || actionType === "attack"){
+          //                 combatant.removeStatusEffect(StatusEffectType.SENTINEL);
+          //             }
+          //             return false;
+          //         },
+          //         [StatusEffectHook.OnAdjacentEnemyEnter]: (combatant:Combatant, enemy:Combatant, board:Board) => {
+          //             if(board.getAdjacentCombatants(combatant, 1).includes(enemy)){
+          //                 combatant.basicAttack(enemy);
+          //             }
+          //         }
+          //       },
+          //     });
+          //   },
+          // },
         ], team
       );
-      this.lastStandTriggered = false;
     }
-    private lastStandTriggered: boolean;
+
+    basicAttack(): Damage {
+      return { amount: 20, type: DamageType.Slash };
+  }
   
-    basicAttack(target: Combatant): Damage {
-      return { amount: this.stats.attackPower, type: DamageType.Slash };
-    }
-  
-    takeDamage(damage: Damage): void {
-      super.takeDamage(damage);
-  
-      if (this.stats.hp <= 0 && !this.lastStandTriggered) {
-          this.stats.hp = 1;
-          this.lastStandTriggered = true;
-          console.log(`${this.name} triggered Last Stand!`);
-      }
-    }
-  
-    move(newPosition: Position, board: Board): boolean {
+    move(newPosition: Position, board: Board) {
         const marchingDefense = this.statusEffects.find(effect => effect.name === StatusEffectType.DEFENDING);
         if(marchingDefense){
             if(board.isValidMove(this.position, newPosition, this.stats.movementSpeed)){
@@ -118,7 +114,7 @@ export class Defender extends Combatant {
                 return true;
             }
         }
-        return super.move(newPosition, board);
+        super.move(newPosition, board);
     }
   
     defend(): number {

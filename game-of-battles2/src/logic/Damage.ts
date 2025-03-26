@@ -10,8 +10,22 @@ export enum DamageType {
     Dark = "Dark",
     Unstoppable = "Unstoppable",
   }
+
+  export enum DamageReaction {
+    NONE= "None",
+    WEAKNESS= "Weakness",
+    RESISTANCE= "Resistance",
+    IMMUNITY= "Immunity",
+  }
+
+  export interface Resistance {
+    type: DamageType;
+    reaction: DamageReaction;
+  }
   
   export interface Damage {
     amount: number;
     type: DamageType;
   }
+
+  

@@ -22,6 +22,13 @@ export class Board {
     }
   }
 
+  removeCombatant(combatant: Combatant): void {
+    const position = combatant.position;
+    if (this.isValidPosition(position)) {
+      this.grid[position.y][position.x] = null;
+    }
+  }
+
   getCombatantAtPosition(position: Position): Combatant | null {
     // eslint-disable-next-line
     // debugger;
@@ -29,6 +36,40 @@ export class Board {
       return this.grid[position.y][position.x];
     }
     return null;
+  }
+
+  // note how this is only straight line attacks, for now
+  getValidAttacks(combatant: Combatant): Position[] {
+    const validAttacks: Position[] = [];
+    const { x, y } = combatant.position;
+    const range = combatant.stats.range;
+
+    for (let i = 1; i <= range; i++) {
+      const up = { x, y: y - i };
+      const down = { x, y: y + i };
+      const left = { x: x - i, y };
+      const right = { x: x + i, y };
+
+      if (this.isValidPosition(up) && this.hasEnemy(combatant, up)) {
+        validAttacks.push(up);
+      }
+      if (this.isValidPosition(down) && this.hasEnemy(combatant, down)) {
+        validAttacks.push(down);
+      }
+      if (this.isValidPosition(left) && this.hasEnemy(combatant, left)) {
+        validAttacks.push(left);
+      }
+      if (this.isValidPosition(right) && this.hasEnemy(combatant, right)) {
+        validAttacks.push(right);
+      }
+    }
+
+    return validAttacks;
+  }
+
+  private hasEnemy(combatant: Combatant, position: Position): boolean {
+    const target = this.getCombatantAtPosition(position);
+    return !!target && target.team.getName() !== combatant.team.getName();
   }
 
   getValidMoves(combatant: Combatant): Position[] {
@@ -104,12 +145,6 @@ export class Board {
       return true;
   }
 
-  removeCombatant(combatant: Combatant): void {
-    const position = combatant.position;
-    if (this.isValidPosition(position)) {
-      this.grid[position.y][position.x] = null;
-    }
-  }
 
   getAdjacentCombatants(combatant:Combatant, range:number): Combatant[] {
     const adjacent: Combatant[] = [];

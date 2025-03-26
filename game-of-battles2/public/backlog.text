@@ -1,9 +1,27 @@
 
-implement basic movement
+implement basic movement V
 
 implement basic attack - weak, critical, miss, fumble, damage.
 
-basic test - 10 militia, to the death.
+normal combatants cannot both defend and move
 
-implement defender + all skills
+death and end game
+
+correct turn rotation in team
+
+basic livetest - 10 militia, to the death.
+
+implement basic Integration tests
+
+implement defender + all special moves + more tests
+
+implement hunter + all special moves + more tests
+
+implement healer + all special moves + more tests
+
+implement mage + all special moves + more tests
+
+-- basic sprites demo?
+
+
 

@@ -1,5 +1,8 @@
+import { ActionResult } from "./attackResult";
 import { Board } from "./Board";
 import { Combatant } from "./Combatant";
+import { CombatMaster } from "./CombatMaster";
+import { Position } from "./Position";
 import { Team } from "./Team";
 
 export class Game {
@@ -7,6 +10,7 @@ export class Game {
     private currentCombatantIndex: number = 0;
     private actionsRemaining: number = 0;
     private roundCount: number = 1;
+    private combatMaster: CombatMaster;
 
     public getRoundCount(): number {
       return this.roundCount;
@@ -23,6 +27,7 @@ export class Game {
       this.setupCombatants();
       this.determineStartingTeam();
       this.actionsRemaining = this.teams[this.currentTeamIndex].combatants.length;
+      this.combatMaster = new CombatMaster();
     }
   
     private setupCombatants(): void {
@@ -48,6 +53,10 @@ export class Game {
 
     getActionsRemaining(): number {
       return this.actionsRemaining;
+    }
+
+    executeAttack(attacker: Combatant, position: Position, board: Board): ActionResult {
+      return this.combatMaster.executeAttack(attacker, position, board);
     }
   
     nextTurn(turnCost: number = 0.5): void {
