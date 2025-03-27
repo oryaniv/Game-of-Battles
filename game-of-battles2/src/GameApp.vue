@@ -87,17 +87,18 @@ export default defineComponent({
     const whiteTeam = ref(new Team('White Team', 0));
     const blackTeam = ref(new Team('Black Team', 1));
     /// add to white team
-    whiteTeam.value.addCombatant(new Militia('M', { x: 5, y: 4 }, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Militia('M', { x: 2, y: 0 }, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Militia('M', { x: 4, y: 0 }, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Militia('M', { x: 6, y: 0 }, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Militia('M', { x: 8, y: 0 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Militia('M', { x: 0, y: 4 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Militia('M', { x: 2, y: 4 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Militia('M', { x: 4, y: 4 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Militia('M', { x: 6, y: 4 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Militia('M', { x: 8, y: 4 }, whiteTeam.value));
     /// add to black team
+    blackTeam.value.addCombatant(new Militia('M', { x: 1, y: 5 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Militia('M', { x: 3, y: 5 }, blackTeam.value));
     blackTeam.value.addCombatant(new Militia('M', { x: 5, y: 5 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Militia('M', { x: 6, y: 4 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Militia('M', { x: 4, y: 4 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Militia('M', { x: 4, y: 5 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Militia('M', { x: 9, y: 9 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Militia('M', { x: 7, y: 5 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Militia('M', { x: 9, y: 5 }, blackTeam.value));
+
     const teams = ref([whiteTeam.value, blackTeam.value]);
     const game = ref(new Game(teams.value, board.value as Board));
     const teamColors = ref(['white', 'black']);
@@ -133,7 +134,11 @@ export default defineComponent({
     });
 
     const updateTurnMessage = () => {
-      turnMessage.value = `${game.value.teams[(game.value as Game).getCurrentTeamIndex()].name}'s Turn`;
+      if(game.value.isGameOver()) {
+        turnMessage.value = `Game Over`;
+      } else {
+        turnMessage.value = `${game.value.teams[(game.value as Game).getCurrentTeamIndex()].name}'s Turn`;
+      }
     };
 
     const getCombatant = (position: Position): Combatant | null => {
@@ -287,7 +292,11 @@ export default defineComponent({
 
     
     const skip = () => {
-      game.value.nextTurn();
+      if(currentTeam.value.getAliveCombatants().length === 1) {
+        game.value.nextTurn(1);
+      } else {
+        game.value.nextTurn(0.5);
+      }
       prepareNextTurn();
     };
 

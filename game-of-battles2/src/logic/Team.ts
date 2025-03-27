@@ -32,4 +32,12 @@ export class Team {
     getAliveCombatants(): Combatant[] {
       return this.combatants.filter(combatant => !combatant.isKnockedOut())
     }
+
+    rotateCombatants(): void {
+        if (this.combatants.length <= 1) return;
+        const firstCombatant = this.combatants.shift();
+        if (firstCombatant) {
+            this.combatants.push(firstCombatant);
+        }
+    }
   }

@@ -13,6 +13,18 @@ export class CombatMaster {
             throw new Error("No target found");
         }
 
+        if(target.isDefending()) {
+            const baseDamage = this.calcaulateBaseDamage(attacker, target);
+            const finalDamage = {amount: baseDamage.amount / 2, type: baseDamage.type};
+            this.handleInjuryAilmentAndDeath(target, finalDamage.amount, board);
+            return {
+                attackResult: AttackResult.Hit,
+                damage: {amount: baseDamage.amount / 2, type: baseDamage.type},
+                cost: 1,
+                reaction: DamageReaction.NONE
+            };
+        }
+
         const attackResult = this.calculateAttackRoll(attacker, target);
         if(attackResult === AttackResult.Hit || attackResult === AttackResult.CriticalHit){
             const baseDamage = this.calcaulateBaseDamage(attacker, target);
@@ -46,6 +58,7 @@ export class CombatMaster {
         const reaction = resistances.find((r) => r.type === damageType)?.reaction || DamageReaction.NONE;
         let finalDamage = damage.amount;
         let cost = 1;
+
         if(reaction === DamageReaction.RESISTANCE) {
             finalDamage = damage.amount * 0.5;
         } else if(reaction === DamageReaction.IMMUNITY) {
@@ -83,7 +96,6 @@ export class CombatMaster {
         target.stats.hp -= finalDamage;
         if(target.stats.hp <= 0) {
           target.stats.hp = 0;
-          // board.removeCombatant(target);
         }
       }
     

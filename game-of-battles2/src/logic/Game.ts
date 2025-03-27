@@ -60,11 +60,14 @@ export class Game {
     }
   
     nextTurn(turnCost: number = 0.5): void {
-        this.actionsRemaining -= turnCost;
-        // next team
-        if (this.actionsRemaining <= 0) {
+      if(this.isGameOver()) {
+        return;
+      }
+      this.actionsRemaining -= turnCost;
+      // next team
+      if (this.actionsRemaining <= 0) {
           this.currentTeamIndex = 1 - this.currentTeamIndex;
-          this.actionsRemaining = this.teams[this.currentTeamIndex].combatants.length;
+          this.actionsRemaining = this.teams[this.currentTeamIndex].getAliveCombatants().length;
           // next round
           if (this.currentTeamIndex === 0) {
             this.nextRound();
@@ -72,12 +75,13 @@ export class Game {
         }
 
         // pick next combatant
-        const aliveCombatants = this.teams[this.currentTeamIndex].getAliveCombatants();
-        if(this.currentCombatantIndex < aliveCombatants.length - 1) {
-          this.currentCombatantIndex++;
-        } else {
-          this.currentCombatantIndex = 0;
-        }
+        // const aliveCombatants = this.teams[this.currentTeamIndex].getAliveCombatants();
+        // if(this.currentCombatantIndex < aliveCombatants.length - 1) {
+        //   this.currentCombatantIndex++;
+        // } else {
+        //   this.currentCombatantIndex = 0;
+        // }
+        this.teams[this.currentTeamIndex].rotateCombatants();
         this.getCurrentCombatant().startTurn();
     }
 
