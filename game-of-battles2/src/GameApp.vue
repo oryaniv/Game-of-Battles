@@ -93,9 +93,9 @@ export default defineComponent({
     whiteTeam.value.addCombatant(new Militia('M', { x: 6, y: 4 }, whiteTeam.value));
     whiteTeam.value.addCombatant(new Militia('M', { x: 8, y: 4 }, whiteTeam.value));
     /// add to black team
-    blackTeam.value.addCombatant(new Militia('M', { x: 1, y: 5 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Militia('M', { x: 3, y: 5 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Militia('M', { x: 5, y: 5 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Militia('M', { x: 0, y: 5 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Militia('M', { x: 2, y: 5 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Militia('M', { x: 4, y: 5 }, blackTeam.value));
     blackTeam.value.addCombatant(new Militia('M', { x: 7, y: 5 }, blackTeam.value));
     blackTeam.value.addCombatant(new Militia('M', { x: 9, y: 5 }, blackTeam.value));
 
@@ -235,10 +235,10 @@ export default defineComponent({
     const attackTarget = (position: Position) => {
       if (isAttackValid(position) && currentCombatant.value) {
         const result: ActionResult = game.value.executeAttack(currentCombatant.value, position, board.value as Board); 
-        applyAttackEffects(result, position);
         game.value.nextTurn(result.cost);
         validAttacks.value = [];
         attackMode.value = false;
+        applyAttackEffects(result, position);
         prepareNextTurn();
       }
     };

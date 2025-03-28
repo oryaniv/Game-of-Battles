@@ -91,34 +91,6 @@ export interface CombatantStats {
   
       if (this.stats.hp < 0) this.stats.hp = 0;
     }
-  
-    // calculateAttackResult(position: Position, board: Board): AttackResult {
-    //     const target = board.getCombatantAtPosition(position);
-    //     if(!target) return AttackResult.NotFound;
-
-    //     const attackResult = this.calculateAttackRoll(target);
-    //     if(attackResult === AttackResult.Hit || attackResult === AttackResult.CriticalHit){
-    //         const damage = this.basicAttack();
-    //         return target.takeDamage(damage);
-    //     }   
-    //     return attackResult;
-    // }
-  
-    // calculateAttackRoll(target: Combatant): AttackResult {
-    //   const hitRoll = ((this.stats.agility - target.stats.agility) * 0.01) + Math.floor(Math.random() * 100) + 1;
-
-    //   if(hitRoll < 5) {
-    //     return AttackResult.Fumble;
-    //   }
-    //   else if (hitRoll < 20) {
-    //     return AttackResult.Miss;
-    //   } else if (hitRoll > 90) {
-    //     return AttackResult.CriticalHit;
-    //   } else {
-    //     return AttackResult.Hit;
-    //   }
-    // }
-
     
     applyStatusEffect(effect: StatusEffect): void {
         this.statusEffects.push(effect);

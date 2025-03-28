@@ -51,6 +51,10 @@ export class Game {
       return aliveCombatants[this.currentCombatantIndex];
     }
 
+    getCurrentTeam(): Team {
+      return this.teams[this.currentTeamIndex];
+    }
+
     getActionsRemaining(): number {
       return this.actionsRemaining;
     }
@@ -75,18 +79,22 @@ export class Game {
         }
 
         // pick next combatant
-        // const aliveCombatants = this.teams[this.currentTeamIndex].getAliveCombatants();
-        // if(this.currentCombatantIndex < aliveCombatants.length - 1) {
-        //   this.currentCombatantIndex++;
-        // } else {
-        //   this.currentCombatantIndex = 0;
-        // }
-        this.teams[this.currentTeamIndex].rotateCombatants();
+        const aliveCombatants = this.teams[this.currentTeamIndex].getAliveCombatants();
+        if(this.currentCombatantIndex < aliveCombatants.length - 1) {
+          this.currentCombatantIndex++;
+        } else {
+          this.currentCombatantIndex = 0;
+        }
+        // this.teams[this.currentTeamIndex].rotateCombatants();
         this.getCurrentCombatant().startTurn();
     }
 
     nextRound(): void {
       this.roundCount++;
+    }
+
+    getCurrentRound(): number {
+      return this.roundCount;
     }
 
     updateStatusEffects(): void {

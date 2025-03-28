@@ -11,7 +11,9 @@ correct turn rotation in team
 
 basic livetest - 10 militia, to the death.
 
-implement basic Integration tests
+implement basic Integration/unit tests <----------
+
+fix all known bugs - use the tests to guide you
 
 implement defender + all special moves + more tests
 
@@ -25,5 +27,29 @@ implement mage + all special moves + more tests
 
 -- basic sprites demo?
 
+special moves  foundation
 
+next combatants - 
+
+* leader
+
+* occultist
+
+* fool
+
+* pikeman
+
+the hardest ones:
+
+* shock trooper
+
+* rogue
+
+* fistweaver
+
+* artificer
+
+verify hight coverage of tests for all the new logic
+
+Co op moves
 
