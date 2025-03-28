@@ -164,12 +164,12 @@ export default defineComponent({
     }
 
     const canDefend = () => {
-      return hasMoved;
+      return hasMoved.value;
     }
 
     const defend = () => {
-      const defendCost = currentCombatant.value?.defend();
-      game.value.nextTurn(defendCost);
+      game.value.executeDefend();
+      game.value.nextTurn();
       prepareNextTurn();
     };
 
@@ -235,7 +235,7 @@ export default defineComponent({
     const attackTarget = (position: Position) => {
       if (isAttackValid(position) && currentCombatant.value) {
         const result: ActionResult = game.value.executeAttack(currentCombatant.value, position, board.value as Board); 
-        game.value.nextTurn(result.cost);
+        game.value.nextTurn();
         validAttacks.value = [];
         attackMode.value = false;
         applyAttackEffects(result, position);
@@ -292,11 +292,8 @@ export default defineComponent({
 
     
     const skip = () => {
-      if(currentTeam.value.getAliveCombatants().length === 1) {
-        game.value.nextTurn(1);
-      } else {
-        game.value.nextTurn(0.5);
-      }
+      game.value.executeSkipTurn();
+      game.value.nextTurn();
       prepareNextTurn();
     };
 

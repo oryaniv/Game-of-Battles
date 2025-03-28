@@ -60,14 +60,26 @@ export class Game {
     }
 
     executeAttack(attacker: Combatant, position: Position, board: Board): ActionResult {
-      return this.combatMaster.executeAttack(attacker, position, board);
+      const actionResult = this.combatMaster.executeAttack(attacker, position, board);
+      this.actionsRemaining -= actionResult.cost;
+      return actionResult;
+    }
+    
+    executeDefend(): void {
+      const currentCombatant = this.getCurrentCombatant();
+      this.combatMaster.defend(currentCombatant);
+      this.actionsRemaining -= 1;
+    }
+
+    executeSkipTurn(): void {
+      this.actionsRemaining -= (this.getCurrentTeam().getAliveCombatants().length === 1 ? 1 : 0.5);
     }
   
-    nextTurn(turnCost: number = 0.5): void {
+    nextTurn(): void {
       if(this.isGameOver()) {
         return;
       }
-      this.actionsRemaining -= turnCost;
+
       // next team
       if (this.actionsRemaining <= 0) {
           this.currentTeamIndex = 1 - this.currentTeamIndex;

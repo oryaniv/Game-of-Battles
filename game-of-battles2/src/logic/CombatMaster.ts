@@ -46,13 +46,13 @@ export class CombatMaster {
         };
     }
 
-    calcaulateBaseDamage(attacker: Combatant, target: Combatant): Damage {
+    private calcaulateBaseDamage(attacker: Combatant, target: Combatant): Damage {
         const delta = attacker.stats.attackPower - target.stats.defensePower;
         const damage = attacker.basicAttack();
         return {amount: damage.amount * (delta * 0.01 + 1), type: damage.type};
     }
 
-    finalizeDamage(target: Combatant, damage: Damage, attackResult: AttackResult) : ActionResult {
+    private finalizeDamage(target: Combatant, damage: Damage, attackResult: AttackResult) : ActionResult {
         const resistances = target.resistances;
         const damageType = damage.type;
         const reaction = resistances.find((r) => r.type === damageType)?.reaction || DamageReaction.NONE;
@@ -77,7 +77,7 @@ export class CombatMaster {
         return {attackResult: attackResult, damage: {amount: finalDamage, type: damage.type}, cost: cost, reaction: reaction};
     }
 
-    calculateAttackRoll(attacker: Combatant, target: Combatant): AttackResult {
+    private calculateAttackRoll(attacker: Combatant, target: Combatant): AttackResult {
         const hitRoll = ((attacker.stats.agility - target.stats.agility) * 0.01) + Math.floor(Math.random() * 100) + 1;
   
         if(hitRoll < 5) {
@@ -92,11 +92,15 @@ export class CombatMaster {
         }
       }
 
-      handleInjuryAilmentAndDeath(target: Combatant, finalDamage: number, board: Board) {
+      private handleInjuryAilmentAndDeath(target: Combatant, finalDamage: number, board: Board) {
         target.stats.hp -= finalDamage;
         if(target.stats.hp <= 0) {
           target.stats.hp = 0;
         }
+      }
+
+      public defend(target: Combatant): void {
+        target.defend();
       }
     
 
