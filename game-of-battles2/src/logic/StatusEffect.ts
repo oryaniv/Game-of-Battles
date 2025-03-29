@@ -12,6 +12,7 @@ export enum StatusEffectType {
     OnRemove = "OnRemove",
     OnTurnStart = "OnTurnStart",
     OnTurnEnd = "OnTurnEnd",
+    OnBeingAttacked = "OnBeingAttacked",
     OnDamageTaken = "OnDamageTaken",
     OnActionAttempt = "OnActionAttempt",
     OnCalculateDamage = "OnCalculateDamage",

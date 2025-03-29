@@ -11,11 +11,11 @@ correct turn rotation in team
 
 basic livetest - 10 militia, to the death.
 
-implement basic Integration/unit tests <----------
+implement basic Integration/unit tests 
 
 fix all known bugs - use the tests to guide you
 
-implement defender + all special moves + more tests
+implement defender + all special moves + more tests <----------
 
 implement hunter + all special moves + more tests
 
@@ -23,11 +23,11 @@ implement healer + all special moves + more tests
 
 implement mage + all special moves + more tests
 
+do some nice UI - background, fonts, images on the sides, etc. maybe even sprites
+
 -- CAN SHOW MY WIFE!
 
--- basic sprites demo?
-
-special moves  foundation
+special moves foundation
 
 next combatants - 
 
@@ -53,3 +53,17 @@ verify hight coverage of tests for all the new logic
 
 Co op moves
 
+-------
+
+AI - 3 levels
+
+---------
+
+Modren Graphical interface
+
+********
+
+
+potential testers:
+
+Elad, Nadav, Kauffman, Emanuel, Zach, Lich, Tendler, Yotam, Anat

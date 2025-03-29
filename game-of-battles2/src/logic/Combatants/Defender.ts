@@ -1,123 +1,53 @@
 import { StatusEffect } from "../StatusEffect";
-
 import { Board } from "../Board";
 import { Combatant } from "../Combatant";
 import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Position } from "../Position";
 import { StatusEffectHook, StatusEffectType } from "../StatusEffect";
 import { Team } from "../Team";
-
+import { CombatantType } from "./CombatantType";
+import { MarchingDefense } from "../SpecialMoves/Singular/Passives";
+import { BlockingStance } from "../SpecialMoves/Singular/Self";
 export class Defender extends Combatant {
     constructor(name: string, position: Position, team: Team) {
       super(
         name,
         {
-          hp: 150,
+          hp: 100,
           attackPower: 10,
           defensePower: 30,
           stamina: 30,
-          initiative: 5,
-          movementSpeed: 2,
+          initiative: 4,
+          movementSpeed: 3,
           range: 1,
-          agility: 10,
-          luck: 5,
+          agility: 5,
+          luck: 3,
         },
         position,
         [
           {type: DamageType.Slash, reaction: DamageReaction.RESISTANCE},
           {type: DamageType.Pierce, reaction: DamageReaction.RESISTANCE},
-          {type: DamageType.Crush, reaction: DamageReaction.RESISTANCE},
-          {type: DamageType.Fire, reaction: DamageReaction.RESISTANCE},
-          {type: DamageType.Lightning, reaction: DamageReaction.RESISTANCE},
-          {type: DamageType.Blight, reaction: DamageReaction.RESISTANCE},
-          {type: DamageType.Holy, reaction: DamageReaction.RESISTANCE},
-          {type: DamageType.Dark, reaction: DamageReaction.RESISTANCE},
+          {type: DamageType.Crush, reaction: DamageReaction.NONE},
+          {type: DamageType.Fire, reaction: DamageReaction.WEAKNESS},
+          {type: DamageType.Ice, reaction: DamageReaction.NONE},
+          {type: DamageType.Lightning, reaction: DamageReaction.WEAKNESS},
+          {type: DamageType.Blight, reaction: DamageReaction.NONE},
+          {type: DamageType.Holy, reaction: DamageReaction.NONE},
+          {type: DamageType.Dark, reaction: DamageReaction.NONE},
         ],
         [
-          {
-            name: "Defensive Strike",
-            cost: 5,
-            range: 1,
-            damage: { amount: 15, type: DamageType.Slash },
-            effect: (target: Combatant) => {
-              console.log(`${this.name} used Defensive Strike on ${target.name}!`);
-              this.defend();
-            },
-          },
-          {
-            name: "Blocking Stance",
-            cost: 3,
-            range: 0,
-            damage: { amount: 0, type: DamageType.Unstoppable },
-            effect: (combatant: Combatant) => {
-              combatant.applyStatusEffect({
-                name: StatusEffectType.BLOCKING_STANCE,
-                duration: Infinity,
-                hooks: {
-                  [StatusEffectHook.OnApply]: (combatant: Combatant) => combatant.defend(),
-                  [StatusEffectHook.OnCalculateDamage]: (combatant: Combatant, damage: Damage) => {
-                    if ([DamageType.Slash, DamageType.Pierce, DamageType.Crush].includes(damage.type) && Math.random() < 0.5) {
-                      console.log(`${combatant.name} blocked the attack!`);
-                      // Here you would also increase the AP cost of the attack, but we'll leave that for later.
-                    }
-                    return damage;
-                  },
-                  [StatusEffectHook.OnActionAttempt]: (combatant: Combatant, actionType:string) => {
-                      if (actionType === "move" || actionType === "attack"){
-                          combatant.removeStatusEffect(StatusEffectType.BLOCKING_STANCE);
-                      }
-                      return false;
-                  }
-                },
-              });
-            },
-          },
-          // {
-          //   name: "Sentinel",
-          //   cost: 3,
-          //   range: 0,
-          //   damage: { amount: 0, type: DamageType.Unstoppable },
-          //   effect: (combatant: Combatant) => {
-          //     combatant.applyStatusEffect({
-          //       name: StatusEffectType.SENTINEL,
-          //       duration: Infinity,
-          //       hooks: {
-          //         [StatusEffectHook.OnActionAttempt]: (combatant, actionType:string) => {
-          //             if (actionType === "move" || actionType === "attack"){
-          //                 combatant.removeStatusEffect(StatusEffectType.SENTINEL);
-          //             }
-          //             return false;
-          //         },
-          //         [StatusEffectHook.OnAdjacentEnemyEnter]: (combatant:Combatant, enemy:Combatant, board:Board) => {
-          //             if(board.getAdjacentCombatants(combatant, 1).includes(enemy)){
-          //                 combatant.basicAttack(enemy);
-          //             }
-          //         }
-          //       },
-          //     });
-          //   },
-          // },
-        ], team
+          new MarchingDefense(),
+          new BlockingStance(),
+          // new DefensiveStrke(),
+        ], team 
       );
     }
 
     basicAttack(): Damage {
       return { amount: 20, type: DamageType.Slash };
-  }
-  
-    move(newPosition: Position, board: Board) {
-        const marchingDefense = this.statusEffects.find(effect => effect.name === StatusEffectType.DEFENDING);
-        if(marchingDefense){
-            if(board.isValidMove(this.position, newPosition, this.stats.movementSpeed)){
-                this.position = newPosition;
-                this.removeStatusEffect(StatusEffectType.DEFENDING);
-                return true;
-            }
-        }
-        super.move(newPosition, board);
     }
-  
-    defend(): number {
-      return super.defend();
-    }   
+
+    getCombatantType(): CombatantType {
+      return CombatantType.Defender;
+    }
   }

@@ -2,6 +2,7 @@ import { Combatant } from "../Combatant";
 import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Position } from "../Position";
 import { Team } from "../Team";
+import { CombatantType } from "./CombatantType";
 export class Militia extends Combatant {
     constructor(name: string, position: Position, team: Team) {
       super(
@@ -14,7 +15,7 @@ export class Militia extends Combatant {
           initiative: 4,
           movementSpeed: 3,
           range: 1,
-          agility: 8,
+          agility: 5,
           luck: 3,
         },
         position,
@@ -33,6 +34,9 @@ export class Militia extends Combatant {
       team);
     }
 
+    getCombatantType(): CombatantType {
+        return CombatantType.Militia;
+    }
   
     basicAttack(): Damage {
         return { amount: 20, type: DamageType.Crush };

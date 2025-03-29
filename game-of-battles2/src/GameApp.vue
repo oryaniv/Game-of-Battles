@@ -13,7 +13,13 @@
           v-for="x in 10"
           :key="x"
           class="panel"
-          :class="{ validMove: isMoveValid({ x: x - 1, y: y - 1 }), validAttack: isAttackValid({ x: x - 1, y: y - 1 }) }"
+          :class="{ 
+                    validMove: isMoveValid({ x: x - 1, y: y - 1 }),
+                    validAttack: isAttackValid({ x: x - 1, y: y - 1 }),
+                    validSkillHostile: isSkillTargetValid({ x: x - 1, y: y - 1 }) && isEnemy({ x: x - 1, y: y - 1 }),
+                    validSkillFriendly: isSkillTargetValid({ x: x - 1, y: y - 1 }) && isFriendly({ x: x - 1, y: y - 1 }),
+                    validSkillNeutral: isSkillTargetValid({ x: x - 1, y: y - 1 }) && isNeutral({ x: x - 1, y: y - 1 })
+           }"
           @click="performAction({ x: x - 1, y:  y - 1})"
         >
           <!-- <div>{{x -1}},{{y - 1}}</div> -->
@@ -33,7 +39,7 @@
             <div class="stamina-bar">
               <div class="stamina-fill" :style="calcStaminaFill(getCombatant({ x, y }))"></div>
             </div>
-            {{ getCombatant({ x, y }).name }}
+                {{ getCombatantVisualType(getCombatant({ x, y })) }}
             <img v-if="isDefending(getCombatant({ x, y }))" class="defend-icon" src="./assets/defend.svg" alt="Defend" />
             <transition-group name="damage-text" tag="div">
               <div
@@ -58,21 +64,50 @@
       <div v-if="currentCombatant">
         Actions Remaining: {{ actionsRemaining }}
         <button :disabled="attackMode" @click="showAttackOptions">Attack</button>
-        <button :disabled="hasMoved" @click="defend">Defend</button>
+        <button :disabled="hasMoved && !canDefendAndMove()" @click="defend">Defend</button>
         <button v-if="!hasMoved" @click="showMoveOptions">Move</button>
         <button v-if="hasMoved" @click="undoMove">Undo</button>
-        <button @click="specialSkill">Special Skill</button>
+        <button :disabled="showSkillsMenu || !hasActiveSpecialMoves() || skillMode" @click="showSpecialSkills">Special Skill</button>
         <button @click="skip">Skip</button>
-        <button :disabled="!moveMode && !attackMode" @click="cancel">Cancel</button>
+        <button :disabled="!moveMode && !attackMode && !showSkillsMenu && !skillMode" @click="cancel">Cancel</button>
       </div>
     </div>
+
+
+    <div v-if="showSkillsMenu" class="skill-menu">
+      <div class="skill-menu-header">
+        <div class="skill-menu-header-name">{{ currentCombatant?.name }} The {{ currentCombatant?.getCombatantType() }}</div>
+        <div class="skill-menu-header-sp-remaining">Remaining SP : {{ currentCombatant?.stats.stamina }}</div>
+      </div>
+      <div class="skill-menu-body">
+        <div
+          v-for="skill in getCombatantSpecialMoves(currentCombatant)"
+          :key="skill.name"
+          class="skill-item"
+          :class="{ disabled: currentCombatant.stats.stamina < skill.cost }"
+          @click="showSkillTargets(skill.name)"
+          @mouseover="showSkillDescription(skill.name)"
+          @mouseleave="hideSkillDescription"
+        >
+          <span class="skill-name">{{ skill.name }}</span>
+          <span class="skill-cost">{{ skill.cost }} SP</span>
+        </div>
+      </div>
+      <div v-if="selectedSkillDescription" class="skill-description">
+        {{ selectedSkillDescription }}
+      </div>
+    </div>
+
+    <img class="dragon-left" src="./assets/white_dragon_black_back.png" alt="left dragon" />
+    <img class="dragon-right" src="./assets/white_dragon_black_back.png" alt="right dragon" />
+    
   </div>
 </template>
 
 <script lang="ts">
 /* eslint-disable */
 import { defineComponent, ref, onMounted, computed } from 'vue';
-import { Militia} from './logic/Combatants/Militia'; // Assuming your combatant.ts is in the same directory.
+ // Assuming your combatant.ts is in the same directory.
 import { Combatant } from './logic/Combatant';
 import { Board } from './logic/Board';
 import { Team } from './logic/Team';
@@ -80,6 +115,13 @@ import { Game } from './logic/Game';
 import { Position } from './logic/Position';
 import { ActionResult, AttackResult } from './logic/attackResult';
 import { DamageType, DamageReaction } from './logic/Damage';
+import { CombatantType } from './logic/Combatants/CombatantType';
+import { Militia} from './logic/Combatants/Militia';
+import { Defender } from './logic/Combatants/Defender';
+import { Hunter } from './logic/Combatants/Hunter';
+import { Healer } from './logic/Combatants/Healer';
+import { Wizard } from './logic/Combatants/Wizard'; 
+import { SpecialMoveTriggerType } from './logic/SpecialMove';
 
 export default defineComponent({
   setup() {
@@ -87,17 +129,17 @@ export default defineComponent({
     const whiteTeam = ref(new Team('White Team', 0));
     const blackTeam = ref(new Team('Black Team', 1));
     /// add to white team
-    whiteTeam.value.addCombatant(new Militia('M', { x: 0, y: 4 }, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Militia('M', { x: 2, y: 4 }, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Militia('M', { x: 4, y: 4 }, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Militia('M', { x: 6, y: 4 }, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Militia('M', { x: 8, y: 4 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Defender('Boris', { x: 0, y: 4 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Militia('Igor', { x: 2, y: 4 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Militia('Yanko', { x: 4, y: 4 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Militia('Ivan', { x: 6, y: 4 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Militia('Vitaly', { x: 8, y: 4 }, whiteTeam.value));
     /// add to black team
-    blackTeam.value.addCombatant(new Militia('M', { x: 0, y: 5 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Militia('M', { x: 2, y: 5 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Militia('M', { x: 4, y: 5 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Militia('M', { x: 7, y: 5 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Militia('M', { x: 9, y: 5 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Militia('Michael', { x: 0, y: 5 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Militia('Jake', { x: 2, y: 5 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Militia('Chuck', { x: 4, y: 5 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Militia('Joe', { x: 7, y: 5 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Militia('Dan', { x: 9, y: 5 }, blackTeam.value));
 
     const teams = ref([whiteTeam.value, blackTeam.value]);
     const game = ref(new Game(teams.value, board.value as Board));
@@ -118,9 +160,14 @@ export default defineComponent({
     const previousPosition = ref<Position | null>(null);
 
     const attackMode = ref(false);
+    const skillMode = ref(false);
     const validAttacks = ref<Position[]>([]);
+    const validTargetsForSkill = ref<Position[]>([]);
 
     const damageEffects = ref<{ [key: string]: any[] }>({});
+
+    const showSkillsMenu = ref(false);
+    const selectedSkillDescription = ref<string | null>(null);
 
     const getCombatantEffects = (position: Position) => {
       const key = `${position.x},${position.y}`;
@@ -160,11 +207,9 @@ export default defineComponent({
         moveCombatant(position);
       } else if (attackMode.value) {
         attackTarget(position);
+      } else if (skillMode.value) {
+        performSkill(position);
       }
-    }
-
-    const canDefend = () => {
-      return hasMoved.value;
     }
 
     const defend = () => {
@@ -199,8 +244,11 @@ export default defineComponent({
     const cancel = () => {
       moveMode.value = false;
       attackMode.value = false;
+      skillMode.value = false;
       validMoves.value = [];
       validAttacks.value = [];
+      showSkillsMenu.value = false;
+      validTargetsForSkill.value = [];
     };
 
     const isMoveValid = (position: Position): boolean => {
@@ -283,13 +331,10 @@ export default defineComponent({
           }, 500);
     };
 
-    const specialSkill = () => {
-      // Implement special skill logic here
-      actionsRemaining.value--;
-      game.value.nextTurn();
-      prepareNextTurn();
-    };
-
+    const canDefendAndMove = () => {
+      const currentCombatant = game.value.getCurrentCombatant();
+      return currentCombatant?.getSpecialMoves().some((move) => move.name === "Marching Defense");
+    }
     
     const skip = () => {
       game.value.executeSkipTurn();
@@ -320,6 +365,25 @@ export default defineComponent({
       return { width: (combatant.stats.stamina / combatant.baseStats.stamina) * 100 + '%' };
     };
 
+    const getCombatantVisualType = (combatant: Combatant) => {
+      return typeToVisualType(combatant.getCombatantType());
+    }
+
+    const typeToVisualType = (type: CombatantType) => {
+      switch (type) {
+        case CombatantType.Militia:
+          return 'M';
+        case CombatantType.Defender:
+          return 'D';
+        case CombatantType.Hunter:
+          return 'T';
+        case CombatantType.Healer:
+          return 'H';
+        case CombatantType.Wizard:
+          return 'W';
+      }
+    }
+
     const getDamageColor = (type: DamageType): string => {
       switch (type) {
         case DamageType.Slash:
@@ -345,6 +409,78 @@ export default defineComponent({
       }
     };
 
+    const showSpecialSkills = () => {
+      showSkillsMenu.value = true;
+    };
+
+    const getCombatantSpecialMoves = (combatant: Combatant) => {
+      return combatant.getSpecialMoves().filter((move) => move.triggerType === SpecialMoveTriggerType.Active);
+    }
+
+    const hasActiveSpecialMoves = () => {
+      return currentCombatant.value?.getSpecialMoves()
+      .filter((move) => move.triggerType === SpecialMoveTriggerType.Active).length > 0;
+    }
+
+    const showSkillDescription = (skillName: string) => {
+      if (currentCombatant.value) {
+        const skill = currentCombatant.value.specialMoves.find(
+          (skill) => skill.name === skillName
+        );
+        if (skill) {
+          selectedSkillDescription.value = skill.description || 'No description available.';
+        }
+      }
+    };
+
+    const hideSkillDescription = () => {
+      selectedSkillDescription.value = null;
+    };
+
+    const showSkillTargets = (skillName: string) => {
+      if(!currentCombatant.value) {
+        return;
+      }
+      const skill = currentCombatant.value.specialMoves.find(
+        (skill) => skill.name === skillName
+      );
+      if(!skill) {
+        return;
+      }
+      showSkillsMenu.value = false;
+      skillMode.value = true;
+      const range = skill.range;
+      validTargetsForSkill.value = board.value.getValidTargetsForSkill(currentCombatant.value, range);      
+    };
+
+    const isSkillTargetValid = (position: Position): boolean => {
+      return validTargetsForSkill.value.some(
+        (target) => target.x === position.x && target.y === position.y
+      );
+    };
+
+    const isEnemy = (position: Position): boolean => {
+      const combatant = getCombatant(position);
+      return combatant?.team !== currentTeam.value;
+    }
+
+    const isFriendly = (position: Position): boolean => {
+      const combatant = getCombatant(position);
+      return combatant?.team === currentTeam.value;
+    }
+
+    const isNeutral = (position: Position): boolean => {  
+      const combatant = getCombatant(position);
+      return !combatant;
+    }
+
+    const performSkill = (position: Position) => {
+      if (isSkillTargetValid(position) && currentCombatant.value) {
+        alert('do skill');
+        skillMode.value = false;
+      }
+    }
+
     return {
       board,
       teams,
@@ -353,11 +489,10 @@ export default defineComponent({
       isCurrentCombatant,
       actionsRemaining,
       turnMessage,
-      canDefend,
       defend,
-      specialSkill,
       skip,
       currentCombatant,
+      canDefendAndMove,
       canUndo,
       isDefending,
       roundCount,
@@ -376,12 +511,30 @@ export default defineComponent({
       calcHealthFill,
       calcStaminaFill,
       getCombatantEffects,
+      showSpecialSkills,
+      showSkillsMenu,
+      getCombatantVisualType,
+      getCombatantSpecialMoves,
+      hasActiveSpecialMoves,
+      showSkillDescription,
+      hideSkillDescription,
+      selectedSkillDescription,
+      showSkillTargets,
+      isSkillTargetValid,
+      skillMode,
+      isEnemy,
+      isFriendly,
+      isNeutral
     };
   },
 });
 </script>
 
 <style scoped>
+
+div {
+  color: white;
+}
 
 .game-container {
   display: flex;
@@ -416,6 +569,21 @@ export default defineComponent({
 
 .validAttack {
   background-color:rgb(226, 83, 83);
+  cursor: pointer;
+}
+
+.validSkillHostile {
+  background-color: rgb(226, 83, 83);
+  cursor: pointer;
+}
+
+.validSkillFriendly {
+  background-color: blue;
+  cursor: pointer;
+}
+
+.validSkillNeutral {
+  background-color: #e8ef8d;
   cursor: pointer;
 }
 
@@ -501,5 +669,91 @@ export default defineComponent({
     opacity: 0;
     transform: translate(-50%, -30px);
   }
+}
+
+.skill-menu {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  height: 300px;
+  background-color: #333;
+  border: 1px solid white;
+  display: flex;
+  flex-direction: column;
+  color: white;
+}
+
+.skill-menu-header {
+  padding: 10px;
+  border-bottom: 1px solid white;
+}
+
+.skill-menu-header-name {
+  font-size: 20px;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.skill-menu-header-sp-remaining {
+  font-size: 16px;
+  display: inline-block;
+  float: right;
+}
+
+.skill-menu-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.skill-item {
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #555;
+  cursor: pointer;
+}
+
+.skill-item:last-child {
+  border-bottom: none;
+}
+
+.skill-item:hover {
+  background-color: #444;
+}
+
+.skill-name {
+  flex: 1;
+}
+
+.skill-cost {
+  width: 40px;
+  text-align: right;
+}
+
+.disabled {
+  color: #888;
+  cursor: not-allowed;
+}
+
+.skill-description {
+  padding: 10px;
+  border-top: 1px solid white;
+  text-align: center;
+}
+
+.dragon-left {
+  position: absolute;
+  top: 10%;
+  left: 0;
+  transform: scale(0.6);
+}
+
+.dragon-right {
+  position: absolute;
+  top: 10%;
+  right: 0;
+  transform: scale(0.6) scaleX(-1);
 }
 </style>

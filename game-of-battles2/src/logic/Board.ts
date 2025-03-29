@@ -3,14 +3,18 @@
   // board.ts
 import { Combatant } from "./Combatant";
 import { Position } from "./Position";
+import { RangeCalculator } from "./RangeCalculator";
+import { SpecialMove, SpecialMoveRange } from "./SpecialMove";
 
 export class Board {
   private grid: (Combatant | null)[][];
+  private rangeCalculator: RangeCalculator;
 
   constructor(public width: number, public height: number) {
     this.grid = Array(height)
       .fill(null)
       .map(() => Array(width).fill(null));
+    this.rangeCalculator = new RangeCalculator();
   }
 
   placeCombatant(combatant: Combatant, position: Position): void {
@@ -36,6 +40,13 @@ export class Board {
       return this.grid[position.y][position.x];
     }
     return null;
+  }
+
+  
+
+  private hasEnemy(combatant: Combatant, position: Position): boolean {
+    const target = this.getCombatantAtPosition(position);
+    return !!target && target.team.getName() !== combatant.team.getName();
   }
 
   // note how this is only straight line attacks, for now
@@ -65,11 +76,6 @@ export class Board {
     }
 
     return validAttacks;
-  }
-
-  private hasEnemy(combatant: Combatant, position: Position): boolean {
-    const target = this.getCombatantAtPosition(position);
-    return !!target && target.team.getName() !== combatant.team.getName();
   }
 
   getValidMoves(combatant: Combatant): Position[] {
@@ -111,6 +117,11 @@ export class Board {
     }
 
     return validMoves;
+  }
+
+  getValidTargetsForSkill(combatant: Combatant, skillRange: SpecialMoveRange): Position[] {
+    const validTargets =  this.rangeCalculator.getValidTargetPositions(combatant, skillRange, this);
+    return validTargets;
   }
 
   isValidPosition(position: Position): boolean {

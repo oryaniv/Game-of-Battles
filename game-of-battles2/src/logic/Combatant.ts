@@ -6,6 +6,7 @@ import { SpecialMove } from "./SpecialMove";
 import { StatusEffect, StatusEffectHook, StatusEffectType } from "./StatusEffect";
 import { Team } from "./Team";
 import { AttackResult } from "./attackResult";
+import { CombatantType } from "./Combatants/CombatantType";
 
 export interface CombatantStats {
     hp: number;
@@ -40,6 +41,12 @@ export interface CombatantStats {
     }
 
     abstract basicAttack(): Damage
+
+    abstract getCombatantType(): CombatantType;
+
+    getSpecialMoves(): SpecialMove[] {
+      return this.specialMoves;
+    }
   
     useSpecialMove(target: Combatant, moveName: string): Damage | null {
       const move = this.specialMoves.find((m) => m.name === moveName);
@@ -56,7 +63,7 @@ export interface CombatantStats {
   
       // Apply special effect if any.
       if (move.effect) {
-        move.effect(target);
+        move.effect([target]);
       }
       return damage;
     }
@@ -71,7 +78,7 @@ export interface CombatantStats {
           name: StatusEffectType.DEFENDING,
           duration: 0,
           hooks: {
-            [StatusEffectHook.OnDamageTaken]: (combatant, damage: number) => damage / 2,
+
           },
         };
         this.applyStatusEffect(defenseStatus);
