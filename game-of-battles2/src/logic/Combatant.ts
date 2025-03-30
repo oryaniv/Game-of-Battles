@@ -48,26 +48,6 @@ export interface CombatantStats {
       return this.specialMoves;
     }
   
-    useSpecialMove(target: Combatant, moveName: string): Damage | null {
-      const move = this.specialMoves.find((m) => m.name === moveName);
-      if (!move) return null;
-  
-      if (this.stats.stamina < move.cost) {
-        console.log("Not enough stamina!");
-        return null;
-      }
-  
-      this.stats.stamina -= move.cost;
-  
-      const damage = move.damage;
-  
-      // Apply special effect if any.
-      if (move.effect) {
-        move.effect([target]);
-      }
-      return damage;
-    }
-  
     move(newPosition: Position, board: Board) {
         board.removeCombatant(this);
         board.placeCombatant(this, newPosition);

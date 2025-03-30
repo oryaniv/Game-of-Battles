@@ -2,7 +2,7 @@ import { Combatant } from "./Combatant";
 import { Damage } from "./Damage";
 import { Position } from "./Position";
 import { StatusEffectType } from "./StatusEffect";
-
+import { Board } from "./Board";
 export interface SpecialMove {
     name: string;
     triggerType: SpecialMoveTriggerType;
@@ -10,7 +10,7 @@ export interface SpecialMove {
     turnCost: number;
     range: SpecialMoveRange;
     damage: Damage;
-    effect?: (targets: Combatant[]) => void;
+    effect?: (target: Position, board: Board) => void;
     requirements?: (self: Combatant) => boolean;
     description: string;
   }

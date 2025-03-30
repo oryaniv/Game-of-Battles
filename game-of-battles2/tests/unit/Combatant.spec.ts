@@ -58,11 +58,6 @@ describe('Combatant - Militia', () => {
     expect(combatant.stats.hp).toBe(initialHp - 5);
   });
 
-  it('should handle special moves when none exist', () => {
-    const result = combatant.useSpecialMove(combatant, 'NonexistentMove');
-    expect(result).toBeNull();
-  });
-
   it('should update position when moving', () => {
     const newPosition: Position = { x: 1, y: 1 };
     const mockBoard = {

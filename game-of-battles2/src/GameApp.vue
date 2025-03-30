@@ -39,7 +39,7 @@
             <div class="stamina-bar">
               <div class="stamina-fill" :style="calcStaminaFill(getCombatant({ x, y }))"></div>
             </div>
-                {{ getCombatantVisualType(getCombatant({ x, y })) }}
+                <img class="combatant-sprite" :src="getCombatantSprite(getCombatant({ x, y }))" alt="Combatant" />
             <img v-if="isDefending(getCombatant({ x, y }))" class="defend-icon" src="./assets/defend.svg" alt="Defend" />
             <transition-group name="damage-text" tag="div">
               <div
@@ -61,17 +61,25 @@
       </div>
     </div>
     <div class="actions">
-      <div v-if="currentCombatant">
-        Actions Remaining: {{ actionsRemaining }}
-        <button :disabled="attackMode" @click="showAttackOptions">Attack</button>
-        <button :disabled="hasMoved && !canDefendAndMove()" @click="defend">Defend</button>
-        <button v-if="!hasMoved" @click="showMoveOptions">Move</button>
+      <span class="actions-remaining-label">Actions Remaining</span>
+      <div v-for="x in Math.floor(actionsRemaining)" class="turn-icon" :key="x">
+      </div>
+      <div v-if="actionsRemaining !== Math.round(actionsRemaining)" class="half-turn-icon" :key="x">
+      </div>
+    </div>
+
+    <div class="action-menu" v-if="!isGameOver()">
+      <div class="action-menu-button-container" v-if="currentCombatant">
+        <button :disabled="attackMode || moveMode || showSkillsMenu || skillMode" @click="showAttackOptions">Attack</button>
+        <button :disabled="hasMoved && !canDefendAndMove() || attackMode || moveMode || showSkillsMenu || skillMode" @click="defend">Defend</button>
+        <button :disabled="attackMode || moveMode || showSkillsMenu || skillMode" v-if="!hasMoved" @click="showMoveOptions">Move</button>
         <button v-if="hasMoved" @click="undoMove">Undo</button>
         <button :disabled="showSkillsMenu || !hasActiveSpecialMoves() || skillMode" @click="showSpecialSkills">Special Skill</button>
         <button @click="skip">Skip</button>
         <button :disabled="!moveMode && !attackMode && !showSkillsMenu && !skillMode" @click="cancel">Cancel</button>
       </div>
     </div>
+
 
 
     <div v-if="showSkillsMenu" class="skill-menu">
@@ -98,8 +106,8 @@
       </div>
     </div>
 
-    <img class="dragon-left" src="./assets/white_dragon_black_back.png" alt="left dragon" />
-    <img class="dragon-right" src="./assets/white_dragon_black_back.png" alt="right dragon" />
+    <!-- <img class="dragon-left" src="./assets/white_dragon_black_back.png" alt="left dragon" />
+    <img class="dragon-right" src="./assets/white_dragon_black_back.png" alt="right dragon" /> -->
     
   </div>
 </template>
@@ -121,7 +129,7 @@ import { Defender } from './logic/Combatants/Defender';
 import { Hunter } from './logic/Combatants/Hunter';
 import { Healer } from './logic/Combatants/Healer';
 import { Wizard } from './logic/Combatants/Wizard'; 
-import { SpecialMoveTriggerType } from './logic/SpecialMove';
+import { SpecialMove, SpecialMoveTriggerType } from './logic/SpecialMove';
 
 export default defineComponent({
   setup() {
@@ -130,12 +138,12 @@ export default defineComponent({
     const blackTeam = ref(new Team('Black Team', 1));
     /// add to white team
     whiteTeam.value.addCombatant(new Defender('Boris', { x: 0, y: 4 }, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Militia('Igor', { x: 2, y: 4 }, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Militia('Yanko', { x: 4, y: 4 }, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Militia('Ivan', { x: 6, y: 4 }, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Militia('Vitaly', { x: 8, y: 4 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Defender('Igor', { x: 2, y: 4 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Hunter('Yanko', { x: 4, y: 4 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Wizard('Ivan', { x: 6, y: 4 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Healer('Vitaly', { x: 8, y: 4 }, whiteTeam.value));
     /// add to black team
-    blackTeam.value.addCombatant(new Militia('Michael', { x: 0, y: 5 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Defender('Michael', { x: 0, y: 5 }, blackTeam.value));
     blackTeam.value.addCombatant(new Militia('Jake', { x: 2, y: 5 }, blackTeam.value));
     blackTeam.value.addCombatant(new Militia('Chuck', { x: 4, y: 5 }, blackTeam.value));
     blackTeam.value.addCombatant(new Militia('Joe', { x: 7, y: 5 }, blackTeam.value));
@@ -168,6 +176,7 @@ export default defineComponent({
 
     const showSkillsMenu = ref(false);
     const selectedSkillDescription = ref<string | null>(null);
+    const currentSkill = ref<SpecialMove | null>(null);
 
     const getCombatantEffects = (position: Position) => {
       const key = `${position.x},${position.y}`;
@@ -249,10 +258,10 @@ export default defineComponent({
       validAttacks.value = [];
       showSkillsMenu.value = false;
       validTargetsForSkill.value = [];
+      currentSkill.value = null;
     };
 
     const isMoveValid = (position: Position): boolean => {
-      // debugger;
       return validMoves.value.some(
         (move) => move.x === (position.x) && move.y === (position.y)
       );
@@ -365,22 +374,23 @@ export default defineComponent({
       return { width: (combatant.stats.stamina / combatant.baseStats.stamina) * 100 + '%' };
     };
 
-    const getCombatantVisualType = (combatant: Combatant) => {
-      return typeToVisualType(combatant.getCombatantType());
+
+    const getCombatantSprite = (combatant: Combatant) => {
+      return typeToSprite(combatant.getCombatantType());
     }
 
-    const typeToVisualType = (type: CombatantType) => {
+    const typeToSprite = (type: CombatantType) => {
       switch (type) {
         case CombatantType.Militia:
-          return 'M';
+          return require('./assets/Militia.svg');
         case CombatantType.Defender:
-          return 'D';
+          return require('./assets/Defender.svg');
         case CombatantType.Hunter:
-          return 'T';
+          return require('./assets/Hunter.svg');
         case CombatantType.Healer:
-          return 'H';
+          return require('./assets/Healer.svg');
         case CombatantType.Wizard:
-          return 'W';
+          return require('./assets/Wizard.svg');
       }
     }
 
@@ -449,6 +459,7 @@ export default defineComponent({
       }
       showSkillsMenu.value = false;
       skillMode.value = true;
+      currentSkill.value = skill;
       const range = skill.range;
       validTargetsForSkill.value = board.value.getValidTargetsForSkill(currentCombatant.value, range);      
     };
@@ -475,10 +486,16 @@ export default defineComponent({
     }
 
     const performSkill = (position: Position) => {
-      if (isSkillTargetValid(position) && currentCombatant.value) {
+      if (isSkillTargetValid(position) && currentCombatant.value 
+      && currentSkill.value && currentSkill.value.effect) {
         alert('do skill');
+        currentSkill.value.effect(position, board.value as Board);
         skillMode.value = false;
       }
+    }
+
+    const isGameOver = () => {
+      return game.value.isGameOver();
     }
 
     return {
@@ -513,7 +530,7 @@ export default defineComponent({
       getCombatantEffects,
       showSpecialSkills,
       showSkillsMenu,
-      getCombatantVisualType,
+      getCombatantSprite,
       getCombatantSpecialMoves,
       hasActiveSpecialMoves,
       showSkillDescription,
@@ -524,7 +541,8 @@ export default defineComponent({
       skillMode,
       isEnemy,
       isFriendly,
-      isNeutral
+      isNeutral,
+      isGameOver
     };
   },
 });
@@ -532,14 +550,65 @@ export default defineComponent({
 
 <style scoped>
 
+@font-face {
+  font-family: "EnchantedLand";
+  src: url("@/assets/EnchantedLand-jnX9.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
 div {
+  font-family: "EnchantedLand", Arial, sans-serif;
   color: white;
 }
+
+button {
+  font-family: "EnchantedLand", Arial, sans-serif;
+} 
 
 .game-container {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.message {
+  font-size: 32px;
+}
+
+.actions-remaining-label {
+  font-size: 24px;
+  display: inline-block;
+  margin-right: 10px;
+  vertical-align: super;
+}
+
+.combatant-sprite {
+  width: 15px;
+  height: 15px;
+}
+
+.turn-icon {
+  width: 25px;
+  height: 25px;
+  background-image: url('./assets/flaming_sword.jpg');
+  background-size: cover;
+  background-position: center;
+  display: inline-block;
+}
+
+.half-turn-icon {
+  width: 25px;
+  height: 25px;
+  background-image: url('./assets/flaming_sword.jpg');
+  background-size: cover;
+  background-position: center;
+  display: inline-block;
+  filter: brightness(0.5);
+}
+
+.round-count {
+  font-size: 24px;
 }
 
 .board {
@@ -560,6 +629,7 @@ div {
   justify-content: center;
   align-items: center;
   border: 1px solid black;
+  background-size: cover;
 }
 
 .validMove {
@@ -618,6 +688,36 @@ div {
 
 .actions {
   margin-top: 20px;
+  font-size: 24px;
+}
+
+.action-menu {
+  position: absolute;
+  left: 15%;
+  bottom: 7%;
+}
+
+.action-menu-button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.action-menu-button-container button {
+  font-size: 20px;
+  color: white;
+  width: 100%;
+  background-image: url(https://img.goodfon.com/original/3024x1964/8/46/tekstura-ametist-kamen.jpg);
+  border-radius: 20px;
+}
+
+.action-menu-button-container button:hover {
+  color: red;
+}
+
+.action-menu-button-container button:disabled {
+  color: gray;
 }
 
 @keyframes glow {
@@ -691,13 +791,13 @@ div {
 }
 
 .skill-menu-header-name {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: bold;
   display: inline-block;
 }
 
 .skill-menu-header-sp-remaining {
-  font-size: 16px;
+  font-size: 20px;
   display: inline-block;
   float: right;
 }
@@ -708,6 +808,7 @@ div {
 }
 
 .skill-item {
+  font-size: 20px;
   padding: 10px;
   display: flex;
   justify-content: space-between;
@@ -738,6 +839,7 @@ div {
 }
 
 .skill-description {
+  font-size: 20px;
   padding: 10px;
   border-top: 1px solid white;
   text-align: center;

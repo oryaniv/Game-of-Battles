@@ -78,6 +78,8 @@ export class CombatMaster {
     }
 
     private calculateAttackRoll(attacker: Combatant, target: Combatant): AttackResult {
+        // const onBeingAttackedHook = target.statusEffects.find((effect) => effect.name === StatusEffectType.BLOCKING_STANCE)?.hooks[StatusEffectHook.OnBeingAttacked];
+
         const hitRoll = ((attacker.stats.agility - target.stats.agility) * 0.01) + Math.floor(Math.random() * 100) + 1;
   
         if(hitRoll < 5) {
