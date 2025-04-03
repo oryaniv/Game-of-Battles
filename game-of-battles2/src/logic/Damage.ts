@@ -9,7 +9,8 @@ export enum DamageType {
     Holy = "Holy",
     Dark = "Dark",
     Unstoppable = "Unstoppable",
-  }
+}
+
 
   export enum DamageReaction {
     NONE= "None",

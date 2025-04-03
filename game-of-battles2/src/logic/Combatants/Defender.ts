@@ -8,6 +8,7 @@ import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
 import { MarchingDefense } from "../SpecialMoves/Singular/Passives";
 import { BlockingStance } from "../SpecialMoves/Singular/Self";
+import { DefensiveStrike } from "../SpecialMoves/Singular/Offensive";
 export class Defender extends Combatant {
     constructor(name: string, position: Position, team: Team) {
       super(
@@ -16,7 +17,7 @@ export class Defender extends Combatant {
           hp: 100,
           attackPower: 10,
           defensePower: 30,
-          stamina: 30,
+          stamina: 20,
           initiative: 4,
           movementSpeed: 3,
           range: 1,
@@ -38,13 +39,13 @@ export class Defender extends Combatant {
         [
           new MarchingDefense(),
           new BlockingStance(),
-          // new DefensiveStrke(),
+          new DefensiveStrike(),
         ], team 
       );
     }
 
     basicAttack(): Damage {
-      return { amount: 20, type: DamageType.Slash };
+      return { amount: 15, type: DamageType.Slash };
     }
 
     getCombatantType(): CombatantType {

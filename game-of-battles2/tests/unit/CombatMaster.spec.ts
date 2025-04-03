@@ -21,7 +21,7 @@ describe('CombatMaster', () => {
     team2 = new Team('Team 2', 2);
     attacker = new Militia('Attacker', { x: 0, y: 0 }, team1);
     defender = new Militia('Defender', { x: 1, y: 0 }, team2);
-    combatMaster = new CombatMaster();
+    combatMaster = CombatMaster.getInstance(); //new CombatMaster();
   });
 
   it('aaa',() => {

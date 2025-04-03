@@ -3,18 +3,38 @@ import { Board } from "./Board";
 import { Combatant } from "./Combatant";
 import { Damage, DamageReaction, DamageType } from "./Damage";
 import { Position } from "./Position";
+import { getResultsForStatusEffectHook, StatusEffect, StatusEffectHook, StatusEffectType } from "./StatusEffect";
 
 
 export class CombatMaster {
+    private static instance: CombatMaster;
 
-    executeAttack(attacker: Combatant, position: Position, board: Board): ActionResult {
+    private constructor() {}
+
+    public static getInstance(): CombatMaster {
+        if (!CombatMaster.instance) {
+            CombatMaster.instance = new CombatMaster();
+        }
+        return CombatMaster.instance;
+    }
+
+    executeAttack(attacker: Combatant, position: Position, board: Board, damage?: Damage): ActionResult {
         const target = board.getCombatantAtPosition(position);
         if(!target) {
             throw new Error("No target found");
         }
 
+        getResultsForStatusEffectHook(attacker, StatusEffectHook.OnAttacking);
+
+        damage = damage || attacker.basicAttack();
+
+        const onBeingAttackedHookResult = this.getOnBeingAttackedHookResults(target, attacker, damage.type);
+        if(onBeingAttackedHookResult) {
+            return onBeingAttackedHookResult;
+        }
+
         if(target.isDefending()) {
-            const baseDamage = this.calcaulateBaseDamage(attacker, target);
+            const baseDamage = this.calcaulateBaseDamage(attacker, target, damage);
             const finalDamage = {amount: baseDamage.amount / 2, type: baseDamage.type};
             this.handleInjuryAilmentAndDeath(target, finalDamage.amount, board);
             return {
@@ -27,7 +47,7 @@ export class CombatMaster {
 
         const attackResult = this.calculateAttackRoll(attacker, target);
         if(attackResult === AttackResult.Hit || attackResult === AttackResult.CriticalHit){
-            const baseDamage = this.calcaulateBaseDamage(attacker, target);
+            const baseDamage = this.calcaulateBaseDamage(attacker, target, damage);
             const actionResult = this.finalizeDamage(target, baseDamage, attackResult);
             this.handleInjuryAilmentAndDeath(target, actionResult.damage.amount, board);
             return actionResult;
@@ -46,10 +66,32 @@ export class CombatMaster {
         };
     }
 
-    private calcaulateBaseDamage(attacker: Combatant, target: Combatant): Damage {
+     public tryInflictStatusEffect(afflictor: Combatant, target: Position, board: Board,
+       statusEffect: StatusEffectType, duration: number, chance: number): void {
+        const targetCombatant = board.getCombatantAtPosition(target);
+        if(!targetCombatant) {
+            return;
+        }
+        const chanceWithDelta = chance + ((afflictor.stats.luck - targetCombatant.stats.luck) * 0.02);
+        if(Math.random() >= chanceWithDelta) {
+            return;
+        }
+        if(targetCombatant.hasStatusEffect(statusEffect)) {
+          targetCombatant.updateStatusEffect({name: statusEffect, duration: duration});
+        } else {
+          targetCombatant.applyStatusEffect({name: statusEffect, duration: duration});
+        }
+     }
+
+
+    public defend(target: Combatant): void {
+      target.defend();
+    }
+
+
+    private calcaulateBaseDamage(attacker: Combatant, target: Combatant, damageToUse: Damage): Damage {
         const delta = attacker.stats.attackPower - target.stats.defensePower;
-        const damage = attacker.basicAttack();
-        return {amount: damage.amount * (delta * 0.01 + 1), type: damage.type};
+        return {amount: (Math.random() * (1.3 - 0.7) + 0.70) * damageToUse.amount * (delta * 0.01 + 1), type: damageToUse.type};
     }
 
     private finalizeDamage(target: Combatant, damage: Damage, attackResult: AttackResult) : ActionResult {
@@ -78,21 +120,21 @@ export class CombatMaster {
     }
 
     private calculateAttackRoll(attacker: Combatant, target: Combatant): AttackResult {
-        // const onBeingAttackedHook = target.statusEffects.find((effect) => effect.name === StatusEffectType.BLOCKING_STANCE)?.hooks[StatusEffectHook.OnBeingAttacked];
-
-        const hitRoll = ((attacker.stats.agility - target.stats.agility) * 0.01) + Math.floor(Math.random() * 100) + 1;
+        const attackRoll = ((attacker.stats.agility - target.stats.agility) * 0.02) + Math.floor(Math.random() * 100) + 1;
   
-        if(hitRoll < 5) {
+        if(attackRoll < 5) {
           return AttackResult.Fumble;
         }
-        else if (hitRoll < 20) {
+        else if (attackRoll < 20) {
           return AttackResult.Miss;
-        } else if (hitRoll > 90) {
+        } else if (attackRoll > 90) {
           return AttackResult.CriticalHit;
         } else {
           return AttackResult.Hit;
         }
       }
+
+      
 
       private handleInjuryAilmentAndDeath(target: Combatant, finalDamage: number, board: Board) {
         target.stats.hp -= finalDamage;
@@ -101,8 +143,21 @@ export class CombatMaster {
         }
       }
 
-      public defend(target: Combatant): void {
-        target.defend();
+      
+
+      private getOnBeingAttackedHookResults(target: Combatant, attacker: Combatant, damageType: DamageType): ActionResult | undefined {
+        const onBeingAttackedHookResults = getResultsForStatusEffectHook(target, StatusEffectHook.OnBeingAttacked, attacker, damageType, 1);
+
+        if(onBeingAttackedHookResults.length > 0) {
+            const mostRelevantResult = this.getMostRelevantResult(onBeingAttackedHookResults);
+            return mostRelevantResult;
+        }
+      }
+
+      private getMostRelevantResult(results: ActionResult[]): ActionResult {
+        return results.reduce((mostRelevant, current) => {            
+            return current.cost > mostRelevant.cost ? current : mostRelevant;
+        }, results[0]);
       }
     
 

@@ -3,9 +3,9 @@ import { Board } from "./Board";
 import { DamageType } from "./Damage";
 import { Position } from "./Position";
 import { SpecialMove } from "./SpecialMove";
-import { StatusEffect, StatusEffectHook, StatusEffectType } from "./StatusEffect";
+import { getResultsForStatusEffectHook, getStatusEffect, StatusEffect, StatusEffectApplication, StatusEffectHook, StatusEffectType } from "./StatusEffect";
 import { Team } from "./Team";
-import { AttackResult } from "./attackResult";
+import { ActionResult, AttackResult } from "./attackResult";
 import { CombatantType } from "./Combatants/CombatantType";
 
 export interface CombatantStats {
@@ -31,7 +31,7 @@ export interface CombatantStats {
     ) {this.stats = { ...this.baseStats }; this.team = team;}
 
     public stats: CombatantStats; // Current stats, can be modified by effects
-    public statusEffects: StatusEffect[] = [];
+    public statusEffects: StatusEffectApplication[] = [];
 
     startTurn(): void {
         if(this.isDefending()) {
@@ -49,17 +49,27 @@ export interface CombatantStats {
     }
   
     move(newPosition: Position, board: Board) {
+        // const onMovingHooks: StatusEffect[] = this.getStatusEffectsOfHook(StatusEffectHook.OnMoving);
+        // const onMovingHookskResults: ActionResult[] = onMovingHooks
+        // .map((hook) => hook.applicationHooks[StatusEffectHook.OnMoving]!(this))
+        // .filter((result) => result !== undefined) as ActionResult[];
+
+        const onMovingHookResults = getResultsForStatusEffectHook(this, StatusEffectHook.OnMoving);
+
         board.removeCombatant(this);
         board.placeCombatant(this, newPosition);
     }
   
     defend(): number {
-        const defenseStatus: StatusEffect = {
+      // const onDefendingHooks: StatusEffect[] = this.getStatusEffectsOfHook(StatusEffectHook.OnDefending);
+      // const onDefendingHookResults: ActionResult[] = onDefendingHooks
+      // .map((hook) => hook.applicationHooks[StatusEffectHook.OnDefending]!(this))
+      // .filter((result) => result !== undefined) as ActionResult[];
+
+      const onDefendingHookResults = getResultsForStatusEffectHook(this, StatusEffectHook.OnDefending);
+      const defenseStatus: StatusEffectApplication = {
           name: StatusEffectType.DEFENDING,
           duration: 0,
-          hooks: {
-
-          },
         };
         this.applyStatusEffect(defenseStatus);
         return 1;
@@ -79,44 +89,64 @@ export interface CombatantStats {
       if (this.stats.hp < 0) this.stats.hp = 0;
     }
     
-    applyStatusEffect(effect: StatusEffect): void {
+    applyStatusEffect(effect: StatusEffectApplication): void {
         this.statusEffects.push(effect);
-        const onApplyHook = effect.hooks[StatusEffectHook.OnApply];
-        if (onApplyHook && typeof onApplyHook === 'function') {
-            onApplyHook(this);
-        }
+    }
+
+    updateStatusEffect(effect: StatusEffectApplication): void {
+      const effectToUpdate = this.statusEffects.find((effect) => effect.name === effect.name);
+      if(effectToUpdate) {
+        effectToUpdate.duration = effect.duration;
       }
+    }
     
-      removeStatusEffect(effectName: StatusEffectType): void {
-        const effectToRemove = this.statusEffects.find((effect) => effect.name === effectName);
-
-        if (effectToRemove && effectToRemove.hooks[StatusEffectHook.OnRemove] !== undefined && typeof effectToRemove.hooks[StatusEffectHook.OnRemove] === 'function') {
-            effectToRemove.hooks[StatusEffectHook.OnRemove]?.(this);
-        }
-
+    removeStatusEffect(effectName: StatusEffectType): void {
+      const effectToRemove = this.statusEffects.find((effect) => effect.name === effectName);
+      if(effectToRemove) {
         this.statusEffects = this.statusEffects.filter((effect) => effect.name !== effectName);
       }
+    }
     
       updateStatusEffects(roundCount: number): void {
         for (let i = this.statusEffects.length - 1; i >= 0; i--) {
             const effect = this.statusEffects[i];
-            if (effect.hooks[StatusEffectHook.OnTurnStart] !== undefined && typeof effect.hooks[StatusEffectHook.OnTurnStart] === 'function') {
-              effect.hooks[StatusEffectHook.OnTurnStart]?.(this);
-            }
             effect.duration--;
             if (effect.duration <= 0) {
               this.removeStatusEffect(effect.name);
             }
           }
       }
+
+      hasStatusEffect(effectName: StatusEffectType): boolean {
+        return this.statusEffects.some((effect) => effect.name === effectName);
+      }
+
+      getStatusEffectsOfHook(hook: StatusEffectHook): StatusEffect[] {
+        const statusEffectsOfHook = this.statusEffects.filter((statusApp) => {
+          const statusEffect = getStatusEffect(statusApp.name);
+          return statusEffect && statusEffect.applicationHooks[hook];
+        }).map((statusApp) => getStatusEffect(statusApp.name))
+        .filter((statusEffect) => statusEffect !== undefined) as StatusEffect[];
+        return statusEffectsOfHook;
+      }
+
+      getStatusEffects(): StatusEffect[] {
+        return this.statusEffects.map((statusApp) => getStatusEffect(statusApp.name))
+        .filter((statusEffect) => statusEffect !== undefined) as StatusEffect[];
+      }
     
       applyStatModifiers(roundCount: number): void {
-        this.stats = { ...this.baseStats };
+        // this.stats = { ...this.baseStats };
     
-        for (const effect of this.statusEffects) {
-          if (effect.modifyStats) {
-            this.stats = effect.modifyStats(this.stats);
-          }
-        }
+        // for (const effect of this.statusEffects) {
+        //   if (effect.modifyStats) {
+        //     this.stats = effect.modifyStats(this.stats);
+        //   }
+        // }
+      }
+
+      canUseSkill(skill: SpecialMove): boolean {
+        return this.stats.stamina >= skill.cost && 
+        (!skill.checkRequirements || skill.checkRequirements(this));
       }
   }

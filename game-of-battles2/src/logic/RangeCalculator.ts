@@ -10,6 +10,8 @@ export class RangeCalculator {
     range: SpecialMoveRange,
     board: Board
   ): Position[] {
+    // eslint-disable-next-line
+    // debugger;
     switch (range.type) {
       case SpecialMoveRangeType.Self:
         return this.getSelfTargetPositions(caster, board);

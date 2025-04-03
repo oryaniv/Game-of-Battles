@@ -1,8 +1,12 @@
-import { ActionResult } from "./attackResult";
+import { ActionResult, getEmptyActionResult } from "./attackResult";
 import { Board } from "./Board";
 import { Combatant } from "./Combatant";
 import { CombatMaster } from "./CombatMaster";
+import { Damage } from "./Damage";
 import { Position } from "./Position";
+import { SpecialMove } from "./SpecialMove";
+import { StatusEffectHook } from "./StatusEffect";
+import { getResultsForStatusEffectHook } from "./StatusEffect";
 import { Team } from "./Team";
 
 export class Game {
@@ -27,7 +31,7 @@ export class Game {
       this.setupCombatants();
       this.determineStartingTeam();
       this.actionsRemaining = this.teams[this.currentTeamIndex].combatants.length;
-      this.combatMaster = new CombatMaster();
+      this.combatMaster = CombatMaster.getInstance(); // new CombatMaster();
     }
   
     private setupCombatants(): void {
@@ -59,20 +63,38 @@ export class Game {
       return this.actionsRemaining;
     }
 
-    executeAttack(attacker: Combatant, position: Position, board: Board): ActionResult {
-      const actionResult = this.combatMaster.executeAttack(attacker, position, board);
-      this.actionsRemaining -= actionResult.cost;
+    executeAttack(attacker: Combatant, position: Position, board: Board, damage?: Damage): ActionResult {
+      damage = damage || attacker.basicAttack();
+      const actionResult = this.combatMaster.executeAttack(attacker, position, board, damage);
+      this.spendActionPoints(actionResult.cost);
+      return actionResult;
+    }
+
+    executeSkill(skill: SpecialMove, invoker: Combatant, target: Position, board: Board): ActionResult {
+      // eslint-disable-next-line
+      debugger;
+      if(!skill.effect) {
+        return getEmptyActionResult(); 
+      }
+      invoker.stats.stamina -= skill.cost;
+      getResultsForStatusEffectHook(invoker, StatusEffectHook.OnSkillUsed);
+      const actionResult = skill.effect(invoker, target, board);
+      this.spendActionPoints(actionResult.cost);
       return actionResult;
     }
     
     executeDefend(): void {
       const currentCombatant = this.getCurrentCombatant();
       this.combatMaster.defend(currentCombatant);
-      this.actionsRemaining -= 1;
+      this.spendActionPoints(1);
     }
 
     executeSkipTurn(): void {
-      this.actionsRemaining -= (this.getCurrentTeam().getAliveCombatants().length === 1 ? 1 : 0.5);
+      this.spendActionPoints(this.getCurrentTeam().getAliveCombatants().length === 1 ? 1 : 0.5);
+    }
+
+    spendActionPoints(amount: number): void {
+      this.actionsRemaining -= amount;
     }
   
     nextTurn(): void {

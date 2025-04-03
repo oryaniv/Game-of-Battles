@@ -3,5 +3,13 @@ export enum CombatantType {
     Defender = "Defender", 
     Hunter = "Hunter",
     Healer = "Healer",
-    Wizard = "Wizard"
+    Wizard = "Wizard",
+    StandardBearer = "StandardBearer",
+    Witch = "Witch",
+    Fool = "Fool",
+    Pikeman = "Pikeman",
+    Vanguard = "Vanguard",
+    Rogue = "Rogue",
+    Artificer = "Artificer",
+    Fistweaver = "Fistweaver",
 }

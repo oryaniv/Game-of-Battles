@@ -8,47 +8,45 @@ import { StatusEffectHook, StatusEffectType } from "../StatusEffect";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
 import { SacredFlame } from "../SpecialMoves/Singular/Offensive";
-import { Purify } from "../SpecialMoves/Singular/Support";
 
-export class Healer extends Combatant {
+export class Witch extends Combatant {
     constructor(name: string, position: Position, team: Team) {
       super(
         name,
         {
-          hp: 50,
-          attackPower: 10,
-          defensePower: 10,
-          stamina: 50,
-          initiative: 2,
-          movementSpeed: 4,
+          hp: 55,
+          attackPower: 15,
+          defensePower: 5,
+          stamina: 40,
+          initiative: 3,
+          movementSpeed: 3,
           range: 1,
-          agility: 5,
-          luck: 8,
+          agility: 4,
+          luck: 9,
         },
         position,
         [
-          {type: DamageType.Slash, reaction: DamageReaction.NONE},
+          {type: DamageType.Slash, reaction: DamageReaction.WEAKNESS},
           {type: DamageType.Pierce, reaction: DamageReaction.NONE},
           {type: DamageType.Crush, reaction: DamageReaction.NONE},
-          {type: DamageType.Fire, reaction: DamageReaction.NONE},
-          {type: DamageType.Ice, reaction: DamageReaction.NONE},
+          {type: DamageType.Fire, reaction: DamageReaction.WEAKNESS},
+          {type: DamageType.Ice, reaction: DamageReaction.RESISTANCE},
           {type: DamageType.Lightning, reaction: DamageReaction.NONE},
-          {type: DamageType.Blight, reaction: DamageReaction.WEAKNESS},
-          {type: DamageType.Holy, reaction: DamageReaction.IMMUNITY},
-          {type: DamageType.Dark, reaction: DamageReaction.WEAKNESS},
+          {type: DamageType.Blight, reaction: DamageReaction.RESISTANCE},
+          {type: DamageType.Holy, reaction: DamageReaction.WEAKNESS},
+          {type: DamageType.Dark, reaction: DamageReaction.IMMUNITY},
         ],
         [
-          new Purify(),
-          new SacredFlame(),
+          
         ], team
       );
     }
 
     basicAttack(): Damage {
-      return { amount: 10, type: DamageType.Holy };
+      return { amount: 15, type: DamageType.Dark };
     }
 
     getCombatantType(): CombatantType {
-        return CombatantType.Healer;
+        return CombatantType.Witch;
       }
   }

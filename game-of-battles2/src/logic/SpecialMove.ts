@@ -3,6 +3,7 @@ import { Damage } from "./Damage";
 import { Position } from "./Position";
 import { StatusEffectType } from "./StatusEffect";
 import { Board } from "./Board";
+import { ActionResult } from "./attackResult";
 export interface SpecialMove {
     name: string;
     triggerType: SpecialMoveTriggerType;
@@ -10,8 +11,8 @@ export interface SpecialMove {
     turnCost: number;
     range: SpecialMoveRange;
     damage: Damage;
-    effect?: (target: Position, board: Board) => void;
-    requirements?: (self: Combatant) => boolean;
+    effect?: (invoker: Combatant, target: Position, board: Board) => ActionResult;
+    checkRequirements?: (self: Combatant) => boolean;
     description: string;
   }
 
@@ -42,6 +43,7 @@ export enum SpecialMoveAreaOfEffect {
     Nova = "Nova",
     Line = "Line",
     Cone = "Cone",
+    Chain = "Chain"
 }
 
 export enum SpecialMoveAlignment {
@@ -50,3 +52,34 @@ export enum SpecialMoveAlignment {
     "Enemy" = "Enemy",
     "All" = "All"
 }
+
+// special move template
+
+/*
+export class XXX implements SpecialMove {
+    name: string = "XXX";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 5;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Melee,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 1
+    };
+    damage: Damage = {
+        amount: 20,
+        type: DamageType.Slash
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const result = CombatMaster.getInstance().executeAttack(invoker, target, board);
+        invoker.defend();
+        return result;
+    };
+    checkRequirements = undefined
+    description = ``
+    
+}
+
+
+*/

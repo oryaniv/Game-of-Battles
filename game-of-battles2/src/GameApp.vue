@@ -16,13 +16,13 @@
           :class="{ 
                     validMove: isMoveValid({ x: x - 1, y: y - 1 }),
                     validAttack: isAttackValid({ x: x - 1, y: y - 1 }),
-                    validSkillHostile: isSkillTargetValid({ x: x - 1, y: y - 1 }) && isEnemy({ x: x - 1, y: y - 1 }),
-                    validSkillFriendly: isSkillTargetValid({ x: x - 1, y: y - 1 }) && isFriendly({ x: x - 1, y: y - 1 }),
-                    validSkillNeutral: isSkillTargetValid({ x: x - 1, y: y - 1 }) && isNeutral({ x: x - 1, y: y - 1 })
+                    validSkillHostile: isSkillTargetValid({ x: x - 1, y: y - 1 }) && isEnemy({ x: x, y: y }),
+                    validSkillFriendly: isSkillTargetValid({ x: x - 1, y: y - 1 }) && isFriendly({ x: x , y: y  }),
+                    validSkillNeutral: isSkillTargetValid({ x: x - 1, y: y - 1 }) && isNeutral({ x: x , y: y  })
            }"
           @click="performAction({ x: x - 1, y:  y - 1})"
         >
-          <!-- <div>{{x -1}},{{y - 1}}</div> -->
+          <!-- <div class="coordinates" style="font-size: 24px;">{{x -1}},{{y - 1}}</div> -->
           <div
             v-if="getCombatant({ x , y})"
             class="combatant"
@@ -39,8 +39,11 @@
             <div class="stamina-bar">
               <div class="stamina-fill" :style="calcStaminaFill(getCombatant({ x, y }))"></div>
             </div>
-                <img class="combatant-sprite" :src="getCombatantSprite(getCombatant({ x, y }))" alt="Combatant" />
-            <img v-if="isDefending(getCombatant({ x, y }))" class="defend-icon" src="./assets/defend.svg" alt="Defend" />
+            <div :class="{'sprite-container': true, 'white': getCombatant({ x, y })?.team.getIndex() === 0}">
+              <img class="combatant-sprite" :src="getCombatantSprite(getCombatant({ x, y }))" alt="Combatant" />
+             
+            </div>
+             <img v-if="isDefending(getCombatant({ x, y }))" class="defend-icon" src="./assets/defend.svg" alt="Defend" />
             <transition-group name="damage-text" tag="div">
               <div
                 v-for="effect in getCombatantEffects({ x: x - 1, y: y - 1 })"
@@ -56,6 +59,14 @@
                 <div v-if="effect.blocked">Blocked!</div>
               </div>
             </transition-group>
+            <div
+              v-for="statusEffect in getCombatantStatusEffects({ x: x - 1, y: y - 1 })"
+              :key="statusEffect.name"
+              class="status-effect-indicator"
+              :style="{ color: getStatusEffectColor(statusEffect.alignment) }"
+            >
+              {{ getStatusEffectLetter(statusEffect.name) }}
+            </div>
           </div>
         </div>
       </div>
@@ -92,7 +103,8 @@
           v-for="skill in getCombatantSpecialMoves(currentCombatant)"
           :key="skill.name"
           class="skill-item"
-          :class="{ disabled: currentCombatant.stats.stamina < skill.cost }"
+          :class="{ disabled: !isSkillEnabled(skill.name) }"
+          :disabled="!isSkillEnabled(skill.name)"
           @click="showSkillTargets(skill.name)"
           @mouseover="showSkillDescription(skill.name)"
           @mouseleave="hideSkillDescription"
@@ -130,6 +142,7 @@ import { Hunter } from './logic/Combatants/Hunter';
 import { Healer } from './logic/Combatants/Healer';
 import { Wizard } from './logic/Combatants/Wizard'; 
 import { SpecialMove, SpecialMoveTriggerType } from './logic/SpecialMove';
+import { StatusEffect, StatusEffectType, StatusEffectAlignment } from './logic/StatusEffect';
 
 export default defineComponent({
   setup() {
@@ -137,17 +150,17 @@ export default defineComponent({
     const whiteTeam = ref(new Team('White Team', 0));
     const blackTeam = ref(new Team('Black Team', 1));
     /// add to white team
-    whiteTeam.value.addCombatant(new Defender('Boris', { x: 0, y: 4 }, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Defender('Igor', { x: 2, y: 4 }, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Hunter('Yanko', { x: 4, y: 4 }, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Defender('Boris', { x: 0, y: 4 }, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Defender('Igor', { x: 2, y: 4 }, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Hunter('Yanko', { x: 4, y: 4 }, whiteTeam.value));
     whiteTeam.value.addCombatant(new Wizard('Ivan', { x: 6, y: 4 }, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Healer('Vitaly', { x: 8, y: 4 }, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Healer('Vitaly', { x: 8, y: 4 }, whiteTeam.value));
     /// add to black team
-    blackTeam.value.addCombatant(new Defender('Michael', { x: 0, y: 5 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Militia('Jake', { x: 2, y: 5 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Militia('Chuck', { x: 4, y: 5 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Militia('Joe', { x: 7, y: 5 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Militia('Dan', { x: 9, y: 5 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Defender('Michael', { x: 0, y: 5 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Militia('Jake', { x: 2, y: 5 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Militia('Chuck', { x: 4, y: 5 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Wizard('Joe', { x: 7, y: 5 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Militia('Dan', { x: 9, y: 5 }, blackTeam.value));
 
     const teams = ref([whiteTeam.value, blackTeam.value]);
     const game = ref(new Game(teams.value, board.value as Board));
@@ -447,6 +460,13 @@ export default defineComponent({
       selectedSkillDescription.value = null;
     };
 
+    const isSkillEnabled = (skillName: string) => {
+      const skill = currentCombatant.value?.specialMoves.find(
+        (skill) => skill.name === skillName
+      );
+      return !!skill && !!currentCombatant.value && currentCombatant.value.canUseSkill(skill);
+    }
+
     const showSkillTargets = (skillName: string) => {
       if(!currentCombatant.value) {
         return;
@@ -488,11 +508,48 @@ export default defineComponent({
     const performSkill = (position: Position) => {
       if (isSkillTargetValid(position) && currentCombatant.value 
       && currentSkill.value && currentSkill.value.effect) {
-        alert('do skill');
-        currentSkill.value.effect(position, board.value as Board);
+        const actionResult = game.value.executeSkill(currentSkill.value, currentCombatant.value, position, board.value as Board);
+        if(actionResult.attackResult !== AttackResult.NotFound) {
+          applyAttackEffects(actionResult, position);
+        }
         skillMode.value = false;
+        validTargetsForSkill.value = [];
+        game.value.nextTurn();
+        prepareNextTurn();
       }
     }
+
+    const statusEffectLetters: { [key in StatusEffectType]?: string } = {
+      [StatusEffectType.BLOCKING_STANCE]: "B",
+      [StatusEffectType.ARCANE_CHANNELING]: "H",
+      [StatusEffectType.FOCUS_AIM]: "A",
+      [StatusEffectType.FORTIFIED]: "F",
+      // ... add mappings for other status effect types
+    };
+
+    const getStatusEffectLetter = (effectType: StatusEffectType): string => {
+      debugger;
+      return statusEffectLetters[effectType] || "?"; // Default to "?" if not found
+    };
+
+     const getStatusEffectColor = (alignment: StatusEffectAlignment): string => {
+      switch (alignment) {
+        case StatusEffectAlignment.Positive:
+          return 'blue';
+        case StatusEffectAlignment.Negative:
+          return 'red';
+        case StatusEffectAlignment.Neutral:
+          return 'yellow';
+        default:
+          return 'white'; // Default color
+      }
+    };
+
+    const getCombatantStatusEffects = (position: Position): StatusEffect[] => {
+      debugger;
+      const combatant = board.value.getCombatantAtPosition(position);
+      return combatant ? combatant.getStatusEffects() : [];
+    };
 
     const isGameOver = () => {
       return game.value.isGameOver();
@@ -536,13 +593,17 @@ export default defineComponent({
       showSkillDescription,
       hideSkillDescription,
       selectedSkillDescription,
+      isSkillEnabled,
       showSkillTargets,
       isSkillTargetValid,
       skillMode,
       isEnemy,
       isFriendly,
       isNeutral,
-      isGameOver
+      isGameOver,
+      getCombatantStatusEffects,
+      getStatusEffectColor,
+      getStatusEffectLetter
     };
   },
 });
@@ -586,6 +647,10 @@ button {
 .combatant-sprite {
   width: 15px;
   height: 15px;
+}
+
+.sprite-container.white {
+  filter: invert(1);
 }
 
 .turn-icon {
@@ -673,7 +738,7 @@ button {
 .stamina-bar{
     width: 100%;
     height: 3px;
-    background-color: blue;
+    background-color: darkblue;
     margin-bottom: 2px;
 }
 
@@ -681,6 +746,12 @@ button {
     background-color: red;
     height: 100%;
 }
+
+.stamina-fill{
+  background-color: blue;
+  height: 100%;
+}
+
 .defend-icon{
   position: absolute;
   top: 6px;
@@ -857,5 +928,15 @@ button {
   top: 10%;
   right: 0;
   transform: scale(0.6) scaleX(-1);
+}
+
+.status-effect-indicator {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 8px;
+  font-weight: bold;
+  /* Add more styling as needed */
 }
 </style>

@@ -7,6 +7,8 @@ import { Position } from "../Position";
 import { StatusEffectHook, StatusEffectType } from "../StatusEffect";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
+import { ChainLightning, FireBall, Flame, FrozenBurst, Icicle, LightningBolt } from "../SpecialMoves/Singular/Offensive";
+import { ArcaneChanneling } from "../SpecialMoves/Singular/Self";
 
 export class Wizard extends Combatant {
     constructor(name: string, position: Position, team: Team) {
@@ -36,7 +38,13 @@ export class Wizard extends Combatant {
           {type: DamageType.Dark, reaction: DamageReaction.NONE},
         ],
         [
-
+          new Flame(),
+          new LightningBolt(),
+          new Icicle(),
+          new ArcaneChanneling(),
+          new FireBall(),
+          new ChainLightning(),
+          new FrozenBurst(),
         ], team
       );
     }

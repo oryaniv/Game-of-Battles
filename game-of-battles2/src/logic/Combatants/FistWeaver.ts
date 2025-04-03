@@ -3,20 +3,21 @@ import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Position } from "../Position";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
-export class Militia extends Combatant {
+
+export class FistWeaver extends Combatant {
     constructor(name: string, position: Position, team: Team) {
       super(
         name,
         {
-          hp: 40,
-          attackPower: 10,
-          defensePower: 10,
-          stamina: 20,
-          initiative: 4,
-          movementSpeed: 3,
+          hp: 70,
+          attackPower: 25,
+          defensePower: 15,
+          stamina: 35,
+          initiative: 5,
+          movementSpeed: 4,
           range: 1,
-          agility: 5,
-          luck: 3,
+          agility: 7,
+          luck: 6,
         },
         position,
         [
@@ -25,20 +26,22 @@ export class Militia extends Combatant {
             {type: DamageType.Slash, reaction: DamageReaction.NONE},
             {type: DamageType.Fire, reaction: DamageReaction.NONE},
             {type: DamageType.Ice, reaction: DamageReaction.NONE},
-            {type: DamageType.Blight, reaction: DamageReaction.NONE},
+            {type: DamageType.Blight, reaction: DamageReaction.WEAKNESS},
             {type: DamageType.Lightning, reaction: DamageReaction.NONE},
-            {type: DamageType.Holy, reaction: DamageReaction.NONE},
-            {type: DamageType.Dark, reaction: DamageReaction.NONE},
+            {type: DamageType.Holy, reaction: DamageReaction.RESISTANCE},
+            {type: DamageType.Dark, reaction: DamageReaction.WEAKNESS},
         ],
-        [],
+        [
+
+        ],
       team);
     }
 
     getCombatantType(): CombatantType {
-        return CombatantType.Militia;
+        return CombatantType.Fistweaver;
     }
   
     basicAttack(): Damage {
-        return { amount: 20, type: DamageType.Crush };
+        return { amount: 25, type: DamageType.Crush };
     }
   }
