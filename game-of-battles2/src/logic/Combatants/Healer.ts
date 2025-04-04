@@ -8,7 +8,7 @@ import { StatusEffectHook, StatusEffectType } from "../StatusEffect";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
 import { SacredFlame } from "../SpecialMoves/Singular/Offensive";
-import { Purify } from "../SpecialMoves/Singular/Support";
+import { Heal, Purify, Regenerate } from "../SpecialMoves/Singular/Support";
 
 export class Healer extends Combatant {
     constructor(name: string, position: Position, team: Team) {
@@ -38,6 +38,8 @@ export class Healer extends Combatant {
           {type: DamageType.Dark, reaction: DamageReaction.WEAKNESS},
         ],
         [
+          new Heal(),
+          new Regenerate(),
           new Purify(),
           new SacredFlame(),
         ], team

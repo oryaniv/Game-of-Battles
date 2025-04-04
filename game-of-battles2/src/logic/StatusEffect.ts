@@ -1,8 +1,9 @@
 import { ActionResult } from "./attackResult";
 import { Combatant, CombatantStats } from "./Combatant";
-import { DamageType } from "./Damage";
+import { DamageType, Damage } from "./Damage";
 import { BlockingStance } from "./SpecialMoves/Singular/Self";
-import { ArcaneChannelingStatusEffect, BlockingStanceStatusEffect } from "./StatusEffects.ts/PositiveEffects";
+import { FrozenStatusEffect, ImmobilizedStatusEffect } from "./StatusEffects.ts/NegativeEffects";
+import { ArcaneChannelingStatusEffect, BlockingStanceStatusEffect, FocusAimStatusEffect, RegeneratingStatusEffect } from "./StatusEffects.ts/PositiveEffects";
 
 export enum StatusEffectType {
     DEFENDING,
@@ -10,7 +11,9 @@ export enum StatusEffectType {
     ARCANE_CHANNELING,
     FOCUS_AIM,
     FORTIFIED,
-    IMMOBILIZED
+    IMMOBILIZED,
+    REGENERATING,
+    FROZEN
 }
 
   export enum StatusEffectHook {
@@ -26,7 +29,7 @@ export enum StatusEffectType {
     OnBeingAttacked = "OnBeingAttacked",
     // for affects to happen when the combatant takes damage, like ???
     OnDamageTaken = "OnDamageTaken",
-    OnCalculateDamage = "OnCalculateDamage",
+    OnAfterCalculateDamage = "OnAfterCalculateDamage",
     OnAdjacentEnemyEnter = "OnAdjacentEnemyEnter",
     // for affects to happen when the combatant is knocked out like last stand
     OnKnockOut = "OnKnockOut",
@@ -66,17 +69,21 @@ export enum StatusEffectType {
 
   const StatusEffectsTable: StatusEffects = {
     [StatusEffectType.BLOCKING_STANCE]: new BlockingStanceStatusEffect(),
-    [StatusEffectType.ARCANE_CHANNELING]: new ArcaneChannelingStatusEffect()
+    [StatusEffectType.ARCANE_CHANNELING]: new ArcaneChannelingStatusEffect(),
+    [StatusEffectType.FOCUS_AIM]: new FocusAimStatusEffect(),
+    [StatusEffectType.IMMOBILIZED]: new ImmobilizedStatusEffect(),
+    [StatusEffectType.REGENERATING]: new RegeneratingStatusEffect(),
+    [StatusEffectType.FROZEN]: new FrozenStatusEffect()
   };
 
   export function getStatusEffect(name: StatusEffectType) : StatusEffect | undefined {
     return StatusEffectsTable[name];
   }
 
-  export function getResultsForStatusEffectHook(invoker: Combatant, hookType: StatusEffectHook, target?: Combatant, damageType?: DamageType, amount?: number): ActionResult[] {
+  export function getResultsForStatusEffectHook(invoker: Combatant, hookType: StatusEffectHook, target?: Combatant, damage?: Damage, amount?: number): ActionResult[] {
     const correspondingToTypeHooks: StatusEffect[] = invoker.getStatusEffectsOfHook(hookType);
     const correspondingToTypeHooksResults: ActionResult[] = correspondingToTypeHooks
-    .map((hook) => hook.applicationHooks[hookType]!(invoker, target, damageType, 1))
+    .map((hook) => hook.applicationHooks[hookType]!(invoker, target, damage, 1))
     .filter((result) => result !== undefined) as ActionResult[];
 
     return correspondingToTypeHooksResults;

@@ -33,11 +33,12 @@ export interface CombatantStats {
     public stats: CombatantStats; // Current stats, can be modified by effects
     public statusEffects: StatusEffectApplication[] = [];
 
-    startTurn(): void {
+    startTurn(): ActionResult[] {
         if(this.isDefending()) {
             this.removeStatusEffect(StatusEffectType.DEFENDING);
         }
-        this.stats.hp === this.baseStats.hp;
+        const turnStartHookResults: ActionResult[] = getResultsForStatusEffectHook(this, StatusEffectHook.OnTurnStart);
+        return turnStartHookResults;
     }
 
     abstract basicAttack(): Damage
@@ -49,11 +50,6 @@ export interface CombatantStats {
     }
   
     move(newPosition: Position, board: Board) {
-        // const onMovingHooks: StatusEffect[] = this.getStatusEffectsOfHook(StatusEffectHook.OnMoving);
-        // const onMovingHookskResults: ActionResult[] = onMovingHooks
-        // .map((hook) => hook.applicationHooks[StatusEffectHook.OnMoving]!(this))
-        // .filter((result) => result !== undefined) as ActionResult[];
-
         const onMovingHookResults = getResultsForStatusEffectHook(this, StatusEffectHook.OnMoving);
 
         board.removeCombatant(this);
@@ -61,11 +57,6 @@ export interface CombatantStats {
     }
   
     defend(): number {
-      // const onDefendingHooks: StatusEffect[] = this.getStatusEffectsOfHook(StatusEffectHook.OnDefending);
-      // const onDefendingHookResults: ActionResult[] = onDefendingHooks
-      // .map((hook) => hook.applicationHooks[StatusEffectHook.OnDefending]!(this))
-      // .filter((result) => result !== undefined) as ActionResult[];
-
       const onDefendingHookResults = getResultsForStatusEffectHook(this, StatusEffectHook.OnDefending);
       const defenseStatus: StatusEffectApplication = {
           name: StatusEffectType.DEFENDING,
@@ -91,6 +82,7 @@ export interface CombatantStats {
     
     applyStatusEffect(effect: StatusEffectApplication): void {
         this.statusEffects.push(effect);
+        getResultsForStatusEffectHook(this, StatusEffectHook.OnApply, this, {amount: 0, type: DamageType.Unstoppable});
     }
 
     updateStatusEffect(effect: StatusEffectApplication): void {
@@ -101,21 +93,22 @@ export interface CombatantStats {
     }
     
     removeStatusEffect(effectName: StatusEffectType): void {
+      getResultsForStatusEffectHook(this, StatusEffectHook.OnRemove, this, {amount: 0, type: DamageType.Unstoppable});
       const effectToRemove = this.statusEffects.find((effect) => effect.name === effectName);
       if(effectToRemove) {
         this.statusEffects = this.statusEffects.filter((effect) => effect.name !== effectName);
       }
     }
     
-      updateStatusEffects(roundCount: number): void {
-        for (let i = this.statusEffects.length - 1; i >= 0; i--) {
-            const effect = this.statusEffects[i];
-            effect.duration--;
-            if (effect.duration <= 0) {
-              this.removeStatusEffect(effect.name);
-            }
+    updateStatusEffects(): void {
+      for (let i = this.statusEffects.length - 1; i >= 0; i--) {
+          const effect = this.statusEffects[i];
+          effect.duration--;
+          if (effect.duration <= 0) {
+            this.removeStatusEffect(effect.name);
           }
-      }
+        }
+    }
 
       hasStatusEffect(effectName: StatusEffectType): boolean {
         return this.statusEffects.some((effect) => effect.name === effectName);

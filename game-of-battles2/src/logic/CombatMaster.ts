@@ -23,12 +23,14 @@ export class CombatMaster {
         if(!target) {
             throw new Error("No target found");
         }
-
+      
+        // eslint-disable-next-line
+        debugger;
         getResultsForStatusEffectHook(attacker, StatusEffectHook.OnAttacking);
 
         damage = damage || attacker.basicAttack();
 
-        const onBeingAttackedHookResult = this.getOnBeingAttackedHookResults(target, attacker, damage.type);
+        const onBeingAttackedHookResult = this.getOnBeingAttackedHookResults(target, attacker, damage);
         if(onBeingAttackedHookResult) {
             return onBeingAttackedHookResult;
         }
@@ -89,7 +91,7 @@ export class CombatMaster {
     }
 
 
-    private calcaulateBaseDamage(attacker: Combatant, target: Combatant, damageToUse: Damage): Damage {
+    calcaulateBaseDamage(attacker: Combatant, target: Combatant, damageToUse: Damage): Damage {
         const delta = attacker.stats.attackPower - target.stats.defensePower;
         return {amount: (Math.random() * (1.3 - 0.7) + 0.70) * damageToUse.amount * (delta * 0.01 + 1), type: damageToUse.type};
     }
@@ -105,10 +107,10 @@ export class CombatMaster {
             finalDamage = damage.amount * 0.5;
         } else if(reaction === DamageReaction.IMMUNITY) {
             finalDamage = 0;
-            cost = 2;
+            cost *= 2;
         } else if(reaction === DamageReaction.WEAKNESS) {
             finalDamage = damage.amount * 1.25;
-            cost = 0.5;
+            cost = Math.max(0.5, cost / 2);
         } 
         if(attackResult === AttackResult.CriticalHit && reaction !== DamageReaction.IMMUNITY) {
             finalDamage = damage.amount * 1.5;
@@ -116,10 +118,27 @@ export class CombatMaster {
         }
 
         finalDamage = Math.max(0, finalDamage);
-        return {attackResult: attackResult, damage: {amount: finalDamage, type: damage.type}, cost: cost, reaction: reaction};
+
+        const onAfterCalculateDamageHookResults = getResultsForStatusEffectHook(target, StatusEffectHook.OnAfterCalculateDamage, target, damage, 1);
+        if(onAfterCalculateDamageHookResults.length > 0) {
+          const hookMaxDamage = onAfterCalculateDamageHookResults
+          .map((r) => r.damage.amount)
+          .sort((a, b) => b - a)[0];
+          finalDamage = Math.max(hookMaxDamage, finalDamage);
+        }
+        
+        return {
+          attackResult: attackResult,
+          damage: {
+            amount: finalDamage,
+             type: damage.type
+          }, 
+          cost: cost,
+          reaction: reaction
+        };
     }
 
-    private calculateAttackRoll(attacker: Combatant, target: Combatant): AttackResult {
+      calculateAttackRoll(attacker: Combatant, target: Combatant): AttackResult {
         const attackRoll = ((attacker.stats.agility - target.stats.agility) * 0.02) + Math.floor(Math.random() * 100) + 1;
   
         if(attackRoll < 5) {
@@ -145,8 +164,8 @@ export class CombatMaster {
 
       
 
-      private getOnBeingAttackedHookResults(target: Combatant, attacker: Combatant, damageType: DamageType): ActionResult | undefined {
-        const onBeingAttackedHookResults = getResultsForStatusEffectHook(target, StatusEffectHook.OnBeingAttacked, attacker, damageType, 1);
+      private getOnBeingAttackedHookResults(target: Combatant, attacker: Combatant, damage: Damage): ActionResult | undefined {
+        const onBeingAttackedHookResults = getResultsForStatusEffectHook(target, StatusEffectHook.OnBeingAttacked, attacker, damage, 1);
 
         if(onBeingAttackedHookResults.length > 0) {
             const mostRelevantResult = this.getMostRelevantResult(onBeingAttackedHookResults);

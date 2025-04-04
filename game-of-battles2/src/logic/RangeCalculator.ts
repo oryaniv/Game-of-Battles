@@ -1,7 +1,7 @@
 import { Board } from "./Board";
 import { Combatant } from "./Combatant";
 import { Position } from "./Position";
-import { SpecialMoveAlignment, SpecialMoveRange, SpecialMoveRangeType } from "./SpecialMove";
+import { SpecialMoveAlignment, SpecialMoveAreaOfEffect, SpecialMoveRange, SpecialMoveRangeType } from "./SpecialMove";
 
 export class RangeCalculator {
 
@@ -20,7 +20,7 @@ export class RangeCalculator {
       case SpecialMoveRangeType.Straight:
         return this.getStraightTargetPositions(caster, range, board);
       case SpecialMoveRangeType.Curve:
-        return this.getCurveTargetPositions(caster, range.align, range.range, board);
+        return this.getCurveTargetPositions(caster, range, board);
       case SpecialMoveRangeType.None:
         return []; // No target required
       default:
@@ -89,7 +89,7 @@ export class RangeCalculator {
         if (target) {
           if (
             (align === SpecialMoveAlignment.Enemy && target.team !== caster.team) ||
-            (align === SpecialMoveAlignment.Ally && target.team === caster.team) ||
+            ((align === SpecialMoveAlignment.SelfAndAlly || align === SpecialMoveAlignment.Self) && target.team === caster.team) ||
             align === SpecialMoveAlignment.All
           ) {
             targets.push(targetPos);
@@ -97,17 +97,26 @@ export class RangeCalculator {
           break; // Stop if a combatant is in the way
         }
 
-        targets.push(targetPos); // Add even empty tiles
+        // should Add even empty tiles?
+        if(range.areaOfEffect === SpecialMoveAreaOfEffect.Nova || 
+          range.areaOfEffect === SpecialMoveAreaOfEffect.Line || 
+          range.areaOfEffect === SpecialMoveAreaOfEffect.Cross || 
+          range.areaOfEffect === SpecialMoveAreaOfEffect.Cone) {
+          targets.push(targetPos); 
+        }
       }
     });
+
+    if (align === SpecialMoveAlignment.SelfAndAlly || align === SpecialMoveAlignment.Self) {
+      targets.push(caster.position);
+    }
 
     return targets;
   }
 
   private getCurveTargetPositions(
     caster: Combatant,
-    align: SpecialMoveAlignment,
-    maxRange: number,
+    range: SpecialMoveRange,
     board: Board
   ): Position[] {
     const targets: Position[] = [];
@@ -127,23 +136,29 @@ export class RangeCalculator {
       visited[key] = true;
 
       if (distance > 0) {
+        //
         if (board.isValidPosition(position)) {
           const target = board.getCombatantAtPosition(position);
+          // if there is a combatant at the position, check if it is an enemy or ally
           if (target) {
             if (
-              (align === SpecialMoveAlignment.Enemy && target.team !== caster.team) ||
-              (align === SpecialMoveAlignment.Ally && target.team === caster.team) ||
-              align === SpecialMoveAlignment.All
+              (range.align === SpecialMoveAlignment.Enemy && target.team !== caster.team) ||
+              ((range.align === SpecialMoveAlignment.SelfAndAlly || range.align === SpecialMoveAlignment.Self) && target.team === caster.team) ||
+              range.align === SpecialMoveAlignment.All
             ) {
               targets.push(position);
             }
-          } else {
+            // allow for AOE targeting
+          } else if(range.areaOfEffect === SpecialMoveAreaOfEffect.Nova || 
+            range.areaOfEffect === SpecialMoveAreaOfEffect.Line || 
+            range.areaOfEffect === SpecialMoveAreaOfEffect.Cross || 
+            range.areaOfEffect === SpecialMoveAreaOfEffect.Cone) {
             targets.push(position);
           }
         }
       }
 
-      if (distance < maxRange) {
+      if (distance < range.range) {
         const neighbors = [
           { x: currentX, y: currentY - 1 }, // Up
           { x: currentX, y: currentY + 1 }, // Down
@@ -157,6 +172,10 @@ export class RangeCalculator {
           }
         });
       }
+    }
+
+    if (range.align === SpecialMoveAlignment.SelfAndAlly || range.align === SpecialMoveAlignment.Self) {
+      targets.push(caster.position);
     }
 
     return targets;

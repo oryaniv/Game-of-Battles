@@ -1,13 +1,13 @@
 import { StatusEffect, StatusEffectType, StatusEffectHook, StatusEffectAlignment } from "../StatusEffect";
 import { Combatant } from "../Combatant";
 import { ActionResult, AttackResult } from "../attackResult";
-import { DamageReaction, DamageType } from "../Damage";
+import { Damage, DamageReaction, DamageType } from "../Damage";
 
 export class BlockingStanceStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.BLOCKING_STANCE;
     applicationHooks =  {
-        [StatusEffectHook.OnBeingAttacked]: (attacker: Combatant, defender: Combatant, damage: DamageType, attackCost: number) => {
-            if(damage !== DamageType.Crush && damage !== DamageType.Pierce && damage !== DamageType.Slash) {
+        [StatusEffectHook.OnBeingAttacked]: (attacker: Combatant, defender: Combatant, damage: Damage, attackCost: number) => {
+            if(damage.type !== DamageType.Crush && damage.type !== DamageType.Pierce && damage.type !== DamageType.Slash) {
                 return;
             }
 
@@ -54,6 +54,17 @@ export class FocusAimStatusEffect implements StatusEffect {
             self.stats.attackPower -= 25;
             self.stats.agility -= 5;
         },
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
+}
+
+
+export class RegeneratingStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.REGENERATING;
+    applicationHooks = {
+        [StatusEffectHook.OnTurnStart]: (self: Combatant) => {
+            self.stats.hp = Math.min(self.stats.hp + 8, self.baseStats.hp);
+        }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
 }

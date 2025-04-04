@@ -71,8 +71,6 @@ export class Game {
     }
 
     executeSkill(skill: SpecialMove, invoker: Combatant, target: Position, board: Board): ActionResult {
-      // eslint-disable-next-line
-      debugger;
       if(!skill.effect) {
         return getEmptyActionResult(); 
       }
@@ -120,11 +118,26 @@ export class Game {
           this.currentCombatantIndex = 0;
         }
         // this.teams[this.currentTeamIndex].rotateCombatants();
-        this.getCurrentCombatant().startTurn();
+
+        const turnStartHookResults: ActionResult[] = this.getCurrentCombatant().startTurn();
+        // // eslint-disable-next-line
+        // debugger;
+        if(turnStartHookResults.length > 0) {
+            const mostRelevantResult = turnStartHookResults.reduce((mostRelevant, current) => {            
+              return current.cost > mostRelevant.cost ? current : mostRelevant;
+          }, turnStartHookResults[0]);
+          
+          if(mostRelevantResult.cost > 0) {
+            this.spendActionPoints(mostRelevantResult.cost);
+            this.nextTurn();
+          }
+        }
+        
     }
 
     nextRound(): void {
       this.roundCount++;
+      this.updateStatusEffects();
     }
 
     getCurrentRound(): number {
@@ -134,7 +147,7 @@ export class Game {
     updateStatusEffects(): void {
       this.teams.forEach((team) => {
         team.combatants.forEach((combatant) => {
-          combatant.updateStatusEffects(this.roundCount);
+          combatant.updateStatusEffects();
         });
       });
     }

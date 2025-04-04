@@ -9,6 +9,8 @@ export enum DamageType {
     Holy = "Holy",
     Dark = "Dark",
     Unstoppable = "Unstoppable",
+    // Not actually a damage type, but used for healing
+    Healing = "Healing",
 }
 
 

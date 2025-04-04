@@ -57,23 +57,27 @@
                 <div v-if="effect.miss">Miss!</div>
                 <div v-if="effect.fumble">Fumble!</div>
                 <div v-if="effect.blocked">Blocked!</div>
+                
               </div>
+              <!-- <div class="damage-icon"></div> -->
             </transition-group>
-            <div
-              v-for="statusEffect in getCombatantStatusEffects({ x: x - 1, y: y - 1 })"
-              :key="statusEffect.name"
-              class="status-effect-indicator"
-              :style="{ color: getStatusEffectColor(statusEffect.alignment) }"
-            >
-              {{ getStatusEffectLetter(statusEffect.name) }}
+            <div class="status-effect-indicator">
+                <div
+                  v-for="statusEffect in getCombatantStatusEffects({ x: x - 1, y: y - 1 })"
+                  :key="statusEffect.name"
+                  
+                  :style="{ color: getStatusEffectColor(statusEffect.alignment) }"
+                >
+                  {{ getStatusEffectLetter(statusEffect.name) }}
+                </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="actions">
+    <div v-if="actionsRemaining > 0" class="actions">
       <span class="actions-remaining-label">Actions Remaining</span>
-      <div v-for="x in Math.floor(actionsRemaining)" class="turn-icon" :key="x">
+      <div  v-for="x in Math.floor(actionsRemaining)" class="turn-icon" :key="x">
       </div>
       <div v-if="actionsRemaining !== Math.round(actionsRemaining)" class="half-turn-icon" :key="x">
       </div>
@@ -84,9 +88,9 @@
         <button :disabled="attackMode || moveMode || showSkillsMenu || skillMode" @click="showAttackOptions">Attack</button>
         <button :disabled="hasMoved && !canDefendAndMove() || attackMode || moveMode || showSkillsMenu || skillMode" @click="defend">Defend</button>
         <button :disabled="attackMode || moveMode || showSkillsMenu || skillMode" v-if="!hasMoved" @click="showMoveOptions">Move</button>
-        <button v-if="hasMoved" @click="undoMove">Undo</button>
+        <button v-if="hasMoved" @click="undoMove">Undo Move</button>
         <button :disabled="showSkillsMenu || !hasActiveSpecialMoves() || skillMode" @click="showSpecialSkills">Special Skill</button>
-        <button @click="skip">Skip</button>
+        <button :disabled="attackMode || moveMode || showSkillsMenu || skillMode" @click="skip">Skip</button>
         <button :disabled="!moveMode && !attackMode && !showSkillsMenu && !skillMode" @click="cancel">Cancel</button>
       </div>
     </div>
@@ -153,13 +157,13 @@ export default defineComponent({
     // whiteTeam.value.addCombatant(new Defender('Boris', { x: 0, y: 4 }, whiteTeam.value));
     // whiteTeam.value.addCombatant(new Defender('Igor', { x: 2, y: 4 }, whiteTeam.value));
     // whiteTeam.value.addCombatant(new Hunter('Yanko', { x: 4, y: 4 }, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Wizard('Ivan', { x: 6, y: 4 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Wizard('Ivan', { x: 7, y: 4 }, whiteTeam.value));
     // whiteTeam.value.addCombatant(new Healer('Vitaly', { x: 8, y: 4 }, whiteTeam.value));
     /// add to black team
     // blackTeam.value.addCombatant(new Defender('Michael', { x: 0, y: 5 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Militia('Jake', { x: 2, y: 5 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Militia('Chuck', { x: 4, y: 5 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Wizard('Joe', { x: 7, y: 5 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Wizard('Jake', { x: 6, y: 7 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Hunter('Chuck', { x: 4, y: 6 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Healer('Joe', { x: 5, y: 6 }, blackTeam.value));
     // blackTeam.value.addCombatant(new Militia('Dan', { x: 9, y: 5 }, blackTeam.value));
 
     const teams = ref([whiteTeam.value, blackTeam.value]);
@@ -427,6 +431,8 @@ export default defineComponent({
           return 'purple';
         case DamageType.Unstoppable:
           return 'black';
+        case DamageType.Healing:
+          return 'lightgreen';
         default:
           return 'white';
       }
@@ -523,12 +529,13 @@ export default defineComponent({
       [StatusEffectType.BLOCKING_STANCE]: "B",
       [StatusEffectType.ARCANE_CHANNELING]: "H",
       [StatusEffectType.FOCUS_AIM]: "A",
-      [StatusEffectType.FORTIFIED]: "F",
+      [StatusEffectType.IMMOBILIZED]: "Z",
+      // [StatusEffectType.FORTIFIED]: "F",
+      [StatusEffectType.FROZEN]: "F",
       // ... add mappings for other status effect types
     };
 
     const getStatusEffectLetter = (effectType: StatusEffectType): string => {
-      debugger;
       return statusEffectLetters[effectType] || "?"; // Default to "?" if not found
     };
 
@@ -546,7 +553,6 @@ export default defineComponent({
     };
 
     const getCombatantStatusEffects = (position: Position): StatusEffect[] => {
-      debugger;
       const combatant = board.value.getCombatantAtPosition(position);
       return combatant ? combatant.getStatusEffects() : [];
     };
@@ -823,6 +829,19 @@ button {
   animation: floatUp 1s forwards;
 }
 
+.damage-icon {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 14px;
+  background-image: url('./assets/Healing.svg');
+  background-size: cover;
+  background-position: center;
+  width: 15px;
+  height: 15px;
+}
+
 @keyframes floatUp {
   0% {
     opacity: 0;
@@ -848,7 +867,7 @@ button {
   left: 50%;
   transform: translate(-50%, -50%);
   width: 400px;
-  height: 300px;
+  height: 450px;
   background-color: #333;
   border: 1px solid white;
   display: flex;
@@ -937,6 +956,8 @@ button {
   transform: translateX(-50%);
   font-size: 8px;
   font-weight: bold;
+  display: flex;
+  gap: 1px;
   /* Add more styling as needed */
 }
 </style>

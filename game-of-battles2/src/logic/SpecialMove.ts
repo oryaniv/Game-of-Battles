@@ -48,6 +48,7 @@ export enum SpecialMoveAreaOfEffect {
 
 export enum SpecialMoveAlignment {
     "Self" = "Self",
+    "SelfAndAlly" = "SelfAndAlly",
     "Ally" = "Ally",
     "Enemy" = "Enemy",
     "All" = "All"

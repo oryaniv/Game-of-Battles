@@ -51,8 +51,6 @@ export class Flame implements SpecialMove {
         type: DamageType.Fire
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
-        // eslint-disable-next-line
-        debugger;
         const result = CombatMaster.getInstance().executeAttack(invoker, target, board, this.damage);
         return result;
     };
@@ -127,7 +125,7 @@ export class FireBall implements SpecialMove {
         return result;
     };
     checkRequirements = (self: Combatant) => {
-        return self.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING);
+        return true || self.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING);
     };
     description = `Hurl a ball of fire that explodes on impact, dealing medium Fire damage to all in the area. Removes Arcane Channeling.`   
 }
@@ -172,16 +170,20 @@ export class FrozenBurst implements SpecialMove {
         range: 4
     };
     damage: Damage = {
-        amount: 25,
+        amount: 40,
         type: DamageType.Ice
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
         invoker.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
-        const result = CombatMaster.getInstance().executeAttack(invoker, target, board, this.damage);
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage);
+        if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
+            combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.FROZEN, 2, 0.9);
+        }
         return result;
     };
     checkRequirements = (self: Combatant) => {
-        return self.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING);
+        return true || self.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING);
     };
     description = `Blast an enemy with a surge of freezing cold, dealing medium ice damage and having a hight chance
     of freezing the target for 2 turns. Removes Arcane Channeling.`   
@@ -230,7 +232,7 @@ export class PinDown implements SpecialMove {
         const combatMaster = CombatMaster.getInstance();
         const result = combatMaster.executeAttack(invoker, target, board, this.damage);
         if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
-            combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.IMMOBILIZED, 2, 0.6);
+            combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.IMMOBILIZED, 2, 1);
         }
         return result;
     };
