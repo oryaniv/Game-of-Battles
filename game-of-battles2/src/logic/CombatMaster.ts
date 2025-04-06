@@ -24,8 +24,6 @@ export class CombatMaster {
             throw new Error("No target found");
         }
       
-        // eslint-disable-next-line
-        debugger;
         getResultsForStatusEffectHook(attacker, StatusEffectHook.OnAttacking);
 
         damage = damage || attacker.basicAttack();
@@ -43,14 +41,15 @@ export class CombatMaster {
                 attackResult: AttackResult.Hit,
                 damage: {amount: baseDamage.amount / 2, type: baseDamage.type},
                 cost: 1,
-                reaction: DamageReaction.NONE
+                reaction: DamageReaction.NONE,
+                position: position
             };
         }
 
         const attackResult = this.calculateAttackRoll(attacker, target);
         if(attackResult === AttackResult.Hit || attackResult === AttackResult.CriticalHit){
             const baseDamage = this.calcaulateBaseDamage(attacker, target, damage);
-            const actionResult = this.finalizeDamage(target, baseDamage, attackResult);
+            const actionResult = this.finalizeDamage(target, baseDamage, attackResult, position);
             this.handleInjuryAilmentAndDeath(target, actionResult.damage.amount, board);
             return actionResult;
         }  
@@ -59,12 +58,14 @@ export class CombatMaster {
             attackResult: AttackResult.Miss,
             damage: {amount: 0, type: DamageType.Unstoppable},
             cost: 1,
-            reaction: DamageReaction.NONE
+            reaction: DamageReaction.NONE,
+            position: position
         } : {
             attackResult: AttackResult.Fumble,
             damage: {amount: 0, type: DamageType.Unstoppable},
             cost: 2,
-            reaction: DamageReaction.NONE
+            reaction: DamageReaction.NONE,
+            position: position
         };
     }
 
@@ -96,7 +97,7 @@ export class CombatMaster {
         return {amount: (Math.random() * (1.3 - 0.7) + 0.70) * damageToUse.amount * (delta * 0.01 + 1), type: damageToUse.type};
     }
 
-    private finalizeDamage(target: Combatant, damage: Damage, attackResult: AttackResult) : ActionResult {
+    private finalizeDamage(target: Combatant, damage: Damage, attackResult: AttackResult, position: Position) : ActionResult {
         const resistances = target.resistances;
         const damageType = damage.type;
         const reaction = resistances.find((r) => r.type === damageType)?.reaction || DamageReaction.NONE;
@@ -134,7 +135,8 @@ export class CombatMaster {
              type: damage.type
           }, 
           cost: cost,
-          reaction: reaction
+          reaction: reaction,
+          position: position
         };
     }
 

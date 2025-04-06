@@ -18,9 +18,12 @@
                     validAttack: isAttackValid({ x: x - 1, y: y - 1 }),
                     validSkillHostile: isSkillTargetValid({ x: x - 1, y: y - 1 }) && isEnemy({ x: x, y: y }),
                     validSkillFriendly: isSkillTargetValid({ x: x - 1, y: y - 1 }) && isFriendly({ x: x , y: y  }),
-                    validSkillNeutral: isSkillTargetValid({ x: x - 1, y: y - 1 }) && isNeutral({ x: x , y: y  })
+                    validSkillNeutral: isSkillTargetValid({ x: x - 1, y: y - 1 }) && isNeutral({ x: x , y: y  }),
+                    'aoe-highlight': isAoeHighlighted({ x: x - 1, y: y - 1 })
            }"
           @click="performAction({ x: x - 1, y:  y - 1})"
+          @mouseover="showAoe({ x: x - 1, y: y - 1 })"
+          @mouseleave="hideAoe"
         >
           <!-- <div class="coordinates" style="font-size: 24px;">{{x -1}},{{y - 1}}</div> -->
           <div
@@ -157,14 +160,20 @@ export default defineComponent({
     // whiteTeam.value.addCombatant(new Defender('Boris', { x: 0, y: 4 }, whiteTeam.value));
     // whiteTeam.value.addCombatant(new Defender('Igor', { x: 2, y: 4 }, whiteTeam.value));
     // whiteTeam.value.addCombatant(new Hunter('Yanko', { x: 4, y: 4 }, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Wizard('Ivan', { x: 7, y: 4 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Hunter('Ivan', { x: 7, y: 1 }, whiteTeam.value));
     // whiteTeam.value.addCombatant(new Healer('Vitaly', { x: 8, y: 4 }, whiteTeam.value));
     /// add to black team
     // blackTeam.value.addCombatant(new Defender('Michael', { x: 0, y: 5 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Wizard('Jake', { x: 6, y: 7 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Wizard('Jake', { x: 6, y: 7 }, blackTeam.value));
     // blackTeam.value.addCombatant(new Hunter('Chuck', { x: 4, y: 6 }, blackTeam.value));
     // blackTeam.value.addCombatant(new Healer('Joe', { x: 5, y: 6 }, blackTeam.value));
     // blackTeam.value.addCombatant(new Militia('Dan', { x: 9, y: 5 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Militia('Dan', { x: 7, y: 6 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Militia('aan', { x: 5, y: 6 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Militia('san', { x: 3, y: 6 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Militia('ran', { x: 2, y: 8 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Militia('ban', { x: 1, y: 9 }, blackTeam.value));
+    
 
     const teams = ref([whiteTeam.value, blackTeam.value]);
     const game = ref(new Game(teams.value, board.value as Board));
@@ -194,6 +203,7 @@ export default defineComponent({
     const showSkillsMenu = ref(false);
     const selectedSkillDescription = ref<string | null>(null);
     const currentSkill = ref<SpecialMove | null>(null);
+    const aoePositions = ref<Position[]>([]);
 
     const getCombatantEffects = (position: Position) => {
       const key = `${position.x},${position.y}`;
@@ -276,6 +286,7 @@ export default defineComponent({
       showSkillsMenu.value = false;
       validTargetsForSkill.value = [];
       currentSkill.value = null;
+      aoePositions.value = [];
     };
 
     const isMoveValid = (position: Position): boolean => {
@@ -308,7 +319,7 @@ export default defineComponent({
 
     const attackTarget = (position: Position) => {
       if (isAttackValid(position) && currentCombatant.value) {
-        const result: ActionResult = game.value.executeAttack(currentCombatant.value, position, board.value as Board); 
+        const result: ActionResult = game.value.executeBasicAttack(currentCombatant.value, position, board.value as Board); 
         game.value.nextTurn();
         validAttacks.value = [];
         attackMode.value = false;
@@ -514,12 +525,16 @@ export default defineComponent({
     const performSkill = (position: Position) => {
       if (isSkillTargetValid(position) && currentCombatant.value 
       && currentSkill.value && currentSkill.value.effect) {
-        const actionResult = game.value.executeSkill(currentSkill.value, currentCombatant.value, position, board.value as Board);
-        if(actionResult.attackResult !== AttackResult.NotFound) {
-          applyAttackEffects(actionResult, position);
-        }
+        const actionResults = game.value.executeSkill(currentSkill.value, currentCombatant.value, position, board.value as Board);
+        actionResults.forEach((actionResult) => {
+          if(actionResult.attackResult !== AttackResult.NotFound) {
+            const applyPosition = actionResult.position || position;
+            applyAttackEffects(actionResult, applyPosition);
+          }
+        });
         skillMode.value = false;
         validTargetsForSkill.value = [];
+        aoePositions.value = [];
         game.value.nextTurn();
         prepareNextTurn();
       }
@@ -551,6 +566,27 @@ export default defineComponent({
           return 'white'; // Default color
       }
     };
+
+    const showAoe = (position: Position) => {
+        if(currentSkill.value && currentCombatant.value && isSkillTargetValid(position)) {
+          aoePositions.value = board.value.getAreaOfEffectPositions(
+            currentCombatant.value,
+            position,
+            currentSkill.value.range.areaOfEffect,
+            currentSkill.value.range.range
+          );
+        }
+    }
+
+    const hideAoe = () => {
+        aoePositions.value = [];
+    }
+
+    const isAoeHighlighted = (position: Position): boolean => {
+      return aoePositions.value.some(
+        (aoePosition) => aoePosition.x === position.x && aoePosition.y === position.y
+      );
+    }
 
     const getCombatantStatusEffects = (position: Position): StatusEffect[] => {
       const combatant = board.value.getCombatantAtPosition(position);
@@ -609,7 +645,10 @@ export default defineComponent({
       isGameOver,
       getCombatantStatusEffects,
       getStatusEffectColor,
-      getStatusEffectLetter
+      getStatusEffectLetter,
+      isAoeHighlighted,
+      showAoe,
+      hideAoe
     };
   },
 });
@@ -959,5 +998,13 @@ button {
   display: flex;
   gap: 1px;
   /* Add more styling as needed */
+}
+
+.aoe-highlight {
+  background-color: rgba(255, 0, 0, 0.5); /* Default red */
+}
+
+.aoe-highlight[data-alignment='Positive'] {
+  background-color: rgba(0, 0, 255, 0.5); /* Light blue */
 }
 </style>

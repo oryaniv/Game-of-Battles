@@ -1,4 +1,5 @@
 import { Damage, DamageReaction, DamageType } from "./Damage";
+import { Position } from "./Position";
 
 export enum AttackResult {
     Hit,
@@ -16,6 +17,7 @@ export interface ActionResult {
     damage: Damage;
     cost: number;
     reaction: DamageReaction;
+    position?: Position;
 }
 
 

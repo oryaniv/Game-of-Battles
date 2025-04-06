@@ -8,6 +8,7 @@ import { AttackResult, getEmptyActionResult } from "@/logic/attackResult";
 import { Combatant } from "@/logic/Combatant";
 import { CombatMaster } from "@/logic/CombatMaster";
 import { ActionResult } from "@/logic/attackResult";
+import { RangeCalculator } from "@/logic/RangeCalculator";
 
 export class DefensiveStrike implements SpecialMove {
     name: string = "Defensive Strike";
@@ -120,12 +121,17 @@ export class FireBall implements SpecialMove {
         type: DamageType.Fire
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
         invoker.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
-        const result = CombatMaster.getInstance().executeAttack(invoker, target, board, this.damage);
-        return result;
+        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.range);
+        const fireBallResults = getAllTargets.map(AOETarget => {
+            return combatMaster.executeAttack(invoker, AOETarget, board, this.damage);
+        });
+
+        return fireBallResults;
     };
     checkRequirements = (self: Combatant) => {
-        return true || self.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING);
+        return self.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING);
     };
     description = `Hurl a ball of fire that explodes on impact, dealing medium Fire damage to all in the area. Removes Arcane Channeling.`   
 }
@@ -137,7 +143,7 @@ export class ChainLightning implements SpecialMove {
     turnCost: number = 1;
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Straight,
-        align: SpecialMoveAlignment.All,
+        align: SpecialMoveAlignment.Enemy,
         areaOfEffect: SpecialMoveAreaOfEffect.Chain,
         range: 5
     };
@@ -147,11 +153,20 @@ export class ChainLightning implements SpecialMove {
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
         invoker.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
-        const result = CombatMaster.getInstance().executeAttack(invoker, target, board, this.damage);
-        return result;
+        const combatMaster = CombatMaster.getInstance();
+        const chainTargets = board.getChainTargets(invoker, target, 3, 3);
+        const chainLightningResults: ActionResult[] = [];
+        for(const currentTarget of chainTargets) {
+            const result = combatMaster.executeAttack(invoker, currentTarget, board, this.damage);
+            chainLightningResults.push(result);
+            if(result.attackResult === AttackResult.Miss || result.attackResult === AttackResult.Fumble || result.attackResult === AttackResult.Blocked) {
+                break;
+            }
+        }
+        return chainLightningResults;
     };
     checkRequirements = (self: Combatant) => {
-        return self.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING);
+        return true || self.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING);
     };
     description = `Shoot a bolt of lightning at an enemy, the bolt will then jump to up to 3 other 
     enemies, dealing half damage of the previous hit. Removes Arcane Channeling.`   
@@ -238,4 +253,37 @@ export class PinDown implements SpecialMove {
     };
     checkRequirements = undefined
     description = `Shoot an enemy's legs, with amedium chance to immobilize them for 2 turns.`   
+}
+
+export class Ricochet implements SpecialMove {
+    name: string = "Ricochet";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 7;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Straight,
+        align: SpecialMoveAlignment.All,
+        areaOfEffect: SpecialMoveAreaOfEffect.Chain,
+        range: 8
+    };
+    damage: Damage = {
+        amount: 25,
+        type: DamageType.Pierce
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        invoker.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
+        const combatMaster = CombatMaster.getInstance();
+        const chainTargets = board.getChainTargets(invoker, target, 1, 3);
+        const ricochetResultsResults: ActionResult[] = [];
+        for(const currentTarget of chainTargets) {
+            const result = combatMaster.executeAttack(invoker, currentTarget, board, this.damage);
+            ricochetResultsResults.push(result);
+            if(result.attackResult === AttackResult.Miss || result.attackResult === AttackResult.Fumble || result.attackResult === AttackResult.Blocked) {
+                break;
+            }
+        }
+        return ricochetResultsResults;
+    };
+    checkRequirements = undefined
+    description = `Shoot an enemy with a special arrow the splinters on impact, ricocheting and hitting another enemy.`   
 }

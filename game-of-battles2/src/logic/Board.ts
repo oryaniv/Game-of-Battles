@@ -4,7 +4,7 @@
 import { Combatant } from "./Combatant";
 import { Position } from "./Position";
 import { RangeCalculator } from "./RangeCalculator";
-import { SpecialMove, SpecialMoveRange } from "./SpecialMove";
+import { SpecialMove, SpecialMoveAreaOfEffect, SpecialMoveRange } from "./SpecialMove";
 
 export class Board {
   private grid: (Combatant | null)[][];
@@ -34,8 +34,6 @@ export class Board {
   }
 
   getCombatantAtPosition(position: Position): Combatant | null {
-    // eslint-disable-next-line
-    // debugger;
     if (this.isValidPosition(position)) {
       return this.grid[position.y][position.x];
     }
@@ -121,6 +119,23 @@ export class Board {
 
   getValidTargetsForSkill(combatant: Combatant, skillRange: SpecialMoveRange): Position[] {
     const validTargets =  this.rangeCalculator.getValidTargetPositions(combatant, skillRange, this);
+    return validTargets;
+  }
+
+  getAreaOfEffectPositions(caster: Combatant,
+    targetPosition: Position,
+    aoe: SpecialMoveAreaOfEffect,
+    range: number): Position[] {
+    const validTargets =  this.rangeCalculator.getAreaOfEffectPositions(caster, targetPosition, aoe, range, this);
+    return validTargets;
+  }
+
+  getChainTargets(
+    caster: Combatant,
+    targetPosition: Position,
+    jumps: number,
+    jumpRange: number): Position[] {
+    const validTargets =  this.rangeCalculator.getChainTargets(caster, targetPosition, jumps, jumpRange, this);
     return validTargets;
   }
 

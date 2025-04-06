@@ -11,7 +11,7 @@ export interface SpecialMove {
     turnCost: number;
     range: SpecialMoveRange;
     damage: Damage;
-    effect?: (invoker: Combatant, target: Position, board: Board) => ActionResult;
+    effect?: (invoker: Combatant, target: Position, board: Board) => ActionResult | ActionResult[];
     checkRequirements?: (self: Combatant) => boolean;
     description: string;
   }

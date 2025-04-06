@@ -1,7 +1,7 @@
 import { Combatant } from "../Combatant";
 import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Position } from "../Position";
-import { PinDown } from "../SpecialMoves/Singular/Offensive";
+import { PinDown, Ricochet } from "../SpecialMoves/Singular/Offensive";
 import { FocusAim } from "../SpecialMoves/Singular/Self";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
@@ -37,6 +37,7 @@ export class Hunter extends Combatant {
           [
             new FocusAim(),
             new PinDown(),
+            new Ricochet(),
           ], team
         );
       }

@@ -63,22 +63,36 @@ export class Game {
       return this.actionsRemaining;
     }
 
+    
+
     executeAttack(attacker: Combatant, position: Position, board: Board, damage?: Damage): ActionResult {
       damage = damage || attacker.basicAttack();
       const actionResult = this.combatMaster.executeAttack(attacker, position, board, damage);
+      return actionResult;
+    }
+
+    executeBasicAttack(attacker: Combatant, position: Position, board: Board): ActionResult {
+      const damage = attacker.basicAttack();
+      const actionResult = this.executeAttack(attacker, position, board, damage);
       this.spendActionPoints(actionResult.cost);
       return actionResult;
     }
 
-    executeSkill(skill: SpecialMove, invoker: Combatant, target: Position, board: Board): ActionResult {
+    executeSkill(skill: SpecialMove, invoker: Combatant, target: Position, board: Board): ActionResult[] {
       if(!skill.effect) {
-        return getEmptyActionResult(); 
+        return [getEmptyActionResult()]; 
       }
       invoker.stats.stamina -= skill.cost;
       getResultsForStatusEffectHook(invoker, StatusEffectHook.OnSkillUsed);
-      const actionResult = skill.effect(invoker, target, board);
-      this.spendActionPoints(actionResult.cost);
-      return actionResult;
+      const actionResult: ActionResult | ActionResult[] = skill.effect(invoker, target, board); 
+      let maxCost:number = 0;
+      if(Array.isArray(actionResult)) {
+        maxCost = actionResult.reduce((maxCost, result) => Math.max(maxCost, result.cost), 0);
+      } else {
+        maxCost = actionResult.cost;
+      }
+      this.spendActionPoints(maxCost);
+      return Array.isArray(actionResult) ? actionResult : [actionResult];
     }
     
     executeDefend(): void {

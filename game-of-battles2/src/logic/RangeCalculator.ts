@@ -180,4 +180,170 @@ export class RangeCalculator {
 
     return targets;
   }
+
+  getAreaOfEffectPositions(
+    caster: Combatant,
+    targetPosition: Position,
+    aoe: SpecialMoveAreaOfEffect,
+    range: number,
+    board: Board
+  ): Position[] {
+    const aoePositions: Position[] = [];
+    const trueRange = 1;
+
+    switch (aoe) {
+      case SpecialMoveAreaOfEffect.Single:
+        aoePositions.push(targetPosition);
+        break;
+      case SpecialMoveAreaOfEffect.Cross:
+        aoePositions.push(targetPosition);
+        aoePositions.push({ x: targetPosition.x - 1, y: targetPosition.y });
+        aoePositions.push({ x: targetPosition.x + 1, y: targetPosition.y });
+        aoePositions.push({ x: targetPosition.x, y: targetPosition.y - 1 });
+        aoePositions.push({ x: targetPosition.x, y: targetPosition.y + 1 });
+        break;
+      case SpecialMoveAreaOfEffect.Nova:
+        
+        for (let dx = -trueRange; dx <= trueRange; dx++) {
+          for (let dy = -trueRange; dy <= trueRange; dy++) {
+            if (dx === 0 && dy === 0) continue; // Skip the center
+            const pos = { x: targetPosition.x + dx, y: targetPosition.y + dy };
+            if (board.isValidPosition(pos)) {
+              aoePositions.push(pos);
+            }
+          }
+        }
+        aoePositions.push(targetPosition);
+        break;
+      case SpecialMoveAreaOfEffect.Line:
+        if(caster.position.x === targetPosition.x -1) { 
+          for(let i = 0; i <= range; i++) {
+            aoePositions.push({ x: targetPosition.x + i, y: targetPosition.y });
+          }
+        } else if(caster.position.x === targetPosition.x + 1) {
+          for(let i = 0; i <= range; i++) {
+            aoePositions.push({ x: targetPosition.x - i, y: targetPosition.y });
+          }
+        } else if(caster.position.y === targetPosition.y - 1) {
+          for(let i = 0; i <= range; i++) {
+            aoePositions.push({ x: targetPosition.x, y: targetPosition.y + i });
+          }
+        } else if(caster.position.y === targetPosition.y + 1) {
+          for(let i = 0; i <= range; i++) {
+            aoePositions.push({ x: targetPosition.x, y: targetPosition.y - i });
+          }
+        }
+        break;
+      case SpecialMoveAreaOfEffect.Cone:
+        if(caster.position.x !== targetPosition.x) { 
+          aoePositions.push({ x: targetPosition.x, y: targetPosition.y });
+          aoePositions.push({ x: targetPosition.x , y: targetPosition.y -1 });
+          aoePositions.push({ x: targetPosition.x , y: targetPosition.y +1 });
+          aoePositions.push({ x: targetPosition.x, y: targetPosition.y });
+          aoePositions.push({ x: targetPosition.x , y: targetPosition.y -1 });
+          aoePositions.push({ x: targetPosition.x , y: targetPosition.y +1 });
+        } else if(caster.position.y === targetPosition.y) {
+          aoePositions.push({ x: targetPosition.x, y: targetPosition.y });
+          aoePositions.push({ x: targetPosition.x -1, y: targetPosition.y });
+          aoePositions.push({ x: targetPosition.x +1, y: targetPosition.y });
+          aoePositions.push({ x: targetPosition.x, y: targetPosition.y });
+          aoePositions.push({ x: targetPosition.x -1, y: targetPosition.y });
+          aoePositions.push({ x: targetPosition.x +1, y: targetPosition.y });
+        }
+        break;
+      case SpecialMoveAreaOfEffect.Chain:
+        // Implement chain logic (e.g., jumps to nearby enemies)
+        // This can be complex and might require graph traversal
+        break;
+    }
+
+    
+    return aoePositions.filter((pos) => board.isValidPosition(pos)); // Ensure all positions are valid
+  }
+
+  getChainTargets(
+    caster: Combatant,
+    targetPosition: Position,
+    jumps: number,
+    jumpRange: number,
+    board: Board
+  ): Position[] {
+    const chainTargets: Position[] = [targetPosition];
+    let currentTarget = board.getCombatantAtPosition(targetPosition);
+    if (!currentTarget) return []; // If initial target is invalid
+
+    let lastPosition = targetPosition;
+
+    for (let i = 0; i < jumps; i++) {
+      const nextTargetPosition = this.findNextChainTarget(
+        caster,
+        lastPosition,
+        jumpRange,
+        chainTargets.map(pos => board.getCombatantAtPosition(pos)),
+        board
+      );
+
+      if (!nextTargetPosition) {
+        break; // Stop if no valid next target
+      }
+
+      chainTargets.push(nextTargetPosition);
+      lastPosition = nextTargetPosition;
+      currentTarget = board.getCombatantAtPosition(nextTargetPosition);
+      if (!currentTarget) break; // Stop if no combatant at next position.
+    }
+
+    return chainTargets;
+  }
+
+  private findNextChainTarget(
+    caster: Combatant,
+    fromPosition: Position,
+    jumpRange: number,
+    avoidTargets: (Combatant | null)[],
+    board: Board
+  ): Position | null {
+    const { x, y } = fromPosition;
+    const visited: { [key: string]: boolean } = {};
+    const queue: { position: Position; distance: number }[] = [{ position: { x, y }, distance: 0 }];
+    let nearestTarget: { position: Position; distance: number } | null = null;
+
+    while (queue.length > 0) {
+      const { position, distance } = queue.shift()!;
+      const { x: currentX, y: currentY } = position;
+      const key = `${currentX},${currentY}`;
+
+      if (visited[key]) {
+        continue;
+      }
+      visited[key] = true;
+
+      if (distance > 0) {
+        const target = board.getCombatantAtPosition(position);
+        if (target && target !== caster && !avoidTargets.includes(target)) {
+          if (!nearestTarget || distance < nearestTarget.distance) {
+            nearestTarget = { position, distance };
+          }
+          // We can't just return here, we need to explore further to find the *nearest*
+        }
+      }
+
+      if (distance < jumpRange) {
+        const neighbors = [
+          { x: currentX, y: currentY - 1 }, // Up
+          { x: currentX, y: currentY + 1 }, // Down
+          { x: currentX - 1, y: currentY }, // Left
+          { x: currentX + 1, y: currentY }, // Right
+        ];
+
+        neighbors.forEach((neighbor) => {
+          if (board.isValidPosition(neighbor)) {
+            queue.push({ position: neighbor, distance: distance + 1 });
+          }
+        });
+      }
+    }
+
+    return nearestTarget ? nearestTarget.position : null;
+  }
 }
