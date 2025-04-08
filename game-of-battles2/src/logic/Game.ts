@@ -1,4 +1,4 @@
-import { ActionResult, getEmptyActionResult } from "./attackResult";
+import { ActionResult, getStandardActionResult } from "./attackResult";
 import { Board } from "./Board";
 import { Combatant } from "./Combatant";
 import { CombatMaster } from "./CombatMaster";
@@ -8,6 +8,7 @@ import { SpecialMove } from "./SpecialMove";
 import { StatusEffectHook } from "./StatusEffect";
 import { getResultsForStatusEffectHook } from "./StatusEffect";
 import { Team } from "./Team";
+import { emitter } from '../eventBus';
 
 export class Game {
     private currentTeamIndex: number = 0;
@@ -80,14 +81,14 @@ export class Game {
 
     executeSkill(skill: SpecialMove, invoker: Combatant, target: Position, board: Board): ActionResult[] {
       if(!skill.effect) {
-        return [getEmptyActionResult()]; 
+        return [getStandardActionResult()]; 
       }
       invoker.stats.stamina -= skill.cost;
       getResultsForStatusEffectHook(invoker, StatusEffectHook.OnSkillUsed);
       const actionResult: ActionResult | ActionResult[] = skill.effect(invoker, target, board); 
       let maxCost:number = 0;
       if(Array.isArray(actionResult)) {
-        maxCost = actionResult.reduce((maxCost, result) => Math.max(maxCost, result.cost), 0);
+        maxCost = this.determineCostOfManyActions(actionResult);
       } else {
         maxCost = actionResult.cost;
       }
@@ -131,18 +132,12 @@ export class Game {
         } else {
           this.currentCombatantIndex = 0;
         }
-        // this.teams[this.currentTeamIndex].rotateCombatants();
 
         const turnStartHookResults: ActionResult[] = this.getCurrentCombatant().startTurn();
-        // // eslint-disable-next-line
-        // debugger;
         if(turnStartHookResults.length > 0) {
-            const mostRelevantResult = turnStartHookResults.reduce((mostRelevant, current) => {            
-              return current.cost > mostRelevant.cost ? current : mostRelevant;
-          }, turnStartHookResults[0]);
-          
-          if(mostRelevantResult.cost > 0) {
-            this.spendActionPoints(mostRelevantResult.cost);
+          const cost = this.determineCostOfManyActions(turnStartHookResults);
+          if(cost > 0) {
+            this.spendActionPoints(cost);
             this.nextTurn();
           }
         }
@@ -164,6 +159,19 @@ export class Game {
           combatant.updateStatusEffects();
         });
       });
+    }
+
+    determineCostOfManyActions(actions: ActionResult[]): number {
+      if(actions.length === 0) {
+        return 0;
+      }
+      if(actions.some((action) => action.cost === 2)) {
+        return 2;
+      } else if(actions.some((action) => action.cost === 0.5)) {
+        return 0.5;
+      } else {
+        return 1;
+      }
     }
   
     isGameOver(): boolean {

@@ -25,9 +25,9 @@ implement healer + all special moves + more tests
 
 implement mage + all special moves + more tests
 
-current bugs - target finding issues, AOE effects, stat effects, weird action array thing
-
 do some nice UI - background, fonts, images on the sides, etc. maybe even sprites
+
+current bugs - cost of several actions, AOE targeting empty space, hunter can hit from melee, focus aim not ending
 
 -- CAN SHOW MY WIFE!
 --------------------

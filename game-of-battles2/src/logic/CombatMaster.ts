@@ -1,4 +1,4 @@
-import { ActionResult, AttackResult } from "./attackResult";
+import { ActionResult, AttackResult, getStandardActionResult } from "./attackResult";
 import { Board } from "./Board";
 import { Combatant } from "./Combatant";
 import { Damage, DamageReaction, DamageType } from "./Damage";
@@ -18,10 +18,21 @@ export class CombatMaster {
         return CombatMaster.instance;
     }
 
-    executeAttack(attacker: Combatant, position: Position, board: Board, damage?: Damage): ActionResult {
+    executeAttack(attacker: Combatant, position: Position, board: Board, damage?: Damage, allowEmptyTarget: boolean = false): ActionResult {
+        const results = this.executeAttackInner(attacker, position, board, damage, allowEmptyTarget);
+        getResultsForStatusEffectHook(attacker, StatusEffectHook.OnAfterAttacking);
+        return results;
+    }
+
+    private executeAttackInner(attacker: Combatant, position: Position, board: Board, damage?: Damage, allowEmptyTarget: boolean = false): ActionResult {
         const target = board.getCombatantAtPosition(position);
+
         if(!target) {
+          if(allowEmptyTarget) {
+            return getStandardActionResult();
+          } else {
             throw new Error("No target found");
+          }
         }
       
         getResultsForStatusEffectHook(attacker, StatusEffectHook.OnAttacking);

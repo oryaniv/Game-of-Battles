@@ -21,7 +21,7 @@ export interface ActionResult {
 }
 
 
-export function getEmptyActionResult(): ActionResult {
+export function getStandardActionResult(): ActionResult {
     return {
         attackResult: AttackResult.NotFound,
         damage: {

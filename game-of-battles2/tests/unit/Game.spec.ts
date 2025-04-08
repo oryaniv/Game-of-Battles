@@ -69,7 +69,7 @@ describe('Game suite', () => {
           expect(game.getCurrentTeam()).toBe(team2);
       });
 
-      it('skipt turn costs 1 whenn only 1 combatant is alive', () => {
+      it('skipt turn costs 1 when only 1 combatant is alive', () => {
         expect(game.getCurrentTeam()).toBe(team1);
         game.executeSkipTurn();
         game.nextTurn();
@@ -138,7 +138,59 @@ describe('Game suite', () => {
           game.nextTurn(); // Back to Team 1, new round
           expect(game.getCurrentRound()).toBe(2);
         });
+
+        it('combatants lose defend mode when their turn start', () => {
+          // set up initial state
+          const combatant1 = game.getCurrentCombatant();
+          const combatant2 = team2.combatants[0];
+
+          // have both combatants defend
+          game.executeDefend();
+          game.nextTurn();
+          game.executeDefend();
+
+          // verify both are defending
+          expect(combatant1.isDefending()).toBe(true);
+          expect(combatant2.isDefending()).toBe(true);
+
+          // start next round
+          game.nextTurn();
+
+          // verify first combatant is no longer defending but second still is
+          expect(combatant1.isDefending()).toBe(false);
+          expect(combatant2.isDefending()).toBe(true);
+
+          // next turn
+          game.executeSkipTurn();
+          game.nextTurn();
+
+          // verify second combatant is no longer defending
+          expect(combatant2.isDefending()).toBe(false);
+          
+        });
   });
+
+  describe('Game status effects test', () => {
+    it('status effects are removed after certain amount of rounds', () => {
+      
+    });
+
+    it('status effects are removed after their own conditions are met', () => {
+      
+    });
+  });
+
+  describe('turn cost tests', () => {
+    it('turn cost is according the the correct rules', () => {
+      
+    });
+  });
+
+  describe('execute attack tests', () => {
+    
+  });
+
+
   
 });
 

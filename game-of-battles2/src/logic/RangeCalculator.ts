@@ -10,8 +10,6 @@ export class RangeCalculator {
     range: SpecialMoveRange,
     board: Board
   ): Position[] {
-    // eslint-disable-next-line
-    // debugger;
     switch (range.type) {
       case SpecialMoveRangeType.Self:
         return this.getSelfTargetPositions(caster, board);
@@ -89,7 +87,7 @@ export class RangeCalculator {
         if (target) {
           if (
             (align === SpecialMoveAlignment.Enemy && target.team !== caster.team) ||
-            ((align === SpecialMoveAlignment.SelfAndAlly || align === SpecialMoveAlignment.Self) && target.team === caster.team) ||
+            ((align === SpecialMoveAlignment.SelfAndAlly || align === SpecialMoveAlignment.Ally) && target.team === caster.team) ||
             align === SpecialMoveAlignment.All
           ) {
             targets.push(targetPos);

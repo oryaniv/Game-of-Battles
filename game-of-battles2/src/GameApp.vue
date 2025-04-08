@@ -62,7 +62,14 @@
                 <div v-if="effect.blocked">Blocked!</div>
                 
               </div>
-              <!-- <div class="damage-icon"></div> -->
+            </transition-group>
+            <transition-group name="damage-svg" tag="div">
+              <img
+                v-if="getCombatantEffects({ x: x - 1, y: y - 1 }).length > 0 && getCombatantEffects({ x: x - 1, y: y - 1 })[0].damage !== ''"
+                :key="getCombatantEffects({ x: x - 1, y: y - 1 })[0].id"
+                :src="getDamageSvg(getCombatantEffects({ x: x - 1, y: y - 1 })[0].type)"
+                class="damage-svg-icon"
+              />
             </transition-group>
             <div class="status-effect-indicator">
                 <div
@@ -134,7 +141,7 @@
 <script lang="ts">
 /* eslint-disable */
 import { defineComponent, ref, onMounted, computed } from 'vue';
- // Assuming your combatant.ts is in the same directory.
+import { emitter } from './eventBus';
 import { Combatant } from './logic/Combatant';
 import { Board } from './logic/Board';
 import { Team } from './logic/Team';
@@ -157,22 +164,23 @@ export default defineComponent({
     const whiteTeam = ref(new Team('White Team', 0));
     const blackTeam = ref(new Team('Black Team', 1));
     /// add to white team
-    // whiteTeam.value.addCombatant(new Defender('Boris', { x: 0, y: 4 }, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Defender('Igor', { x: 2, y: 4 }, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Hunter('Yanko', { x: 4, y: 4 }, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Hunter('Ivan', { x: 7, y: 1 }, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Healer('Vitaly', { x: 8, y: 4 }, whiteTeam.value));
+    //  whiteTeam.value.addCombatant(new Defender('Boris', { x: 4, y: 1 }, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Defender('Igor', { x: 5, y: 1 }, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Hunter('Zarina', { x: 4, y: 0 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Wizard('Ivan', { x: 5, y: 0 }, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Healer('Annika', { x: 3, y: 0 }, whiteTeam.value));
     /// add to black team
-    // blackTeam.value.addCombatant(new Defender('Michael', { x: 0, y: 5 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Wizard('Jake', { x: 6, y: 7 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Hunter('Chuck', { x: 4, y: 6 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Healer('Joe', { x: 5, y: 6 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Militia('Dan', { x: 9, y: 5 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Militia('Dan', { x: 7, y: 6 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Militia('aan', { x: 5, y: 6 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Militia('san', { x: 3, y: 6 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Militia('ran', { x: 2, y: 8 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Militia('ban', { x: 1, y: 9 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Defender('Michael', { x: 5, y: 8 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Defender('Jake', { x: 6, y: 8 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Hunter('Cecile', { x: 5, y: 9 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Wizard('Bran', { x: 6, y: 9 }, blackTeam.value));
+    //blackTeam.value.addCombatant(new Healer('Marianne', { x: 7, y: 9 }, blackTeam.value));
+    
+    whiteTeam.value.addCombatant(new Militia('q', { x: 0, y: 0 }, whiteTeam.value));
+    blackTeam.value.addCombatant(new Militia('n', { x: 5, y: 3 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Militia('b', { x: 4, y: 3 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Militia('c', { x: 3, y: 3 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Militia('d', { x: 4, y: 2 }, blackTeam.value));
     
 
     const teams = ref([whiteTeam.value, blackTeam.value]);
@@ -214,6 +222,10 @@ export default defineComponent({
       updateTurnMessage();
 
       actionsRemaining.value = currentTeam.value.combatants.length;
+      emitter.on('trigger-method', (actionResultData:any) => {
+        applyAttackEffects(actionResultData, actionResultData.position);
+      });
+      
     });
 
     const updateTurnMessage = () => {
@@ -346,6 +358,7 @@ export default defineComponent({
             fumble: isFumble,
             blocked: isBlocked,
             color: getDamageColor(actionResult.damage.type),
+            type: actionResult.damage.type
           };
 
           const key = `${position.x},${position.y}`;
@@ -449,6 +462,34 @@ export default defineComponent({
       }
     };
 
+    const getDamageSvg = (type: DamageType): string => {
+        switch (type) {
+          case DamageType.Slash:
+            return require('./assets/Slash.svg');
+          case DamageType.Crush:
+            return require('./assets/Crush.svg');
+          case DamageType.Pierce:
+            return require('./assets/Pierce.svg');
+          case DamageType.Fire:
+            return require('./assets/Flame.svg');
+          case DamageType.Ice:
+            return require('./assets/Ice.svg');
+          case DamageType.Lightning:
+            return require('./assets/Thunder.svg');
+          case DamageType.Blight:
+            return require('./assets/Skull.svg');
+          case DamageType.Holy:
+            return require('./assets/Sun.svg');
+          case DamageType.Dark:
+            return require('./assets/Pentagram.svg');
+          case DamageType.Healing:
+            return require('./assets/Healing.svg');
+          // ... other cases
+          default:
+            return require('./assets/Empty.svg'); // Or a default SVG path
+        }
+    };
+
     const showSpecialSkills = () => {
       showSkillsMenu.value = true;
     };
@@ -545,8 +586,9 @@ export default defineComponent({
       [StatusEffectType.ARCANE_CHANNELING]: "H",
       [StatusEffectType.FOCUS_AIM]: "A",
       [StatusEffectType.IMMOBILIZED]: "Z",
-      // [StatusEffectType.FORTIFIED]: "F",
+      [StatusEffectType.FORTIFIED]: "O",
       [StatusEffectType.FROZEN]: "F",
+      [StatusEffectType.REGENERATING]: "R",
       // ... add mappings for other status effect types
     };
 
@@ -648,7 +690,8 @@ export default defineComponent({
       getStatusEffectLetter,
       isAoeHighlighted,
       showAoe,
-      hideAoe
+      hideAoe,
+      getDamageSvg
     };
   },
 });
@@ -1006,5 +1049,25 @@ button {
 
 .aoe-highlight[data-alignment='Positive'] {
   background-color: rgba(0, 0, 255, 0.5); /* Light blue */
+}
+
+.damage-svg-enter-active,
+.damage-svg-leave-active {
+  transition: opacity 1s ease;
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.damage-svg-enter-from,
+.damage-svg-leave-to {
+  opacity: 0;
+}
+
+.damage-svg-icon {
+  width: 20px;
+  height: 20px;
+  color: red;
 }
 </style>

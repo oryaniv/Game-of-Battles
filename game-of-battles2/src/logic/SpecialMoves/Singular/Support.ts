@@ -1,5 +1,5 @@
 import { AttackResult } from "@/logic/attackResult";
-import { getEmptyActionResult } from "@/logic/attackResult";
+import { getStandardActionResult } from "@/logic/attackResult";
 import { Board } from "@/logic/Board";
 import { Combatant } from "@/logic/Combatant";
 import { CombatMaster } from "@/logic/CombatMaster";
@@ -30,7 +30,7 @@ export class Heal implements SpecialMove {
     effect = (invoker: Combatant, target: Position, board: Board) => {
         const targetCombatant = board.getCombatantAtPosition(target);
         if(!targetCombatant) {
-            return getEmptyActionResult();  
+            return getStandardActionResult();  
         }
         targetCombatant.stats.hp = Math.min(targetCombatant.stats.hp + this.damage.amount, targetCombatant.baseStats.hp);
         return {
@@ -65,13 +65,13 @@ export class Regenerate implements SpecialMove {
     effect = (invoker: Combatant, target: Position, board: Board) => {
         const targetCombatant = board.getCombatantAtPosition(target);
         if(!targetCombatant) {
-            return getEmptyActionResult();  
+            return getStandardActionResult();  
         }
         targetCombatant.applyStatusEffect({
             name: StatusEffectType.REGENERATING,
             duration: 5,
         }); 
-        return getEmptyActionResult();
+        return getStandardActionResult();
     };
     checkRequirements = undefined
     description = `Greatly empower an ally's natural healing abilities, 
@@ -96,13 +96,13 @@ export class Purify implements SpecialMove {
     effect = (invoker: Combatant, target: Position, board: Board) => {
         const targetCombatant = board.getCombatantAtPosition(target);
         if(!targetCombatant) {
-            return getEmptyActionResult();
+            return getStandardActionResult();
         }
         const negativeStatusEffects: StatusEffect[] = targetCombatant.getStatusEffects().filter(status => status.alignment === StatusEffectAlignment.Negative);
         for(const statusEffect of negativeStatusEffects) {
             targetCombatant?.removeStatusEffect(statusEffect.name);
         }
-        return getEmptyActionResult();
+        return getStandardActionResult();
     };
     checkRequirements = undefined
     description = `Cure an ally of all Negative status effects`   

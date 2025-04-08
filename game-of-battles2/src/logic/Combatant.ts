@@ -7,6 +7,7 @@ import { getResultsForStatusEffectHook, getStatusEffect, StatusEffect, StatusEff
 import { Team } from "./Team";
 import { ActionResult, AttackResult } from "./attackResult";
 import { CombatantType } from "./Combatants/CombatantType";
+import { emitter } from "@/eventBus";
 
 export interface CombatantStats {
     hp: number;
@@ -38,6 +39,9 @@ export interface CombatantStats {
             this.removeStatusEffect(StatusEffectType.DEFENDING);
         }
         const turnStartHookResults: ActionResult[] = getResultsForStatusEffectHook(this, StatusEffectHook.OnTurnStart);
+        turnStartHookResults.forEach((result) => {
+            emitter.emit('trigger-method', result);
+        });
         return turnStartHookResults;
     }
 
@@ -60,7 +64,7 @@ export interface CombatantStats {
       const onDefendingHookResults = getResultsForStatusEffectHook(this, StatusEffectHook.OnDefending);
       const defenseStatus: StatusEffectApplication = {
           name: StatusEffectType.DEFENDING,
-          duration: 0,
+          duration: Number.POSITIVE_INFINITY,
         };
         this.applyStatusEffect(defenseStatus);
         return 1;

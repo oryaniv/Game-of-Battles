@@ -4,7 +4,7 @@ import { Position } from "@/logic/Position";
 import { SpecialMove, SpecialMoveAlignment, SpecialMoveAreaOfEffect, SpecialMoveRange, SpecialMoveRangeType, SpecialMoveTriggerType } from "@/logic/SpecialMove";
 import { Board } from "@/logic/Board";
 import { StatusEffectType, StatusEffectHook } from "@/logic/StatusEffect";
-import { AttackResult, getEmptyActionResult } from "@/logic/attackResult";
+import { AttackResult, getStandardActionResult } from "@/logic/attackResult";
 import { Combatant } from "@/logic/Combatant";
 import { CombatMaster } from "@/logic/CombatMaster";
 import { ActionResult } from "@/logic/attackResult";
@@ -125,13 +125,13 @@ export class FireBall implements SpecialMove {
         invoker.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
         const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.range);
         const fireBallResults = getAllTargets.map(AOETarget => {
-            return combatMaster.executeAttack(invoker, AOETarget, board, this.damage);
+            return combatMaster.executeAttack(invoker, AOETarget, board, this.damage, true);
         });
 
         return fireBallResults;
     };
     checkRequirements = (self: Combatant) => {
-        return self.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING);
+        return true || self.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING);
     };
     description = `Hurl a ball of fire that explodes on impact, dealing medium Fire damage to all in the area. Removes Arcane Channeling.`   
 }
@@ -166,7 +166,7 @@ export class ChainLightning implements SpecialMove {
         return chainLightningResults;
     };
     checkRequirements = (self: Combatant) => {
-        return true || self.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING);
+        return self.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING);
     };
     description = `Shoot a bolt of lightning at an enemy, the bolt will then jump to up to 3 other 
     enemies, dealing half damage of the previous hit. Removes Arcane Channeling.`   
@@ -198,7 +198,7 @@ export class FrozenBurst implements SpecialMove {
         return result;
     };
     checkRequirements = (self: Combatant) => {
-        return true || self.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING);
+        return self.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING);
     };
     description = `Blast an enemy with a surge of freezing cold, dealing medium ice damage and having a hight chance
     of freezing the target for 2 turns. Removes Arcane Channeling.`   
@@ -262,7 +262,7 @@ export class Ricochet implements SpecialMove {
     turnCost: number = 1;
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Straight,
-        align: SpecialMoveAlignment.All,
+        align: SpecialMoveAlignment.Enemy,
         areaOfEffect: SpecialMoveAreaOfEffect.Chain,
         range: 8
     };

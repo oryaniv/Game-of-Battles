@@ -22,7 +22,7 @@ export class Board {
       this.grid[position.y][position.x] = combatant;
       combatant.position = position;
     } else {
-      console.error("Invalid position");
+      // console.error("Invalid position");
     }
   }
 

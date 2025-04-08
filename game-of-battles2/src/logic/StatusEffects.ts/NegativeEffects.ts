@@ -4,7 +4,7 @@ import { Combatant } from "../Combatant";
 import { StatusEffectHook, StatusEffectType } from "../StatusEffect";
 
 import { StatusEffect } from "../StatusEffect";
-import { AttackResult, getEmptyActionResult } from "../attackResult";
+import { AttackResult, getStandardActionResult } from "../attackResult";
 import { DamageType, Damage } from "../Damage";
 import { DamageReaction } from "../Damage";
 import { CombatMaster } from "../CombatMaster";

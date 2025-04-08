@@ -4,7 +4,7 @@ import { Position } from "@/logic/Position";
 import { SpecialMove, SpecialMoveAlignment, SpecialMoveAreaOfEffect, SpecialMoveRange, SpecialMoveRangeType, SpecialMoveTriggerType } from "@/logic/SpecialMove";
 import { Board } from "@/logic/Board";
 import { StatusEffectType, StatusEffectHook } from "@/logic/StatusEffect";
-import { getEmptyActionResult } from "@/logic/attackResult";
+import { getStandardActionResult } from "@/logic/attackResult";
 import { Combatant } from "@/logic/Combatant";
 
 
@@ -26,13 +26,13 @@ export class BlockingStance implements SpecialMove {
     effect = (invoker: Combatant, target: Position, board: Board) => {
         const combatant = board.getCombatantAtPosition(target);
         if(!combatant) {
-            return getEmptyActionResult();
+            return getStandardActionResult();
         }
         combatant.applyStatusEffect({
             name: StatusEffectType.BLOCKING_STANCE,
             duration: Number.POSITIVE_INFINITY,
         }); 
-        return getEmptyActionResult();
+        return getStandardActionResult();
         
     };
     checkRequirements = (self: Combatant) => {
@@ -61,13 +61,13 @@ export class ArcaneChanneling implements SpecialMove {
     effect = (invoker: Combatant, target: Position, board: Board) => {
         const combatant = board.getCombatantAtPosition(target);
         if(!combatant) {
-            return getEmptyActionResult();
+            return getStandardActionResult();
         }
         combatant.applyStatusEffect({
             name: StatusEffectType.ARCANE_CHANNELING,
             duration: Number.POSITIVE_INFINITY,
         }); 
-        return getEmptyActionResult();
+        return getStandardActionResult();
     };
     checkRequirements = (self: Combatant) => {
         return !self.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING);
@@ -93,13 +93,13 @@ export class FocusAim implements SpecialMove {
     effect = (invoker: Combatant, target: Position, board: Board) => {
         const combatant = board.getCombatantAtPosition(target);
         if(!combatant) {
-            return getEmptyActionResult();
+            return getStandardActionResult();
         }
         combatant.applyStatusEffect({
             name: StatusEffectType.FOCUS_AIM,
             duration: Number.POSITIVE_INFINITY,
         }); 
-        return getEmptyActionResult();
+        return getStandardActionResult();
     };
     checkRequirements = (self: Combatant) => {
         return !self.hasStatusEffect(StatusEffectType.FOCUS_AIM);
