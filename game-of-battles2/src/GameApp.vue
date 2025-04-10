@@ -155,19 +155,25 @@ import { Defender } from './logic/Combatants/Defender';
 import { Hunter } from './logic/Combatants/Hunter';
 import { Healer } from './logic/Combatants/Healer';
 import { Wizard } from './logic/Combatants/Wizard'; 
+import { Witch } from './logic/Combatants/Witch';
+import { StandardBearer } from './logic/Combatants/StandardBearer';
 import { SpecialMove, SpecialMoveTriggerType } from './logic/SpecialMove';
 import { StatusEffect, StatusEffectType, StatusEffectAlignment } from './logic/StatusEffect';
+import { SimpleAIAgent } from './logic/AI/AIAgent';
+import { DummyAIAgent, BunkerDummyAIAgent, ToddlerAIAgent } from './logic/AI/DeterministicAgents';
 
 export default defineComponent({
   setup() {
     const board = ref(new Board(10, 10));
     const whiteTeam = ref(new Team('White Team', 0));
+    //const blackTeam = ref(new Team('Black Team', 1, new ToddlerAIAgent()));
     const blackTeam = ref(new Team('Black Team', 1));
     /// add to white team
-    //  whiteTeam.value.addCombatant(new Defender('Boris', { x: 4, y: 1 }, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Defender('Igor', { x: 5, y: 1 }, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Hunter('Zarina', { x: 4, y: 0 }, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Wizard('Ivan', { x: 5, y: 0 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new StandardBearer('Boris', { x: 4, y: 1 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Witch('Jezebel', { x: 5, y: 1 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Defender('Igor', { x: 3, y: 1 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Hunter('Zarina', { x: 4, y: 0 }, whiteTeam.value));
+    //whiteTeam.value.addCombatant(new Wizard('Ivan', { x: 5, y: 0 }, whiteTeam.value));
     // whiteTeam.value.addCombatant(new Healer('Annika', { x: 3, y: 0 }, whiteTeam.value));
     /// add to black team
     // blackTeam.value.addCombatant(new Defender('Michael', { x: 5, y: 8 }, blackTeam.value));
@@ -176,11 +182,11 @@ export default defineComponent({
     // blackTeam.value.addCombatant(new Wizard('Bran', { x: 6, y: 9 }, blackTeam.value));
     //blackTeam.value.addCombatant(new Healer('Marianne', { x: 7, y: 9 }, blackTeam.value));
     
-    whiteTeam.value.addCombatant(new Militia('q', { x: 0, y: 0 }, whiteTeam.value));
-    blackTeam.value.addCombatant(new Militia('n', { x: 5, y: 3 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Militia('b', { x: 4, y: 3 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Militia('c', { x: 3, y: 3 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Militia('d', { x: 4, y: 2 }, blackTeam.value));
+    // whiteTeam.value.addCombatant(new Militia('q', { x: 0, y: 0 }, whiteTeam.value));
+    blackTeam.value.addCombatant(new Militia('n', { x: 5, y: 9 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Militia('b', { x: 4, y: 9 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Militia('c', { x: 3, y: 9 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Militia('d', { x: 6, y: 9 }, blackTeam.value));
     
 
     const teams = ref([whiteTeam.value, blackTeam.value]);
@@ -309,7 +315,9 @@ export default defineComponent({
 
     const undoMove = () => {
       if (previousPosition.value && currentCombatant.value) {
+        // currentCombatant.value.hasMoved = false;
         currentCombatant.value.move(previousPosition.value, board.value as Board);
+        // currentCombatant.value.hasMoved = false;
         previousPosition.value = null;
         hasMoved.value = false;
       }
@@ -397,7 +405,35 @@ export default defineComponent({
       hasMoved.value = false;
       previousPosition.value = null;
       updateTurnMessage();
+
+      if(game.value.isGameOver()) {
+        return;
+      }
+
+      // if the current combatant has an AI agent, let it play the turn
+      const currentCombatant = game.value.getCurrentCombatant();
+      if(currentCombatant && currentCombatant.aiAgent !== undefined) {
+        setTimeout(() => {
+          playAiTurn(currentCombatant);
+        }, 1000);
+      }
     };
+
+    const playAiTurn = (currentCombatant: Combatant) => {
+      const aiActionResult: ActionResult | ActionResult[] = 
+      currentCombatant.aiAgent!.playTurn(game.value.getCurrentCombatant(), game.value as Game, board.value as Board);
+      if(Array.isArray(aiActionResult)) {
+        aiActionResult.forEach((actionResult) => {
+          actionResult.position && applyAttackEffects(actionResult, actionResult.position);
+        });
+      } else {
+        aiActionResult.position && applyAttackEffects(aiActionResult, aiActionResult.position);
+      }
+      setTimeout(() => {
+        game.value.nextTurn();
+        prepareNextTurn();
+      }, 1000);
+    }
 
     const isDefending = (combatant: Combatant) => {
       return combatant.isDefending();
@@ -432,6 +468,10 @@ export default defineComponent({
           return require('./assets/Healer.svg');
         case CombatantType.Wizard:
           return require('./assets/Wizard.svg');
+        case CombatantType.StandardBearer:
+          return require('./assets/StandardBearer.svg');
+        case CombatantType.Witch:
+          return require('./assets/Witch.svg');
       }
     }
 
@@ -589,6 +629,15 @@ export default defineComponent({
       [StatusEffectType.FORTIFIED]: "O",
       [StatusEffectType.FROZEN]: "F",
       [StatusEffectType.REGENERATING]: "R",
+      [StatusEffectType.STRENGTH_BOOST]: "S",
+      [StatusEffectType.MOBILITY_BOOST]: "M",
+      [StatusEffectType.ENCOURAGED]: "E",
+      [StatusEffectType.RALLIED]: "L",
+      [StatusEffectType.STRENGTH_DOWNGRADE]: "SD",
+      [StatusEffectType.LUCK_DOWNGRADE]: "LD",
+      [StatusEffectType.SLOW]: "SW",
+      [StatusEffectType.POISONED]: "P",
+      [StatusEffectType.BLEEDING]: "BL",
       // ... add mappings for other status effect types
     };
 

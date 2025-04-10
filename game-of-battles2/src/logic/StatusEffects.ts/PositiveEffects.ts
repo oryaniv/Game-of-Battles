@@ -1,6 +1,6 @@
 import { StatusEffect, StatusEffectType, StatusEffectHook, StatusEffectAlignment } from "../StatusEffect";
 import { Combatant } from "../Combatant";
-import { ActionResult, AttackResult } from "../attackResult";
+import { ActionResult, AttackResult, getStandardActionResult } from "../attackResult";
 import { Damage, DamageReaction, DamageType } from "../Damage";
 
 export class BlockingStanceStatusEffect implements StatusEffect {
@@ -86,6 +86,67 @@ export class FortifiedStatusEffect implements StatusEffect {
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
             target.stats.defensePower -= 20;
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
+}
+
+export class StrengthBoostStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.STRENGTH_BOOST;
+    applicationHooks = {
+        [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
+            target.stats.attackPower += 20;
+        },
+        [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
+            target.stats.attackPower -= 20;
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
+}
+
+export class MobilityBoostStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.MOBILITY_BOOST;
+    applicationHooks = {
+        [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
+            target.stats.movementSpeed += 3;
+        },
+        [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
+            target.stats.movementSpeed -= 3;
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
+}
+
+export class EncouragedStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.ENCOURAGED;
+    applicationHooks = {
+        [StatusEffectHook.OnTurnEnd]: (caster: Combatant, target: Combatant) => {
+            const roll = Math.random();
+            if (roll <= 0.2) {
+                return {
+                    attackResult: AttackResult.Hit,
+                    damage: { amount: 0, type: DamageType.Unstoppable },
+                    cost: -1, // Refund 1 action point
+                    reaction: DamageReaction.NONE,
+                    position: target.position
+                };
+            }
+            return undefined;
+        },
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
+}
+
+export class RalliedStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.RALLIED;
+    applicationHooks = {
+        [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
+            target.stats.defensePower += 10;
+            target.stats.luck += 5;
+        },
+        [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
+            target.stats.defensePower -= 10;
+            target.stats.luck -= 5;
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;

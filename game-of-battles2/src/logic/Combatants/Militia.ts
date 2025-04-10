@@ -12,7 +12,7 @@ export class Militia extends Combatant {
           attackPower: 10,
           defensePower: 10,
           stamina: 20,
-          initiative: 2,
+          initiative: 1,
           movementSpeed: 3,
           range: 1,
           agility: 5,

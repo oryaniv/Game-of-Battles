@@ -8,6 +8,7 @@ import { AttackResult, getStandardActionResult } from "../attackResult";
 import { DamageType, Damage } from "../Damage";
 import { DamageReaction } from "../Damage";
 import { CombatMaster } from "../CombatMaster";
+import { Board } from "../Board";
 
 export class ImmobilizedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.IMMOBILIZED;
@@ -58,6 +59,93 @@ export class FrozenStatusEffect implements StatusEffect {
                 reaction: DamageReaction.NONE
             };
         },
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
+}
+
+export class StrengthDowngradeStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.STRENGTH_DOWNGRADE;
+    applicationHooks = {
+        [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
+            target.stats.attackPower -= 20;
+        },
+        [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
+            target.stats.attackPower += 20;
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
+}
+
+export class LuckDowngradeStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.LUCK_DOWNGRADE;
+    applicationHooks = {
+        [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
+            target.stats.luck -= 5;
+        },
+        [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
+            target.stats.luck += 5;
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
+}
+
+export class SlowStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.SLOW;
+    applicationHooks = {
+        [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
+            target.stats.movementSpeed -= 2;
+            target.stats.agility -= 3;
+        },
+        [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
+            target.stats.movementSpeed += 2;
+            target.stats.agility += 3;
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
+}
+
+export class PoisonedStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.POISONED;
+    applicationHooks = {
+        [StatusEffectHook.OnTurnEnd]: (caster: Combatant, target: Combatant, board: Board) => {
+            target.stats.hp -= 10;
+            if(target.stats.hp <= 0) {
+                target.stats.hp = 0;
+                board.removeCombatant(target);
+            }
+            return {
+                attackResult: AttackResult.Hit,
+                damage: {
+                    amount: 10,
+                    type: DamageType.Blight
+                },
+                cost: 0,
+                reaction: DamageReaction.NONE
+            }
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
+}
+
+export class BleedingStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.BLEEDING;
+    applicationHooks = {
+        [StatusEffectHook.OnTurnEnd]: (caster: Combatant, target: Combatant, board: Board) => {
+            target.stats.hp -= 10;
+            if(target.stats.hp <= 0) {
+                target.stats.hp = 0;
+                board.removeCombatant(target);
+            }
+            return {
+                attackResult: AttackResult.Hit,
+                damage: {
+                    amount: 10,
+                    type: DamageType.Pierce
+                },
+                cost: 0,
+                reaction: DamageReaction.NONE
+            }
+        }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
 }

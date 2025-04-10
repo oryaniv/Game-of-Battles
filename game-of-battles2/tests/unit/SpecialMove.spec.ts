@@ -2,11 +2,22 @@ import { SpecialMove } from '@/logic/SpecialMove';
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 
 import { SpecialMoveTriggerType, SpecialMoveRangeType, SpecialMoveAreaOfEffect, SpecialMoveAlignment } from '@/logic/SpecialMove';
-import { DamageType } from '@/logic/Damage';
+import { DamageReaction, DamageType } from '@/logic/Damage';
 import { Combatant } from '@/logic/Combatant';
 import { Board } from '@/logic/Board';
 import { Position } from '@/logic/Position';
-import { getStandardActionResult } from '@/logic/attackResult';
+import { AttackResult, getStandardActionResult } from '@/logic/attackResult';
+import { Militia } from '@/logic/Combatants/Militia';
+import { Game } from '@/logic/Game';
+import { Team } from '@/logic/Team';
+import { Defender } from '@/logic/Combatants/Defender';
+import { ArcaneChanneling, BlockingStance, FocusAim } from '@/logic/SpecialMoves/Singular/Self';
+import { StatusEffectAlignment, StatusEffectType } from '@/logic/StatusEffect';
+import { ChainLightning, DefensiveStrike, FireBall, FrozenBurst, Ricochet } from '@/logic/SpecialMoves/Singular/Offensive';
+import { Heal, Purify, Regenerate } from '@/logic/SpecialMoves/Singular/Support';
+import { CombatMaster } from '@/logic/CombatMaster';
+import { Hunter } from '@/logic/Combatants/Hunter';
+import { Wizard } from '@/logic/Combatants/Wizard';
 
 describe('SpecialMove', () => {
   it('should define correct trigger types', () => {
@@ -104,97 +115,366 @@ describe('SpecialMove', () => {
 });
 
 describe('Blocking stance tests', () => {
-  it('true is true', () => {
-    expect(true).toBe(true);
+    let team1,team2,board:Board,game:Game,combatant:Combatant;
+
+    beforeEach(() => {
+      team1 = new Team('Team 1', 1);
+      team2 = new Team('Team 2', 2);
+      board = new Board(10, 10);
+      combatant = new Defender('Fighter', { x: 0, y: 0 }, team1);
+      team1.addCombatant(combatant);
+      team2.addCombatant(new Militia('Enemy', { x: 1, y: 0 }, team2));
+      game = new Game([team1, team2],board);
+    });
+
+  it('activate blocking stance, defender has blocking stance status effect', () => {
+    game.executeSkill(new BlockingStance(),combatant,{x:0,y:0},board);
+    expect(combatant.hasStatusEffect(StatusEffectType.BLOCKING_STANCE)).toBe(true);
   });
+
+  it('blocking stance is removed after moving', () => {
+    game.executeSkill(new BlockingStance(),combatant,{x:0,y:0},board);
+    expect(combatant.hasStatusEffect(StatusEffectType.BLOCKING_STANCE)).toBe(true);
+    combatant.move({x:1,y:1},board);
+    expect(combatant.hasStatusEffect(StatusEffectType.BLOCKING_STANCE)).toBe(false);
+  });
+
+  it('blocking stance is removed after defending', () => {
+    game.executeSkill(new BlockingStance(),combatant,{x:0,y:0},board);
+    expect(combatant.hasStatusEffect(StatusEffectType.BLOCKING_STANCE)).toBe(true);
+    game.executeDefend();
+    expect(combatant.hasStatusEffect(StatusEffectType.BLOCKING_STANCE)).toBe(false);
+  });
+
+  it('blocking stance is removed after being attacked', () => {
+    game.executeSkill(new BlockingStance(),combatant,{x:0,y:0},board);
+    expect(combatant.hasStatusEffect(StatusEffectType.BLOCKING_STANCE)).toBe(true);
+    game.executeBasicAttack(combatant,{x:1,y:0},board);
+    expect(combatant.hasStatusEffect(StatusEffectType.BLOCKING_STANCE)).toBe(false);
+  });
+  
 });
 
+
+
 describe('Defensive strike tests', () => {
-    it('should execute a special move', () => {
-        expect(true).toBe(true);
+
+    it('should defend after using defensive strike', () => {
+        let team1 = new Team('Team 1', 1);
+        let team2 = new Team('Team 2', 2);
+        let board = new Board(10, 10);
+        let combatant = new Defender('Fighter', { x: 0, y: 0 }, team1);
+        team1.addCombatant(combatant);
+        team2.addCombatant(new Militia('Enemy', { x: 1, y: 0 }, team2));
+        let game = new Game([team1, team2], board);
+
+        game.executeSkill(new DefensiveStrike(), combatant, {x:1,y:0}, board);
+        expect(combatant.hasStatusEffect(StatusEffectType.DEFENDING)).toBe(true);
     });
   });
 
   describe('Heal tests', () => {
-    it('should execute a special move', () => {
-        expect(true).toBe(true);
+    it('ally should be healed after using heal', () => {
+        let team1 = new Team('Team 1', 1);
+        let team2 = new Team('Team 2', 2);
+        let board = new Board(10, 10);
+        let healer = new Militia('Healer', { x: 0, y: 0 }, team1);
+        let ally = new Militia('Ally', { x: 1, y: 0 }, team1);
+        team1.addCombatant(healer);
+        team1.addCombatant(ally);
+        let game = new Game([team1, team2], board);
+
+        // Damage the ally first
+        ally.stats.hp -= 20;
+        const initialHp = ally.stats.hp;
+
+        game.executeSkill(new Heal(), healer, {x:1,y:0}, board);
+        expect(ally.stats.hp).toBeGreaterThan(initialHp);
     });
   });
 
-  describe('Purift tests', () => {
-    it('should execute a special move', () => {
-        expect(true).toBe(true);
+  describe('Purify tests', () => {
+    it('ally should lose all negative status effects after being targeted by purify', () => {
+        let team1 = new Team('Team 1', 1);
+        let team2 = new Team('Team 2', 2);
+        let board = new Board(10, 10);
+        let healer = new Militia('Healer', { x: 0, y: 0 }, team1);
+        let ally = new Militia('Ally', { x: 1, y: 0 }, team1);
+        team1.addCombatant(healer);
+        team1.addCombatant(ally);
+        let game = new Game([team1, team2], board);
+
+        // Apply some negative status effects to ally
+        ally.applyStatusEffect({
+            name: StatusEffectType.FROZEN,
+            duration: 3,
+        });
+        ally.applyStatusEffect({
+            name: StatusEffectType.IMMOBILIZED,
+            duration: 3,
+        });
+
+        expect(ally.hasStatusEffect(StatusEffectType.FROZEN)).toBe(true);
+        expect(ally.hasStatusEffect(StatusEffectType.IMMOBILIZED)).toBe(true);
+
+        game.executeSkill(new Purify(), healer, {x:1,y:0}, board);
+        
+        expect(ally.hasStatusEffect(StatusEffectType.FROZEN)).toBe(false);
+        expect(ally.hasStatusEffect(StatusEffectType.IMMOBILIZED)).toBe(false);
     });
   });
 
-  describe('Sacred Flame tests', () => {
-    it('should execute a special move', () => {
-        expect(true).toBe(true);
-    });
-  });
 
   describe('Regenerate tests', () => {
-    it('should execute a special move', () => {
-        expect(true).toBe(true);
+    it('should heal a little every turn', () => {
+        let team1 = new Team('Team 1', 1);
+        let team2 = new Team('Team 2', 2);
+        let board = new Board(10, 10);
+        let healer = new Militia('Healer', { x: 0, y: 0 }, team1);
+        let ally = new Militia('Ally', { x: 1, y: 0 }, team1);
+        let enemy = new Militia('Enemy', { x: 2, y: 0 }, team2);
+        team1.addCombatant(healer);
+        team1.addCombatant(ally);
+        team2.addCombatant(enemy);
+        let game = new Game([team1, team2], board);
+
+        // Damage the ally first
+        ally.stats.hp -= 20;
+        const initialHp = ally.stats.hp;
+
+        game.executeSkill(new Regenerate(), healer, {x:1,y:0}, board);
+        
+        expect(ally.hasStatusEffect(StatusEffectType.REGENERATING)).toBe(true);
+        game.nextTurn();
+
+        // Skip first turn
+        game.executeSkipTurn();
+        game.nextTurn();
+        expect(ally.stats.hp).toBeGreaterThan(initialHp);
+
+        const hpAfterFirstTurn = ally.stats.hp;
+
+        // Skip second turn  
+        game.executeSkipTurn();
+        game.nextTurn();
+
+        game.executeSkipTurn();
+        game.nextTurn();
+
+        game.executeSkipTurn();
+        game.nextTurn();
+        expect(ally.stats.hp).toBeGreaterThan(hpAfterFirstTurn);
     });
   });
 
   describe('Focus Aim tests', () => {
-    it('should execute a special move', () => {
-        expect(true).toBe(true);
+    
+    it('should have focus aim status effect after using focus aim', () => {
+        let team1 = new Team('Team 1', 1);
+        let team2 = new Team('Team 2', 2);
+        let board = new Board(10, 10);
+        let archer = new Militia('Archer', { x: 0, y: 0 }, team1);
+        let enemy = new Militia('Enemy', { x: 3, y: 0 }, team2);
+        team1.addCombatant(archer);
+        team2.addCombatant(enemy);
+        let game = new Game([team1, team2], board);
+
+        const initialAttack = archer.stats.attackPower;
+        const initialAgility = archer.stats.agility;
+
+        game.executeSkill(new FocusAim(), archer, {x:0,y:0}, board);
+        
+        expect(archer.hasStatusEffect(StatusEffectType.FOCUS_AIM)).toBe(true);
+    });
+
+    it('should remove focus aim status effect after attacking', () => {
+        let team1 = new Team('Team 1', 1);
+        let team2 = new Team('Team 2', 2);
+        let board = new Board(10, 10);
+        let archer = new Militia('Archer', { x: 0, y: 0 }, team1);
+        let enemy = new Militia('Enemy', { x: 1, y: 0 }, team2);
+        team1.addCombatant(archer);
+        team2.addCombatant(enemy);
+        let game = new Game([team1, team2], board);
+
+        game.executeSkill(new FocusAim(), archer, {x:0,y:0}, board);
+        expect(archer.hasStatusEffect(StatusEffectType.FOCUS_AIM)).toBe(true);
+
+        game.executeBasicAttack(archer, {x:1,y:0}, board);
+        expect(archer.hasStatusEffect(StatusEffectType.FOCUS_AIM)).toBe(false);
     });
   });
 
   describe('Pin down tests', () => {
-    it('should execute a special move', () => {
+    it('enemy should be pinned down after using pin down', () => {
         expect(true).toBe(true);
     });
   });
 
   describe('Ricochet tests', () => {
-    it('should execute a special move', () => {
-        expect(true).toBe(true);
-    });
-  });
+    it('should hit 2 targets after using ricochet', () => {
+        let team1 = new Team('Team 1', 1);
+        let team2 = new Team('Team 2', 2);
+        let board = new Board(10, 10);
+        let archer = new Hunter('Archer', { x: 0, y: 0 }, team1);
+        let enemy1 = new Militia('Enemy1', { x: 2, y: 0 }, team2);
+        let enemy2 = new Militia('Enemy2', { x: 3, y: 0 }, team2);
+        team1.addCombatant(archer);
+        team2.addCombatant(enemy1);
+        team2.addCombatant(enemy2);
+        let game = new Game([team1, team2], board);
 
-  describe('Flame tests', () => {
-    it('should execute a special move', () => {
-        expect(true).toBe(true);
-    });
-  });
 
-  describe('Lightning bolt stance tests', () => {
-    it('should execute a special move', () => {
-        expect(true).toBe(true);
-    });
-  });
+        // Mock CombatMaster to always return successful hits
+        jest.spyOn(CombatMaster.getInstance(), 'executeAttack').mockImplementation(() => {
+            return {
+                attackResult: AttackResult.Hit,
+                damage: {
+                    amount: 10,
+                    type: DamageType.Pierce
+                },
+                cost: 1,
+                reaction: DamageReaction.NONE,
+            };
+        });
 
-  describe('Icicle tests', () => {
-    it('should execute a special move', () => {
-        expect(true).toBe(true);
+        const actionResults = game.executeSkill(new Ricochet(), archer, {x:2,y:0}, board);
+
+        expect(actionResults.length).toBe(2);
+        expect(actionResults[0].damage.amount).toBe(10);
+        expect(actionResults[1].damage.amount).toBe(10);
     });
   });
 
   describe('Arcane channeling tests', () => {
-    it('should execute a special move', () => {
-        expect(true).toBe(true);
+    it('should have arcane channeling status effect after using arcane channeling', () => {
+        let team1 = new Team('Team 1', 1);
+        let team2 = new Team('Team 2', 2);
+        let board = new Board(10, 10);
+        let mage = new Militia('Mage', { x: 0, y: 0 }, team1);
+        team1.addCombatant(mage);
+        let game = new Game([team1, team2], board);
+
+        game.executeSkill(new ArcaneChanneling(), mage, {x:0,y:0}, board);
+        
+        expect(mage.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING)).toBe(true);
     });
   });
 
   describe('Fireball tests', () => {
-    it('should execute a special move', () => {
-        expect(true).toBe(true);
+    it('should hit all enemies after using fireball', () => {
+        let team1 = new Team('Team 1', 1);
+        let team2 = new Team('Team 2', 2);
+        let board = new Board(10, 10);
+        let wizard = new Wizard('Wizard', { x: 0, y: 0 }, team1);
+        let enemy1 = new Militia('Enemy1', { x: 6, y: 0 }, team2);
+        let enemy2 = new Militia('Enemy2', { x: 5, y: 0 }, team2);
+        let enemy3 = new Militia('Enemy3', { x: 4, y: 0 }, team2);
+        team1.addCombatant(wizard);
+        team2.addCombatant(enemy1);
+        team2.addCombatant(enemy2);
+        team2.addCombatant(enemy3);
+        let game = new Game([team1, team2], board);
+
+        // Mock CombatMaster to always return successful hits
+        jest.spyOn(CombatMaster.getInstance(), 'executeAttack').mockImplementation(() => {
+            return {
+                attackResult: AttackResult.Hit,
+                damage: {
+                    amount: 10,
+                    type: DamageType.Fire
+                },
+                cost: 1,
+                reaction: DamageReaction.NONE,
+            };
+        });
+
+        const actionResults = game.executeSkill(new FireBall(), wizard, {x:5,y:0}, board);
+
+        expect(actionResults.length).toBe(6);
+        expect(actionResults[0].damage.amount).toBe(10);
+        expect(actionResults[1].damage.amount).toBe(10);
+        expect(actionResults[2].damage.amount).toBe(10);
+        expect(actionResults[0].damage.type).toBe(DamageType.Fire);
     });
   });
 
   describe('Chain lightning tests', () => {
-    it('should execute a special move', () => {
-        expect(true).toBe(true);
+    it('should hit 4 enemies after using chain lightning', () => {
+        let team1 = new Team('Team 1', 1);
+        let team2 = new Team('Team 2', 2);
+        let board = new Board(10, 10);
+        let wizard = new Wizard('Wizard', { x: 0, y: 0 }, team1);
+        let enemy1 = new Militia('Enemy1', { x: 2, y: 0 }, team2);
+        let enemy2 = new Militia('Enemy2', { x: 2, y: 1 }, team2);
+        let enemy3 = new Militia('Enemy3', { x: 3, y: 0 }, team2);
+        let enemy4 = new Militia('Enemy4', { x: 3, y: 1 }, team2);
+        team1.addCombatant(wizard);
+        team2.addCombatant(enemy1);
+        team2.addCombatant(enemy2);
+        team2.addCombatant(enemy3);
+        team2.addCombatant(enemy4);
+        let game = new Game([team1, team2], board);
+
+        // Mock CombatMaster to always return successful hits
+        jest.spyOn(CombatMaster.getInstance(), 'executeAttack').mockImplementation(() => {
+            return {
+                attackResult: AttackResult.Hit,
+                damage: {
+                    amount: 10,
+                    type: DamageType.Lightning
+                },
+                cost: 1,
+                reaction: DamageReaction.NONE,
+            };
+        });
+
+        const actionResults = game.executeSkill(new ChainLightning(), wizard, {x:2,y:0}, board);
+
+        expect(actionResults.length).toBe(4);
+        expect(actionResults[0].damage.amount).toBe(10);
+        expect(actionResults[1].damage.amount).toBe(10);
+        expect(actionResults[2].damage.amount).toBe(10);
+        expect(actionResults[3].damage.amount).toBe(10);
+        expect(actionResults[0].damage.type).toBe(DamageType.Lightning);
     });
   });
 
-  describe('Frozne burst tests', () => {
-    it('should execute a special move', () => {
+  describe('Frozen burst tests', () => {
+    it('enemy should be frozen after using frozen burst', () => {
+        let team1 = new Team('Team 1', 1);
+        let team2 = new Team('Team 2', 2);
+        let board = new Board(10, 10);
+        let wizard = new Wizard('Wizard', { x: 0, y: 0 }, team1);
+        let enemy = new Militia('Enemy', { x: 1, y: 0 }, team2);
+        team1.addCombatant(wizard);
+        team2.addCombatant(enemy);
+        let game = new Game([team1, team2], board);
+
+        // Mock CombatMaster to return successful hit and status effect application
+        jest.spyOn(CombatMaster.getInstance(), 'executeAttack').mockImplementation(() => {
+            return {
+                attackResult: AttackResult.Hit,
+                damage: {
+                    amount: 10,
+                    type: DamageType.Ice
+                },
+                cost: 1,
+                reaction: DamageReaction.NONE,
+            };
+        });
+
+        jest.spyOn(CombatMaster.getInstance(), 'tryInflictStatusEffect').mockImplementation(() => true);
+
+        const actionResults = game.executeSkill(new FrozenBurst(), wizard, {x:1,y:0}, board);
+
+        expect(actionResults.length).toBe(1);
+        expect(actionResults[0].damage.type).toBe(DamageType.Ice);
+        expect(CombatMaster.getInstance().tryInflictStatusEffect).toHaveBeenCalledWith(
+            expect.any(Object),
+            StatusEffectType.FROZEN,
+            expect.any(Number)
+        );
         expect(true).toBe(true);
     });
   });

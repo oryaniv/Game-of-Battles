@@ -131,7 +131,7 @@ export class FireBall implements SpecialMove {
         return fireBallResults;
     };
     checkRequirements = (self: Combatant) => {
-        return true || self.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING);
+        return self.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING);
     };
     description = `Hurl a ball of fire that explodes on impact, dealing medium Fire damage to all in the area. Removes Arcane Channeling.`   
 }
@@ -228,6 +228,29 @@ export class SacredFlame implements SpecialMove {
     description = `Strike an enemy with a beam of holy retribution, dealing low Holy damage.`   
 }
 
+export class DarkThorn implements SpecialMove {
+    name: string = "Dark Thorn";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 3;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Curve,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 4
+    };
+    damage: Damage = {
+        amount: 25,
+        type: DamageType.Dark
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const result = CombatMaster.getInstance().executeAttack(invoker, target, board, this.damage);
+        return result;
+    };
+    checkRequirements = undefined
+    description = `Raise a thorn coated with Dark energies from the ground, dealing low Darl damage to the target.`   
+}
+
 export class PinDown implements SpecialMove {
     name: string = "Pin Down";
     triggerType = SpecialMoveTriggerType.Active;
@@ -274,16 +297,43 @@ export class Ricochet implements SpecialMove {
         invoker.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
         const combatMaster = CombatMaster.getInstance();
         const chainTargets = board.getChainTargets(invoker, target, 1, 3);
-        const ricochetResultsResults: ActionResult[] = [];
+        const ricochetResults: ActionResult[] = [];
         for(const currentTarget of chainTargets) {
             const result = combatMaster.executeAttack(invoker, currentTarget, board, this.damage);
-            ricochetResultsResults.push(result);
+            ricochetResults.push(result);
             if(result.attackResult === AttackResult.Miss || result.attackResult === AttackResult.Fumble || result.attackResult === AttackResult.Blocked) {
                 break;
             }
         }
-        return ricochetResultsResults;
+        return ricochetResults;
     };
     checkRequirements = undefined
     description = `Shoot an enemy with a special arrow the splinters on impact, ricocheting and hitting another enemy.`   
+}
+
+export class ToxicArrow implements SpecialMove {
+    name: string = "Toxic Arrow";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 6;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Straight,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 8
+    };
+    damage: Damage = {
+        amount: 25,
+        type: DamageType.Blight
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage);
+        if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
+            combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.POISONED, 3, 0.6);
+        }
+        return result;
+    };
+    checkRequirements = undefined
+    description = `Launch an arrow coated in a deadly poison, dealing medium Blight damage and having a medium chance to inflict Poisoned for 3 turns.`   
 }

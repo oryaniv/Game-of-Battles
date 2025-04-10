@@ -2,12 +2,13 @@ import { Damage, Resistance } from "./Damage";
 import { Board } from "./Board";
 import { DamageType } from "./Damage";
 import { Position } from "./Position";
-import { SpecialMove } from "./SpecialMove";
+import { SpecialMove, SpecialMoveTriggerType } from "./SpecialMove";
 import { getResultsForStatusEffectHook, getStatusEffect, StatusEffect, StatusEffectApplication, StatusEffectHook, StatusEffectType } from "./StatusEffect";
 import { Team } from "./Team";
 import { ActionResult, AttackResult } from "./attackResult";
 import { CombatantType } from "./Combatants/CombatantType";
 import { emitter } from "@/eventBus";
+import { AIAgent } from "./AI/AIAgent";
 
 export interface CombatantStats {
     hp: number;
@@ -29,12 +30,21 @@ export interface CombatantStats {
       public resistances: Resistance[],
       public specialMoves: SpecialMove[],
       public team: Team
-    ) {this.stats = { ...this.baseStats }; this.team = team;}
+    ) {
+        this.stats = { ...this.baseStats }; 
+        this.team = team;
+        this.specialMoves.filter((move) => move.triggerType === SpecialMoveTriggerType.Passive).forEach((move) => {
+          move.effect && move.effect(this, this.position,  {} as Board);
+        });
+      }
 
     public stats: CombatantStats; // Current stats, can be modified by effects
     public statusEffects: StatusEffectApplication[] = [];
+    public aiAgent: AIAgent | undefined;
+    hasMoved: boolean = false;
 
     startTurn(): ActionResult[] {
+        this.hasMoved = false;
         if(this.isDefending()) {
             this.removeStatusEffect(StatusEffectType.DEFENDING);
         }
@@ -43,6 +53,14 @@ export interface CombatantStats {
             emitter.emit('trigger-method', result);
         });
         return turnStartHookResults;
+    }
+
+    endTurn(): ActionResult[] {
+        const endTurnHookResults: ActionResult[] = getResultsForStatusEffectHook(this, StatusEffectHook.OnTurnEnd);
+        endTurnHookResults.forEach((result) => {
+            emitter.emit('trigger-method', result);
+        });
+        return endTurnHookResults;
     }
 
     abstract basicAttack(): Damage
@@ -58,6 +76,7 @@ export interface CombatantStats {
 
         board.removeCombatant(this);
         board.placeCombatant(this, newPosition);
+        this.hasMoved = true;
     }
   
     defend(): number {
@@ -132,15 +151,6 @@ export interface CombatantStats {
         .filter((statusEffect) => statusEffect !== undefined) as StatusEffect[];
       }
     
-      applyStatModifiers(roundCount: number): void {
-        // this.stats = { ...this.baseStats };
-    
-        // for (const effect of this.statusEffects) {
-        //   if (effect.modifyStats) {
-        //     this.stats = effect.modifyStats(this.stats);
-        //   }
-        // }
-      }
 
       canUseSkill(skill: SpecialMove): boolean {
         return this.stats.stamina >= skill.cost && 

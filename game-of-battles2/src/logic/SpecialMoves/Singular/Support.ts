@@ -107,3 +107,38 @@ export class Purify implements SpecialMove {
     checkRequirements = undefined
     description = `Cure an ally of all Negative status effects`   
 }
+
+export class RallyToTheBanner implements SpecialMove {
+    name: string = "Rally to the Banner";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 8;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Self,
+        align: SpecialMoveAlignment.SelfAndAlly,
+        areaOfEffect: SpecialMoveAreaOfEffect.Cross,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Healing
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.range);
+        getAllTargets.map(AOETarget => {
+            const targetCombatant = board.getCombatantAtPosition(AOETarget);
+            if(!targetCombatant) {
+                return getStandardActionResult();
+            }
+            targetCombatant.applyStatusEffect({
+                name: StatusEffectType.RALLIED,
+                duration: 3,
+            });
+        });
+
+        return getStandardActionResult();
+    };
+    checkRequirements = undefined
+    description = `Rally close allies to the banner, granting them all a small bonus to both defense and luck. this move
+    cannot be user after moving` 
+}

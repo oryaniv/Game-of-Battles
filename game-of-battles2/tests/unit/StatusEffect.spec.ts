@@ -84,9 +84,3 @@ describe('StatusEffect basic tests', () => {
 });
 
 
-describe('StatusEffect updating tests', () => {
-    it('generic status effect - end in time', () => {
-        expect(true).toBe(true);
-    });
-});
-

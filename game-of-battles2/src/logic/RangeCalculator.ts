@@ -141,7 +141,9 @@ export class RangeCalculator {
           if (target) {
             if (
               (range.align === SpecialMoveAlignment.Enemy && target.team !== caster.team) ||
-              ((range.align === SpecialMoveAlignment.SelfAndAlly || range.align === SpecialMoveAlignment.Self) && target.team === caster.team) ||
+              ((range.align === SpecialMoveAlignment.SelfAndAlly || 
+                range.align === SpecialMoveAlignment.Ally || 
+                range.align === SpecialMoveAlignment.Self) && target.team === caster.team) ||
               range.align === SpecialMoveAlignment.All
             ) {
               targets.push(position);

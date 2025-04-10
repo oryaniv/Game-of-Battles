@@ -1,11 +1,14 @@
 import { Combatant } from "./Combatant";
-
+import { AIAgent } from "./AI/AIAgent";
 export class Team {
     public combatants: Combatant[] = [];
-    constructor(public name: string, public index: number) {}
+    constructor(public name: string, public index: number, public aiAgent: AIAgent | undefined = undefined) {}
 
     addCombatant(combatant: Combatant) {
         this.combatants.push(combatant);
+        if(this.aiAgent) {
+            combatant.aiAgent = this.aiAgent;
+        }
     }
 
     getName(): string {

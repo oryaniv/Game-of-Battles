@@ -9,6 +9,7 @@ import { CombatantType } from "./CombatantType";
 import { MarchingDefense } from "../SpecialMoves/Singular/Passives";
 import { BlockingStance } from "../SpecialMoves/Singular/Self";
 import { DefensiveStrike } from "../SpecialMoves/Singular/Offensive";
+import { Fortify } from "../SpecialMoves/Singular/Buffs";
 export class Defender extends Combatant {
     constructor(name: string, position: Position, team: Team) {
       super(
@@ -40,6 +41,7 @@ export class Defender extends Combatant {
           new MarchingDefense(),
           new BlockingStance(),
           new DefensiveStrike(),
+          new Fortify(),
         ], team 
       );
     }

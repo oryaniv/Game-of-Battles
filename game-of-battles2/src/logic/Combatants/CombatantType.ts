@@ -4,7 +4,7 @@ export enum CombatantType {
     Hunter = "Hunter",
     Healer = "Healer",
     Wizard = "Wizard",
-    StandardBearer = "StandardBearer",
+    StandardBearer = "Standard Bearer",
     Witch = "Witch",
     Fool = "Fool",
     Pikeman = "Pikeman",

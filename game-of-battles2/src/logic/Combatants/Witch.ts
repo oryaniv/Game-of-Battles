@@ -7,7 +7,8 @@ import { Position } from "../Position";
 import { StatusEffectHook, StatusEffectType } from "../StatusEffect";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
-import { SacredFlame } from "../SpecialMoves/Singular/Offensive";
+import { DarkThorn, SacredFlame } from "../SpecialMoves/Singular/Offensive";
+import { EvilEye, SiphonEnergy, Slow, Weaken } from "../SpecialMoves/Singular/Debuffs";
 
 export class Witch extends Combatant {
     constructor(name: string, position: Position, team: Team) {
@@ -37,7 +38,11 @@ export class Witch extends Combatant {
           {type: DamageType.Dark, reaction: DamageReaction.IMMUNITY},
         ],
         [
-          
+          new Weaken(),
+          new EvilEye(),
+          new Slow(),
+          new DarkThorn(),
+          new SiphonEnergy(),
         ], team
       );
     }

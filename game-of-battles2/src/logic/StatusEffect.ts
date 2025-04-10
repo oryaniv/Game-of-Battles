@@ -2,8 +2,9 @@ import { ActionResult } from "./attackResult";
 import { Combatant, CombatantStats } from "./Combatant";
 import { DamageType, Damage } from "./Damage";
 import { BlockingStance } from "./SpecialMoves/Singular/Self";
-import { FrozenStatusEffect, ImmobilizedStatusEffect } from "./StatusEffects.ts/NegativeEffects";
-import { ArcaneChannelingStatusEffect, BlockingStanceStatusEffect, FocusAimStatusEffect, RegeneratingStatusEffect } from "./StatusEffects.ts/PositiveEffects";
+import { FrozenStatusEffect, ImmobilizedStatusEffect, LuckDowngradeStatusEffect, SlowStatusEffect, StrengthDowngradeStatusEffect, PoisonedStatusEffect, BleedingStatusEffect } from "./StatusEffects.ts/NegativeEffects";
+import { EnergyAbsorbStatusEffect, InspiringKillerStatusEffect } from "./StatusEffects.ts/NeutralEffects";
+import { ArcaneChannelingStatusEffect, BlockingStanceStatusEffect, EncouragedStatusEffect, FocusAimStatusEffect, FortifiedStatusEffect, MobilityBoostStatusEffect, RalliedStatusEffect, RegeneratingStatusEffect, StrengthBoostStatusEffect } from "./StatusEffects.ts/PositiveEffects";
 
 export enum StatusEffectType {
     DEFENDING,
@@ -13,7 +14,18 @@ export enum StatusEffectType {
     FORTIFIED,
     IMMOBILIZED,
     REGENERATING,
-    FROZEN
+    FROZEN,
+    POISONED,
+    STRENGTH_BOOST,
+    MOBILITY_BOOST,
+    ENCOURAGED,
+    RALLIED,
+    INSPIRING_KILLER,
+    STRENGTH_DOWNGRADE,
+    LUCK_DOWNGRADE,
+    SLOW, 
+    ENERGY_ABOSORB,
+    BLEEDING
 }
 
   export enum StatusEffectHook {
@@ -41,7 +53,8 @@ export enum StatusEffectType {
     // for affects to happen when the combatant uses a skill - like remove blocking stance
     OnSkillUsed = "OnSkillUsed",
     // for affects to happen when the combatant moves - like remove blocking stance
-    OnMoving = "OnMoving"
+    OnMoving = "OnMoving",
+    OnKilling = "OnKilling"
   }
 
   export enum StatusEffectAlignment {
@@ -73,7 +86,19 @@ export enum StatusEffectType {
     [StatusEffectType.FOCUS_AIM]: new FocusAimStatusEffect(),
     [StatusEffectType.IMMOBILIZED]: new ImmobilizedStatusEffect(),
     [StatusEffectType.REGENERATING]: new RegeneratingStatusEffect(),
-    [StatusEffectType.FROZEN]: new FrozenStatusEffect()
+    [StatusEffectType.FROZEN]: new FrozenStatusEffect(),
+    [StatusEffectType.POISONED]: new PoisonedStatusEffect(), 
+    [StatusEffectType.BLEEDING]: new BleedingStatusEffect(),
+    [StatusEffectType.FORTIFIED]: new FortifiedStatusEffect(),
+    [StatusEffectType.STRENGTH_BOOST]: new StrengthBoostStatusEffect(),
+    [StatusEffectType.MOBILITY_BOOST]: new MobilityBoostStatusEffect(),
+    [StatusEffectType.ENCOURAGED]: new EncouragedStatusEffect(),
+    [StatusEffectType.RALLIED]: new RalliedStatusEffect(),
+    [StatusEffectType.INSPIRING_KILLER]: new InspiringKillerStatusEffect(),
+    [StatusEffectType.STRENGTH_DOWNGRADE]: new StrengthDowngradeStatusEffect(),
+    [StatusEffectType.LUCK_DOWNGRADE]: new LuckDowngradeStatusEffect(),
+    [StatusEffectType.SLOW]: new SlowStatusEffect(),
+    [StatusEffectType.ENERGY_ABOSORB]: new EnergyAbsorbStatusEffect()
   };
 
   export function getStatusEffect(name: StatusEffectType) : StatusEffect | undefined {

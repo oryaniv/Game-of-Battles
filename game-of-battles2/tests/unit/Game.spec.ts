@@ -2,10 +2,13 @@ import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { Board } from '../../src/logic/Board';
 import { Combatant } from '../../src/logic/Combatant';
 import { Position } from '@/logic/Position';
-import { DamageType } from '@/logic/Damage';
+import { DamageReaction, DamageType } from '@/logic/Damage';
 import { Militia } from '@/logic/Combatants/Militia';
 import { Team } from '@/logic/Team';
 import { Game } from '@/logic/Game';
+import { StatusEffectType } from '@/logic/StatusEffect';
+import { CombatMaster } from '@/logic/CombatMaster';
+import { AttackResult } from '@/logic/attackResult';
 
 describe('Game suite', () => {
   let game: Game;
@@ -171,24 +174,114 @@ describe('Game suite', () => {
   });
 
   describe('Game status effects test', () => {
+    let team1,team2,board:Board,game:Game,combatant:Combatant;
+
+    beforeEach(() => {
+      team1 = new Team('Team 1', 1);
+      team2 = new Team('Team 2', 2);
+      board = new Board(10, 10);
+      combatant = new Militia('Fighter', { x: 0, y: 0 }, team1);
+      team1.addCombatant(combatant);
+      team2.addCombatant(new Militia('Enemy', { x: 1, y: 0 }, team2));
+      game = new Game([team1, team2],board);
+    });
     it('status effects are removed after certain amount of rounds', () => {
-      
+      // Apply a status effect that lasts 2 turns
+      combatant.applyStatusEffect({
+        name: StatusEffectType.FORTIFIED,
+        duration: 2
+      });
+
+      expect(combatant.hasStatusEffect(StatusEffectType.FORTIFIED)).toBe(true);
+
+      // Skip first turn
+      game.executeSkipTurn();
+      game.nextTurn();
+      expect(combatant.hasStatusEffect(StatusEffectType.FORTIFIED)).toBe(true);
+
+      // Skip second turn
+      game.executeSkipTurn(); 
+      game.nextTurn();
+
+      game.executeSkipTurn();
+      game.nextTurn();
+      expect(combatant.hasStatusEffect(StatusEffectType.FORTIFIED)).toBe(true);
+
+      // Skip second turn
+      game.executeSkipTurn(); 
+      game.nextTurn();
+      expect(combatant.hasStatusEffect(StatusEffectType.FORTIFIED)).toBe(false);
     });
 
     it('status effects are removed after their own conditions are met', () => {
+      combatant.applyStatusEffect({
+        name: StatusEffectType.FOCUS_AIM,
+        duration: 2
+      });
+
+      expect(combatant.hasStatusEffect(StatusEffectType.FOCUS_AIM)).toBe(true);
+
+      CombatMaster.getInstance().executeAttack(combatant,{x:1, y:0},board);
+
+      expect(combatant.hasStatusEffect(StatusEffectType.FOCUS_AIM)).toBe(false);
       
     });
   });
 
   describe('turn cost tests', () => {
+    let team1:Team,team2:Team,board:Board,game:Game,combatant:Combatant;
+
+    beforeEach(() => {
+      team1 = new Team('Team 1', 1);
+      team2 = new Team('Team 2', 2);
+      board = new Board(10, 10);
+      combatant = new Militia('Fighter', { x: 0, y: 0 }, team1);
+      team1.addCombatant(combatant);
+      team2.addCombatant(new Militia('Enemy', { x: 1, y: 0 }, team2));
+      game = new Game([team1, team2],board);
+    });
+
     it('turn cost is according the the correct rules', () => {
-      
+        const game = new Game([team1, team2],board);
+        const actionResult1 = {
+          attackResult: AttackResult.NotFound,
+          damage: {
+              amount: 0,
+              type: DamageType.Unstoppable
+          },
+          cost: 1,
+          reaction: DamageReaction.NONE
+       };
+
+       const actionResult2 = {
+        attackResult: AttackResult.NotFound,
+        damage: {
+            amount: 0,
+            type: DamageType.Unstoppable
+        },
+        cost: 0.5,
+        reaction: DamageReaction.NONE
+     };
+
+      const actionResult3 = {
+        attackResult: AttackResult.NotFound,
+        damage: {
+            amount: 0,
+            type: DamageType.Unstoppable
+        },
+        cost: 2,
+        reaction: DamageReaction.NONE
+    };
+
+      expect(game.determineCostOfManyActions([actionResult1, actionResult2, actionResult3])).toBe(2);
+      expect(game.determineCostOfManyActions([actionResult1, actionResult2])).toBe(0.5);
+      expect(game.determineCostOfManyActions([actionResult1])).toBe(1);
     });
   });
 
-  describe('execute attack tests', () => {
+  // describe('execute attack tests', () => {
     
-  });
+  // });
 
 
   

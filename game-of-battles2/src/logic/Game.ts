@@ -64,8 +64,6 @@ export class Game {
       return this.actionsRemaining;
     }
 
-    
-
     executeAttack(attacker: Combatant, position: Position, board: Board, damage?: Damage): ActionResult {
       damage = damage || attacker.basicAttack();
       const actionResult = this.combatMaster.executeAttack(attacker, position, board, damage);
@@ -111,21 +109,31 @@ export class Game {
     }
   
     nextTurn(): void {
+      // if game over, return
       if(this.isGameOver()) {
         return;
       }
 
-      // next team
+      // end turn hook application
+      const turnEndHookResults: ActionResult[] = this.getCurrentCombatant().endTurn();
+      if(turnEndHookResults.length > 0) {
+        const cost = this.determineCostOfManyActions(turnEndHookResults);
+        if(cost !== 0) {
+          this.spendActionPoints(cost);
+        }
+      }
+
+      // should we switch teams?
       if (this.actionsRemaining <= 0) {
           this.currentTeamIndex = 1 - this.currentTeamIndex;
           this.actionsRemaining = this.teams[this.currentTeamIndex].getAliveCombatants().length;
-          // next round
+          // not just next turn, but also next round
           if (this.currentTeamIndex === 0) {
             this.nextRound();
           }
         }
 
-        // pick next combatant
+        // pick next combatant from current playing team
         const aliveCombatants = this.teams[this.currentTeamIndex].getAliveCombatants();
         if(this.currentCombatantIndex < aliveCombatants.length - 1) {
           this.currentCombatantIndex++;
@@ -133,15 +141,23 @@ export class Game {
           this.currentCombatantIndex = 0;
         }
 
-        const turnStartHookResults: ActionResult[] = this.getCurrentCombatant().startTurn();
+        const currentCombatant = this.getCurrentCombatant();
+        // start turn hook application
+        const turnStartHookResults: ActionResult[] = currentCombatant.startTurn();
         if(turnStartHookResults.length > 0) {
           const cost = this.determineCostOfManyActions(turnStartHookResults);
-          if(cost > 0) {
+          if(cost !== 0) {
             this.spendActionPoints(cost);
             this.nextTurn();
           }
         }
-        
+
+        // // if there's an AI agent on the current combatant, let it play the turn
+        // if(currentCombatant.aiAgent !== undefined) {
+        //   currentCombatant.aiAgent.playTurn(currentCombatant, this.board);
+        // }
+
+        // // otherwise, control will be released to the player
     }
 
     nextRound(): void {
