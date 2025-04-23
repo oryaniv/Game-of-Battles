@@ -2,7 +2,7 @@ import { ActionResult } from "./attackResult";
 import { Combatant, CombatantStats } from "./Combatant";
 import { DamageType, Damage } from "./Damage";
 import { BlockingStance } from "./SpecialMoves/Singular/Self";
-import { FrozenStatusEffect, ImmobilizedStatusEffect, LuckDowngradeStatusEffect, SlowStatusEffect, StrengthDowngradeStatusEffect, PoisonedStatusEffect, BleedingStatusEffect } from "./StatusEffects.ts/NegativeEffects";
+import { FrozenStatusEffect, ImmobilizedStatusEffect, LuckDowngradeStatusEffect, SlowStatusEffect, StrengthDowngradeStatusEffect, PoisonedStatusEffect, BleedingStatusEffect, TauntedStatusEffect } from "./StatusEffects.ts/NegativeEffects";
 import { EnergyAbsorbStatusEffect, InspiringKillerStatusEffect } from "./StatusEffects.ts/NeutralEffects";
 import { ArcaneChannelingStatusEffect, BlockingStanceStatusEffect, EncouragedStatusEffect, FocusAimStatusEffect, FortifiedStatusEffect, MobilityBoostStatusEffect, RalliedStatusEffect, RegeneratingStatusEffect, StrengthBoostStatusEffect } from "./StatusEffects.ts/PositiveEffects";
 
@@ -25,7 +25,8 @@ export enum StatusEffectType {
     LUCK_DOWNGRADE,
     SLOW, 
     ENERGY_ABOSORB,
-    BLEEDING
+    BLEEDING,
+    TAUNTED
 }
 
   export enum StatusEffectHook {
@@ -58,9 +59,9 @@ export enum StatusEffectType {
   }
 
   export enum StatusEffectAlignment {
-    Positive,
-    Negative,
-    Neutral
+    Negative = 0,
+    Positive = 1,
+    Neutral = 2
   }
 
   export interface StatusEffectApplication {
@@ -98,7 +99,8 @@ export enum StatusEffectType {
     [StatusEffectType.STRENGTH_DOWNGRADE]: new StrengthDowngradeStatusEffect(),
     [StatusEffectType.LUCK_DOWNGRADE]: new LuckDowngradeStatusEffect(),
     [StatusEffectType.SLOW]: new SlowStatusEffect(),
-    [StatusEffectType.ENERGY_ABOSORB]: new EnergyAbsorbStatusEffect()
+    [StatusEffectType.ENERGY_ABOSORB]: new EnergyAbsorbStatusEffect(),
+    [StatusEffectType.TAUNTED]: new TauntedStatusEffect()
   };
 
   export function getStatusEffect(name: StatusEffectType) : StatusEffect | undefined {

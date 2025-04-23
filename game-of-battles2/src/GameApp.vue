@@ -71,9 +71,19 @@
                 class="damage-svg-icon"
               />
             </transition-group>
-            <div class="status-effect-indicator">
+            <div class="status-effect-indicator-negative">
                 <div
-                  v-for="statusEffect in getCombatantStatusEffects({ x: x - 1, y: y - 1 })"
+                  v-for="statusEffect in getCombatantStatusEffects({ x: x - 1, y: y - 1 }, 0)"
+                  :key="statusEffect.name"
+                  
+                  :style="{ color: getStatusEffectColor(statusEffect.alignment) }"
+                >
+                  {{ getStatusEffectLetter(statusEffect.name) }}
+                </div>
+            </div>
+            <div class="status-effect-indicator-positive">
+                <div
+                  v-for="statusEffect in getCombatantStatusEffects({ x: x - 1, y: y - 1 }, 1)"
                   :key="statusEffect.name"
                   
                   :style="{ color: getStatusEffectColor(statusEffect.alignment) }"
@@ -102,9 +112,11 @@
         <button :disabled="showSkillsMenu || !hasActiveSpecialMoves() || skillMode" @click="showSpecialSkills">Special Skill</button>
         <button :disabled="attackMode || moveMode || showSkillsMenu || skillMode" @click="skip">Skip</button>
         <button :disabled="!moveMode && !attackMode && !showSkillsMenu && !skillMode" @click="cancel">Cancel</button>
+        <!-- <button v-if="!isGameOver()" @click="playAiTurn(currentCombatant)">AI Play</button> -->
+        <button @click="showStatus">Status</button>
       </div>
     </div>
-
+    
 
 
     <div v-if="showSkillsMenu" class="skill-menu">
@@ -132,10 +144,88 @@
       </div>
     </div>
 
-    <!-- <img class="dragon-left" src="./assets/white_dragon_black_back.png" alt="left dragon" />
-    <img class="dragon-right" src="./assets/white_dragon_black_back.png" alt="right dragon" /> -->
-    
+  <div v-if="getWhiteTeamCombatants().length > 0" class="white-team-turn-order-container">
+    <div v-for="combatant in getWhiteTeamCombatants()" :key="combatant.name" class="turn-order-item" :style="{ filter: getCurrentTeamIndex() === 1 ? 'blur(4px)' : '' }">
+      <div class="turn-order-combatant-icon" :style="{ boxShadow: getCurrentCombatant()?.name === combatant.name ? '0 0 10px 5px rgba(0, 255, 0, 0.7)' : '' }">
+        <div class="sprite-container white">
+              <img class="combatant-sprite" :src="getCombatantSprite(combatant)" alt="Combatant" />  
+        </div>
+        {{ combatant.name }}
+      </div>
+      <div class="dead-x" v-if="combatant.stats.hp <= 0">
+        <img  src="./assets/X.svg" alt="Dead" />
+      </div>
+    </div>
   </div>
+
+  <div v-if="getBlackTeamCombatants().length > 0" class="black-team-turn-order-container" >
+    <div v-for="combatant in getBlackTeamCombatants()" :key="combatant.name" class="turn-order-item" :style="{ filter: getCurrentTeamIndex() === 0 ? 'blur(4px)' : '' }">
+      <div class="turn-order-combatant-icon" :style="{ boxShadow: getCurrentCombatant()?.name === combatant.name ? '0 0 10px 5px rgba(0, 255, 0, 0.7)' : '' }">
+        <div class="sprite-container black" >
+            <img class="combatant-sprite" :src="getCombatantSprite(combatant)" alt="Combatant" />  
+        </div>
+        {{ combatant.name }}
+      </div>
+      <div class="dead-x" v-if="combatant.stats.hp <= 0">
+        <img  src="./assets/X.svg" alt="Dead" />
+      </div>
+    </div>
+  </div>
+
+
+    <!-- <img class="dragon-left" src="./assets/white_dragon_black_back.png" alt="left dragon" />
+    <img class="dragon-right" src="./assets/white_dragon_black_back.png" alt="right dragon" />
+     -->
+     <div v-if="showStatusPopup" class="status-popup">
+      <div class="status-popup-header">
+        {{ currentCombatant?.name }} the {{ currentCombatant?.getCombatantType() }}'s Status
+      </div>
+      <div class="status-popup-body">
+        <div
+          v-for="[statName, statValue] in Object.entries(getCurrentCombatant()?.stats)"
+          :key="statName"
+          class="stat-bar"
+        >
+          <span class="stat-name">{{ getStatUiName(statName) }}:</span>
+          <span
+            class="stat-value"
+            :style="{ color: 'white' }"
+          >
+            {{ Math.floor(statValue) }}
+          </span>
+          <div class="bar-container">
+            <div v-if="statValue === getCurrentCombatant()?.baseStats[statName]"
+              class="bar-fill"
+              :style="{ width: (statValue / getStatusScale(statName)) * 100 + '%' }"
+            ></div>
+            <div v-if="statValue < getCurrentCombatant()?.baseStats[statName]"
+              class="bar-fill-debuff"
+              :style="{ width: (statValue / getStatusScale(statName)) * 100 + '%' }"
+            ></div>
+            <div v-if="statValue > getCurrentCombatant()?.baseStats[statName]"
+              class="bar-fill-buff"
+              :style="{ width: (statValue / getStatusScale(statName)) * 100 + '%' }"
+            ></div>
+          </div>
+        </div>
+        <div class="status-effects-list">
+          <div class="status-effects-header">Status Effects:</div>
+          <div
+            v-for="effect in currentCombatant?.statusEffects"
+            :key="effect.name"
+            class="status-effect-item"
+            :style="{ color: getStatusEffectColor(effect.type) }"
+          >
+            {{ statusNameToText(effect.name) }}
+          </div>
+        </div>
+      </div>
+      <div class="status-popup-close">
+        <button @click="hideStatusPopup">Close</button>
+      </div>
+    </div>
+  </div>
+
 </template>
 
 <script lang="ts">
@@ -160,33 +250,32 @@ import { StandardBearer } from './logic/Combatants/StandardBearer';
 import { SpecialMove, SpecialMoveTriggerType } from './logic/SpecialMove';
 import { StatusEffect, StatusEffectType, StatusEffectAlignment } from './logic/StatusEffect';
 import { SimpleAIAgent } from './logic/AI/AIAgent';
-import { DummyAIAgent, BunkerDummyAIAgent, ToddlerAIAgent } from './logic/AI/DeterministicAgents';
+import { DummyAIAgent, BunkerDummyAIAgent, ToddlerAIAgent, KidAIAgent } from './logic/AI/DeterministicAgents';
+import { Howl } from 'howler';
 
 export default defineComponent({
   setup() {
+    
     const board = ref(new Board(10, 10));
     const whiteTeam = ref(new Team('White Team', 0));
-    //const blackTeam = ref(new Team('Black Team', 1, new ToddlerAIAgent()));
-    const blackTeam = ref(new Team('Black Team', 1));
-    /// add to white team
-    whiteTeam.value.addCombatant(new StandardBearer('Boris', { x: 4, y: 1 }, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Witch('Jezebel', { x: 5, y: 1 }, whiteTeam.value));
+    const blackTeam = ref(new Team('Black Team', 1, new KidAIAgent()));
+    // whiteTeam.value.addCombatant(new Witch('Jezebel', { x: 5, y: 1 }, whiteTeam.value));
     whiteTeam.value.addCombatant(new Defender('Igor', { x: 3, y: 1 }, whiteTeam.value));
     whiteTeam.value.addCombatant(new Hunter('Zarina', { x: 4, y: 0 }, whiteTeam.value));
-    //whiteTeam.value.addCombatant(new Wizard('Ivan', { x: 5, y: 0 }, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Healer('Annika', { x: 3, y: 0 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Wizard('Ivan', { x: 5, y: 0 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Healer('Annika', { x: 3, y: 0 }, whiteTeam.value));
     /// add to black team
-    // blackTeam.value.addCombatant(new Defender('Michael', { x: 5, y: 8 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Defender('Jake', { x: 6, y: 8 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Hunter('Cecile', { x: 5, y: 9 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Wizard('Bran', { x: 6, y: 9 }, blackTeam.value));
-    //blackTeam.value.addCombatant(new Healer('Marianne', { x: 7, y: 9 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Defender('Michael', { x: 5, y: 8 }, blackTeam.value));
+    blackTeam.value.addCombatant(new StandardBearer('Jake', { x: 6, y: 8 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Hunter('Cecile', { x: 5, y: 9 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Wizard('Bran', { x: 6, y: 9 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Healer('Marianne', { x: 7, y: 9 }, blackTeam.value));
     
     // whiteTeam.value.addCombatant(new Militia('q', { x: 0, y: 0 }, whiteTeam.value));
-    blackTeam.value.addCombatant(new Militia('n', { x: 5, y: 9 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Militia('b', { x: 4, y: 9 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Militia('c', { x: 3, y: 9 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Militia('d', { x: 6, y: 9 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Militia('n', { x: 5, y: 9 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Hunter('b', { x: 4, y: 9 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Militia('c', { x: 3, y: 9 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Militia('d', { x: 6, y: 9 }, blackTeam.value));
     
 
     const teams = ref([whiteTeam.value, blackTeam.value]);
@@ -199,6 +288,7 @@ export default defineComponent({
     const lastMove = ref<Position | null>(null);
 
     const currentCombatant = computed(() => game.value.getCurrentCombatant());
+
     const currentTeam = computed(()=> game.value.teams[(game.value as Game).getCurrentTeamIndex()]); 
     const roundCount = computed(() => (game.value as Game).getRoundCount());
 
@@ -246,6 +336,14 @@ export default defineComponent({
       return board.value.getCombatantAtPosition({x: position.x -1, y: position.y - 1});
     };
 
+    const getWhiteTeamCombatants = () => {
+      return whiteTeam.value.combatants;
+    }
+
+    const getBlackTeamCombatants = () => {
+      return blackTeam.value.combatants;
+    }
+
     const isCurrentCombatant = (position: Position): boolean => {
       if (currentCombatant.value && currentCombatant.value.position) {
         return (
@@ -255,6 +353,14 @@ export default defineComponent({
       }
       return false;
     };
+
+    const getCurrentCombatant = () => {
+      return currentCombatant.value;
+    }
+
+    const getCurrentTeamIndex = () => {
+      return game.value.getCurrentTeamIndex();
+    }
 
     const performAction = (position: Position) => {
       if (moveMode.value) {
@@ -279,7 +385,7 @@ export default defineComponent({
         validMoves.value = [];
         hasMoved.value = true;
         moveMode.value = false;
-
+        moveSound && moveSound.play();
         if (actionsRemaining.value <= 0) {
           game.value.nextTurn();
           prepareNextTurn();
@@ -387,7 +493,16 @@ export default defineComponent({
               board.value.removeCombatant(hitCombatant); 
             }
           }, 500);
+
+          playSound(actionResult.damage.type);
     };
+
+    const playSound = (type: DamageType) => {
+      const sound = actionSounds[type];
+      if(sound) {
+        sound.play();
+      }
+    }
 
     const canDefendAndMove = () => {
       const currentCombatant = game.value.getCurrentCombatant();
@@ -679,13 +794,167 @@ export default defineComponent({
       );
     }
 
-    const getCombatantStatusEffects = (position: Position): StatusEffect[] => {
+    const getCombatantStatusEffects = (position: Position, alignment: StatusEffectAlignment): StatusEffect[] => {
+      // debugger;
       const combatant = board.value.getCombatantAtPosition(position);
-      return combatant ? combatant.getStatusEffects() : [];
+      return combatant ? combatant.getStatusEffects().filter((statusEffect) => statusEffect.alignment === alignment) : [];
     };
 
     const isGameOver = () => {
       return game.value.isGameOver();
+    }
+
+    const actionSounds: { [key: string]: Howl } = {};
+    // const moveSounds = [];
+    let moveSound: Howl | null = null;
+
+    const loadSounds = () => {
+      const allSounds = [
+        {name:'Blight', path:require('./sound/acid_splash_sound.mp3')},
+        {name:'Crush', path:require('./sound/fist_sound.mp3')},
+        {name:'Dark', path:require('./sound/dark_attack_sound.mp3')},
+        {name:'Fire', path:require('./sound/flame_sound.mp3')},
+        {name:'Healing', path:require('./sound/healing_sound.mp3')},
+        {name:'Holy', path:require('./sound/holy_attack_sound.mp3')},
+        {name:'Ice', path:require('./sound/Ice_sound.mp3')},
+        {name:'Pierce', path:require('./sound/pierce_attack_sound.mp3')},
+        {name:'Slash', path:require('./sound/sword_slash_sound.mp3')},
+        {name:'Lightning', path:require('./sound/thunder_sound.mp3')},
+      ];
+
+      allSounds.forEach((sound) => {
+         const newSound = new Howl({
+          src: [sound.path],
+          preload: true,
+          onload: () => {
+            console.log(sound +' sound preloaded!');
+          },
+        });
+        actionSounds[sound.name] = newSound;
+      })
+
+      moveSound = new Howl({
+        src: [require('./sound/move_sound_1.mp3')],
+        preload: true,
+      });
+
+      // const movePaths = ['./sound/move_sound_1.mp3', './sound/move_sound_2.mp3', './sound/move_sound_3.mp3'];
+
+      // movePaths.forEach((sound) => {
+      //   const newSound = new Howl({
+      //     src: [require(sound)],
+      //     preload: true,
+      //   });
+      //   moveSounds.push(newSound);
+      // });
+    }
+
+    loadSounds();
+
+    const showStatusPopup = ref(false);
+    const hideStatusPopup = () => {
+      showStatusPopup.value = false;
+    };
+
+    const showStatus = () => {
+      // debugger;
+      const stats = getCurrentCombatant()?.stats;
+      for(const [statName, statValue] of Object.entries(stats)) {
+        // debugger;
+        console.log(statName, statValue);
+      }
+      showStatusPopup.value = true;
+    };
+
+    const getStatUiName = (statName: string) => {
+      switch (statName) {
+        case 'hp':
+          return 'HP';
+        case 'attackPower':
+          return 'Attack';
+        case 'defensePower':
+          return 'Defense';
+        case 'agility':
+          return 'Agility';
+        case 'stamina':
+          return 'Stamina';
+        case 'movementSpeed':
+          return 'Movement';
+        case 'initiative':
+          return 'Initiative';
+        case 'range':
+          return 'Range';
+        case 'luck':
+          return 'Luck';
+      }
+    }
+
+    const getStatusScale = (statName: string) => {
+      switch (statName) {
+        case 'hp':
+          return 100;
+        case 'attackPower':
+          return 50;
+        case 'defensePower':
+          return 50;
+        case 'agility':
+          return 15;
+        case 'stamina':
+          return 60;
+        case 'movementSpeed':
+          return 6;
+        case 'initiative':
+          return 10;
+        case 'range':
+          return 10;
+        case 'luck':
+          return 15;
+      }
+    }
+
+    const statusNameToText = (statusName: StatusEffectType) => {
+      switch (statusName) {
+        case 0:
+          return "Defending";
+        case 1:
+          return "Blocking Stance";
+        case 2:
+          return "Arcane Channeling";
+        case 3:
+          return "Focus Aim";
+        case 4:
+          return "Fortified";
+        case 5:
+          return "Immobilized";
+        case 6:
+          return "Regenerating";
+        case 7:
+          return "Frozen";
+        case 8:
+          return "Poisoned";
+        case 9:
+          return "Strength Boost";
+        case 10:
+          return "Mobility Boost";
+        case 11:
+          return "Encouraged";
+        case 12:
+          return "Rallied";
+        case 13:
+          return "Strength Downgrade";
+        case 14:
+          return "Inspiring Killer";
+        case 15:
+          return "Luck Downgrade";
+        case 16:
+          return "Slow";
+        case 17:
+          return "Energy Absorb";
+        case 18:
+          return "Bleeding";
+        case 19:
+          return "Taunted";
+      }
     }
 
     return {
@@ -740,7 +1009,18 @@ export default defineComponent({
       isAoeHighlighted,
       showAoe,
       hideAoe,
-      getDamageSvg
+      getDamageSvg,
+      playAiTurn,
+      getWhiteTeamCombatants,
+      getBlackTeamCombatants,
+      getCurrentCombatant,
+      getCurrentTeamIndex,
+      showStatusPopup,
+      hideStatusPopup,
+      showStatus,
+      getStatUiName,
+      getStatusScale,
+      statusNameToText
     };
   },
 });
@@ -901,8 +1181,8 @@ button {
 
 .action-menu {
   position: absolute;
-  left: 15%;
-  bottom: 7%;
+  left: 12%;
+  top: 30%;
 }
 
 .action-menu-button-container {
@@ -1068,28 +1348,35 @@ button {
 
 .dragon-left {
   position: absolute;
-  top: 10%;
+  top: 7%;
   left: 0;
   transform: scale(0.6);
 }
 
 .dragon-right {
   position: absolute;
-  top: 10%;
+  top: 7%;
   right: 0;
   transform: scale(0.6) scaleX(-1);
 }
 
-.status-effect-indicator {
+.status-effect-indicator-positive, .status-effect-indicator-negative {
   position: absolute;
-  bottom: -4px;
-  left: 50%;
-  transform: translateX(-50%);
+  top: -15%;
   font-size: 8px;
   font-weight: bold;
   display: flex;
-  gap: 1px;
+  flex-direction: column;
+  gap: 0px;
   /* Add more styling as needed */
+}
+
+.status-effect-indicator-positive {
+  left: -50%;
+}
+
+.status-effect-indicator-negative {
+  right: -50%;
 }
 
 .aoe-highlight {
@@ -1119,4 +1406,160 @@ button {
   height: 20px;
   color: red;
 }
+
+.white-team-turn-order-container, .black-team-turn-order-container {
+  display: flex;
+}
+
+.turn-order-item {
+  border-radius: 5px;
+  position: relative;
+}
+
+.dead-x {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.white-team-turn-order-container .turn-order-item {
+  background-color: black;
+  color: white;
+}
+
+.black-team-turn-order-container .turn-order-item {
+  background-color: white;
+  color: black;
+}
+
+.black-team-turn-order-container .turn-order-combatant-icon {
+  color: black;
+}
+
+.black-team-turn-order-container {
+  position: absolute;
+  bottom: 0;
+  right: 2%;
+}
+
+.white-team-turn-order-container {
+  position: absolute;
+  top: 0;
+  right: 2%;
+}
+
+.turn-order-item {
+  background-color: #333;
+  border: 1px solid white;
+  padding: 10px;
+  margin: 5px;
+  min-width: 35px;
+  max-width: 35px;
+  text-align: center;
+}
+
+.turn-order-combatant-icon .sprite-container {
+  text-align: center;
+}
+
+.status-popup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  padding: 20px;
+  background-color: #222;
+  border: 1px solid white;
+  color: white;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  border-radius: 5px;
+}
+
+.status-popup-header {
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #555;
+  padding-bottom: 5px;
+}
+
+.status-popup-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.stat-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.stat-name {
+  width: 100px;
+  margin-right: 10px;
+}
+
+.stat-value {
+  margin-right: 10px;
+  font-weight: bold;
+  min-width: 20px;
+  max-width: 20px;
+}
+
+.bar-container {
+  flex: 1;
+  height: 10px;
+  background-color: #555;
+  border-radius: 5px;
+  overflow: hidden;
+  position: relative;
+}
+
+.bar-fill {
+  height: 100%;
+  background-color: green;
+  border-radius: 5px;
+  position: absolute;
+  z-index: 2;
+}
+
+.bar-fill-debuff {
+  height: 100%;
+  background-color: red;
+  border-radius: 5px;
+  position: absolute;
+  z-index: 3;
+}
+
+.bar-fill-buff {
+  height: 100%;
+  background-color: blue;
+  border-radius: 5px;
+  position: absolute;
+  z-index: 1;
+}
+
+
+.status-effects-list {
+  margin-top: 15px;
+}
+
+.status-effects-header {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.status-effect-item {
+  margin-bottom: 3px;
+}
+
+.status-popup-close {
+  margin-top: 20px;
+  text-align: center;
+}
+
 </style>

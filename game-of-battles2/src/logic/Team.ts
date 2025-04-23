@@ -1,7 +1,9 @@
 import { Combatant } from "./Combatant";
 import { AIAgent } from "./AI/AIAgent";
+
 export class Team {
     public combatants: Combatant[] = [];
+    public turnOrderIndex: number = 0;
     constructor(public name: string, public index: number, public aiAgent: AIAgent | undefined = undefined) {}
 
     addCombatant(combatant: Combatant) {
@@ -9,6 +11,7 @@ export class Team {
         if(this.aiAgent) {
             combatant.aiAgent = this.aiAgent;
         }
+        this.combatants.sort((a, b) => b.stats.initiative - a.stats.initiative);
     }
 
     getName(): string {
@@ -17,6 +20,14 @@ export class Team {
 
     getIndex(): number {
         return this.index;
+    }
+
+    getTurnOrderIndex(): number {
+        return this.turnOrderIndex;
+    }
+
+    setTurnOrderIndex(index: number) {
+        this.turnOrderIndex = index;
     }
   
     getAverageInitiative(): number {

@@ -24,7 +24,7 @@ describe('Combatant - Militia', () => {
     expect(combatant.stats.attackPower).toBe(10);
     expect(combatant.stats.defensePower).toBe(10);
     expect(combatant.stats.stamina).toBe(20);
-    expect(combatant.stats.initiative).toBe(2);
+    expect(combatant.stats.initiative).toBe(1);
     expect(combatant.stats.movementSpeed).toBe(3);
     expect(combatant.stats.range).toBe(1);
     expect(combatant.stats.agility).toBe(5);

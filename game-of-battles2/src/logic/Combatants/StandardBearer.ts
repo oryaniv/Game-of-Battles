@@ -25,7 +25,7 @@ export class StandardBearer extends Combatant {
         position,
         [
             {type: DamageType.Slash, reaction: DamageReaction.NONE},
-            {type: DamageType.Pierce, reaction: DamageReaction.WEAKNESS},
+            {type: DamageType.Pierce, reaction: DamageReaction.NONE},
             {type: DamageType.Crush, reaction: DamageReaction.RESISTANCE},
             {type: DamageType.Fire, reaction: DamageReaction.RESISTANCE},
             {type: DamageType.Ice, reaction: DamageReaction.WEAKNESS},

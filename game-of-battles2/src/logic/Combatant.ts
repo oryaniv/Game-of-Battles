@@ -105,7 +105,13 @@ export interface CombatantStats {
     
     applyStatusEffect(effect: StatusEffectApplication): void {
         this.statusEffects.push(effect);
-        getResultsForStatusEffectHook(this, StatusEffectHook.OnApply, this, {amount: 0, type: DamageType.Unstoppable});
+        const statusEffect = getStatusEffect(effect.name);
+        if(statusEffect) {
+          const applyHook = statusEffect.applicationHooks[StatusEffectHook.OnApply];
+          applyHook && applyHook(this, this, {amount: 0, type: DamageType.Unstoppable});
+        }
+
+       //  getResultsForStatusEffectHook(this, StatusEffectHook.OnApply, this, {amount: 0, type: DamageType.Unstoppable});
     }
 
     updateStatusEffect(effect: StatusEffectApplication): void {

@@ -5,7 +5,7 @@ import { Game } from "../Game";
 
 export interface AIAgent {
     playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[];
-  }
+}
 
 export class SimpleAIAgent implements AIAgent {
     playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {

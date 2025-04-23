@@ -1,14 +1,13 @@
 import { StatusEffectAlignment } from "../StatusEffect";
-
 import { Combatant } from "../Combatant";
 import { StatusEffectHook, StatusEffectType } from "../StatusEffect";
-
 import { StatusEffect } from "../StatusEffect";
 import { AttackResult, getStandardActionResult } from "../attackResult";
 import { DamageType, Damage } from "../Damage";
 import { DamageReaction } from "../Damage";
 import { CombatMaster } from "../CombatMaster";
 import { Board } from "../Board";
+import { TauntedAIAgent } from "../AI/DeterministicAgents";
 
 export class ImmobilizedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.IMMOBILIZED;
@@ -67,6 +66,8 @@ export class StrengthDowngradeStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.STRENGTH_DOWNGRADE;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
+            // eslint-disable-next-line
+            debugger;
             target.stats.attackPower -= 20;
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
@@ -80,6 +81,8 @@ export class LuckDowngradeStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.LUCK_DOWNGRADE;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
+            // eslint-disable-next-line
+            debugger;
             target.stats.luck -= 5;
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
@@ -108,10 +111,10 @@ export class PoisonedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.POISONED;
     applicationHooks = {
         [StatusEffectHook.OnTurnEnd]: (caster: Combatant, target: Combatant, board: Board) => {
-            target.stats.hp -= 10;
-            if(target.stats.hp <= 0) {
-                target.stats.hp = 0;
-                board.removeCombatant(target);
+            caster.stats.hp -= 10;
+            if(caster.stats.hp <= 0) {
+                caster.stats.hp = 0;
+                board.removeCombatant(caster);
             }
             return {
                 attackResult: AttackResult.Hit,
@@ -120,7 +123,8 @@ export class PoisonedStatusEffect implements StatusEffect {
                     type: DamageType.Blight
                 },
                 cost: 0,
-                reaction: DamageReaction.NONE
+                reaction: DamageReaction.NONE,
+                position: caster.position
             }
         }
     };
@@ -131,10 +135,10 @@ export class BleedingStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.BLEEDING;
     applicationHooks = {
         [StatusEffectHook.OnTurnEnd]: (caster: Combatant, target: Combatant, board: Board) => {
-            target.stats.hp -= 10;
-            if(target.stats.hp <= 0) {
-                target.stats.hp = 0;
-                board.removeCombatant(target);
+            caster.stats.hp -= 10;
+            if(caster.stats.hp <= 0) {
+                caster.stats.hp = 0;
+                board.removeCombatant(caster);
             }
             return {
                 attackResult: AttackResult.Hit,
@@ -143,8 +147,22 @@ export class BleedingStatusEffect implements StatusEffect {
                     type: DamageType.Pierce
                 },
                 cost: 0,
-                reaction: DamageReaction.NONE
+                reaction: DamageReaction.NONE,
+                position: caster.position
             }
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
+}
+
+export class TauntedStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.TAUNTED;
+    applicationHooks = {
+        [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
+            target.aiAgent = new TauntedAIAgent(caster);
+        },
+        [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
+            target.aiAgent = undefined;
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;

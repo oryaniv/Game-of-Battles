@@ -53,7 +53,12 @@ export class Game {
   
     getCurrentCombatant(): Combatant {
       const aliveCombatants = this.teams[this.currentTeamIndex].getAliveCombatants();
-      return aliveCombatants[this.currentCombatantIndex];
+      // return aliveCombatants[this.currentCombatantIndex];
+      const turnOrderIndex = this.teams[this.currentTeamIndex].getTurnOrderIndex();
+      if(turnOrderIndex >= aliveCombatants.length) {
+        this.teams[this.currentTeamIndex].setTurnOrderIndex(aliveCombatants.length - 1);
+      }
+      return aliveCombatants[this.teams[this.currentTeamIndex].getTurnOrderIndex()];
     }
 
     getCurrentTeam(): Team {
@@ -125,23 +130,23 @@ export class Game {
 
       // should we switch teams?
       if (this.actionsRemaining <= 0) {
+        // pick next combatant from current playing team
+          this.teamNextCombatant();
           this.currentTeamIndex = 1 - this.currentTeamIndex;
           this.actionsRemaining = this.teams[this.currentTeamIndex].getAliveCombatants().length;
           // not just next turn, but also next round
           if (this.currentTeamIndex === 0) {
             this.nextRound();
           }
-        }
-
-        // pick next combatant from current playing team
-        const aliveCombatants = this.teams[this.currentTeamIndex].getAliveCombatants();
-        if(this.currentCombatantIndex < aliveCombatants.length - 1) {
-          this.currentCombatantIndex++;
         } else {
-          this.currentCombatantIndex = 0;
+          this.teamNextCombatant();
         }
 
         const currentCombatant = this.getCurrentCombatant();
+        if(!currentCombatant) {
+          // eslint-disable-next-line
+          debugger;
+        }
         // start turn hook application
         const turnStartHookResults: ActionResult[] = currentCombatant.startTurn();
         if(turnStartHookResults.length > 0) {
@@ -151,13 +156,15 @@ export class Game {
             this.nextTurn();
           }
         }
+    }
 
-        // // if there's an AI agent on the current combatant, let it play the turn
-        // if(currentCombatant.aiAgent !== undefined) {
-        //   currentCombatant.aiAgent.playTurn(currentCombatant, this.board);
-        // }
-
-        // // otherwise, control will be released to the player
+    private teamNextCombatant(): void {
+      const aliveCombatants = this.teams[this.currentTeamIndex].getAliveCombatants();
+      if(this.teams[this.currentTeamIndex].getTurnOrderIndex() < aliveCombatants.length - 1) {
+        this.teams[this.currentTeamIndex].setTurnOrderIndex(this.teams[this.currentTeamIndex].getTurnOrderIndex() + 1);
+      } else {
+        this.teams[this.currentTeamIndex].setTurnOrderIndex(0);
+      }
     }
 
     nextRound(): void {
@@ -185,9 +192,10 @@ export class Game {
         return 2;
       } else if(actions.some((action) => action.cost === 0.5)) {
         return 0.5;
-      } else {
-        return 1;
+      } else if(actions.some((action) => action.cost === 0)) {
+        return 0;
       }
+      return 1;
     }
   
     isGameOver(): boolean {

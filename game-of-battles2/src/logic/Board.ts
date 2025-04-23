@@ -4,7 +4,7 @@
 import { Combatant } from "./Combatant";
 import { Position } from "./Position";
 import { RangeCalculator } from "./RangeCalculator";
-import { SpecialMove, SpecialMoveAreaOfEffect, SpecialMoveRange } from "./SpecialMove";
+import { SpecialMove, SpecialMoveAlignment, SpecialMoveAreaOfEffect, SpecialMoveRange, SpecialMoveRangeType } from "./SpecialMove";
 
 export class Board {
   private grid: (Combatant | null)[][];
@@ -49,31 +49,13 @@ export class Board {
 
   // note how this is only straight line attacks, for now
   getValidAttacks(combatant: Combatant): Position[] {
-    const validAttacks: Position[] = [];
-    const { x, y } = combatant.position;
-    const range = combatant.stats.range;
-
-    for (let i = 1; i <= range; i++) {
-      const up = { x, y: y - i };
-      const down = { x, y: y + i };
-      const left = { x: x - i, y };
-      const right = { x: x + i, y };
-
-      if (this.isValidPosition(up) && this.hasEnemy(combatant, up)) {
-        validAttacks.push(up);
-      }
-      if (this.isValidPosition(down) && this.hasEnemy(combatant, down)) {
-        validAttacks.push(down);
-      }
-      if (this.isValidPosition(left) && this.hasEnemy(combatant, left)) {
-        validAttacks.push(left);
-      }
-      if (this.isValidPosition(right) && this.hasEnemy(combatant, right)) {
-        validAttacks.push(right);
-      }
-    }
-
-    return validAttacks;
+    return this.rangeCalculator.getValidTargetPositions(combatant, 
+      {
+           type: SpecialMoveRangeType.Straight,
+           align: SpecialMoveAlignment.Enemy,
+           areaOfEffect: SpecialMoveAreaOfEffect.Single,
+           range: combatant.stats.range
+      }, this);
   }
 
   getValidMoves(combatant: Combatant): Position[] {

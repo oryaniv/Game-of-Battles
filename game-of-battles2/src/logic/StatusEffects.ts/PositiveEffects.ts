@@ -66,10 +66,12 @@ export class RegeneratingStatusEffect implements StatusEffect {
             const newHp = Math.min(self.stats.hp + 8, self.baseStats.hp);
             const deltaHp = newHp - self.stats.hp;
             self.stats.hp = newHp;
+            // eslint-disable-next-line
+            debugger;
             return {
                 attackResult: AttackResult.Hit,
                 damage: {amount: deltaHp, type: DamageType.Healing},
-                cost: 1,
+                cost: 0,
                 reaction: DamageReaction.NONE,
                 position: self.position
             };
@@ -82,6 +84,8 @@ export class FortifiedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.FORTIFIED;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
+            // eslint-disable-next-line
+            debugger;
             target.stats.defensePower += 20;
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {

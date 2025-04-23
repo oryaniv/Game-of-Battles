@@ -3,7 +3,10 @@ import { Board } from "../Board";
 import { Combatant } from "../Combatant";
 import { Game } from "../Game";
 import { Position } from "../Position";
+import { SpecialMoveAlignment } from "../SpecialMove";
 import { AIAgent } from "./AIAgent";
+import { getClosestEnemy, getValidAttacks, getValidAttackWithSkillsIncluded, getValidMovePositions, moveTowards, shuffleArray } from "./AIUtils";
+
 
 export class DummyAIAgent implements AIAgent {
     playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
@@ -26,77 +29,121 @@ export class ToddlerAIAgent implements AIAgent {
     }
 
     private searchAndDestroy(combatant: Combatant, game: Game, board: Board): ActionResult {
-        const validAttacks = this.getValidAttacks(combatant, board);
+        const validAttacks = getValidAttacks(combatant, board);
         // can attack without moving
         if(validAttacks.length > 0) {
             const randomTarget = validAttacks[Math.floor(Math.random() * validAttacks.length)];
             return game.executeBasicAttack(combatant, randomTarget, board);
         } else {
-            const validNewPositions = this.getValidMovePositions(combatant, board);
-            validNewPositions.forEach(position => {
+            const validNewPositions = getValidMovePositions(combatant, board);
+            for (let i = 0; i < validNewPositions.length; i++) {
+                const position = validNewPositions[i];
                 // can attack from new position
-                const validAttacks = this.getValidAttacks(Object.assign({}, combatant, { position }), board);
+                const validAttacks = getValidAttacks(Object.assign({}, combatant, { position }), board);
                 if(validAttacks.length > 0) {
                     combatant.move(position, board);
                     const randomTarget = validAttacks[Math.floor(Math.random() * validAttacks.length)];
                     return game.executeBasicAttack(combatant, randomTarget, board);
                 }
-            });
+            }
         }
-        const closestEnemyPosition = this.getClosestEnemy(combatant, game, board);
-        this.moveTowards(combatant, closestEnemyPosition, board);
+        const closestEnemyPosition = getClosestEnemy(combatant, game, board);
+        moveTowards(combatant, closestEnemyPosition, board);
         game.executeSkipTurn();
         return getStandardActionResult();
     }
+}
 
-    private getValidMovePositions(combatant: Combatant, board: Board): Position[] {
-        const validNewPositions = board.getValidMoves(combatant);
-        return validNewPositions;
+
+export class TauntedAIAgent implements AIAgent {
+    private offender: Combatant;
+
+    constructor(offender: Combatant) {
+        this.offender = offender;
     }
 
-    private getValidAttacks(combatant: Combatant, board: Board): Position[] {
-        const validAttacks = board.getValidAttacks(combatant);
-        return validAttacks;
+    playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
+        const actionResult = this.chaseTheOffender(combatant, game, board, this.offender);
+        return actionResult;
     }
 
-    private getClosestEnemy(combatant: Combatant, game: Game, board: Board): Position {
-        const enemyTeam = game.teams.find(team => team.index !== combatant.team.index);
-        const closestEnemy = enemyTeam?.combatants.reduce((closest, enemy) => {
-            if (enemy.isKnockedOut()) return closest;
-            const distanceToEnemy = Math.sqrt(
-                Math.pow(enemy.position.x - combatant.position.x, 2) + 
-                Math.pow(enemy.position.y - combatant.position.y, 2)
-            );
-            const distanceToClosest = closest ? Math.sqrt(
-                Math.pow(closest.position.x - combatant.position.x, 2) + 
-                Math.pow(closest.position.y - combatant.position.y, 2)
-            ) : Infinity;
-            return distanceToEnemy < distanceToClosest ? enemy : closest;
-        }, null as Combatant | null);
-        return closestEnemy?.position || combatant.position;
-    }
-
-    private moveTowards(combatant: Combatant, position: Position, board: Board): void {
-        const validMoves = this.getValidMovePositions(combatant, board);
-        if (validMoves.length === 0) return;
-
-        const closestPosition = validMoves.reduce((closest, move) => {
-            const distanceToTarget = Math.sqrt(
-                Math.pow(move.x - position.x, 2) + 
-                Math.pow(move.y - position.y, 2)
-            );
-            const distanceToClosest = closest ? Math.sqrt(
-                Math.pow(closest.x - position.x, 2) + 
-                Math.pow(closest.y - position.y, 2)
-            ) : Infinity;
-            return distanceToTarget < distanceToClosest ? move : closest;
-        }, null as Position | null);
-
-        if (closestPosition) {
-            combatant.move(closestPosition, board);
+    private chaseTheOffender(combatant: Combatant, game: Game, board: Board, offender: Combatant): ActionResult {
+        const validAttacks = getValidAttacks(combatant, board);
+        if(validAttacks.length > 0 && validAttacks.some((attack) => attack.x === offender.position.x && attack.y === offender.position.y)) {
+            return game.executeBasicAttack(combatant, offender.position, board);
+        } else {
+            const validNewPositions = getValidMovePositions(combatant, board);
+            for (let i = 0; i < validNewPositions.length; i++) {
+                const position = validNewPositions[i];
+                // can attack from new position
+                const validAttacks = getValidAttacks(Object.assign({}, combatant, { position }), board);
+                if(validAttacks.length > 0 && validAttacks.some((attack) => attack.x === offender.position.x && attack.y === offender.position.y)) {
+                    combatant.move(position, board);
+                    return game.executeBasicAttack(combatant, offender.position, board);
+                }
+            }
         }
+        moveTowards(combatant, offender.position, board);
+        game.executeSkipTurn();
+        return getStandardActionResult();
+    }       
+}
+
+
+export class KidAIAgent implements AIAgent {
+    playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
+        const actionResult = this.searchAndDestroy(combatant, game, board);
+        return actionResult;
+    }
+
+    private searchAndDestroy(combatant: Combatant, game: Game, board: Board): ActionResult[] {
+        const skillAttacks = getValidAttackWithSkillsIncluded(combatant, board);
+        if(skillAttacks) {
+            const randomTarget = skillAttacks.targets[Math.floor(Math.random() * skillAttacks.targets.length)];
+            return game.executeSkill(skillAttacks.skill, combatant, randomTarget, board);
+        }
+        const validAttacks = getValidAttacks(combatant, board);
+        // can attack without moving
+        if(validAttacks.length > 0) {
+            const randomTarget = validAttacks[Math.floor(Math.random() * validAttacks.length)];
+            return [game.executeBasicAttack(combatant, randomTarget, board)];
+        } else {
+            const validNewPositions = getValidMovePositions(combatant, board);
+            for (let i = 0; i < validNewPositions.length; i++) {
+                const position = validNewPositions[i];
+                // can attack from new position
+                const skillAttacks = getValidAttackWithSkillsIncluded(Object.assign({}, combatant, { position }), board);
+                if(skillAttacks) {
+                    combatant.move(position, board);
+                    const randomTarget = skillAttacks.targets[Math.floor(Math.random() * skillAttacks.targets.length)];
+                    return game.executeSkill(skillAttacks.skill, combatant, randomTarget, board);
+                }
+
+                const validAttacks = getValidAttacks(Object.assign({}, combatant, { position }), board);
+                if(validAttacks.length > 0) {
+                    combatant.move(position, board);
+                    const randomTarget = validAttacks[Math.floor(Math.random() * validAttacks.length)];
+                    return [game.executeBasicAttack(combatant, randomTarget, board)];
+                }
+            }
+        }
+        const closestEnemyPosition = getClosestEnemy(combatant, game, board);
+        moveTowards(combatant, closestEnemyPosition, board);
+        game.executeSkipTurn();
+        return [getStandardActionResult()];
     }
 }
 
+export class TeenagerAIAgent implements AIAgent {
+    playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
+        return getStandardActionResult();
+    }
+}
+
+export class GruntAIAgent implements AIAgent {
+    playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
+        return getStandardActionResult();
+    }
+}
 
 

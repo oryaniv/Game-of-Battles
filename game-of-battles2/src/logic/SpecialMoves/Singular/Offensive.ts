@@ -131,7 +131,7 @@ export class FireBall implements SpecialMove {
         return fireBallResults;
     };
     checkRequirements = (self: Combatant) => {
-        return self.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING);
+        return self.statusEffects.some((effect) => effect.name === StatusEffectType.ARCANE_CHANNELING);
     };
     description = `Hurl a ball of fire that explodes on impact, dealing medium Fire damage to all in the area. Removes Arcane Channeling.`   
 }
@@ -166,7 +166,7 @@ export class ChainLightning implements SpecialMove {
         return chainLightningResults;
     };
     checkRequirements = (self: Combatant) => {
-        return self.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING);
+        return self.statusEffects.some((effect) => effect.name === StatusEffectType.ARCANE_CHANNELING);
     };
     description = `Shoot a bolt of lightning at an enemy, the bolt will then jump to up to 3 other 
     enemies, dealing half damage of the previous hit. Removes Arcane Channeling.`   
@@ -198,7 +198,7 @@ export class FrozenBurst implements SpecialMove {
         return result;
     };
     checkRequirements = (self: Combatant) => {
-        return self.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING);
+        return self.statusEffects.some((effect) => effect.name === StatusEffectType.ARCANE_CHANNELING);
     };
     description = `Blast an enemy with a surge of freezing cold, dealing medium ice damage and having a hight chance
     of freezing the target for 2 turns. Removes Arcane Channeling.`   
