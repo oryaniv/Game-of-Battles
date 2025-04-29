@@ -1,32 +1,70 @@
 import { ActionResult } from "./attackResult";
+import { Board } from "./Board";
 import { Combatant, CombatantStats } from "./Combatant";
 import { DamageType, Damage } from "./Damage";
 import { BlockingStance } from "./SpecialMoves/Singular/Self";
-import { FrozenStatusEffect, ImmobilizedStatusEffect, LuckDowngradeStatusEffect, SlowStatusEffect, StrengthDowngradeStatusEffect, PoisonedStatusEffect, BleedingStatusEffect, TauntedStatusEffect } from "./StatusEffects.ts/NegativeEffects";
-import { EnergyAbsorbStatusEffect, InspiringKillerStatusEffect } from "./StatusEffects.ts/NeutralEffects";
-import { ArcaneChannelingStatusEffect, BlockingStanceStatusEffect, EncouragedStatusEffect, FocusAimStatusEffect, FortifiedStatusEffect, MobilityBoostStatusEffect, RalliedStatusEffect, RegeneratingStatusEffect, StrengthBoostStatusEffect } from "./StatusEffects.ts/PositiveEffects";
+import { FrozenStatusEffect, ImmobilizedStatusEffect, LuckDowngradeStatusEffect, SlowStatusEffect, StrengthDowngradeStatusEffect, PoisonedStatusEffect, BleedingStatusEffect, TauntedStatusEffect, StupefiedStatusEffect, NauseatedStatusEffect, MesmerizedStatusEffect, StaggeredStatusEffect, DefenseDowngradeStatusEffect } from "./StatusEffects.ts/NegativeEffects";
+import { EnergyAbsorbStatusEffect, FirstStrikeStatusEffect, FoolsLuckStatusEffect, InspiringKillerStatusEffect } from "./StatusEffects.ts/NeutralEffects";
+import { ArcaneChannelingStatusEffect, BlockingStanceStatusEffect, EncouragedStatusEffect, FocusAimStatusEffect, FortifiedStatusEffect, MesmerizingStatusEffect, MobilityBoostStatusEffect, RalliedStatusEffect, RegeneratingStatusEffect, StrengthBoostStatusEffect } from "./StatusEffects.ts/PositiveEffects";
 
 export enum StatusEffectType {
-    DEFENDING,
+    // 0
     BLOCKING_STANCE,
+    // 1
     ARCANE_CHANNELING,
+    // 2
     FOCUS_AIM,
+    // 3
     FORTIFIED,
+    // 4
     IMMOBILIZED,
+    // 5
     REGENERATING,
+    // 6
     FROZEN,
+    // 7
     POISONED,
+    // 8
     STRENGTH_BOOST,
+    // 9
     MOBILITY_BOOST,
+    // 10
     ENCOURAGED,
+    // 11
     RALLIED,
-    INSPIRING_KILLER,
+    // 12
     STRENGTH_DOWNGRADE,
+    // 13
+    INSPIRING_KILLER,
+    // 14
     LUCK_DOWNGRADE,
-    SLOW, 
-    ENERGY_ABOSORB,
+    // 15
+    SLOW,
+    // 16
+    ENERGY_ABSORB,
+    // 17
     BLEEDING,
-    TAUNTED
+    // 18
+    TAUNTED,
+    // 19
+    FOOLS_LUCK,
+    // 20
+    MESMERIZING,
+    // 21
+    MESMERIZED,
+    // 22
+    NAUSEATED,
+    // 23
+    STUPEFIED,
+    // 24
+    STAGGERED,
+    // 25
+    FIRST_STRIKE,
+    // 26
+    DEFENSE_DOWNGRADE,
+    // 27
+    IDAI_NO_HADOU,
+    DEFENDING
 }
 
   export enum StatusEffectHook {
@@ -55,7 +93,8 @@ export enum StatusEffectType {
     OnSkillUsed = "OnSkillUsed",
     // for affects to happen when the combatant moves - like remove blocking stance
     OnMoving = "OnMoving",
-    OnKilling = "OnKilling"
+    OnKilling = "OnKilling",
+    OnBeingAilmentInflicted = "OnBeingAilmentInflicted"
   }
 
   export enum StatusEffectAlignment {
@@ -99,18 +138,26 @@ export enum StatusEffectType {
     [StatusEffectType.STRENGTH_DOWNGRADE]: new StrengthDowngradeStatusEffect(),
     [StatusEffectType.LUCK_DOWNGRADE]: new LuckDowngradeStatusEffect(),
     [StatusEffectType.SLOW]: new SlowStatusEffect(),
-    [StatusEffectType.ENERGY_ABOSORB]: new EnergyAbsorbStatusEffect(),
-    [StatusEffectType.TAUNTED]: new TauntedStatusEffect()
+    [StatusEffectType.ENERGY_ABSORB]: new EnergyAbsorbStatusEffect(),
+    [StatusEffectType.TAUNTED]: new TauntedStatusEffect(),
+    [StatusEffectType.STUPEFIED]: new StupefiedStatusEffect(),
+    [StatusEffectType.NAUSEATED]: new NauseatedStatusEffect(),
+    [StatusEffectType.MESMERIZED]: new MesmerizedStatusEffect(),
+    [StatusEffectType.MESMERIZING]: new MesmerizingStatusEffect(),
+    [StatusEffectType.FOOLS_LUCK]: new FoolsLuckStatusEffect(),
+    [StatusEffectType.STAGGERED]: new StaggeredStatusEffect(),
+    [StatusEffectType.FIRST_STRIKE]: new FirstStrikeStatusEffect(),
+    [StatusEffectType.DEFENSE_DOWNGRADE]: new DefenseDowngradeStatusEffect(),
   };
 
   export function getStatusEffect(name: StatusEffectType) : StatusEffect | undefined {
     return StatusEffectsTable[name];
   }
 
-  export function getResultsForStatusEffectHook(invoker: Combatant, hookType: StatusEffectHook, target?: Combatant, damage?: Damage, amount?: number): ActionResult[] {
+  export function getResultsForStatusEffectHook(invoker: Combatant, hookType: StatusEffectHook, target?: Combatant, damage?: Damage, amount?: number, board?: Board): ActionResult[] {
     const correspondingToTypeHooks: StatusEffect[] = invoker.getStatusEffectsOfHook(hookType);
     const correspondingToTypeHooksResults: ActionResult[] = correspondingToTypeHooks
-    .map((hook) => hook.applicationHooks[hookType]!(invoker, target, damage, 1))
+    .map((hook) => hook.applicationHooks[hookType]!(invoker, target, damage, amount, board))
     .filter((result) => result !== undefined) as ActionResult[];
 
     return correspondingToTypeHooksResults;

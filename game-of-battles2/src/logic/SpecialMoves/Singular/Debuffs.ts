@@ -131,13 +131,13 @@ export class SiphonEnergy implements SpecialMove {
         targetCombatant.stats.stamina = Math.max(0, targetCombatant.stats.stamina - 10);
         invoker.stats.stamina = Math.min(invoker.stats.stamina + 10, invoker.baseStats.stamina);
         invoker.applyStatusEffect({
-            name: StatusEffectType.ENERGY_ABOSORB,
+            name: StatusEffectType.ENERGY_ABSORB,
             duration: 2,
         });  
         return getStandardActionResult();
     };
     checkRequirements = (self: Combatant) => {
-        return !self.hasStatusEffect(StatusEffectType.ENERGY_ABOSORB);
+        return !self.hasStatusEffect(StatusEffectType.ENERGY_ABSORB);
     };
     description = `Leech upon an enemy's stamina, draining a small amount of theirs to replenish your own`
 }

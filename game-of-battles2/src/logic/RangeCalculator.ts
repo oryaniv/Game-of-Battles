@@ -189,7 +189,6 @@ export class RangeCalculator {
     board: Board
   ): Position[] {
     const aoePositions: Position[] = [];
-    const trueRange = 1;
 
     switch (aoe) {
       case SpecialMoveAreaOfEffect.Single:
@@ -203,33 +202,26 @@ export class RangeCalculator {
         aoePositions.push({ x: targetPosition.x, y: targetPosition.y + 1 });
         break;
       case SpecialMoveAreaOfEffect.Nova:
-        
-        for (let dx = -trueRange; dx <= trueRange; dx++) {
-          for (let dy = -trueRange; dy <= trueRange; dy++) {
-            if (dx === 0 && dy === 0) continue; // Skip the center
-            const pos = { x: targetPosition.x + dx, y: targetPosition.y + dy };
-            if (board.isValidPosition(pos)) {
-              aoePositions.push(pos);
-            }
-          }
-        }
-        aoePositions.push(targetPosition);
+        aoePositions.push(...getNovaTargets(1));
+        break;
+      case SpecialMoveAreaOfEffect.Great_Nova:
+        aoePositions.push(...getNovaTargets(2));
         break;
       case SpecialMoveAreaOfEffect.Line:
         if(caster.position.x === targetPosition.x -1) { 
-          for(let i = 0; i <= range; i++) {
+          for(let i = 0; i <= 2; i++) {
             aoePositions.push({ x: targetPosition.x + i, y: targetPosition.y });
           }
         } else if(caster.position.x === targetPosition.x + 1) {
-          for(let i = 0; i <= range; i++) {
+          for(let i = 0; i <= 2; i++) {
             aoePositions.push({ x: targetPosition.x - i, y: targetPosition.y });
           }
         } else if(caster.position.y === targetPosition.y - 1) {
-          for(let i = 0; i <= range; i++) {
+          for(let i = 0; i <= 2; i++) {
             aoePositions.push({ x: targetPosition.x, y: targetPosition.y + i });
           }
         } else if(caster.position.y === targetPosition.y + 1) {
-          for(let i = 0; i <= range; i++) {
+          for(let i = 0; i <= 2; i++) {
             aoePositions.push({ x: targetPosition.x, y: targetPosition.y - i });
           }
         }
@@ -259,6 +251,21 @@ export class RangeCalculator {
 
     
     return aoePositions.filter((pos) => board.isValidPosition(pos)); // Ensure all positions are valid
+
+    function getNovaTargets(trueRange: number) {
+      const novaPositions: Position[] = [];
+      for (let dx = -trueRange; dx <= trueRange; dx++) {
+        for (let dy = -trueRange; dy <= trueRange; dy++) {
+          if (dx === 0 && dy === 0) continue; // Skip the center
+          const pos = { x: targetPosition.x + dx, y: targetPosition.y + dy };
+          if (board.isValidPosition(pos)) {
+            aoePositions.push(pos);
+          }
+        }
+      }
+      novaPositions.push(targetPosition);
+      return novaPositions;
+    }
   }
 
   getChainTargets(
@@ -320,7 +327,7 @@ export class RangeCalculator {
 
       if (distance > 0) {
         const target = board.getCombatantAtPosition(position);
-        if (target && target !== caster && !avoidTargets.includes(target)) {
+        if (target && target !== caster && !avoidTargets.includes(target) && target.team !== caster.team) {
           if (!nearestTarget || distance < nearestTarget.distance) {
             nearestTarget = { position, distance };
           }
@@ -345,5 +352,12 @@ export class RangeCalculator {
     }
 
     return nearestTarget ? nearestTarget.position : null;
+  }
+
+  areInMeleeRange(caster: Combatant, target: Combatant): boolean {
+    const casterPosition = caster.position;
+    const targetPosition = target.position;
+    const distance = Math.abs(casterPosition.x - targetPosition.x) + Math.abs(casterPosition.y - targetPosition.y);
+    return distance <= 1;
   }
 }

@@ -47,7 +47,7 @@ export class CombatMaster {
         if(target.isDefending()) {
             const baseDamage = this.calcaulateBaseDamage(attacker, target, damage);
             const finalDamage = {amount: baseDamage.amount / 2, type: baseDamage.type};
-            this.handleInjuryAilmentAndDeath(target, finalDamage.amount, board);
+            this.handleInjuryAilmentAndDeath(target, finalDamage.amount);
             return {
                 attackResult: AttackResult.Hit,
                 damage: {amount: baseDamage.amount / 2, type: baseDamage.type},
@@ -61,7 +61,7 @@ export class CombatMaster {
         if(attackResult === AttackResult.Hit || attackResult === AttackResult.CriticalHit){
             const baseDamage = this.calcaulateBaseDamage(attacker, target, damage);
             const actionResult = this.finalizeDamage(target, baseDamage, attackResult, position);
-            this.handleInjuryAilmentAndDeath(target, actionResult.damage.amount, board);
+            this.handleInjuryAilmentAndDeath(target, actionResult.damage.amount);
             return actionResult;
         }  
 
@@ -80,12 +80,20 @@ export class CombatMaster {
         };
     }
 
-     public tryInflictStatusEffect(afflictor: Combatant, target: Position, board: Board,
+
+
+    public tryInflictStatusEffect(afflictor: Combatant, target: Position, board: Board,
        statusEffect: StatusEffectType, duration: number, chance: number): void {
         const targetCombatant = board.getCombatantAtPosition(target);
         if(!targetCombatant) {
             return;
         }
+
+        const onBeingAilmentInflictedHookResult = this.getOnBeingAilmentInflictedHookResults(targetCombatant, afflictor, statusEffect);
+        if(onBeingAilmentInflictedHookResult) {
+            return;
+        }
+
         const chanceWithDelta = chance + ((afflictor.stats.luck - targetCombatant.stats.luck) * 0.02);
         if(Math.random() >= chanceWithDelta) {
             return;
@@ -93,7 +101,7 @@ export class CombatMaster {
         if(targetCombatant.hasStatusEffect(statusEffect)) {
           targetCombatant.updateStatusEffect({name: statusEffect, duration: duration});
         } else {
-          targetCombatant.applyStatusEffect({name: statusEffect, duration: duration});
+          targetCombatant.applyStatusEffect({name: statusEffect, duration: duration}, afflictor);
         }
      }
 
@@ -168,7 +176,7 @@ export class CombatMaster {
 
       
 
-      private handleInjuryAilmentAndDeath(target: Combatant, finalDamage: number, board: Board) {
+      private handleInjuryAilmentAndDeath(target: Combatant, finalDamage: number) {
         target.stats.hp -= finalDamage;
         if(target.stats.hp <= 0) {
           target.stats.hp = 0;
@@ -182,6 +190,14 @@ export class CombatMaster {
 
         if(onBeingAttackedHookResults.length > 0) {
             const mostRelevantResult = this.getMostRelevantResult(onBeingAttackedHookResults);
+            return mostRelevantResult;
+        }
+      }
+
+      private getOnBeingAilmentInflictedHookResults(target: Combatant, attacker: Combatant, statusEffect: StatusEffectType): ActionResult | undefined {
+        const onBeingAilmentInflictedHookResults = getResultsForStatusEffectHook(target, StatusEffectHook.OnBeingAilmentInflicted, attacker, undefined, 1);
+        if(onBeingAilmentInflictedHookResults.length > 0) {
+            const mostRelevantResult = this.getMostRelevantResult(onBeingAilmentInflictedHookResults);
             return mostRelevantResult;
         }
       }

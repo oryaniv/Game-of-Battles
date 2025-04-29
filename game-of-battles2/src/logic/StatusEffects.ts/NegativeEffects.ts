@@ -33,7 +33,8 @@ export class FrozenStatusEffect implements StatusEffect {
                     type: DamageType.Unstoppable
                 },
                 cost: 1,
-                reaction: DamageReaction.NONE
+                reaction: DamageReaction.NONE,
+                position: self.position
             };
         },
         [StatusEffectHook.OnApply]: (self: Combatant) => {
@@ -65,13 +66,24 @@ export class FrozenStatusEffect implements StatusEffect {
 export class StrengthDowngradeStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.STRENGTH_DOWNGRADE;
     applicationHooks = {
-        [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
-            // eslint-disable-next-line
-            debugger;
-            target.stats.attackPower -= 20;
+        [StatusEffectHook.OnApply]: (self: Combatant) => {
+            self.stats.attackPower -= 20;
         },
-        [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
-            target.stats.attackPower += 20;
+        [StatusEffectHook.OnRemove]: (self: Combatant) => {
+            self.stats.attackPower += 20;
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
+}
+
+export class DefenseDowngradeStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.DEFENSE_DOWNGRADE;
+    applicationHooks = {
+        [StatusEffectHook.OnApply]: (self: Combatant) => {
+            self.stats.defensePower -= 20;
+        },
+        [StatusEffectHook.OnRemove]: (self: Combatant) => {
+            self.stats.defensePower += 20;
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
@@ -80,13 +92,24 @@ export class StrengthDowngradeStatusEffect implements StatusEffect {
 export class LuckDowngradeStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.LUCK_DOWNGRADE;
     applicationHooks = {
-        [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
-            // eslint-disable-next-line
-            debugger;
-            target.stats.luck -= 5;
+        [StatusEffectHook.OnApply]: (self: Combatant) => {
+            self.stats.luck -= 5;
         },
-        [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
-            target.stats.luck += 5;
+        [StatusEffectHook.OnRemove]: (self: Combatant) => {
+            self.stats.luck += 5;
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
+}
+
+export class StaggeredStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.STAGGERED;
+    applicationHooks = {
+        [StatusEffectHook.OnApply]: (self: Combatant) => {
+            self.stats.agility -= 5;
+        },
+        [StatusEffectHook.OnRemove]: (self: Combatant) => {
+            self.stats.agility += 5;
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
@@ -95,13 +118,13 @@ export class LuckDowngradeStatusEffect implements StatusEffect {
 export class SlowStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.SLOW;
     applicationHooks = {
-        [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
-            target.stats.movementSpeed -= 2;
-            target.stats.agility -= 3;
+        [StatusEffectHook.OnApply]: (self: Combatant) => {
+            self.stats.movementSpeed -= 2;
+            self.stats.agility -= 3;
         },
-        [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
-            target.stats.movementSpeed += 2;
-            target.stats.agility += 3;
+        [StatusEffectHook.OnRemove]: (self: Combatant) => {
+            self.stats.movementSpeed += 2;
+            self.stats.agility += 3;
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
@@ -110,11 +133,11 @@ export class SlowStatusEffect implements StatusEffect {
 export class PoisonedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.POISONED;
     applicationHooks = {
-        [StatusEffectHook.OnTurnEnd]: (caster: Combatant, target: Combatant, board: Board) => {
-            caster.stats.hp -= 10;
-            if(caster.stats.hp <= 0) {
-                caster.stats.hp = 0;
-                board.removeCombatant(caster);
+        [StatusEffectHook.OnTurnEnd]: (self: Combatant, target: Combatant, board: Board) => {
+            self.stats.hp -= 10;
+            if(self.stats.hp <= 0) {
+                self.stats.hp = 0;
+                // board.removeCombatant(caster);
             }
             return {
                 attackResult: AttackResult.Hit,
@@ -124,7 +147,7 @@ export class PoisonedStatusEffect implements StatusEffect {
                 },
                 cost: 0,
                 reaction: DamageReaction.NONE,
-                position: caster.position
+                position: self.position
             }
         }
     };
@@ -138,7 +161,7 @@ export class BleedingStatusEffect implements StatusEffect {
             caster.stats.hp -= 10;
             if(caster.stats.hp <= 0) {
                 caster.stats.hp = 0;
-                board.removeCombatant(caster);
+                // board.removeCombatant(caster);
             }
             return {
                 attackResult: AttackResult.Hit,
@@ -159,11 +182,80 @@ export class TauntedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.TAUNTED;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
-            target.aiAgent = new TauntedAIAgent(caster);
+            caster.aiAgent = new TauntedAIAgent(target);
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
-            target.aiAgent = undefined;
+            caster.aiAgent = caster.team.aiAgent || undefined;
         }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
+}
+
+export class StupefiedStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.STUPEFIED;
+    applicationHooks = {
+        [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
+            caster.removeStatusEffect(StatusEffectType.FOCUS_AIM);
+            caster.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
+        },  
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
+}
+
+export class NauseatedStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.NAUSEATED;
+    applicationHooks = {
+        [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
+        },
+        [StatusEffectHook.OnTurnStart]: (self: Combatant) => {
+            const chanceWithDelta = 0.5 - ((self.stats.luck) * 0.02);
+            if(Math.random() >= chanceWithDelta) {
+                return {
+                    attackResult: AttackResult.NotFound,
+                    damage: {
+                        amount: 0,
+                        type: DamageType.Unstoppable
+                    },
+                    cost: 0,
+                    reaction: DamageReaction.NONE,
+                    position: self.position
+                };
+            }
+            return {
+                attackResult: AttackResult.NotFound,
+                damage: {
+                    amount: 0,
+                    type: DamageType.Unstoppable
+                },
+                cost: 1,
+                reaction: DamageReaction.NONE,
+                position: self.position
+            };
+        },
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
+}       
+
+export class MesmerizedStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.MESMERIZED;
+    applicationHooks = {
+        [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
+            caster.removeStatusEffect(StatusEffectType.DEFENDING);
+            caster.removeStatusEffect(StatusEffectType.BLOCKING_STANCE);
+            caster.removeStatusEffect(StatusEffectType.FOCUS_AIM);
+            caster.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
+        },
+        [StatusEffectHook.OnTurnStart]: (self: Combatant) => {
+            return {
+                attackResult: AttackResult.NotFound,
+                damage: {
+                    amount: 0,
+                    type: DamageType.Unstoppable
+                },
+                cost: 1,
+                reaction: DamageReaction.NONE
+            };
+        },
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
 }

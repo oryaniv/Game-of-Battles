@@ -1,6 +1,8 @@
 import { Combatant } from "../Combatant";
 import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Position } from "../Position";
+import { GapingStab, HaftStrike, Skewer } from "../SpecialMoves/Singular/Offensive";
+import { FirstStrike } from "../SpecialMoves/Singular/Passives";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
 
@@ -15,7 +17,7 @@ export class Pikeman extends Combatant {
           stamina: 25,
           initiative: 4,
           movementSpeed: 3,
-          range: 1,
+          range: 2,
           agility: 5,
           luck: 5,
         },
@@ -32,7 +34,10 @@ export class Pikeman extends Combatant {
             {type: DamageType.Dark, reaction: DamageReaction.NONE},
         ],
         [
-
+          new Skewer(),
+          new GapingStab(),
+          new HaftStrike(),
+          new FirstStrike(),
         ],
       team);
     }

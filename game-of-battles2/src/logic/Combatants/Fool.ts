@@ -1,6 +1,8 @@
 import { Combatant } from "../Combatant";
 import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Position } from "../Position";
+import { LookeyHere, SmellIt, StupidestCrapEver, YoMama } from "../SpecialMoves/Singular/Ailments";
+import { FoolsLuck } from "../SpecialMoves/Singular/Passives";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
 
@@ -16,7 +18,7 @@ export class Fool extends Combatant {
             stamina: 40,
             initiative: 4,
             movementSpeed: 3,
-            range: 5,
+            range: 2,
             agility: 7,
             luck: 10,
           },
@@ -33,7 +35,11 @@ export class Fool extends Combatant {
             {type: DamageType.Dark, reaction: DamageReaction.NONE},
           ],
           [
-            // fools luck
+            new YoMama(),
+            new StupidestCrapEver(),
+            new SmellIt(),
+            new LookeyHere(),
+            new FoolsLuck(),
           ], team
         );
       }

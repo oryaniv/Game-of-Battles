@@ -41,6 +41,7 @@ export enum SpecialMoveAreaOfEffect {
     Single = "Single",
     Cross = "Cross",
     Nova = "Nova",
+    Great_Nova = "GreatNova",
     Line = "Line",
     Cone = "Cone",
     Chain = "Chain"

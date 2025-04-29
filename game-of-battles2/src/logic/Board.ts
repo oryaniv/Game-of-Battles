@@ -33,6 +33,10 @@ export class Board {
     }
   }
 
+  getAllCombatants(): Combatant[] {
+    return this.grid.flat().filter((combatant) => combatant !== null) as Combatant[];
+  }
+
   getCombatantAtPosition(position: Position): Combatant | null {
     if (this.isValidPosition(position)) {
       return this.grid[position.y][position.x];

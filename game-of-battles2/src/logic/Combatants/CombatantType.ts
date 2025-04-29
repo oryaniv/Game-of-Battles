@@ -11,5 +11,5 @@ export enum CombatantType {
     Vanguard = "Vanguard",
     Rogue = "Rogue",
     Artificer = "Artificer",
-    Fistweaver = "Fistweaver",
+    FistWeaver = "Fistweaver",
 }

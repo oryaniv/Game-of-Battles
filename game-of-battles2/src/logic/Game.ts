@@ -9,6 +9,7 @@ import { StatusEffectHook } from "./StatusEffect";
 import { getResultsForStatusEffectHook } from "./StatusEffect";
 import { Team } from "./Team";
 import { emitter } from '../eventBus';
+import { EventLogger } from '../eventLogger';
 
 export class Game {
     private currentTeamIndex: number = 0;
@@ -33,6 +34,12 @@ export class Game {
       this.determineStartingTeam();
       this.actionsRemaining = this.teams[this.currentTeamIndex].combatants.length;
       this.combatMaster = CombatMaster.getInstance(); // new CombatMaster();
+      
+      const eventLogger = EventLogger.getInstance();
+      eventLogger.logEvent(`Round ${this.roundCount} begins`);
+      eventLogger.addBreak();
+      eventLogger.logEvent(`${this.teams[this.currentTeamIndex].name}'s Turn`);
+      eventLogger.logEvent(`${this.getCurrentCombatant().name} the ${this.getCurrentCombatant().getCombatantType()} acts`);
     }
   
     private setupCombatants(): void {
@@ -76,6 +83,8 @@ export class Game {
     }
 
     executeBasicAttack(attacker: Combatant, position: Position, board: Board): ActionResult {
+      const eventLogger = EventLogger.getInstance();
+      eventLogger.logEvent(`${attacker.name} uses basic attack`);
       const damage = attacker.basicAttack();
       const actionResult = this.executeAttack(attacker, position, board, damage);
       this.spendActionPoints(actionResult.cost);
@@ -86,6 +95,8 @@ export class Game {
       if(!skill.effect) {
         return [getStandardActionResult()]; 
       }
+      const eventLogger = EventLogger.getInstance();
+      eventLogger.logEvent(`${invoker.name} uses ${skill.name}`);
       invoker.stats.stamina -= skill.cost;
       getResultsForStatusEffectHook(invoker, StatusEffectHook.OnSkillUsed);
       const actionResult: ActionResult | ActionResult[] = skill.effect(invoker, target, board); 
@@ -102,10 +113,14 @@ export class Game {
     executeDefend(): void {
       const currentCombatant = this.getCurrentCombatant();
       this.combatMaster.defend(currentCombatant);
+      const eventLogger = EventLogger.getInstance();
+      eventLogger.logEvent(`${currentCombatant.name} defends`);
       this.spendActionPoints(1);
     }
 
     executeSkipTurn(): void {
+      const eventLogger = EventLogger.getInstance();
+      eventLogger.logEvent(`${this.getCurrentCombatant().name}  skips their turn`);
       this.spendActionPoints(this.getCurrentTeam().getAliveCombatants().length === 1 ? 1 : 0.5);
     }
 
@@ -116,11 +131,13 @@ export class Game {
     nextTurn(): void {
       // if game over, return
       if(this.isGameOver()) {
+        const eventLogger = EventLogger.getInstance();
+        eventLogger.logEvent(`Game Over`);
         return;
       }
 
       // end turn hook application
-      const turnEndHookResults: ActionResult[] = this.getCurrentCombatant().endTurn();
+      const turnEndHookResults: ActionResult[] = this.getCurrentCombatant().endTurn(this.board);
       if(turnEndHookResults.length > 0) {
         const cost = this.determineCostOfManyActions(turnEndHookResults);
         if(cost !== 0) {
@@ -131,9 +148,10 @@ export class Game {
       // should we switch teams?
       if (this.actionsRemaining <= 0) {
         // pick next combatant from current playing team
+          
           this.teamNextCombatant();
-          this.currentTeamIndex = 1 - this.currentTeamIndex;
-          this.actionsRemaining = this.teams[this.currentTeamIndex].getAliveCombatants().length;
+          this.nextTeam();
+          
           // not just next turn, but also next round
           if (this.currentTeamIndex === 0) {
             this.nextRound();
@@ -143,10 +161,6 @@ export class Game {
         }
 
         const currentCombatant = this.getCurrentCombatant();
-        if(!currentCombatant) {
-          // eslint-disable-next-line
-          debugger;
-        }
         // start turn hook application
         const turnStartHookResults: ActionResult[] = currentCombatant.startTurn();
         if(turnStartHookResults.length > 0) {
@@ -156,6 +170,14 @@ export class Game {
             this.nextTurn();
           }
         }
+    }
+
+    private nextTeam(): void {
+      this.currentTeamIndex = 1 - this.currentTeamIndex;
+      this.actionsRemaining = this.teams[this.currentTeamIndex].getAliveCombatants().length;
+      const eventLogger = EventLogger.getInstance();
+      eventLogger.addBreak();
+      eventLogger.logEvent(`${this.getCurrentTeam().name}'s Turn`);
     }
 
     private teamNextCombatant(): void {
@@ -169,6 +191,10 @@ export class Game {
 
     nextRound(): void {
       this.roundCount++;
+      const eventLogger = EventLogger.getInstance();
+      eventLogger.addBreak();
+      eventLogger.logEvent(`Round ${this.roundCount} begins`);
+      eventLogger.addBreak();
       this.updateStatusEffects();
     }
 

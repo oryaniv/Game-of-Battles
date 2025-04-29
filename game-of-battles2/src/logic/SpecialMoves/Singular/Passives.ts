@@ -46,7 +46,7 @@ export class InspiringKiller implements SpecialMove {
     effect = (invoker: Combatant, target: Position, board: Board) => {
         invoker.applyStatusEffect({
             name: StatusEffectType.INSPIRING_KILLER,
-            duration: 3,
+            duration: Number.POSITIVE_INFINITY,
         });
         return getStandardActionResult();
     };
@@ -54,3 +54,56 @@ export class InspiringKiller implements SpecialMove {
     description = 'Whenver this combatant kills an enemy, adjacent allies gain a random buff for 3 turns.'
 }
 
+export class FoolsLuck implements SpecialMove {
+    name: string = "Fools Luck";
+    triggerType = SpecialMoveTriggerType.Passive;
+    cost: number = 0;
+    turnCost: number = 0;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.None,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Crush
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        invoker.applyStatusEffect({
+            name: StatusEffectType.FOOLS_LUCK,
+            duration: Number.POSITIVE_INFINITY,
+        });
+        return getStandardActionResult();
+    };
+    requirements = undefined;
+    description = `Whenever this combatant is attacked, there is a fixed small chance the hit will automatically miss.
+    Whenever this combatant is inflicted with an ailment, there is a fixed small chance the ailment will not take effect.`
+}
+
+export class FirstStrike implements SpecialMove {
+    name: string = "First Strike";
+    triggerType = SpecialMoveTriggerType.Passive;
+    cost: number = 0;
+    turnCost: number = 0;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.None,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Crush
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        invoker.applyStatusEffect({
+            name: StatusEffectType.FIRST_STRIKE,
+            duration: Number.POSITIVE_INFINITY,
+        });
+        return getStandardActionResult();
+    };
+    requirements = undefined;
+    description = `When an enemy comes to engage this combatant in close combat, his long weapon gives him the privielge of punishing them
+    for trying to engage him.`
+}   

@@ -109,10 +109,11 @@
         <button :disabled="hasMoved && !canDefendAndMove() || attackMode || moveMode || showSkillsMenu || skillMode" @click="defend">Defend</button>
         <button :disabled="attackMode || moveMode || showSkillsMenu || skillMode" v-if="!hasMoved" @click="showMoveOptions">Move</button>
         <button v-if="hasMoved" @click="undoMove">Undo Move</button>
-        <button :disabled="showSkillsMenu || !hasActiveSpecialMoves() || skillMode" @click="showSpecialSkills">Special Skill</button>
+        <button :disabled="showSkillsMenu || !hasActiveSpecialMoves() || skillMode" @click="showSpecialSkills">Use Skill</button>
+        <button :disabled="true">Use Super</button>
         <button :disabled="attackMode || moveMode || showSkillsMenu || skillMode" @click="skip">Skip</button>
         <button :disabled="!moveMode && !attackMode && !showSkillsMenu && !skillMode" @click="cancel">Cancel</button>
-        <!-- <button v-if="!isGameOver()" @click="playAiTurn(currentCombatant)">AI Play</button> -->
+        <button v-if="!isGameOver()" @click="playAiTurn(currentCombatant)">AI Play</button>
         <button @click="showStatus">Status</button>
       </div>
     </div>
@@ -172,6 +173,17 @@
     </div>
   </div>
 
+
+  <div class="event-log">
+    <div class="event-log-header">
+      Event Log
+    </div>
+    <div id="event-log-body" class="event-log-body">
+      <div class="event-log-item" v-for="event in getEvents()" :key="event.id">
+        {{ event }}
+      </div>
+    </div>
+  </div>
 
     <!-- <img class="dragon-left" src="./assets/white_dragon_black_back.png" alt="left dragon" />
     <img class="dragon-right" src="./assets/white_dragon_black_back.png" alt="right dragon" />
@@ -246,36 +258,50 @@ import { Hunter } from './logic/Combatants/Hunter';
 import { Healer } from './logic/Combatants/Healer';
 import { Wizard } from './logic/Combatants/Wizard'; 
 import { Witch } from './logic/Combatants/Witch';
+import { Fool } from './logic/Combatants/Fool';
+import { Pikeman } from './logic/Combatants/Pikeman';
+import { Vanguard } from './logic/Combatants/Vanguard';
+import { FistWeaver } from './logic/Combatants/FistWeaver';
 import { StandardBearer } from './logic/Combatants/StandardBearer';
 import { SpecialMove, SpecialMoveTriggerType } from './logic/SpecialMove';
 import { StatusEffect, StatusEffectType, StatusEffectAlignment } from './logic/StatusEffect';
 import { SimpleAIAgent } from './logic/AI/AIAgent';
-import { DummyAIAgent, BunkerDummyAIAgent, ToddlerAIAgent, KidAIAgent } from './logic/AI/DeterministicAgents';
+import { DummyAIAgent, BunkerDummyAIAgent, ToddlerAIAgent, KidAIAgent, TeenagerAIAgent, RookieAIAgent } from './logic/AI/DeterministicAgents';
 import { Howl } from 'howler';
+import { EventLogger } from './eventLogger';
+import { AllOfThem, standardVsSetup } from './boardSetups';
 
 export default defineComponent({
   setup() {
     
     const board = ref(new Board(10, 10));
     const whiteTeam = ref(new Team('White Team', 0));
-    const blackTeam = ref(new Team('Black Team', 1, new KidAIAgent()));
+    const blackTeam = ref(new Team('Black Team', 1,new RookieAIAgent()));
+
     // whiteTeam.value.addCombatant(new Witch('Jezebel', { x: 5, y: 1 }, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Defender('Igor', { x: 3, y: 1 }, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Hunter('Zarina', { x: 4, y: 0 }, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Wizard('Ivan', { x: 5, y: 0 }, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Healer('Annika', { x: 3, y: 0 }, whiteTeam.value));
-    /// add to black team
-    blackTeam.value.addCombatant(new Defender('Michael', { x: 5, y: 8 }, blackTeam.value));
-    blackTeam.value.addCombatant(new StandardBearer('Jake', { x: 6, y: 8 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Hunter('Cecile', { x: 5, y: 9 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Wizard('Bran', { x: 6, y: 9 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Healer('Marianne', { x: 7, y: 9 }, blackTeam.value));
+
+    // standardVsSetup(whiteTeam.value, blackTeam.value);
+   //  AllOfThem(whiteTeam.value);
+
+    whiteTeam.value.addCombatant(new Pikeman('Mario', { x: 4, y: 0 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Vanguard('Ragnar', { x: 3, y: 3 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new FistWeaver('Yuri', { x: 1, y: 2 }, whiteTeam.value));
+   
+
+    blackTeam.value.addCombatant(new Wizard('Benchi', { x: 4, y: 1 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Defender('xenchi', { x: 4, y: 3 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Hunter('qenchi', { x: 4, y: 2 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Healer('fench', { x: 4, y: 4 }, blackTeam.value));
     
-    // whiteTeam.value.addCombatant(new Militia('q', { x: 0, y: 0 }, whiteTeam.value));
-    // blackTeam.value.addCombatant(new Militia('n', { x: 5, y: 9 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Hunter('b', { x: 4, y: 9 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Militia('c', { x: 3, y: 9 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Militia('d', { x: 6, y: 9 }, blackTeam.value));
+
+    // whiteTeam.value.addCombatant(new Militia('Gobo', { x: 0, y: 0 }, whiteTeam.value));
+    // blackTeam.value.addCombatant(new Militia('Goboka', { x: 9, y: 9 }, blackTeam.value));
+    // whiteTeam.value.combatants[0].applyStatusEffect({
+    //         name: StatusEffectType.ARCANE_CHANNELING,
+    //         duration: 5,
+    // }); 
+
+    // whiteTeam.value.combatants[0].stats.stamina = 0;
     
 
     const teams = ref([whiteTeam.value, blackTeam.value]);
@@ -308,6 +334,8 @@ export default defineComponent({
     const selectedSkillDescription = ref<string | null>(null);
     const currentSkill = ref<SpecialMove | null>(null);
     const aoePositions = ref<Position[]>([]);
+    const eventLogger = EventLogger.getInstance();
+    let eventLogBody: HTMLElement | null = null;
 
     const getCombatantEffects = (position: Position) => {
       const key = `${position.x},${position.y}`;
@@ -321,7 +349,12 @@ export default defineComponent({
       emitter.on('trigger-method', (actionResultData:any) => {
         applyAttackEffects(actionResultData, actionResultData.position);
       });
-      
+
+      emitter.on('play-move-sound', () => {
+        playMoveSound();
+      });
+
+      eventLogBody = document.getElementById('event-log-body');
     });
 
     const updateTurnMessage = () => {
@@ -385,7 +418,7 @@ export default defineComponent({
         validMoves.value = [];
         hasMoved.value = true;
         moveMode.value = false;
-        moveSound && moveSound.play();
+        // playMoveSound();
         if (actionsRemaining.value <= 0) {
           game.value.nextTurn();
           prepareNextTurn();
@@ -393,6 +426,11 @@ export default defineComponent({
         }
       }
     };
+
+    const playMoveSound = () => {
+      const currentMoveSound = moveSounds[Math.floor(Math.random() * moveSounds.length)];
+      currentMoveSound && currentMoveSound.play();
+    }
 
     const showMoveOptions = () => {
       if (currentCombatant.value) {
@@ -455,6 +493,7 @@ export default defineComponent({
     };
 
     const applyAttackEffects = (actionResult: ActionResult, position: Position) => {
+      debugger;
       const reaction = actionResult.reaction;
       const attackRes = actionResult.attackResult;
       const isMiss = attackRes === AttackResult.Miss;
@@ -487,12 +526,12 @@ export default defineComponent({
             );
           }, 1000);
 
-          setTimeout(() => {
-            const hitCombatant = getCombatant({ x: position.x + 1, y: position.y + 1 });
-            if(hitCombatant && hitCombatant.stats.hp <= 0) {
-              board.value.removeCombatant(hitCombatant); 
-            }
-          }, 500);
+          // setTimeout(() => {
+          //   const hitCombatant = getCombatant({ x: position.x + 1, y: position.y + 1 });
+          //   if(hitCombatant && hitCombatant.stats.hp <= 0) {
+          //     board.value.removeCombatant(hitCombatant); 
+          //   }
+          // }, 500);
 
           playSound(actionResult.damage.type);
     };
@@ -519,8 +558,11 @@ export default defineComponent({
       actionsRemaining.value = game.value.getActionsRemaining();
       hasMoved.value = false;
       previousPosition.value = null;
+      removeTheDead();
       updateTurnMessage();
-
+      if(eventLogBody) {
+        eventLogBody.scrollTop = eventLogBody.scrollHeight;
+      }
       if(game.value.isGameOver()) {
         return;
       }
@@ -533,6 +575,15 @@ export default defineComponent({
         }, 1000);
       }
     };
+
+    const removeTheDead = () => { 
+      setTimeout(() => {
+        const deadCombatants = board.value.getAllCombatants().filter((combatant) => combatant.stats.hp <= 0);
+        deadCombatants.forEach((combatant) => {
+          board.value.removeCombatant(combatant);
+        });
+      }, 500);
+    }
 
     const playAiTurn = (currentCombatant: Combatant) => {
       const aiActionResult: ActionResult | ActionResult[] = 
@@ -587,6 +638,14 @@ export default defineComponent({
           return require('./assets/StandardBearer.svg');
         case CombatantType.Witch:
           return require('./assets/Witch.svg');
+        case CombatantType.Fool:
+          return require('./assets/Fool.svg');
+        case CombatantType.Pikeman:
+          return require('./assets/Pikeman.svg');
+        case CombatantType.Vanguard:
+          return require('./assets/Vanguard.svg');
+        case CombatantType.FistWeaver:
+          return require('./assets/FistWeaver.svg');
       }
     }
 
@@ -651,6 +710,10 @@ export default defineComponent({
 
     const getCombatantSpecialMoves = (combatant: Combatant) => {
       return combatant.getSpecialMoves().filter((move) => move.triggerType === SpecialMoveTriggerType.Active);
+    }
+
+    const getCombatantSupers = (combatant: Combatant) => {
+      return combatant.getSpecialMoves().filter((move) => move.triggerType === SpecialMoveTriggerType.Cooperative);
     }
 
     const hasActiveSpecialMoves = () => {
@@ -753,6 +816,13 @@ export default defineComponent({
       [StatusEffectType.SLOW]: "SW",
       [StatusEffectType.POISONED]: "P",
       [StatusEffectType.BLEEDING]: "BL",
+      [StatusEffectType.TAUNTED]: "TA",
+      [StatusEffectType.STUPEFIED]: "ST",
+      [StatusEffectType.NAUSEATED]: "NA",
+      [StatusEffectType.MESMERIZED]: "ME",
+      [StatusEffectType.MESMERIZING]: "ME",
+      [StatusEffectType.STAGGERED]: "SG",
+      [StatusEffectType.DEFENSE_DOWNGRADE]: "DD",
       // ... add mappings for other status effect types
     };
 
@@ -806,8 +876,10 @@ export default defineComponent({
 
     const actionSounds: { [key: string]: Howl } = {};
     // const moveSounds = [];
-    let moveSound: Howl | null = null;
-
+    let moveSound1: Howl | null = null;
+    let moveSound2: Howl | null = null;
+    let moveSound3: Howl | null = null;
+    let moveSounds: Howl[] = [];
     const loadSounds = () => {
       const allSounds = [
         {name:'Blight', path:require('./sound/acid_splash_sound.mp3')},
@@ -833,20 +905,22 @@ export default defineComponent({
         actionSounds[sound.name] = newSound;
       })
 
-      moveSound = new Howl({
+      moveSound1 = new Howl({
         src: [require('./sound/move_sound_1.mp3')],
         preload: true,
       });
 
-      // const movePaths = ['./sound/move_sound_1.mp3', './sound/move_sound_2.mp3', './sound/move_sound_3.mp3'];
+      moveSound2 = new Howl({
+        src: [require('./sound/move_sound_2.mp3')],
+        preload: true,
+      });
 
-      // movePaths.forEach((sound) => {
-      //   const newSound = new Howl({
-      //     src: [require(sound)],
-      //     preload: true,
-      //   });
-      //   moveSounds.push(newSound);
-      // });
+      moveSound3 = new Howl({
+        src: [require('./sound/move_sound_3.mp3')],
+        preload: true,
+      });
+
+      moveSounds = [moveSound1, moveSound2, moveSound3]
     }
 
     loadSounds();
@@ -915,46 +989,64 @@ export default defineComponent({
     const statusNameToText = (statusName: StatusEffectType) => {
       switch (statusName) {
         case 0:
-          return "Defending";
-        case 1:
           return "Blocking Stance";
-        case 2:
+        case 1:
           return "Arcane Channeling";
-        case 3:
+        case 2:
           return "Focus Aim";
-        case 4:
+        case 3:
           return "Fortified";
-        case 5:
+        case 4:
           return "Immobilized";
-        case 6:
+        case 5:
           return "Regenerating";
-        case 7:
+        case 6:
           return "Frozen";
-        case 8:
+        case 7:
           return "Poisoned";
-        case 9:
+        case 8:
           return "Strength Boost";
-        case 10:
+        case 9:
           return "Mobility Boost";
-        case 11:
+        case 10:
           return "Encouraged";
-        case 12:
+        case 11:
           return "Rallied";
-        case 13:
+        case 12:
           return "Strength Downgrade";
-        case 14:
+        case 13:
           return "Inspiring Killer";
-        case 15:
+        case 14:
           return "Luck Downgrade";
-        case 16:
+        case 15:
           return "Slow";
-        case 17:
+        case 16:
           return "Energy Absorb";
-        case 18:
+        case 17:
           return "Bleeding";
-        case 19:
+        case 18:
           return "Taunted";
+        case 19:
+          return "Fools Luck";
+        case 20:
+          return "Mesmerizing";
+        case 21:
+          return "Mesmerized";
+        case 22:
+          return "Nauseated";
+        case 23:
+          return "Stupefied";
+        case 24:
+          return "Staggered";
+        case 25:
+          return "First Strike";
+        case 26:
+          return "Defense Downgrade";
       }
+    }
+
+    const getEvents = () => {
+      return eventLogger.getEvents();
     }
 
     return {
@@ -991,6 +1083,7 @@ export default defineComponent({
       showSkillsMenu,
       getCombatantSprite,
       getCombatantSpecialMoves,
+      getCombatantSupers,
       hasActiveSpecialMoves,
       showSkillDescription,
       hideSkillDescription,
@@ -1020,7 +1113,8 @@ export default defineComponent({
       showStatus,
       getStatUiName,
       getStatusScale,
-      statusNameToText
+      statusNameToText,
+      getEvents
     };
   },
 });
@@ -1189,11 +1283,11 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
+  gap: 10px;
 }
 
 .action-menu-button-container button {
-  font-size: 20px;
+  font-size: 28px;
   color: white;
   width: 100%;
   background-image: url(https://img.goodfon.com/original/3024x1964/8/46/tekstura-ametist-kamen.jpg);
@@ -1560,6 +1654,37 @@ button {
 .status-popup-close {
   margin-top: 20px;
   text-align: center;
+}
+
+.event-log {
+  position: absolute;
+  top: 30%;
+  right: 3.5%;
+  width: 280px;
+  height: 300px;
+  /* color: white; */
+  z-index: 10;
+}
+
+.event-log-header {
+  background-color: #333;
+  color: white;
+  padding: 10px;
+  font-size: 24px;
+  border: 1px solid white;
+}
+
+.event-log-body {
+  padding: 10px;
+  background-color: #333;
+  border: 1px solid white;
+  min-height: 300px;
+  max-height: 300px;
+  overflow-y: scroll;
+}
+
+.event-log-item {
+  font-size: 20px;
 }
 
 </style>

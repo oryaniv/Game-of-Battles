@@ -2,6 +2,11 @@ import { StatusEffect, StatusEffectType, StatusEffectHook, StatusEffectAlignment
 import { Combatant } from "../Combatant";
 import { ActionResult, AttackResult, getStandardActionResult } from "../attackResult";
 import { Damage, DamageReaction, DamageType } from "../Damage";
+import { CombatMaster } from "../CombatMaster";
+import { SpecialMoveAreaOfEffect } from "../SpecialMove";
+import { RangeCalculator } from "../RangeCalculator";
+import { Board } from "../Board";
+import { Position } from "../Position";
 
 export class BlockingStanceStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.BLOCKING_STANCE;
@@ -66,8 +71,6 @@ export class RegeneratingStatusEffect implements StatusEffect {
             const newHp = Math.min(self.stats.hp + 8, self.baseStats.hp);
             const deltaHp = newHp - self.stats.hp;
             self.stats.hp = newHp;
-            // eslint-disable-next-line
-            debugger;
             return {
                 attackResult: AttackResult.Hit,
                 damage: {amount: deltaHp, type: DamageType.Healing},
@@ -84,8 +87,6 @@ export class FortifiedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.FORTIFIED;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
-            // eslint-disable-next-line
-            debugger;
             target.stats.defensePower += 20;
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
@@ -152,6 +153,34 @@ export class RalliedStatusEffect implements StatusEffect {
             target.stats.defensePower -= 10;
             target.stats.luck -= 5;
         }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
+}
+
+export class MesmerizingStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.MESMERIZING;
+    applicationHooks = {
+        [StatusEffectHook.OnAttacking]: (self: Combatant) => {
+            self.removeStatusEffect(StatusEffectType.MESMERIZING);
+        },
+        [StatusEffectHook.OnDefending]: (self: Combatant) => {
+            self.removeStatusEffect(StatusEffectType.MESMERIZING);
+        },
+        [StatusEffectHook.OnSkillUsed]: (self: Combatant) => {
+            self.removeStatusEffect(StatusEffectType.MESMERIZING);
+        },
+        [StatusEffectHook.OnMoving]: (self: Combatant) => {
+            self.removeStatusEffect(StatusEffectType.MESMERIZING);
+        },
+        [StatusEffectHook.OnTurnEnd]: (self: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
+            const combatMaster = CombatMaster.getInstance();
+            const getAllTargets: Position[] = board.getAreaOfEffectPositions(self, self.position, SpecialMoveAreaOfEffect.Great_Nova, 2);
+            getAllTargets.filter(AOETarget => board.getCombatantAtPosition(AOETarget) !== null)
+                         .filter(AOETarget => board.getCombatantAtPosition(AOETarget)?.team.getName() !== self.team.getName())
+                         .forEach(AOETarget => {
+                combatMaster.tryInflictStatusEffect(self, AOETarget, board, StatusEffectType.MESMERIZED, 1, 0.6);
+            });
+        } 
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
 }

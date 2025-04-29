@@ -21,7 +21,7 @@ export interface ActionResult {
 }
 
 
-export function getStandardActionResult(): ActionResult {
+export function getStandardActionResult(position?: Position): ActionResult {
     return {
         attackResult: AttackResult.NotFound,
         damage: {
@@ -29,6 +29,7 @@ export function getStandardActionResult(): ActionResult {
             type: DamageType.Unstoppable
         },
         cost: 1,
-        reaction: DamageReaction.NONE
+        reaction: DamageReaction.NONE,
+        position: position
     };
 }

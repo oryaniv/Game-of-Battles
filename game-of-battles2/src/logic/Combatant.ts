@@ -9,7 +9,7 @@ import { ActionResult, AttackResult } from "./attackResult";
 import { CombatantType } from "./Combatants/CombatantType";
 import { emitter } from "@/eventBus";
 import { AIAgent } from "./AI/AIAgent";
-
+import { EventLogger } from "@/eventLogger";
 export interface CombatantStats {
     hp: number;
     attackPower: number;
@@ -44,19 +44,21 @@ export interface CombatantStats {
     hasMoved: boolean = false;
 
     startTurn(): ActionResult[] {
+        const eventLogger = EventLogger.getInstance();
+        eventLogger.logEvent(`${this.name} the ${this.getCombatantType()} acts`);
         this.hasMoved = false;
         if(this.isDefending()) {
             this.removeStatusEffect(StatusEffectType.DEFENDING);
         }
         const turnStartHookResults: ActionResult[] = getResultsForStatusEffectHook(this, StatusEffectHook.OnTurnStart);
-        turnStartHookResults.forEach((result) => {
+        turnStartHookResults.filter((result) => result.attackResult !== AttackResult.NotFound).forEach((result) => {
             emitter.emit('trigger-method', result);
         });
         return turnStartHookResults;
     }
 
-    endTurn(): ActionResult[] {
-        const endTurnHookResults: ActionResult[] = getResultsForStatusEffectHook(this, StatusEffectHook.OnTurnEnd);
+    endTurn(board: Board): ActionResult[] {
+        const endTurnHookResults: ActionResult[] = getResultsForStatusEffectHook(this, StatusEffectHook.OnTurnEnd, undefined, undefined, undefined, board);
         endTurnHookResults.forEach((result) => {
             emitter.emit('trigger-method', result);
         });
@@ -76,7 +78,10 @@ export interface CombatantStats {
 
         board.removeCombatant(this);
         board.placeCombatant(this, newPosition);
+        const eventLogger = EventLogger.getInstance();
+        eventLogger.logEvent(`${this.name} moves to (${newPosition.x},${newPosition.y})`);
         this.hasMoved = true;
+        // emitter.emit('play-move-sound');
     }
   
     defend(): number {
@@ -103,15 +108,17 @@ export interface CombatantStats {
       if (this.stats.hp < 0) this.stats.hp = 0;
     }
     
-    applyStatusEffect(effect: StatusEffectApplication): void {
+    applyStatusEffect(effect: StatusEffectApplication, statusSource?: Combatant): void {
+        if(this.hasStatusEffect(effect.name)) {
+           this.updateStatusEffect(effect);
+           return;
+        }
         this.statusEffects.push(effect);
         const statusEffect = getStatusEffect(effect.name);
         if(statusEffect) {
           const applyHook = statusEffect.applicationHooks[StatusEffectHook.OnApply];
-          applyHook && applyHook(this, this, {amount: 0, type: DamageType.Unstoppable});
+          applyHook && applyHook(this, statusSource || this, {amount: 0, type: DamageType.Unstoppable});
         }
-
-       //  getResultsForStatusEffectHook(this, StatusEffectHook.OnApply, this, {amount: 0, type: DamageType.Unstoppable});
     }
 
     updateStatusEffect(effect: StatusEffectApplication): void {
@@ -160,6 +167,7 @@ export interface CombatantStats {
 
       canUseSkill(skill: SpecialMove): boolean {
         return this.stats.stamina >= skill.cost && 
-        (!skill.checkRequirements || skill.checkRequirements(this));
+        (!skill.checkRequirements || skill.checkRequirements(this)) &&
+        !this.hasStatusEffect(StatusEffectType.NAUSEATED);
       }
   }

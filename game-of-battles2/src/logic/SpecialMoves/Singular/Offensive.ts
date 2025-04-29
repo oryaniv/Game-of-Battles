@@ -1,4 +1,4 @@
-import { DamageType } from "@/logic/Damage";
+import { DamageReaction, DamageType } from "@/logic/Damage";
 import { Damage } from "@/logic/Damage";
 import { Position } from "@/logic/Position";
 import { SpecialMove, SpecialMoveAlignment, SpecialMoveAreaOfEffect, SpecialMoveRange, SpecialMoveRangeType, SpecialMoveTriggerType } from "@/logic/SpecialMove";
@@ -336,4 +336,211 @@ export class ToxicArrow implements SpecialMove {
     };
     checkRequirements = undefined
     description = `Launch an arrow coated in a deadly poison, dealing medium Blight damage and having a medium chance to inflict Poisoned for 3 turns.`   
+}
+
+export class Skewer implements SpecialMove {
+    name: string = "Skewer";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 5;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Straight,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Line,
+        range: 1
+    };
+    damage: Damage = {
+        amount: 20,
+        type: DamageType.Pierce
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.range);
+        const skewerResults = getAllTargets.map(AOETarget => {
+            return combatMaster.executeAttack(invoker, AOETarget, board, this.damage, true);
+        });
+
+        return skewerResults;
+    };
+    checkRequirements = undefined
+    description = `Stab the enemy where it hurts, dealing medium Pierce damage.`
+}
+
+export class GapingStab implements SpecialMove {
+    name: string = "Gaping Stab";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 5;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Straight,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 2
+    };
+    damage: Damage = {
+        amount: 20,
+        type: DamageType.Pierce
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage);
+        if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
+            combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.BLEEDING, 3, 0.6);
+        }
+        return result;
+    };
+    checkRequirements = undefined
+    description = `Stab the enemy where it hurts, dealing medium Pierce damage and having a medium chance to inflict Bleeding for 3 turns.`   
+}
+
+export class HaftStrike implements SpecialMove {
+    name: string = "Haft Strike";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 4;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Straight,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 1
+    };
+    damage: Damage = {
+        amount: 15,
+        type: DamageType.Crush
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage);
+        if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
+            combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.STAGGERED, 3, 0.6);
+        }
+        return result;
+    };
+    checkRequirements = undefined
+    description = `Strike an enemy with a powerful haft, dealing medium Crush damage.`   
+}
+
+export class Rampage implements SpecialMove {
+    name: string = "Rampage";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 8;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Straight,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 1
+    };
+    damage: Damage = {
+        amount: 25,
+        type: DamageType.Slash
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const rampageResults: ActionResult[] = [];
+        for(let i = 0; i < 3; i++) {
+        const roll = Math.random();
+            if (roll <= 0.25) {
+                rampageResults.push({
+                    attackResult: AttackResult.Miss,
+                    damage: { amount: 0, type: DamageType.Unstoppable },
+                    cost: -1, // Refund 1 action point
+                    reaction: DamageReaction.NONE,
+                    position: target
+                });
+            } else {
+                rampageResults.push(combatMaster.executeAttack(invoker, target, board, this.damage));
+            }
+        }
+        return rampageResults;
+    };
+    checkRequirements = undefined
+    description = `Strike at the enemy in a wild frenzy, Swinging 3 times but at the cost of a small chance to miss every time regardless.`   
+}
+
+export class GuardBreaker implements SpecialMove {
+    name: string = "Guard Breaker";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 5;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Straight,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 1
+    };
+    damage: Damage = {
+        amount: 10,
+        type: DamageType.Slash
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage);
+        if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
+            const targetCombatant = board.getCombatantAtPosition(target);
+            targetCombatant!.removeStatusEffect(StatusEffectType.DEFENDING);
+            targetCombatant!.removeStatusEffect(StatusEffectType.BLOCKING_STANCE);
+            targetCombatant!.applyStatusEffect({name: StatusEffectType.DEFENSE_DOWNGRADE, duration: 3});
+        }
+        return result;
+    };
+    checkRequirements = undefined
+    description = `Swing at an enemy's armor and shields, ripping them away and opening them up to attack.`   
+}
+
+
+export class FeralSwing implements SpecialMove {
+    name: string = "Feral Swing";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 7;
+    turnCost: number = 1;
+    range: SpecialMoveRange = { 
+        type: SpecialMoveRangeType.Straight,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Cone,
+        range: 1
+    };
+    damage: Damage = {
+        amount: 35,
+        type: DamageType.Slash
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const feralSwingResults: ActionResult[] = [];
+        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.range);
+        for(const currentTarget of getAllTargets) {
+            feralSwingResults.push(combatMaster.executeAttack(invoker, currentTarget, board, this.damage));
+        }
+        return feralSwingResults;
+    };
+    checkRequirements = undefined
+    description = `Swing your blade in a wide arc, dealing massive Slash damage to all in the area.`   
+}
+
+export class TitanicFist implements SpecialMove {
+    name: string = "Titanic Fist";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 6;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Melee,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 1
+    };
+    damage: Damage = {
+        amount: 25,
+        type: DamageType.Crush
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage);
+        if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
+            return result;
+        }
+        return result;
+    };
+    checkRequirements = undefined
+    description = `Strike an enemy with a powerful fist, dealing medium Crush damage and pushing them up to 3 panels back.
+    if they hit something on the way, they'll stop, and both them and the obstacle will suffer a small amount of damage.`   
 }

@@ -142,3 +142,29 @@ export class RallyToTheBanner implements SpecialMove {
     description = `Rally close allies to the banner, granting them all a small bonus to both defense and luck. this move
     cannot be user after moving` 
 }
+
+export class Meditate implements SpecialMove {
+    name: string = "Meditate";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 8;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Self,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Healing
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const negativeStatusEffects: StatusEffect[] = invoker.getStatusEffects().filter(status => status.alignment === StatusEffectAlignment.Negative);
+        for(const statusEffect of negativeStatusEffects) {
+            invoker?.removeStatusEffect(statusEffect.name);
+        }
+        return getStandardActionResult();
+    };
+    checkRequirements = undefined
+    description = `Meditate, cleasing yourself of all negative effects tainting your body and soul`   
+}
