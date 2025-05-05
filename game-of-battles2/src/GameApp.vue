@@ -267,41 +267,49 @@ import { SpecialMove, SpecialMoveTriggerType } from './logic/SpecialMove';
 import { StatusEffect, StatusEffectType, StatusEffectAlignment } from './logic/StatusEffect';
 import { SimpleAIAgent } from './logic/AI/AIAgent';
 import { DummyAIAgent, BunkerDummyAIAgent, ToddlerAIAgent, KidAIAgent, TeenagerAIAgent, RookieAIAgent } from './logic/AI/DeterministicAgents';
+import { RandomAIAgent } from './logic/AI/HeuristicalAgents';
 import { Howl } from 'howler';
 import { EventLogger } from './eventLogger';
-import { AllOfThem, standardVsSetup } from './boardSetups';
+import { AllOfThem, standardVsSetup, theATeam, theBTeam } from './boardSetups';
 
 export default defineComponent({
   setup() {
     
     const board = ref(new Board(10, 10));
-    const whiteTeam = ref(new Team('White Team', 0));
-    const blackTeam = ref(new Team('Black Team', 1,new RookieAIAgent()));
+    const whiteTeam = ref(new Team('White Team', 0, new RandomAIAgent()));
+    const blackTeam = ref(new Team('Black Team', 1, new ToddlerAIAgent()));
 
+  // whiteTeam.value.addCombatant(new Fool('Gobo', { x: 4, y: 3 }, whiteTeam.value));
+     // whiteTeam.value.addCombatant(new FistWeaver('fefe', { x: 3, y: 0 }, whiteTeam.value));
+
+    // whiteTeam.value.addCombatant(new Hunter('afaf', { x: 5, y: 5 }, whiteTeam.value));
+    //  blackTeam.value.addCombatant(new Healer('fffobo', { x: 4, y: 2 }, blackTeam.value));
+    //  whiteTeam.value.addCombatant(new Militia('czve', { x: 4, y: 1 }, whiteTeam.value));
+    //  whiteTeam.value.addCombatant(new Militia('vr', { x: 4, y: 3 }, whiteTeam.value));
+    //  whiteTeam.value.addCombatant(new Militia('csq', { x: 5, y: 2 }, whiteTeam.value));
+    //  whiteTeam.value.addCombatant(new Militia('czve', { x: 3, y: 2 }, whiteTeam.value));
+
+
+
+
+    // blackTeam.value.addCombatant(new Wizard('Jezebel', { x: 4, y: 0 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Hunter('jojo', { x: 3, y: 0 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new FistWeaver('gggjo', { x: 5, y: 1 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Witch('gggjo', { x: 5, y: 2 }, blackTeam.value));
     // whiteTeam.value.addCombatant(new Witch('Jezebel', { x: 5, y: 1 }, whiteTeam.value));
 
     // standardVsSetup(whiteTeam.value, blackTeam.value);
    //  AllOfThem(whiteTeam.value);
-
-    whiteTeam.value.addCombatant(new Pikeman('Mario', { x: 4, y: 0 }, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Vanguard('Ragnar', { x: 3, y: 3 }, whiteTeam.value));
-    whiteTeam.value.addCombatant(new FistWeaver('Yuri', { x: 1, y: 2 }, whiteTeam.value));
-   
-
-    blackTeam.value.addCombatant(new Wizard('Benchi', { x: 4, y: 1 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Defender('xenchi', { x: 4, y: 3 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Hunter('qenchi', { x: 4, y: 2 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Healer('fench', { x: 4, y: 4 }, blackTeam.value));
     
-
-    // whiteTeam.value.addCombatant(new Militia('Gobo', { x: 0, y: 0 }, whiteTeam.value));
-    // blackTeam.value.addCombatant(new Militia('Goboka', { x: 9, y: 9 }, blackTeam.value));
     // whiteTeam.value.combatants[0].applyStatusEffect({
     //         name: StatusEffectType.ARCANE_CHANNELING,
     //         duration: 5,
     // }); 
 
     // whiteTeam.value.combatants[0].stats.stamina = 0;
+
+    theATeam(whiteTeam.value);
+    theBTeam(blackTeam.value);
     
 
     const teams = ref([whiteTeam.value, blackTeam.value]);
@@ -464,6 +472,7 @@ export default defineComponent({
         // currentCombatant.value.hasMoved = false;
         previousPosition.value = null;
         hasMoved.value = false;
+        currentCombatant.value.hasMoved = false;
       }
     };
 
@@ -493,7 +502,6 @@ export default defineComponent({
     };
 
     const applyAttackEffects = (actionResult: ActionResult, position: Position) => {
-      debugger;
       const reaction = actionResult.reaction;
       const attackRes = actionResult.attackResult;
       const isMiss = attackRes === AttackResult.Miss;
@@ -567,9 +575,10 @@ export default defineComponent({
         return;
       }
 
+      // debugger;
       // if the current combatant has an AI agent, let it play the turn
       const currentCombatant = game.value.getCurrentCombatant();
-      if(currentCombatant && currentCombatant.aiAgent !== undefined) {
+      if(currentCombatant && currentCombatant.getAiAgent() !== undefined) {
         setTimeout(() => {
           playAiTurn(currentCombatant);
         }, 1000);
@@ -587,7 +596,7 @@ export default defineComponent({
 
     const playAiTurn = (currentCombatant: Combatant) => {
       const aiActionResult: ActionResult | ActionResult[] = 
-      currentCombatant.aiAgent!.playTurn(game.value.getCurrentCombatant(), game.value as Game, board.value as Board);
+      currentCombatant.getAiAgent()!.playTurn(game.value.getCurrentCombatant(), game.value as Game, board.value as Board);
       if(Array.isArray(aiActionResult)) {
         aiActionResult.forEach((actionResult) => {
           actionResult.position && applyAttackEffects(actionResult, actionResult.position);
@@ -849,7 +858,7 @@ export default defineComponent({
             currentCombatant.value,
             position,
             currentSkill.value.range.areaOfEffect,
-            currentSkill.value.range.range
+            currentSkill.value.range.align
           );
         }
     }
@@ -1042,6 +1051,10 @@ export default defineComponent({
           return "First Strike";
         case 26:
           return "Defense Downgrade";
+        case 27:
+          return "Idai No Hadou";
+        case 28:
+          return "Riposte";
       }
     }
 

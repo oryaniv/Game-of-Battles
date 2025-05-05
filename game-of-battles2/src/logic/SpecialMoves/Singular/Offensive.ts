@@ -123,7 +123,7 @@ export class FireBall implements SpecialMove {
     effect = (invoker: Combatant, target: Position, board: Board) => {
         const combatMaster = CombatMaster.getInstance();
         invoker.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
-        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.range);
+        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
         const fireBallResults = getAllTargets.map(AOETarget => {
             return combatMaster.executeAttack(invoker, AOETarget, board, this.damage, true);
         });
@@ -345,7 +345,7 @@ export class Skewer implements SpecialMove {
     turnCost: number = 1;
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Straight,
-        align: SpecialMoveAlignment.Enemy,
+        align: SpecialMoveAlignment.All,
         areaOfEffect: SpecialMoveAreaOfEffect.Line,
         range: 1
     };
@@ -355,7 +355,7 @@ export class Skewer implements SpecialMove {
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
         const combatMaster = CombatMaster.getInstance();
-        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.range);
+        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
         const skewerResults = getAllTargets.map(AOETarget => {
             return combatMaster.executeAttack(invoker, AOETarget, board, this.damage, true);
         });
@@ -461,7 +461,7 @@ export class Rampage implements SpecialMove {
 export class GuardBreaker implements SpecialMove {
     name: string = "Guard Breaker";
     triggerType = SpecialMoveTriggerType.Active;
-    cost: number = 5;
+    cost: number = 3;
     turnCost: number = 1;
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Straight,
@@ -496,7 +496,7 @@ export class FeralSwing implements SpecialMove {
     turnCost: number = 1;
     range: SpecialMoveRange = { 
         type: SpecialMoveRangeType.Straight,
-        align: SpecialMoveAlignment.Enemy,
+        align: SpecialMoveAlignment.All,
         areaOfEffect: SpecialMoveAreaOfEffect.Cone,
         range: 1
     };
@@ -507,14 +507,75 @@ export class FeralSwing implements SpecialMove {
     effect = (invoker: Combatant, target: Position, board: Board) => {
         const combatMaster = CombatMaster.getInstance();
         const feralSwingResults: ActionResult[] = [];
-        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.range);
+        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
+
         for(const currentTarget of getAllTargets) {
-            feralSwingResults.push(combatMaster.executeAttack(invoker, currentTarget, board, this.damage));
+            feralSwingResults.push(combatMaster.executeAttack(invoker, currentTarget, board, this.damage, true));
         }
         return feralSwingResults;
     };
     checkRequirements = undefined
     description = `Swing your blade in a wide arc, dealing massive Slash damage to all in the area.`   
+}
+
+export class UnstoppableCharge implements SpecialMove {
+    name: string = "Unstoppable Charge";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 5;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Straight,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 5
+    };
+    damage: Damage = {
+        amount: 35,
+        type: DamageType.Slash
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const chargeEndPosition = board.getMovingAttackEndPosition(invoker, target, this.range.range);
+        const distance = board.getDistanceBetweenPositions(invoker.position, chargeEndPosition);
+        invoker.move(chargeEndPosition, board);
+        return combatMaster.executeAttack(invoker, target, board, {
+            amount: this.damage.amount * (1 + (distance * 0.15)),
+            type: this.damage.type
+        });
+    };
+    checkRequirements = (self: Combatant) => {
+        return !self.hasMoved
+    };
+    description = `Charge at an enemy with a blade held high, damage increasees the more panels you move in the process`   
+}
+
+
+export class WindRunAssault implements SpecialMove {
+    name: string = "Wind Run Assault";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 7;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.TeleportAssault,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 5
+    };
+    damage: Damage = {
+        amount: 25,
+        type: DamageType.Crush
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const chargeEndPosition = board.getMovingAttackEndPosition(invoker, target, this.range.range);
+        invoker.move(chargeEndPosition, board);
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage);
+        return result;
+    };
+    checkRequirements = (self: Combatant) => {
+        return !self.hasMoved
+    };
+    description = `Let your feet run on the wind itself, then drop by an enemy and strike them by surprise.`   
 }
 
 export class TitanicFist implements SpecialMove {
@@ -536,7 +597,18 @@ export class TitanicFist implements SpecialMove {
         const combatMaster = CombatMaster.getInstance();
         const result = combatMaster.executeAttack(invoker, target, board, this.damage);
         if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
-            return result;
+            const targetCombatant = board.getCombatantAtPosition(target);
+            const getPushResult = board.getPushResult(invoker, targetCombatant!, 3);
+            if(!getPushResult) {
+                return result;
+            }
+            if(getPushResult.moveTo) {
+                targetCombatant!.move(getPushResult.moveTo, board);
+            }
+            if(getPushResult.collisionObject) {
+                targetCombatant!.stats.hp -= 10;
+                getPushResult.collisionObject.stats.hp -= 10;
+            }
         }
         return result;
     };
@@ -544,3 +616,36 @@ export class TitanicFist implements SpecialMove {
     description = `Strike an enemy with a powerful fist, dealing medium Crush damage and pushing them up to 3 panels back.
     if they hit something on the way, they'll stop, and both them and the obstacle will suffer a small amount of damage.`   
 }
+
+export class AngelicTouch implements SpecialMove {
+    name: string = "Angelic Touch";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 12;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Melee,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 1
+    };
+    damage: Damage = {
+        amount: 60,
+        type: DamageType.Holy
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage);
+        if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
+            const roll = Math.random();
+            if(roll <= 0.15) {
+                const targetCombatant = board.getCombatantAtPosition(target);
+                targetCombatant!.stats.hp = 0;
+            }
+        }
+        return result;
+    };
+    checkRequirements = (self: Combatant) => {
+        return self.hasStatusEffect(StatusEffectType.IDAI_NO_HADOU);
+    };
+    description = `Imbue your fist with the gift of the heavens, deal massive holy damage to an enemy, and may kill it outright.`   
+}   

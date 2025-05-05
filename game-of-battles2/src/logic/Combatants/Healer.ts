@@ -20,7 +20,7 @@ export class Healer extends Combatant {
           defensePower: 10,
           stamina: 50,
           initiative: 2,
-          movementSpeed: 4,
+          movementSpeed: 3,
           range: 1,
           agility: 5,
           luck: 8,

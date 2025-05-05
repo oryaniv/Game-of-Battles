@@ -5,6 +5,7 @@ import { Game } from "../Game";
 
 export interface AIAgent {
     playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[];
+    getAIAgentType(): AIAgentType;
 }
 
 export class SimpleAIAgent implements AIAgent {
@@ -13,4 +14,17 @@ export class SimpleAIAgent implements AIAgent {
         game.spendActionPoints(1);
         return getStandardActionResult();
     }
+
+    getAIAgentType(): AIAgentType {
+        return AIAgentType.PRIMITIVE;
+    }
+}
+
+export enum AIAgentType {
+    PRIMITIVE,
+    TAUNTED,
+    CHARMERD,
+    STUNLOCKED,
+    DETERMINISTIC,
+    SPECIALIZED
 }

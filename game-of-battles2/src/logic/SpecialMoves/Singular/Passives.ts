@@ -23,7 +23,13 @@ export class MarchingDefense implements SpecialMove {
         amount: 0,
         type: DamageType.Crush
     };
-    effect = undefined;
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        invoker.applyStatusEffect({
+            name: StatusEffectType.MARCHING_DEFENSE,
+            duration: Number.POSITIVE_INFINITY,
+        });
+        return getStandardActionResult();
+    };
     requirements = undefined;
     description = 'allows you to use the defend action after moving.'
 }
@@ -105,5 +111,31 @@ export class FirstStrike implements SpecialMove {
     };
     requirements = undefined;
     description = `When an enemy comes to engage this combatant in close combat, his long weapon gives him the privielge of punishing them
-    for trying to engage him.`
+    for trying to engage him, once a round`
 }   
+
+export class Riposte implements SpecialMove {
+    name: string = "Riposte";
+    triggerType = SpecialMoveTriggerType.Passive;
+    cost: number = 0;
+    turnCost: number = 0;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.None,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Crush
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        invoker.applyStatusEffect({
+            name: StatusEffectType.RIPOSTE,
+            duration: Number.POSITIVE_INFINITY,
+        });
+        return getStandardActionResult();
+    };
+    requirements = undefined;
+    description = `When an enemy misses this combatant at close range, this combatant may counterattack.`
+}

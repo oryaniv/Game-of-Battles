@@ -3,7 +3,7 @@ import { Combatant } from "../Combatant";
 import { ActionResult, AttackResult, getStandardActionResult } from "../attackResult";
 import { Damage, DamageReaction, DamageType } from "../Damage";
 import { CombatMaster } from "../CombatMaster";
-import { SpecialMoveAreaOfEffect } from "../SpecialMove";
+import { SpecialMoveAlignment, SpecialMoveAreaOfEffect } from "../SpecialMove";
 import { RangeCalculator } from "../RangeCalculator";
 import { Board } from "../Board";
 import { Position } from "../Position";
@@ -129,11 +129,11 @@ export class EncouragedStatusEffect implements StatusEffect {
             const roll = Math.random();
             if (roll <= 0.2) {
                 return {
-                    attackResult: AttackResult.Hit,
+                    attackResult: AttackResult.NotFound,
                     damage: { amount: 0, type: DamageType.Unstoppable },
                     cost: -1, // Refund 1 action point
                     reaction: DamageReaction.NONE,
-                    position: target.position
+                    position: caster.position
                 };
             }
             return undefined;
@@ -174,7 +174,7 @@ export class MesmerizingStatusEffect implements StatusEffect {
         },
         [StatusEffectHook.OnTurnEnd]: (self: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
             const combatMaster = CombatMaster.getInstance();
-            const getAllTargets: Position[] = board.getAreaOfEffectPositions(self, self.position, SpecialMoveAreaOfEffect.Great_Nova, 2);
+            const getAllTargets: Position[] = board.getAreaOfEffectPositions(self, self.position, SpecialMoveAreaOfEffect.Great_Nova, SpecialMoveAlignment.Enemy);
             getAllTargets.filter(AOETarget => board.getCombatantAtPosition(AOETarget) !== null)
                          .filter(AOETarget => board.getCombatantAtPosition(AOETarget)?.team.getName() !== self.team.getName())
                          .forEach(AOETarget => {

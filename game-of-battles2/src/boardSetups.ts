@@ -38,6 +38,34 @@ export function standardVsSetup(team1: Team, team2: Team) {
     team2.addCombatant(new Hunter('Jake', { x: 6, y: 9 }, team2));
     team2.addCombatant(new Wizard('Bran', { x: 5, y: 9 }, team2));
     team2.addCombatant(new Healer('Marianne', { x: 7, y: 9 }, team2));
-    
+}
+
+export function theATeam(team: Team) {
+    team.addCombatant(new StandardBearer('A', { x: 4, y: 1 }, team));
+    team.addCombatant(new Defender('B', { x: 3, y: 1 }, team));
+    team.addCombatant(new Hunter('C', { x: 2, y: 0 }, team));
+    team.addCombatant(new Healer('D', { x: 4, y: 0 }, team));
+    team.addCombatant(new Wizard('E', { x: 3, y: 0 }, team));
+
+    // team.addCombatant(new Witch('F', { x: 3, y: 0 }, team));
+    // team.addCombatant(new Fool('G', { x: 4, y: 0 }, team));
+    // team.addCombatant(new Vanguard('H', { x: 5, y: 1 }, team));
+    // team.addCombatant(new FistWeaver('I', { x: 3, y: 1 }, team));
+    // team.addCombatant(new Pikeman('J', { x: 4, y: 1 }, team));
+}
+
+export function theBTeam(team: Team) {
+    team.addCombatant(new Hunter('F', { x: 5, y: 9 }, team));
+    team.addCombatant(new Wizard('G', { x: 6, y: 9 }, team));
+    team.addCombatant(new StandardBearer('H', { x: 4, y: 8 }, team));
+    team.addCombatant(new Defender('I', { x: 5, y: 8 }, team));
+    team.addCombatant(new Healer('J', { x: 4, y: 9 }, team));
+
+
+    // team.addCombatant(new Witch('F', { x: 5, y: 9 }, team));
+    // team.addCombatant(new Fool('G', { x: 6, y: 9 }, team));
+    // team.addCombatant(new Vanguard('H', { x: 4, y: 8 }, team));
+    // team.addCombatant(new FistWeaver('I', { x: 5, y: 8 }, team));
+    // team.addCombatant(new Pikeman('J', { x: 6, y: 8 }, team));
 }
 

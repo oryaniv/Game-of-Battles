@@ -39,7 +39,7 @@ export class CombatMaster {
 
         damage = damage || attacker.basicAttack();
 
-        const onBeingAttackedHookResult = this.getOnBeingAttackedHookResults(target, attacker, damage);
+        const onBeingAttackedHookResult = this.getOnBeingAttackedHookResults(target, attacker, damage, board);
         if(onBeingAttackedHookResult) {
             return onBeingAttackedHookResult;
         }
@@ -65,6 +65,8 @@ export class CombatMaster {
             return actionResult;
         }  
 
+        getResultsForStatusEffectHook(target, StatusEffectHook.OnBeingMissed, attacker, undefined, undefined, board);
+
         return attackResult === AttackResult.Miss ? {
             attackResult: AttackResult.Miss,
             damage: {amount: 0, type: DamageType.Unstoppable},
@@ -79,6 +81,8 @@ export class CombatMaster {
             position: position
         };
     }
+
+
 
 
 
@@ -160,12 +164,12 @@ export class CombatMaster {
     }
 
       calculateAttackRoll(attacker: Combatant, target: Combatant): AttackResult {
-        const attackRoll = ((attacker.stats.agility - target.stats.agility) * 0.02) + Math.floor(Math.random() * 100) + 1;
+        const attackRoll = ((attacker.stats.agility - target.stats.agility) * 2) + Math.floor(Math.random() * 100) + 1;
   
         if(attackRoll < 5) {
           return AttackResult.Fumble;
         }
-        else if (attackRoll < 20) {
+        else if (attackRoll < 15) {
           return AttackResult.Miss;
         } else if (attackRoll > 90) {
           return AttackResult.CriticalHit;
@@ -185,8 +189,8 @@ export class CombatMaster {
 
       
 
-      private getOnBeingAttackedHookResults(target: Combatant, attacker: Combatant, damage: Damage): ActionResult | undefined {
-        const onBeingAttackedHookResults = getResultsForStatusEffectHook(target, StatusEffectHook.OnBeingAttacked, attacker, damage, 1);
+      private getOnBeingAttackedHookResults(target: Combatant, attacker: Combatant, damage: Damage, board: Board): ActionResult | undefined {
+        const onBeingAttackedHookResults = getResultsForStatusEffectHook(target, StatusEffectHook.OnBeingAttacked, attacker, damage, 1, board);
 
         if(onBeingAttackedHookResults.length > 0) {
             const mostRelevantResult = this.getMostRelevantResult(onBeingAttackedHookResults);

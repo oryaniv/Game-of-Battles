@@ -43,10 +43,10 @@ export class StupidestCrapEver implements SpecialMove {
     cost: number = 7;
     turnCost: number = 1;
     range: SpecialMoveRange = {
-        type: SpecialMoveRangeType.Curve,
+        type: SpecialMoveRangeType.Straight,
         align: SpecialMoveAlignment.Enemy,
         areaOfEffect: SpecialMoveAreaOfEffect.Cone,
-        range: 3
+        range: 4
     };
     damage: Damage = {
         amount: 0,
@@ -54,7 +54,7 @@ export class StupidestCrapEver implements SpecialMove {
     };
     effect: (invoker: Combatant, target: Position, board: Board) => ActionResult | ActionResult[] = (invoker, target, board) => {
         const combatMaster = CombatMaster.getInstance();
-        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.range);
+        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
         getAllTargets.forEach(AOETarget => {
             combatMaster.tryInflictStatusEffect(invoker, AOETarget, board, StatusEffectType.STUPEFIED, 2, 0.6);
         });
@@ -73,7 +73,7 @@ export class SmellIt implements SpecialMove {
     turnCost: number = 1;
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Curve,
-        align: SpecialMoveAlignment.Enemy,
+        align: SpecialMoveAlignment.All,
         areaOfEffect: SpecialMoveAreaOfEffect.Nova,
         range: 2
     };
@@ -83,9 +83,12 @@ export class SmellIt implements SpecialMove {
     };
     effect: (invoker: Combatant, target: Position, board: Board) => ActionResult | ActionResult[] = (invoker, target, board) => {
         const combatMaster = CombatMaster.getInstance();
-        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.range);
+        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
         getAllTargets.forEach(AOETarget => {
-            combatMaster.tryInflictStatusEffect(invoker, AOETarget, board, StatusEffectType.NAUSEATED, 3, 0.6);
+            const targetCombatant = board.getCombatantAtPosition(AOETarget);
+            if(targetCombatant) {
+                combatMaster.tryInflictStatusEffect(invoker, AOETarget, board, StatusEffectType.NAUSEATED, 3, 0.6);
+            }   
         });
         return getStandardActionResult(target);
     };
@@ -101,7 +104,7 @@ export class LookeyHere implements SpecialMove {
     turnCost: number = 1;
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Self,
-        align: SpecialMoveAlignment.Self,
+        align: SpecialMoveAlignment.Enemy,
         areaOfEffect: SpecialMoveAreaOfEffect.Great_Nova,
         range: 0
     };
@@ -113,7 +116,9 @@ export class LookeyHere implements SpecialMove {
         invoker.applyStatusEffect({name: StatusEffectType.MESMERIZING, duration: Number.POSITIVE_INFINITY});
         return getStandardActionResult(invoker.position);
     };
-    checkRequirements = undefined;
+    checkRequirements = (self: Combatant) => {
+        return !self.hasMoved;
+    };
     description = `Begin one hell of a peculiar dance, making close enememies look at you in bewilderment as long as
     you keep dancing, and as long as they fail to break off of it`;
 }

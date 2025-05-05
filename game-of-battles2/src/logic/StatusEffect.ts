@@ -4,7 +4,7 @@ import { Combatant, CombatantStats } from "./Combatant";
 import { DamageType, Damage } from "./Damage";
 import { BlockingStance } from "./SpecialMoves/Singular/Self";
 import { FrozenStatusEffect, ImmobilizedStatusEffect, LuckDowngradeStatusEffect, SlowStatusEffect, StrengthDowngradeStatusEffect, PoisonedStatusEffect, BleedingStatusEffect, TauntedStatusEffect, StupefiedStatusEffect, NauseatedStatusEffect, MesmerizedStatusEffect, StaggeredStatusEffect, DefenseDowngradeStatusEffect } from "./StatusEffects.ts/NegativeEffects";
-import { EnergyAbsorbStatusEffect, FirstStrikeStatusEffect, FoolsLuckStatusEffect, InspiringKillerStatusEffect } from "./StatusEffects.ts/NeutralEffects";
+import { EnergyAbsorbStatusEffect, FirstStrikeStatusEffect, FoolsLuckStatusEffect, InspiringKillerStatusEffect, MarchingDefenseStatusEffect, RiposteStatusEffect } from "./StatusEffects.ts/NeutralEffects";
 import { ArcaneChannelingStatusEffect, BlockingStanceStatusEffect, EncouragedStatusEffect, FocusAimStatusEffect, FortifiedStatusEffect, MesmerizingStatusEffect, MobilityBoostStatusEffect, RalliedStatusEffect, RegeneratingStatusEffect, StrengthBoostStatusEffect } from "./StatusEffects.ts/PositiveEffects";
 
 export enum StatusEffectType {
@@ -64,6 +64,13 @@ export enum StatusEffectType {
     DEFENSE_DOWNGRADE,
     // 27
     IDAI_NO_HADOU,
+    // 28
+    RIPOSTE,
+    // 29
+    STRUCK_FIRST,
+    // 30
+    MARCHING_DEFENSE,
+    // 31
     DEFENDING
 }
 
@@ -78,6 +85,7 @@ export enum StatusEffectType {
     OnTurnEnd = "OnTurnEnd",
     // for affects to happen when the combatant is being attacked, like blocking stance
     OnBeingAttacked = "OnBeingAttacked",
+    OnBeingMissed = "OnBeingMissed",
     // for affects to happen when the combatant takes damage, like ???
     OnDamageTaken = "OnDamageTaken",
     OnAfterCalculateDamage = "OnAfterCalculateDamage",
@@ -146,8 +154,10 @@ export enum StatusEffectType {
     [StatusEffectType.MESMERIZING]: new MesmerizingStatusEffect(),
     [StatusEffectType.FOOLS_LUCK]: new FoolsLuckStatusEffect(),
     [StatusEffectType.STAGGERED]: new StaggeredStatusEffect(),
+    [StatusEffectType.RIPOSTE]: new RiposteStatusEffect(),
     [StatusEffectType.FIRST_STRIKE]: new FirstStrikeStatusEffect(),
     [StatusEffectType.DEFENSE_DOWNGRADE]: new DefenseDowngradeStatusEffect(),
+    [StatusEffectType.MARCHING_DEFENSE]: new MarchingDefenseStatusEffect(),
   };
 
   export function getStatusEffect(name: StatusEffectType) : StatusEffect | undefined {

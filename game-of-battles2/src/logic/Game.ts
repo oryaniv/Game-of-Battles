@@ -120,8 +120,14 @@ export class Game {
 
     executeSkipTurn(): void {
       const eventLogger = EventLogger.getInstance();
-      eventLogger.logEvent(`${this.getCurrentCombatant().name}  skips their turn`);
-      this.spendActionPoints(this.getCurrentTeam().getAliveCombatants().length === 1 ? 1 : 0.5);
+      const currentCombatant = this.getCurrentCombatant();
+      eventLogger.logEvent(`${currentCombatant.name}  skips their turn`);
+      this.spendActionPoints(currentCombatant.hasMoved || this.getCurrentTeam().getAliveCombatants().length === 1 ? 1 : 0.5);
+      //this.spendActionPoints(this.getCurrentTeam().getAliveCombatants().length === 1 ? 1 : 0.5);
+    }
+
+    executePassTurn(): void {
+      this.spendActionPoints(1);
     }
 
     spendActionPoints(amount: number): void {
@@ -129,20 +135,21 @@ export class Game {
     }
   
     nextTurn(): void {
+
+      // end turn hook application
+      const turnEndHookResults: ActionResult[] = this.getCurrentCombatant()?.endTurn(this.board);
+      if(turnEndHookResults && turnEndHookResults.length > 0) {
+        const cost = this.determineCostOfManyActions(turnEndHookResults);
+        if(cost !== 0) {
+          this.spendActionPoints(cost);
+        }
+      }
+
       // if game over, return
       if(this.isGameOver()) {
         const eventLogger = EventLogger.getInstance();
         eventLogger.logEvent(`Game Over`);
         return;
-      }
-
-      // end turn hook application
-      const turnEndHookResults: ActionResult[] = this.getCurrentCombatant().endTurn(this.board);
-      if(turnEndHookResults.length > 0) {
-        const cost = this.determineCostOfManyActions(turnEndHookResults);
-        if(cost !== 0) {
-          this.spendActionPoints(cost);
-        }
       }
 
       // should we switch teams?
@@ -161,9 +168,10 @@ export class Game {
         }
 
         const currentCombatant = this.getCurrentCombatant();
+
         // start turn hook application
-        const turnStartHookResults: ActionResult[] = currentCombatant.startTurn();
-        if(turnStartHookResults.length > 0) {
+        const turnStartHookResults: ActionResult[] = currentCombatant?.startTurn();
+        if(turnStartHookResults && turnStartHookResults.length > 0) {
           const cost = this.determineCostOfManyActions(turnStartHookResults);
           if(cost !== 0) {
             this.spendActionPoints(cost);
@@ -220,6 +228,8 @@ export class Game {
         return 0.5;
       } else if(actions.some((action) => action.cost === 0)) {
         return 0;
+      } else if(actions.some((action) => action.cost === -1)) {
+        return -1;
       }
       return 1;
     }

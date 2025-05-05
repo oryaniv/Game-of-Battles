@@ -111,7 +111,7 @@ export class Board {
   getAreaOfEffectPositions(caster: Combatant,
     targetPosition: Position,
     aoe: SpecialMoveAreaOfEffect,
-    range: number): Position[] {
+    range: SpecialMoveAlignment): Position[] {
     const validTargets =  this.rangeCalculator.getAreaOfEffectPositions(caster, targetPosition, aoe, range, this);
     return validTargets;
   }
@@ -123,6 +123,32 @@ export class Board {
     jumpRange: number): Position[] {
     const validTargets =  this.rangeCalculator.getChainTargets(caster, targetPosition, jumps, jumpRange, this);
     return validTargets;
+  }
+
+  getMovingAttackEndPosition(caster: Combatant, targetPosition: Position, maxDistance: number): Position {
+    // Get all positions adjacent to target
+    const adjacentPositions = [
+      { x: targetPosition.x, y: targetPosition.y - 1 }, // Up
+      { x: targetPosition.x, y: targetPosition.y + 1 }, // Down 
+      { x: targetPosition.x - 1, y: targetPosition.y }, // Left
+      { x: targetPosition.x + 1, y: targetPosition.y }, // Right
+    ];
+
+    // Filter to only valid unoccupied positions
+    const validPositions = adjacentPositions.filter(pos => 
+      this.isValidPosition(pos) && !this.getCombatantAtPosition(pos)
+    );
+
+    if (validPositions.length === 0) {
+      return caster.position; // Return current position if no valid spots
+    }
+
+    // Find position closest to caster
+    return validPositions.reduce((closest, current) => {
+      const currentDist = this.getDistanceBetweenPositions(caster.position, current);
+      const closestDist = this.getDistanceBetweenPositions(caster.position, closest);
+      return currentDist < closestDist ? current : closest;
+    });
   }
 
   isValidPosition(position: Position): boolean {
@@ -173,6 +199,16 @@ export class Board {
     }
 
     return adjacent;
+  }
+  
+
+  getDistanceBetweenPositions(position1: Position, position2: Position): number {
+    return Math.abs(position1.x - position2.x) + Math.abs(position1.y - position2.y);
+  }
+
+  getPushResult(caster: Combatant, target: Combatant, range: number){
+    const pushResult = this.rangeCalculator.getPushResult(caster, target, range, this);
+    return pushResult;
   }
 
 }

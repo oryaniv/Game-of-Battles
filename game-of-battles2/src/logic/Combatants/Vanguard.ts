@@ -1,7 +1,7 @@
 import { Combatant } from "../Combatant";
 import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Position } from "../Position";
-import { FeralSwing, GuardBreaker, Rampage } from "../SpecialMoves/Singular/Offensive";
+import { FeralSwing, GuardBreaker, Rampage, UnstoppableCharge } from "../SpecialMoves/Singular/Offensive";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
 
@@ -17,7 +17,7 @@ export class Vanguard extends Combatant {
           initiative: 6,
           movementSpeed: 5,
           range: 1,
-          agility: 4,
+          agility: 3,
           luck: 4,
         },
         position,
@@ -33,7 +33,7 @@ export class Vanguard extends Combatant {
             {type: DamageType.Dark, reaction: DamageReaction.NONE},
         ],
         [
-          // new UnstoppableCharge(),
+          new UnstoppableCharge(),
           new FeralSwing(),
           new GuardBreaker(),
           new Rampage(),

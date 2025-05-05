@@ -3,7 +3,7 @@ import { Combatant } from "../Combatant";
 import { StatusEffectHook, StatusEffectType } from "../StatusEffect";
 import { StatusEffect } from "../StatusEffect";
 import { Board } from "../Board";
-import { SpecialMoveAreaOfEffect } from "../SpecialMove";
+import { SpecialMoveAlignment, SpecialMoveAreaOfEffect } from "../SpecialMove";
 import { AttackResult, getStandardActionResult } from "../attackResult";
 import { Damage, DamageType } from "../Damage";
 import { DamageReaction } from "../Damage";
@@ -15,7 +15,7 @@ export class InspiringKillerStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.INSPIRING_KILLER;
     applicationHooks = {
         [StatusEffectHook.OnKilling]: (caster: Combatant, target: Combatant, board: Board) => {
-            const getAllTargets = board.getAreaOfEffectPositions(caster, caster.position, SpecialMoveAreaOfEffect.Cross, 1);
+            const getAllTargets = board.getAreaOfEffectPositions(caster, caster.position, SpecialMoveAreaOfEffect.Cross, SpecialMoveAlignment.SelfAndAlly);
             getAllTargets.forEach((target) => {
                 const targetCombatant = board.getCombatantAtPosition(target);
                 const buffIndex = Math.floor(Math.random() * 3);
@@ -65,13 +65,57 @@ export class FoolsLuckStatusEffect implements StatusEffect {
 export class FirstStrikeStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.FIRST_STRIKE;
     applicationHooks = {
-        [StatusEffectHook.OnBeingAttacked]: (attacker: Combatant, defender: Combatant, damage: Damage, attackCost: number) => {
+        [StatusEffectHook.OnBeingAttacked]: (self: Combatant, attacker: Combatant, damage: Damage, amount: number, board: Board) => {
             const rangeCalculator = new RangeCalculator();
-            if(rangeCalculator.areInMeleeRange(attacker, defender)) {
+            if(self.hasStatusEffect(StatusEffectType.STRUCK_FIRST) || !rangeCalculator.areInMeleeRange(self, attacker)) {
+                return;
+            }
+
+            self.applyStatusEffect({
+                name: StatusEffectType.STRUCK_FIRST,
+                duration: Number.POSITIVE_INFINITY,
+            });
+
+            const combatMaster = CombatMaster.getInstance();
+            combatMaster.executeAttack(self, attacker.position, board, damage);
+            if(attacker.isKnockedOut()) {
+               return getStandardActionResult(attacker.position);
+            }
+            
+        },
+        [StatusEffectHook.OnTurnStart]: (self: Combatant) => {
+            self.removeStatusEffect(StatusEffectType.STRUCK_FIRST);
+        },
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Neutral;
+}
+
+export class StruckFirstStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.STRUCK_FIRST;
+    applicationHooks =  {
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Neutral;
+}
+
+export class RiposteStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.RIPOSTE;
+    applicationHooks = {
+        [StatusEffectHook.OnBeingMissed]: (self: Combatant, attacker: Combatant, damage: Damage, amount: number, board: Board) => {
+            const rangeCalculator = new RangeCalculator();
+            if(rangeCalculator.areInMeleeRange(self, attacker)) {
                 const combatMaster = CombatMaster.getInstance();
-                // combatMaster.executeAttack(attacker, defender.position, board, damage);
+                combatMaster.executeAttack(self, attacker.position, board, damage);
             }
         },
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Neutral;
 }
+
+export class MarchingDefenseStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.MARCHING_DEFENSE;
+    applicationHooks = {
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Neutral;
+}
+
+

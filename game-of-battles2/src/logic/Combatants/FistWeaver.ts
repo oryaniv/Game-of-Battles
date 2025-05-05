@@ -1,7 +1,8 @@
 import { Combatant } from "../Combatant";
 import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Position } from "../Position";
-import { TitanicFist } from "../SpecialMoves/Singular/Offensive";
+import { AngelicTouch, TitanicFist, WindRunAssault } from "../SpecialMoves/Singular/Offensive";
+import { Riposte } from "../SpecialMoves/Singular/Passives";
 import { Meditate } from "../SpecialMoves/Singular/Support";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
@@ -34,11 +35,11 @@ export class FistWeaver extends Combatant {
             {type: DamageType.Dark, reaction: DamageReaction.WEAKNESS},
         ],
         [
-          // new WindRunAssault(),
+          new WindRunAssault(),
           new TitanicFist(),
           new Meditate(),
-          // new AngelicTouch(),
-          // new Riposte()
+          new AngelicTouch(),
+          new Riposte()
         ],
       team);
     }

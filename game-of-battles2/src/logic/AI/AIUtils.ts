@@ -215,10 +215,6 @@ export function getValidBasicAttackWithOptimalTarget(combatant: Combatant, board
 export function isSkillTargetingBetter(best: SkillTargeting, current: SkillTargeting): SkillTargeting {
     if (!best) return current;
     if (!current) return best;
-    if(!best || !current) {
-        // eslint-disable-next-line 
-        debugger;
-    } 
     if (current.priority > best.priority) return current;
     if (current.priority === best.priority && current.targetHp < best.targetHp) return current;
     return best;
@@ -282,4 +278,4 @@ export function mergeDeep(target: any, source: any): any {
            }
        }
     return merged;
-  }
+}

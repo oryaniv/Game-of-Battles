@@ -12,7 +12,7 @@ export class Rogue extends Combatant {
           {
             hp: 50,
             attackPower: 25,
-            defensePower: 10,
+            defensePower: 15,
             stamina: 30,
             initiative: 7,
             movementSpeed: 4,
@@ -24,7 +24,7 @@ export class Rogue extends Combatant {
           [
             {type: DamageType.Slash, reaction: DamageReaction.WEAKNESS},
             {type: DamageType.Pierce, reaction: DamageReaction.NONE},
-            {type: DamageType.Crush, reaction: DamageReaction.NONE},
+            {type: DamageType.Crush, reaction: DamageReaction.WEAKNESS},
             {type: DamageType.Fire, reaction: DamageReaction.NONE},
             {type: DamageType.Ice, reaction: DamageReaction.NONE},
             {type: DamageType.Lightning, reaction: DamageReaction.NONE},

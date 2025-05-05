@@ -124,7 +124,7 @@ export class RallyToTheBanner implements SpecialMove {
         type: DamageType.Healing
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
-        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.range);
+        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
         getAllTargets.map(AOETarget => {
             const targetCombatant = board.getCombatantAtPosition(AOETarget);
             if(!targetCombatant) {
@@ -138,7 +138,9 @@ export class RallyToTheBanner implements SpecialMove {
 
         return getStandardActionResult();
     };
-    checkRequirements = undefined
+    checkRequirements = (self: Combatant) => {
+        return !self.hasMoved
+    };
     description = `Rally close allies to the banner, granting them all a small bonus to both defense and luck. this move
     cannot be user after moving` 
 }

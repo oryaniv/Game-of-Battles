@@ -19,6 +19,8 @@ export class RangeCalculator {
         return this.getStraightTargetPositions(caster, range, board);
       case SpecialMoveRangeType.Curve:
         return this.getCurveTargetPositions(caster, range, board);
+      case SpecialMoveRangeType.TeleportAssault:
+        return this.getCurveTargetPositions(caster, range, board, true);
       case SpecialMoveRangeType.None:
         return []; // No target required
       default:
@@ -115,7 +117,8 @@ export class RangeCalculator {
   private getCurveTargetPositions(
     caster: Combatant,
     range: SpecialMoveRange,
-    board: Board
+    board: Board,
+    isTeleportAssault: boolean = false
   ): Position[] {
     const targets: Position[] = [];
     const { x, y } = caster.position;
@@ -146,7 +149,9 @@ export class RangeCalculator {
                 range.align === SpecialMoveAlignment.Self) && target.team === caster.team) ||
               range.align === SpecialMoveAlignment.All
             ) {
-              targets.push(position);
+              if(!isTeleportAssault || whereToLand(position)) {
+                targets.push(position);
+              }
             }
             // allow for AOE targeting
           } else if(range.areaOfEffect === SpecialMoveAreaOfEffect.Nova || 
@@ -179,27 +184,44 @@ export class RangeCalculator {
     }
 
     return targets;
+
+    function whereToLand(position: Position) {
+      const validPlacesToLand = [
+        {x: position.x - 1, y: position.y},
+        {x: position.x + 1, y: position.y},
+        {x: position.x, y: position.y - 1},
+        {x: position.x, y: position.y + 1}
+      ].filter((pos) => {
+        if(board.isValidPosition(pos) && board.getCombatantAtPosition(pos) === null) {
+          return true;
+        }
+        return false;
+      });
+      return validPlacesToLand.length > 0;
+    }
   }
 
   getAreaOfEffectPositions(
     caster: Combatant,
     targetPosition: Position,
     aoe: SpecialMoveAreaOfEffect,
-    range: number,
+    range: SpecialMoveAlignment,
     board: Board
   ): Position[] {
-    const aoePositions: Position[] = [];
+    let aoePositions: Position[] = [];
 
     switch (aoe) {
       case SpecialMoveAreaOfEffect.Single:
         aoePositions.push(targetPosition);
         break;
       case SpecialMoveAreaOfEffect.Cross:
-        aoePositions.push(targetPosition);
-        aoePositions.push({ x: targetPosition.x - 1, y: targetPosition.y });
-        aoePositions.push({ x: targetPosition.x + 1, y: targetPosition.y });
-        aoePositions.push({ x: targetPosition.x, y: targetPosition.y - 1 });
-        aoePositions.push({ x: targetPosition.x, y: targetPosition.y + 1 });
+        aoePositions = [
+          targetPosition,
+          { x: targetPosition.x - 1, y: targetPosition.y },
+          { x: targetPosition.x + 1, y: targetPosition.y },
+          { x: targetPosition.x, y: targetPosition.y - 1 },
+          { x: targetPosition.x, y: targetPosition.y + 1 }
+        ]
         break;
       case SpecialMoveAreaOfEffect.Nova:
         aoePositions.push(...getNovaTargets(1));
@@ -231,13 +253,7 @@ export class RangeCalculator {
           aoePositions.push({ x: targetPosition.x, y: targetPosition.y });
           aoePositions.push({ x: targetPosition.x , y: targetPosition.y -1 });
           aoePositions.push({ x: targetPosition.x , y: targetPosition.y +1 });
-          aoePositions.push({ x: targetPosition.x, y: targetPosition.y });
-          aoePositions.push({ x: targetPosition.x , y: targetPosition.y -1 });
-          aoePositions.push({ x: targetPosition.x , y: targetPosition.y +1 });
-        } else if(caster.position.y === targetPosition.y) {
-          aoePositions.push({ x: targetPosition.x, y: targetPosition.y });
-          aoePositions.push({ x: targetPosition.x -1, y: targetPosition.y });
-          aoePositions.push({ x: targetPosition.x +1, y: targetPosition.y });
+        } else if(caster.position.y !== targetPosition.y) {
           aoePositions.push({ x: targetPosition.x, y: targetPosition.y });
           aoePositions.push({ x: targetPosition.x -1, y: targetPosition.y });
           aoePositions.push({ x: targetPosition.x +1, y: targetPosition.y });
@@ -250,7 +266,7 @@ export class RangeCalculator {
     }
 
     
-    return aoePositions.filter((pos) => board.isValidPosition(pos)); // Ensure all positions are valid
+    return aoePositions = this.filterByAlignment(aoePositions, range, caster, board); // Ensure all positions are valid
 
     function getNovaTargets(trueRange: number) {
       const novaPositions: Position[] = [];
@@ -266,6 +282,23 @@ export class RangeCalculator {
       novaPositions.push(targetPosition);
       return novaPositions;
     }
+  }
+
+  private filterByAlignment(targets: Position[], range: SpecialMoveAlignment, caster: Combatant, board: Board): Position[] {
+    return targets.filter((pos) => board.isValidPosition(pos))
+        .filter((pos) => {
+          const target = board.getCombatantAtPosition(pos);
+          if(!target) {
+            return true;
+          }
+          if(range === SpecialMoveAlignment.Enemy && target.team !== caster.team ||
+            range === SpecialMoveAlignment.All ||
+            (range === SpecialMoveAlignment.SelfAndAlly && target.team === caster.team) ||
+            range === SpecialMoveAlignment.Self && target.position === caster.position) {
+            return true;
+          }
+          return false;
+        });
   }
 
   getChainTargets(
@@ -360,4 +393,48 @@ export class RangeCalculator {
     const distance = Math.abs(casterPosition.x - targetPosition.x) + Math.abs(casterPosition.y - targetPosition.y);
     return distance <= 1;
   }
+
+  getPushResult(caster: Combatant, target: Combatant, range: number, board: Board) {
+    // Get direction vector from caster to target
+    const dx = target.position.x - caster.position.x;
+    const dy = target.position.y - caster.position.y;
+
+
+    // Normalize to get unit direction vector
+    const dirX = dx === 0 ? 0 : dx / Math.abs(dx);
+    const dirY = dy === 0 ? 0 : dy / Math.abs(dy);
+
+    let pushDistance = 0;
+    let currentPosition = {...target.position};
+    let collisionObject: Combatant | null = null;
+
+    // Check each position in push direction up to range
+    for (let i = 1; i <= range; i++) {
+      const nextPosition = {
+        x: target.position.x + (dirX * i),
+        y: target.position.y + (dirY * i)
+      };
+
+      // Stop if position is invalid or occupied
+      if (!board.isValidPosition(nextPosition)) {
+        break;
+      }
+
+      if(board.getCombatantAtPosition(nextPosition)) {
+        collisionObject = board.getCombatantAtPosition(nextPosition);
+        break;
+      }
+
+      pushDistance = i;
+      currentPosition = nextPosition;
+    }
+
+    if (pushDistance > 0) {
+      // Move target to final push position
+      return {moveTo:currentPosition, collisionObject};
+    }
+
+    return null;
+  }
+  
 }

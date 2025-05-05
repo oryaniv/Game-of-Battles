@@ -89,7 +89,7 @@ export class EvilEye implements SpecialMove {
         type: DamageType.Unstoppable
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
-        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.range);
+        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
         getAllTargets.map(AOETarget => {
             const targetCombatant = board.getCombatantAtPosition(AOETarget);
             if(!targetCombatant) {

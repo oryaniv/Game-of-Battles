@@ -20,7 +20,7 @@ export class Wizard extends Combatant {
           defensePower: 20,
           stamina: 60,
           initiative: 2,
-          movementSpeed: 2,
+          movementSpeed: 3,
           range: 1,
           agility: 6,
           luck: 7,

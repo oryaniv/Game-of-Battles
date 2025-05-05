@@ -7,7 +7,8 @@ import { DamageType, Damage } from "../Damage";
 import { DamageReaction } from "../Damage";
 import { CombatMaster } from "../CombatMaster";
 import { Board } from "../Board";
-import { TauntedAIAgent } from "../AI/DeterministicAgents";
+import { StunLockedAIAgent, TauntedAIAgent } from "../AI/StatusAIAgent";
+import { AIAgentType } from "../AI/AIAgent";
 
 export class ImmobilizedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.IMMOBILIZED;
@@ -25,27 +26,17 @@ export class ImmobilizedStatusEffect implements StatusEffect {
 export class FrozenStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.FROZEN;
     applicationHooks = {
-        [StatusEffectHook.OnTurnStart]: (self: Combatant) => {
-            return {
-                attackResult: AttackResult.NotFound,
-                damage: {
-                    amount: 0,
-                    type: DamageType.Unstoppable
-                },
-                cost: 1,
-                reaction: DamageReaction.NONE,
-                position: self.position
-            };
-        },
         [StatusEffectHook.OnApply]: (self: Combatant) => {
             self.stats.agility = 0;
             self.stats.movementSpeed = Number.NEGATIVE_INFINITY;
             self.removeStatusEffect(StatusEffectType.DEFENDING);
             self.removeStatusEffect(StatusEffectType.BLOCKING_STANCE);
+            self.insertAiAgent(new StunLockedAIAgent("Frozen"));
         },
         [StatusEffectHook.OnRemove]: (self: Combatant) => {
             self.stats.agility = self.baseStats.agility;
             self.stats.movementSpeed = self.baseStats.movementSpeed;
+            self.removeAiAgent(AIAgentType.STUNLOCKED);
         },
         [StatusEffectHook.OnAfterCalculateDamage]: (self: Combatant, attacker: Combatant, damage: Damage) => {
             self.removeStatusEffect(StatusEffectType.FROZEN);
@@ -137,7 +128,6 @@ export class PoisonedStatusEffect implements StatusEffect {
             self.stats.hp -= 10;
             if(self.stats.hp <= 0) {
                 self.stats.hp = 0;
-                // board.removeCombatant(caster);
             }
             return {
                 attackResult: AttackResult.Hit,
@@ -182,10 +172,10 @@ export class TauntedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.TAUNTED;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
-            caster.aiAgent = new TauntedAIAgent(target);
+            caster.insertAiAgent(new TauntedAIAgent(target));
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
-            caster.aiAgent = caster.team.aiAgent || undefined;
+            caster.removeAiAgent(AIAgentType.TAUNTED);
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
@@ -205,33 +195,20 @@ export class StupefiedStatusEffect implements StatusEffect {
 export class NauseatedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.NAUSEATED;
     applicationHooks = {
-        [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
+        [StatusEffectHook.OnApply]: (self: Combatant, target: Combatant) => {
+            self.insertAiAgent(new StunLockedAIAgent("Nauseated"));
         },
         [StatusEffectHook.OnTurnStart]: (self: Combatant) => {
             const chanceWithDelta = 0.5 - ((self.stats.luck) * 0.02);
-            if(Math.random() >= chanceWithDelta) {
-                return {
-                    attackResult: AttackResult.NotFound,
-                    damage: {
-                        amount: 0,
-                        type: DamageType.Unstoppable
-                    },
-                    cost: 0,
-                    reaction: DamageReaction.NONE,
-                    position: self.position
-                };
+            if(Math.random() < chanceWithDelta) {
+                return;
             }
-            return {
-                attackResult: AttackResult.NotFound,
-                damage: {
-                    amount: 0,
-                    type: DamageType.Unstoppable
-                },
-                cost: 1,
-                reaction: DamageReaction.NONE,
-                position: self.position
-            };
+            self.aiAgent && self.removeAiAgent(AIAgentType.STUNLOCKED);
+            self.removeStatusEffect(StatusEffectType.NAUSEATED);
         },
+        [StatusEffectHook.OnRemove]: (self: Combatant) => {
+            self.aiAgent && self.removeAiAgent(AIAgentType.STUNLOCKED);
+        }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
 }       
@@ -244,17 +221,10 @@ export class MesmerizedStatusEffect implements StatusEffect {
             caster.removeStatusEffect(StatusEffectType.BLOCKING_STANCE);
             caster.removeStatusEffect(StatusEffectType.FOCUS_AIM);
             caster.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
+            caster.insertAiAgent(new StunLockedAIAgent("Mesmerized"));
         },
-        [StatusEffectHook.OnTurnStart]: (self: Combatant) => {
-            return {
-                attackResult: AttackResult.NotFound,
-                damage: {
-                    amount: 0,
-                    type: DamageType.Unstoppable
-                },
-                cost: 1,
-                reaction: DamageReaction.NONE
-            };
+        [StatusEffectHook.OnRemove]: (caster: Combatant) => {
+            caster.removeAiAgent(AIAgentType.STUNLOCKED);
         },
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;

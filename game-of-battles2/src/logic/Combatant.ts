@@ -8,8 +8,9 @@ import { Team } from "./Team";
 import { ActionResult, AttackResult } from "./attackResult";
 import { CombatantType } from "./Combatants/CombatantType";
 import { emitter } from "@/eventBus";
-import { AIAgent } from "./AI/AIAgent";
+import { AIAgent, AIAgentType } from "./AI/AIAgent";
 import { EventLogger } from "@/eventLogger";
+
 export interface CombatantStats {
     hp: number;
     attackPower: number;
@@ -40,7 +41,7 @@ export interface CombatantStats {
 
     public stats: CombatantStats; // Current stats, can be modified by effects
     public statusEffects: StatusEffectApplication[] = [];
-    public aiAgent: AIAgent | undefined;
+    public aiAgent: AIAgent[] | undefined;
     hasMoved: boolean = false;
 
     startTurn(): ActionResult[] {
@@ -121,6 +122,16 @@ export interface CombatantStats {
         }
     }
 
+    removeStatusEffect(effectName: StatusEffectType): void {
+      const effectToRemove = this.statusEffects.find((effect) => effect.name === effectName);
+      if(effectToRemove) {
+        const statusEffect = getStatusEffect(effectToRemove.name);
+        const removeStatusHook = statusEffect?.applicationHooks[StatusEffectHook.OnRemove];
+        removeStatusHook && removeStatusHook(this, this, {amount: 0, type: DamageType.Unstoppable});
+        this.statusEffects = this.statusEffects.filter((effect) => effect.name !== effectName);
+      }
+    }
+
     updateStatusEffect(effect: StatusEffectApplication): void {
       const effectToUpdate = this.statusEffects.find((effect) => effect.name === effect.name);
       if(effectToUpdate) {
@@ -128,13 +139,7 @@ export interface CombatantStats {
       }
     }
     
-    removeStatusEffect(effectName: StatusEffectType): void {
-      getResultsForStatusEffectHook(this, StatusEffectHook.OnRemove, this, {amount: 0, type: DamageType.Unstoppable});
-      const effectToRemove = this.statusEffects.find((effect) => effect.name === effectName);
-      if(effectToRemove) {
-        this.statusEffects = this.statusEffects.filter((effect) => effect.name !== effectName);
-      }
-    }
+    
     
     updateStatusEffects(): void {
       for (let i = this.statusEffects.length - 1; i >= 0; i--) {
@@ -168,6 +173,37 @@ export interface CombatantStats {
       canUseSkill(skill: SpecialMove): boolean {
         return this.stats.stamina >= skill.cost && 
         (!skill.checkRequirements || skill.checkRequirements(this)) &&
-        !this.hasStatusEffect(StatusEffectType.NAUSEATED);
+        !this.hasStatusEffect(StatusEffectType.STUPEFIED);
+      }
+
+      insertAiAgent(aiAgent: AIAgent) {
+        if(this.aiAgent) {
+            this.aiAgent.unshift(aiAgent);
+        } else {
+            this.aiAgent = [aiAgent];
+        }
+      }
+
+      getAiAgent(): AIAgent | undefined {
+        return this.aiAgent && this.aiAgent.length > 0 ? this.aiAgent[0] : undefined;
+      }
+
+      removeAiAgent(aiAgentType: AIAgentType) {
+        if(!this.aiAgent) {
+          throw new Error('No AI agent to remove');
+        }
+        if(this.aiAgent.length === 0) {
+          return;
+        }
+        if(this.aiAgent.length === 1) {
+          this.aiAgent.shift();
+        } else {
+          const index = this.aiAgent.findIndex(agent => agent.getAIAgentType() === aiAgentType);
+          if (index !== -1) {
+            this.aiAgent.splice(index, 1);
+          }
+        }
       }
   }
+
+  

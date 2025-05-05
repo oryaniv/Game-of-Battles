@@ -9,7 +9,7 @@ export class Team {
     addCombatant(combatant: Combatant) {
         this.combatants.push(combatant);
         if(this.aiAgent) {
-            combatant.aiAgent = this.aiAgent;
+            combatant.insertAiAgent(this.aiAgent);
         }
         this.combatants.sort((a, b) => b.stats.initiative - a.stats.initiative);
     }
@@ -54,4 +54,5 @@ export class Team {
             this.combatants.push(firstCombatant);
         }
     }
+
   }
