@@ -170,3 +170,44 @@ export class Meditate implements SpecialMove {
     checkRequirements = undefined
     description = `Meditate, cleasing yourself of all negative effects tainting your body and soul`   
 }
+
+export class ReinforceConstruct implements SpecialMove {
+    name: string = "Reinforce Construct";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 6;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Curve,
+        align: SpecialMoveAlignment.Ally,
+        areaOfEffect: SpecialMoveAreaOfEffect.Cross,
+        range: 3
+    };
+    damage: Damage = {
+        amount: 40,
+        type: DamageType.Healing
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
+        getAllTargets.map(AOETarget => {
+            const targetCombatant = board.getCombatantAtPosition(AOETarget);
+            if(!targetCombatant) {
+                return getStandardActionResult();
+            }
+            if(targetCombatant.hasStatusEffect(StatusEffectType.FULL_METAL_JACKET)) {
+                targetCombatant.stats.hp = Math.min(targetCombatant.stats.hp + this.damage.amount, targetCombatant.baseStats.hp);
+                return {
+                    attackResult: AttackResult.Hit,
+                    damage: {
+                        amount: this.damage.amount,
+                        type: this.damage.type
+                    },
+                    cost: 1,
+                    reaction: DamageReaction.NONE
+                };
+            }
+        });
+        return getStandardActionResult();
+    };
+    checkRequirements = undefined
+    description = `Fix and Reinforce a construct, or a Metal covered ally, healing them for a medium amount of health`
+}

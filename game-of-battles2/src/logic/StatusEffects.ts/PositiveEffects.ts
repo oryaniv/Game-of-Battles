@@ -184,3 +184,36 @@ export class MesmerizingStatusEffect implements StatusEffect {
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
 }
+
+export class CloakedStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.CLOAKED;  
+    applicationHooks = {
+        [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
+            target.stats.luck += 5;
+        },
+        [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
+            target.stats.luck -= 5;
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
+}
+
+
+export class FullMetalJacketStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.FULL_METAL_JACKET;
+    applicationHooks = {
+        [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
+            target.stats.defensePower += 20;
+            if([DamageType.Crush, DamageType.Pierce, DamageType.Slash].includes(target.basicAttack().type)) {
+                target.stats.attackPower += 20;
+            }
+        },
+        [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
+            target.stats.defensePower -= 20;
+            if([DamageType.Crush, DamageType.Pierce, DamageType.Slash].includes(target.basicAttack().type)) {
+                target.stats.attackPower -= 20;
+            }
+        },
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
+}

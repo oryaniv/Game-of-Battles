@@ -139,3 +139,30 @@ export class Riposte implements SpecialMove {
     requirements = undefined;
     description = `When an enemy misses this combatant at close range, this combatant may counterattack.`
 }
+
+export class Sadist implements SpecialMove {
+    name: string = "Sadist";
+    triggerType = SpecialMoveTriggerType.Passive;
+    cost: number = 0;
+    turnCost: number = 0;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.None,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Crush
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        invoker.applyStatusEffect({
+            name: StatusEffectType.SADIST,
+            duration: Number.POSITIVE_INFINITY,
+        });
+        return getStandardActionResult();
+    };  
+    requirements = undefined;
+    description = `When this combatant inflicts damage above 50 points, it gets a small health and stamina replenishment,
+    as well as attack power buff for 3 turns.`
+}   

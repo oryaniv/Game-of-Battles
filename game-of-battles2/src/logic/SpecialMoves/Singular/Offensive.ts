@@ -296,7 +296,7 @@ export class Ricochet implements SpecialMove {
     effect = (invoker: Combatant, target: Position, board: Board) => {
         invoker.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
         const combatMaster = CombatMaster.getInstance();
-        const chainTargets = board.getChainTargets(invoker, target, 1, 3);
+        const chainTargets = board.getChainTargets(invoker, target, 1, 2);
         const ricochetResults: ActionResult[] = [];
         for(const currentTarget of chainTargets) {
             const result = combatMaster.executeAttack(invoker, currentTarget, board, this.damage);
@@ -648,4 +648,88 @@ export class AngelicTouch implements SpecialMove {
         return self.hasStatusEffect(StatusEffectType.IDAI_NO_HADOU);
     };
     description = `Imbue your fist with the gift of the heavens, deal massive holy damage to an enemy, and may kill it outright.`   
+}   
+
+export class VipersKiss implements SpecialMove {
+    name: string = "Viper's Kiss";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 5;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Melee,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 1
+    };
+    damage: Damage = {
+        amount: 20,
+        type: DamageType.Blight
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage);
+        if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
+            combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.POISONED, 3, 0.6);
+        }
+        return result;
+    };
+    checkRequirements = undefined
+    description = `Strike the target with a dagger coated with deadly poison, dealing medium Blight damage and having a medium chance to inflict Poisoned for 3 turns.`   
+}
+
+export class SneakAttack implements SpecialMove {
+    name: string = "Sneak Attack";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 5;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Melee,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 1
+    };
+    damage: Damage = {
+        amount: 20,
+        type: DamageType.Pierce
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const targetCombatant = board.getCombatantAtPosition(target);
+        let skillDamage = this.damage.amount;
+        if(invoker.hasStatusEffect(StatusEffectType.CLOAKED) || board.isFlanked(targetCombatant!)) {
+            skillDamage = this.damage.amount * 1.5;
+        }
+            
+        const result = combatMaster.executeAttack(invoker, target, board, {type: this.damage.type, amount: skillDamage});
+        return result;
+    };
+    checkRequirements = undefined
+    description = `Strike the target with a dagger coated with deadly poison, dealing medium Blight damage and having a medium chance to inflict Poisoned for 3 turns.`   
+}
+
+export class ShockingGauntlet implements SpecialMove {
+    name: string = "Shocking Gauntlet";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 5;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Melee,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 1
+    };
+    damage: Damage = {
+        amount: 20,
+        type: DamageType.Lightning
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage);
+        if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
+            combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.STAGGERED, 3, 0.6);
+        }
+        return result;
+    };
+    checkRequirements = undefined
+    description = `Strike the target with a gauntlet coated with shocking lightning, dealing medium Lightning damage.`   
 }   

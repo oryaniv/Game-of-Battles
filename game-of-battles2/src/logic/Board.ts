@@ -211,4 +211,9 @@ export class Board {
     return pushResult;
   }
 
+  isFlanked(combatant: Combatant): boolean {
+    const adjacentCombatants = this.getAdjacentCombatants(combatant, 1);
+    return adjacentCombatants.filter(c => c.team.getName() !== combatant.team.getName()).length > 1;
+  }
+
 }

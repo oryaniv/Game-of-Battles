@@ -128,3 +128,34 @@ export class Encourage implements SpecialMove {
     description = `Raise the morale of an ally, giving them a small chance to gain extra action points after their turn for 5 rounds`
 }
 
+export class FullMetalJacket implements SpecialMove {
+    name: string = "Full Metal Jacket";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 5;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Melee,
+        align: SpecialMoveAlignment.Ally,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 1
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Unstoppable
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const targetCombatant = board.getCombatantAtPosition(target);
+        if(!targetCombatant) {
+            return getStandardActionResult();
+        }
+        targetCombatant.applyStatusEffect({
+            name: StatusEffectType.FULL_METAL_JACKET,
+            duration: 3,
+        }); 
+        return getStandardActionResult();
+    };
+    checkRequirements = undefined;
+    description = `Raise the morale of an ally, giving them a small chance to gain extra action points after their turn for 5 rounds`
+        
+}
+

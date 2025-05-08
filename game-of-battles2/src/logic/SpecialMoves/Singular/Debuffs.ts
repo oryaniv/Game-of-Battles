@@ -141,3 +141,51 @@ export class SiphonEnergy implements SpecialMove {
     };
     description = `Leech upon an enemy's stamina, draining a small amount of theirs to replenish your own`
 }
+
+export class AssassinsMark implements SpecialMove {
+    name: string = "Assassin's Mark";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 0;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Straight,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 3
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Unstoppable
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const targetCombatant = board.getCombatantAtPosition(target);
+        if(!targetCombatant) {
+            return getStandardActionResult();
+        }
+        if(targetCombatant.hasStatusEffect(StatusEffectType.MARKED_FOR_PAIN)) {
+            targetCombatant.removeStatusEffect(StatusEffectType.MARKED_FOR_PAIN);
+            targetCombatant.applyStatusEffect({
+                name: StatusEffectType.MARKED_FOR_EXECUTION,
+                duration: 5,
+            });
+        } else if (targetCombatant.hasStatusEffect(StatusEffectType.MARKED_FOR_EXECUTION)) {
+            targetCombatant.removeStatusEffect(StatusEffectType.MARKED_FOR_EXECUTION);
+            targetCombatant.applyStatusEffect({
+                name: StatusEffectType.MARKED_FOR_OBLIVION,
+                duration: 5,
+            });
+        } else if(targetCombatant.hasStatusEffect(StatusEffectType.MARKED_FOR_OBLIVION)) {
+            return getStandardActionResult();
+        } else {
+            targetCombatant.applyStatusEffect({
+                name: StatusEffectType.MARKED_FOR_PAIN,
+                duration: 5,
+            });
+        }
+        return getStandardActionResult();
+    };
+    checkRequirements = undefined;
+    description = `cast the mark of the assassin on an enemy. the mark can get stronger with every cast.
+    the mark will be detonated when the marked target is struck by a rogue. the stornger the mark is upon detonation,
+    the more damage the target will suffer from the detonating attack.`
+}

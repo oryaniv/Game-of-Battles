@@ -118,4 +118,19 @@ export class MarchingDefenseStatusEffect implements StatusEffect {
     alignment: StatusEffectAlignment = StatusEffectAlignment.Neutral;
 }
 
-
+export class SadistStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.SADIST;
+    applicationHooks = {
+        [StatusEffectHook.OnInflictingDamage]: (self: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
+            if(amount > 50) {
+                self.stats.hp = Math.min(self.stats.hp + 10, self.baseStats.hp);
+                self.stats.stamina = Math.min(self.stats.stamina + 10, self.baseStats.stamina);
+                self.applyStatusEffect({
+                    name: StatusEffectType.STRENGTH_BOOST,
+                    duration: 3,
+                });
+            }
+        },
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Neutral;
+}

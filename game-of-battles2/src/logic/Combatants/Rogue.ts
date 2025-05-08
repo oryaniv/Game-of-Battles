@@ -1,6 +1,10 @@
 import { Combatant } from "../Combatant";
 import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Position } from "../Position";
+import { AssassinsMark } from "../SpecialMoves/Singular/Debuffs";
+import { SneakAttack, VipersKiss } from "../SpecialMoves/Singular/Offensive";
+import { Sadist } from "../SpecialMoves/Singular/Passives";
+import { ShadowStep } from "../SpecialMoves/Singular/Self";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
 
@@ -33,7 +37,12 @@ export class Rogue extends Combatant {
             {type: DamageType.Dark, reaction: DamageReaction.RESISTANCE},
           ],
           [
-  
+            new ShadowStep(),
+            new VipersKiss(),
+            new SneakAttack(),
+            new AssassinsMark(),
+            new Sadist(),
+=
           ], team
         );
       }

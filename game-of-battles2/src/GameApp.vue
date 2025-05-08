@@ -25,7 +25,7 @@
           @mouseover="showAoe({ x: x - 1, y: y - 1 })"
           @mouseleave="hideAoe"
         >
-          <!-- <div class="coordinates" style="font-size: 24px;">{{x -1}},{{y - 1}}</div> -->
+          <div class="coordinates" style="font-size: 24px;">{{x -1}},{{y - 1}}</div>
           <div
             v-if="getCombatant({ x , y})"
             class="combatant"
@@ -174,7 +174,7 @@
   </div>
 
 
-  <div class="event-log">
+  <!-- <div class="event-log">
     <div class="event-log-header">
       Event Log
     </div>
@@ -183,7 +183,7 @@
         {{ event }}
       </div>
     </div>
-  </div>
+  </div> -->
 
     <!-- <img class="dragon-left" src="./assets/white_dragon_black_back.png" alt="left dragon" />
     <img class="dragon-right" src="./assets/white_dragon_black_back.png" alt="right dragon" />
@@ -268,16 +268,19 @@ import { StatusEffect, StatusEffectType, StatusEffectAlignment } from './logic/S
 import { SimpleAIAgent } from './logic/AI/AIAgent';
 import { DummyAIAgent, BunkerDummyAIAgent, ToddlerAIAgent, KidAIAgent, TeenagerAIAgent, RookieAIAgent } from './logic/AI/DeterministicAgents';
 import { RandomAIAgent } from './logic/AI/HeuristicalAgents';
+import { VeteranAIAgent } from './logic/AI/VeteranAIAgent';
 import { Howl } from 'howler';
 import { EventLogger } from './eventLogger';
-import { AllOfThem, standardVsSetup, theATeam, theBTeam } from './boardSetups';
+import { AllOfThem, standardVsSetup, theATeam, theBTeam, allMilitiaSetup } from './boardSetups';
 
 export default defineComponent({
   setup() {
     
     const board = ref(new Board(10, 10));
-    const whiteTeam = ref(new Team('White Team', 0, new RandomAIAgent()));
-    const blackTeam = ref(new Team('Black Team', 1, new ToddlerAIAgent()));
+    const whiteTeam = ref(new Team('White Team', 0, new RookieAIAgent()));
+    const blackTeam = ref(new Team('Black Team', 1, new VeteranAIAgent()));
+
+    allMilitiaSetup(whiteTeam.value, blackTeam.value);
 
   // whiteTeam.value.addCombatant(new Fool('Gobo', { x: 4, y: 3 }, whiteTeam.value));
      // whiteTeam.value.addCombatant(new FistWeaver('fefe', { x: 3, y: 0 }, whiteTeam.value));
@@ -308,8 +311,8 @@ export default defineComponent({
 
     // whiteTeam.value.combatants[0].stats.stamina = 0;
 
-    theATeam(whiteTeam.value);
-    theBTeam(blackTeam.value);
+    // theATeam(whiteTeam.value);
+    // theBTeam(blackTeam.value);
     
 
     const teams = ref([whiteTeam.value, blackTeam.value]);

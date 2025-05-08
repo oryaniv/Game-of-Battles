@@ -3,7 +3,7 @@ import { Board } from "./Board";
 import { Combatant, CombatantStats } from "./Combatant";
 import { DamageType, Damage } from "./Damage";
 import { BlockingStance } from "./SpecialMoves/Singular/Self";
-import { FrozenStatusEffect, ImmobilizedStatusEffect, LuckDowngradeStatusEffect, SlowStatusEffect, StrengthDowngradeStatusEffect, PoisonedStatusEffect, BleedingStatusEffect, TauntedStatusEffect, StupefiedStatusEffect, NauseatedStatusEffect, MesmerizedStatusEffect, StaggeredStatusEffect, DefenseDowngradeStatusEffect } from "./StatusEffects.ts/NegativeEffects";
+import { FrozenStatusEffect, ImmobilizedStatusEffect, LuckDowngradeStatusEffect, SlowStatusEffect, StrengthDowngradeStatusEffect, PoisonedStatusEffect, BleedingStatusEffect, TauntedStatusEffect, StupefiedStatusEffect, NauseatedStatusEffect, MesmerizedStatusEffect, StaggeredStatusEffect, DefenseDowngradeStatusEffect, MarkedForPainStatusEffect, MarkedForOblivionStatusEffect, MarkedForExecutionStatusEffect } from "./StatusEffects.ts/NegativeEffects";
 import { EnergyAbsorbStatusEffect, FirstStrikeStatusEffect, FoolsLuckStatusEffect, InspiringKillerStatusEffect, MarchingDefenseStatusEffect, RiposteStatusEffect } from "./StatusEffects.ts/NeutralEffects";
 import { ArcaneChannelingStatusEffect, BlockingStanceStatusEffect, EncouragedStatusEffect, FocusAimStatusEffect, FortifiedStatusEffect, MesmerizingStatusEffect, MobilityBoostStatusEffect, RalliedStatusEffect, RegeneratingStatusEffect, StrengthBoostStatusEffect } from "./StatusEffects.ts/PositiveEffects";
 
@@ -71,7 +71,21 @@ export enum StatusEffectType {
     // 30
     MARCHING_DEFENSE,
     // 31
-    DEFENDING
+    CLOAKED,
+    // 32
+    SADIST,
+    // 33
+    MARKED_FOR_PAIN,
+    // 34 
+    MARKED_FOR_EXECUTION,
+    // 35
+    MARKED_FOR_OBLIVION,
+    // 36
+    MARKED_DETONATED,
+    // 37
+    FULL_METAL_JACKET,
+    // 38
+    DEFENDING,
 }
 
   export enum StatusEffectHook {
@@ -101,6 +115,7 @@ export enum StatusEffectType {
     OnSkillUsed = "OnSkillUsed",
     // for affects to happen when the combatant moves - like remove blocking stance
     OnMoving = "OnMoving",
+    OnInflictingDamage = "OnInflictingDamage",
     OnKilling = "OnKilling",
     OnBeingAilmentInflicted = "OnBeingAilmentInflicted"
   }
@@ -158,6 +173,9 @@ export enum StatusEffectType {
     [StatusEffectType.FIRST_STRIKE]: new FirstStrikeStatusEffect(),
     [StatusEffectType.DEFENSE_DOWNGRADE]: new DefenseDowngradeStatusEffect(),
     [StatusEffectType.MARCHING_DEFENSE]: new MarchingDefenseStatusEffect(),
+    [StatusEffectType.MARKED_FOR_PAIN]: new MarkedForPainStatusEffect(),
+    [StatusEffectType.MARKED_FOR_EXECUTION]: new MarkedForExecutionStatusEffect(),
+    [StatusEffectType.MARKED_FOR_OBLIVION]: new MarkedForOblivionStatusEffect(),
   };
 
   export function getStatusEffect(name: StatusEffectType) : StatusEffect | undefined {

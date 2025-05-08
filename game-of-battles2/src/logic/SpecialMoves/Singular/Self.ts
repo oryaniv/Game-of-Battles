@@ -106,3 +106,30 @@ export class FocusAim implements SpecialMove {
     };
     description = `Gather the power of the arcane in your body, and get ready to unleash a devastating spell.`
 }
+
+export class ShadowStep implements SpecialMove {
+    name: string = "Shadow Step";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 8;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Curve,
+        align: SpecialMoveAlignment.All,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 4
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Slash
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        invoker.move(target, board);
+        invoker.applyStatusEffect({
+            name: StatusEffectType.CLOAKED,
+            duration: 5,
+        });
+        return getStandardActionResult();
+    };  
+    description = `Step into the shadows, move to target position, and become cloaked for 5 round.
+    cloaking breaks upon taking damage, losing focus or attacking.`
+}

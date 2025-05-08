@@ -123,7 +123,8 @@ export class CombatMaster {
     private finalizeDamage(target: Combatant, damage: Damage, attackResult: AttackResult, position: Position) : ActionResult {
         const resistances = target.resistances;
         const damageType = damage.type;
-        const reaction = resistances.find((r) => r.type === damageType)?.reaction || DamageReaction.NONE;
+        let reaction: DamageReaction = resistances.find((r) => r.type === damageType)?.reaction || DamageReaction.NONE;
+        reaction = this.getReactionFromStatusEffects(target, damageType, reaction);
         let finalDamage = damage.amount;
         let cost = 1;
 
@@ -211,6 +212,12 @@ export class CombatMaster {
             return current.cost > mostRelevant.cost ? current : mostRelevant;
         }, results[0]);
       }
-    
 
+      private getReactionFromStatusEffects(self: Combatant, damageType: DamageType, currentReaction: DamageReaction): DamageReaction {
+        if(self.hasStatusEffect(StatusEffectType.FULL_METAL_JACKET) && damageType === DamageType.Lightning) {
+          return DamageReaction.WEAKNESS;
+        }
+        return currentReaction;
+      }
+    
 }

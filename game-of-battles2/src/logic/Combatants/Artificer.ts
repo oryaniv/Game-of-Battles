@@ -7,6 +7,9 @@ import { Position } from "../Position";
 import { StatusEffectHook, StatusEffectType } from "../StatusEffect";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
+import { ShockingGauntlet } from "../SpecialMoves/Singular/Offensive";
+import { FullMetalJacket } from "../SpecialMoves/Singular/Buffs";
+import { ReinforceConstruct } from "../SpecialMoves/Singular/Support";
 
 export class Artificer extends Combatant {
     constructor(name: string, position: Position, team: Team) {
@@ -36,7 +39,13 @@ export class Artificer extends Combatant {
           {type: DamageType.Dark, reaction: DamageReaction.NONE},
         ],
         [
-        ], team
+          // new BuildWalls(),
+          // new ExplosiveTrap(),
+          new ShockingGauntlet(),
+          new FullMetalJacket(),
+          new ReinforceConstruct()
+        ],
+        team
       );
     }
 

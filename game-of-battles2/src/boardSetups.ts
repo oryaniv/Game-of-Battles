@@ -12,6 +12,19 @@ import { FistWeaver } from './logic/Combatants/FistWeaver';
 import { Combatant } from './logic/Combatant';
 import { StandardBearer } from "./logic/Combatants/StandardBearer";
 
+export function allMilitiaSetup(team1: Team, team2: Team) {
+    team1.addCombatant(new Hunter('A', { x: 3, y: 0 }, team1));
+    team1.addCombatant(new Hunter('B', { x: 4, y: 0 }, team1));
+    team1.addCombatant(new Hunter('C', { x: 5, y: 0 }, team1));
+    team1.addCombatant(new Hunter('D', { x: 6, y: 0 }, team1));
+    team1.addCombatant(new Hunter('E', { x: 7, y: 0 }, team1));
+
+    team2.addCombatant(new Hunter('F', { x: 3, y: 9 }, team2));
+    team2.addCombatant(new Hunter('G', { x: 4, y: 9 }, team2));
+    team2.addCombatant(new Hunter('H', { x: 5, y: 9 }, team2));
+    team2.addCombatant(new Hunter('I', { x: 6, y: 9 }, team2));
+    team2.addCombatant(new Hunter('J', { x: 7, y: 9 }, team2));
+}
 
 export function AllOfThem(team: Team) {
     team.addCombatant(new StandardBearer('A', { x: 0, y: 0 }, team));

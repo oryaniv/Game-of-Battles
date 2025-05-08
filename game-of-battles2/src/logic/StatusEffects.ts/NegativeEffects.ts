@@ -229,3 +229,107 @@ export class MesmerizedStatusEffect implements StatusEffect {
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
 }
+
+export class MarkedForPainStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.MARKED_FOR_PAIN;
+    applicationHooks = {
+        [StatusEffectHook.OnBeingAttacked]: (self: Combatant, attacker: Combatant) => {
+            if(attacker.specialMoves.map(m => m.name).includes("Assassin's Mark" )) {
+                self.applyStatusEffect({
+                    name: StatusEffectType.MARKED_DETONATED,
+                    duration: 0,
+                });
+            }
+        },
+        [StatusEffectHook.OnAfterCalculateDamage]: (self: Combatant, attacker: Combatant, damage: Damage) => {
+            if(!self.hasStatusEffect(StatusEffectType.MARKED_DETONATED)) {
+                return getStandardActionResult();
+            }
+            self.removeStatusEffect(StatusEffectType.MARKED_FOR_PAIN);
+            self.removeStatusEffect(StatusEffectType.MARKED_DETONATED);
+            return {
+                attackResult: AttackResult.NotFound,
+                damage: {
+                    amount: damage.type === DamageType.Crush ? damage.amount * 1.25 : damage.amount,
+                    type: damage.type
+                },
+                cost: 1,
+                reaction: DamageReaction.NONE
+            };
+        },
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
+}   
+
+export class MarkedForExecutionStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.MARKED_FOR_EXECUTION;
+    applicationHooks = {
+        [StatusEffectHook.OnBeingAttacked]: (self: Combatant, attacker: Combatant) => {
+            if(attacker.specialMoves.map(m => m.name).includes("Assassin's Mark" )) {
+                self.applyStatusEffect({
+                    name: StatusEffectType.MARKED_DETONATED,
+                    duration: 0,
+                });
+            }
+        },
+        [StatusEffectHook.OnAfterCalculateDamage]: (self: Combatant, attacker: Combatant, damage: Damage) => {
+            if(!self.hasStatusEffect(StatusEffectType.MARKED_DETONATED)) {
+                return getStandardActionResult();
+            }
+            self.removeStatusEffect(StatusEffectType.MARKED_FOR_EXECUTION);
+            self.removeStatusEffect(StatusEffectType.MARKED_DETONATED);
+            return {
+                attackResult: AttackResult.NotFound,
+                damage: {
+                    amount: damage.type === DamageType.Crush ? damage.amount * 1.5 : damage.amount,
+                    type: damage.type
+                },
+                cost: 1,
+                reaction: DamageReaction.NONE
+            };
+        },
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
+}
+
+export class MarkedForOblivionStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.MARKED_FOR_OBLIVION;
+    applicationHooks = {
+        [StatusEffectHook.OnBeingAttacked]: (self: Combatant, attacker: Combatant) => {
+            if(attacker.specialMoves.map(m => m.name).includes("Assassin's Mark" )) {
+                self.applyStatusEffect({
+                    name: StatusEffectType.MARKED_DETONATED,
+                    duration: 0,
+                });
+            }
+        },
+        [StatusEffectHook.OnAfterCalculateDamage]: (self: Combatant, attacker: Combatant, damage: Damage) => {
+            if(!self.hasStatusEffect(StatusEffectType.MARKED_DETONATED)) {
+                return getStandardActionResult();
+            }
+            self.removeStatusEffect(StatusEffectType.MARKED_FOR_OBLIVION);
+            self.removeStatusEffect(StatusEffectType.MARKED_DETONATED);
+            return {
+                attackResult: AttackResult.NotFound,
+                damage: {
+                    amount: damage.type === DamageType.Crush ? damage.amount * 2 : damage.amount,
+                    type: damage.type
+                },
+                cost: 1,
+                reaction: DamageReaction.NONE
+            };
+        },
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
+}   
+
+
+export class MarkedDetonatedStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.MARKED_DETONATED;
+    applicationHooks = {
+        [StatusEffectHook.OnBeingMissed]: (self: Combatant, attacker: Combatant) => {
+            self.removeStatusEffect(StatusEffectType.MARKED_DETONATED);
+        },
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
+}
