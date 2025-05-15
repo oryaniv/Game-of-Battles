@@ -14,14 +14,18 @@ import { CombatMaster } from "../CombatMaster";
 export class InspiringKillerStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.INSPIRING_KILLER;
     applicationHooks = {
-        [StatusEffectHook.OnKilling]: (caster: Combatant, target: Combatant, board: Board) => {
-            const getAllTargets = board.getAreaOfEffectPositions(caster, caster.position, SpecialMoveAreaOfEffect.Cross, SpecialMoveAlignment.SelfAndAlly);
-            getAllTargets.forEach((target) => {
-                const targetCombatant = board.getCombatantAtPosition(target);
-                const buffIndex = Math.floor(Math.random() * 3);
-                const randomizedBuff = [StatusEffectType.RALLIED, StatusEffectType.MOBILITY_BOOST, StatusEffectType.STRENGTH_BOOST][buffIndex];
-                if (targetCombatant) {
-                    targetCombatant.applyStatusEffect({
+        [StatusEffectHook.OnKilling]: (caster: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
+            const getAllTargets = board.getAreaOfEffectPositions(caster, target.position, SpecialMoveAreaOfEffect.Cross, SpecialMoveAlignment.Ally);
+            getAllTargets.forEach((targetPosition) => {
+                const targetAlly = board.getCombatantAtPosition(targetPosition);
+                if(!targetAlly || targetAlly.team.getName() !== caster.team.getName()) {
+                    return;
+                }
+                const buffIndex = Math.floor(Math.random() * 4);
+                const randomizedBuff = [StatusEffectType.RALLIED, StatusEffectType.MOBILITY_BOOST,
+                     StatusEffectType.STRENGTH_BOOST, StatusEffectType.ENCOURAGED][buffIndex];
+                if (targetAlly) {
+                    targetAlly.applyStatusEffect({
                         name: randomizedBuff,
                         duration: 3,
                     });
@@ -29,7 +33,7 @@ export class InspiringKillerStatusEffect implements StatusEffect {
             });
         },
     };
-    alignment: StatusEffectAlignment = StatusEffectAlignment.Neutral;
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
 }
 
 export class EnergyAbsorbStatusEffect implements StatusEffect {
@@ -59,7 +63,7 @@ export class FoolsLuckStatusEffect implements StatusEffect {
             return;
         },
     };
-    alignment: StatusEffectAlignment = StatusEffectAlignment.Neutral;
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
 }
 
 export class FirstStrikeStatusEffect implements StatusEffect {
@@ -87,7 +91,7 @@ export class FirstStrikeStatusEffect implements StatusEffect {
             self.removeStatusEffect(StatusEffectType.STRUCK_FIRST);
         },
     };
-    alignment: StatusEffectAlignment = StatusEffectAlignment.Neutral;
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
 }
 
 export class StruckFirstStatusEffect implements StatusEffect {
@@ -108,14 +112,14 @@ export class RiposteStatusEffect implements StatusEffect {
             }
         },
     };
-    alignment: StatusEffectAlignment = StatusEffectAlignment.Neutral;
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
 }
 
 export class MarchingDefenseStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.MARCHING_DEFENSE;
     applicationHooks = {
     };
-    alignment: StatusEffectAlignment = StatusEffectAlignment.Neutral;
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
 }
 
 export class SadistStatusEffect implements StatusEffect {
@@ -132,5 +136,5 @@ export class SadistStatusEffect implements StatusEffect {
             }
         },
     };
-    alignment: StatusEffectAlignment = StatusEffectAlignment.Neutral;
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
 }

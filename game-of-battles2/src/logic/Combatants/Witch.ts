@@ -7,7 +7,7 @@ import { Position } from "../Position";
 import { StatusEffectHook, StatusEffectType } from "../StatusEffect";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
-import { DarkThorn, SacredFlame } from "../SpecialMoves/Singular/Offensive";
+import { GraspOfZirash, SacredFlame } from "../SpecialMoves/Singular/Offensive";
 import { EvilEye, SiphonEnergy, Slow, Weaken } from "../SpecialMoves/Singular/Debuffs";
 
 export class Witch extends Combatant {
@@ -41,8 +41,13 @@ export class Witch extends Combatant {
           new Weaken(),
           new EvilEye(),
           new Slow(),
-          new DarkThorn(),
+          new GraspOfZirash(),
           new SiphonEnergy(),
+
+          // supers
+          // new DevourDivinity()
+          // new HungerOfZirash()
+          // new UltimateCurse()
         ], team
       );
     }

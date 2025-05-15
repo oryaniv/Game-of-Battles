@@ -42,6 +42,11 @@ export class Defender extends Combatant {
           new BlockingStance(),
           new DefensiveStrike(),
           new Fortify(),
+
+          // supers
+          // new ShieldWall()
+          // new ShieldBash()
+          // new ArcaneShieldWall()
         ], team 
       );
     }

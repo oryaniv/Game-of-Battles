@@ -45,6 +45,11 @@ export class Wizard extends Combatant {
           new FireBall(),
           new ChainLightning(),
           new FrozenBurst(),
+
+          // supers
+          // new ArcaneConduit()
+          // new ArcaneOvercharge()
+          // new CatastrophicCalamity()
         ], team
       );
     }

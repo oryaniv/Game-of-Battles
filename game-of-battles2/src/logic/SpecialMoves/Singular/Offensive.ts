@@ -3,7 +3,7 @@ import { Damage } from "@/logic/Damage";
 import { Position } from "@/logic/Position";
 import { SpecialMove, SpecialMoveAlignment, SpecialMoveAreaOfEffect, SpecialMoveRange, SpecialMoveRangeType, SpecialMoveTriggerType } from "@/logic/SpecialMove";
 import { Board } from "@/logic/Board";
-import { StatusEffectType, StatusEffectHook } from "@/logic/StatusEffect";
+import { StatusEffectType, StatusEffectHook, StatusEffect, StatusEffectAlignment } from "@/logic/StatusEffect";
 import { AttackResult, getStandardActionResult } from "@/logic/attackResult";
 import { Combatant } from "@/logic/Combatant";
 import { CombatMaster } from "@/logic/CombatMaster";
@@ -217,7 +217,7 @@ export class SacredFlame implements SpecialMove {
         range: 3
     };
     damage: Damage = {
-        amount: 20,
+        amount: 15,
         type: DamageType.Holy
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
@@ -228,8 +228,8 @@ export class SacredFlame implements SpecialMove {
     description = `Strike an enemy with a beam of holy retribution, dealing low Holy damage.`   
 }
 
-export class DarkThorn implements SpecialMove {
-    name: string = "Dark Thorn";
+export class GraspOfZirash implements SpecialMove {
+    name: string = "Grasp of Zirash";
     triggerType = SpecialMoveTriggerType.Active;
     cost: number = 3;
     turnCost: number = 1;
@@ -240,11 +240,16 @@ export class DarkThorn implements SpecialMove {
         range: 4
     };
     damage: Damage = {
-        amount: 25,
+        amount: 20,
         type: DamageType.Dark
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
-        const result = CombatMaster.getInstance().executeAttack(invoker, target, board, this.damage);
+        const targetCombatant = board.getCombatantAtPosition(target);
+        const negativeStatusEffects: StatusEffect[] = targetCombatant!.getStatusEffects().filter(status => status.alignment === StatusEffectAlignment.Negative);
+        const result = CombatMaster.getInstance().executeAttack(invoker, target, board, {
+            amount: this.damage.amount * (1 + (negativeStatusEffects.length * 0.5)),
+            type: this.damage.type,
+        });
         return result;
     };
     checkRequirements = undefined
@@ -704,7 +709,7 @@ export class SneakAttack implements SpecialMove {
         return result;
     };
     checkRequirements = undefined
-    description = `Strike the target with a dagger coated with deadly poison, dealing medium Blight damage and having a medium chance to inflict Poisoned for 3 turns.`   
+    description = `Strike an unsuspecting enemy, either from invisibility or from from the flank, for considerable pierce damage`   
 }
 
 export class ShockingGauntlet implements SpecialMove {
@@ -726,10 +731,10 @@ export class ShockingGauntlet implements SpecialMove {
         const combatMaster = CombatMaster.getInstance();
         const result = combatMaster.executeAttack(invoker, target, board, this.damage);
         if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
-            combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.STAGGERED, 3, 0.6);
+            combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.STAGGERED, 3, 0.3);
         }
         return result;
     };
     checkRequirements = undefined
-    description = `Strike the target with a gauntlet coated with shocking lightning, dealing medium Lightning damage.`   
+    description = `Use your handy electrified gauntlet to shock an enemy from up close, dealing medium Lightning damage and having a small chance to inflict Staggered for 3 turns.`   
 }   

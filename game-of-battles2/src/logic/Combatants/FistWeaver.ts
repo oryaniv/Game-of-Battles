@@ -39,7 +39,12 @@ export class FistWeaver extends Combatant {
           new TitanicFist(),
           new Meditate(),
           new AngelicTouch(),
-          new Riposte()
+          new Riposte(),
+
+          // supers
+          // new WayOfTheDragon()
+          // new WayOfTheTiger()
+          // new IdaiNoHadou()
         ],
       team);
     }

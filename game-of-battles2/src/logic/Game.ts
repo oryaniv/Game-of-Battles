@@ -244,4 +244,11 @@ export class Game {
       }
       return null;
     }
+
+    getLoser(): Team | null {
+      if (this.isGameOver()) {
+        return this.teams.find((team) => team.isDefeated()) || null;
+      }
+      return null;
+    } 
   }

@@ -4,11 +4,31 @@ teenager AI
 
 grunt AI
 
-soldier AI
-
-specialist AI
+Rookie AI
 
 more skills (that have the right infra)
+
+stats button(UI)
+
+turn order strip(UI)
+
+event log(UI)
+
+---------------------------------
+
+Veteran AI:
+
+wizard - generally fine
+
+defender - stand to test
+
+healer - why attack when you can heal (they weren't weak or near death)
+
+standard bearer - check working by inspired killer
+
+hunter - move forward when line of sight blocked
+
+----------------------------------------
 
 board oriented skills (landmine, wall, cloacking, etc.)
 
@@ -16,8 +36,3 @@ supers/co-op skills
 
 super gauge(supers)
 
-stats button(UI)
-
-turn order strip(UI)
-
-event log(UI)

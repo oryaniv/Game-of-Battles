@@ -38,6 +38,11 @@ export class Pikeman extends Combatant {
           new GapingStab(),
           new HaftStrike(),
           new FirstStrike(),
+
+          // supers
+          // new ThunderLance()
+          // new SkeweringHarppon()
+          // new MyrmidonHour()
         ],
       team);
     }

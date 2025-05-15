@@ -44,7 +44,7 @@ export class BlockingStance implements SpecialMove {
 }
 
 export class ArcaneChanneling implements SpecialMove {
-    name: string = "Arcane Chanelling";
+    name: string = "Arcane Channeling";
     triggerType = SpecialMoveTriggerType.Active;
     cost: number = 7;
     turnCost: number = 1;

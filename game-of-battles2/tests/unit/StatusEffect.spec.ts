@@ -47,6 +47,7 @@ describe('StatusEffect basic tests', () => {
     expect(StatusEffectAlignment.Positive).toBe(0);
     expect(StatusEffectAlignment.Negative).toBe(1);
     expect(StatusEffectAlignment.Neutral).toBe(2);
+    expect(StatusEffectAlignment.Permanent).toBe(3);
   });
 
   it('should get status effect from table', () => {

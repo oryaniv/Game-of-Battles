@@ -1,56 +1,49 @@
 import { Combatant } from "../Combatant";
 import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Position } from "../Position";
-import { FeralSwing, GuardBreaker, Rampage, UnstoppableCharge } from "../SpecialMoves/Singular/Offensive";
+import { BlockingStance } from "../SpecialMoves/Singular/Self";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
 
-export class Vanguard extends Combatant {
+export class DragonOfChaos extends Combatant {
     constructor(name: string, position: Position, team: Team) {
       super(
         name,
         {
-          hp: 90,
-          attackPower: 35,
-          defensePower: 10,
-          stamina: 25,
-          initiative: 6,
-          movementSpeed: 5,
+          hp: 250,
+          attackPower: 40,
+          defensePower: 40,
+          stamina: 200,
+          initiative: 10,
+          movementSpeed: Number.NEGATIVE_INFINITY,
           range: 1,
-          agility: 3,
-          luck: 4,
+          agility: 8,
+          luck: 12,
         },
         position,
         [
             {type: DamageType.Crush, reaction: DamageReaction.NONE},
-            {type: DamageType.Pierce, reaction: DamageReaction.WEAKNESS},
+            {type: DamageType.Pierce, reaction: DamageReaction.NONE},
             {type: DamageType.Slash, reaction: DamageReaction.NONE},
-            {type: DamageType.Fire, reaction: DamageReaction.RESISTANCE},
-            {type: DamageType.Ice, reaction: DamageReaction.WEAKNESS},
+            {type: DamageType.Fire, reaction: DamageReaction.NONE},
+            {type: DamageType.Ice, reaction: DamageReaction.NONE},
             {type: DamageType.Blight, reaction: DamageReaction.NONE},
             {type: DamageType.Lightning, reaction: DamageReaction.NONE},
             {type: DamageType.Holy, reaction: DamageReaction.NONE},
             {type: DamageType.Dark, reaction: DamageReaction.NONE},
         ],
         [
-          new UnstoppableCharge(),
-          new FeralSwing(),
-          new GuardBreaker(),
-          new Rampage(),
-
-          // supers
-          // new WhirlwindAttack()
-          // new Frenzy()
-          // new HellScream()
+            // new SoulDevourer(),
+            // 
         ],
       team);
     }
 
     getCombatantType(): CombatantType {
-        return CombatantType.Vanguard;
+        return CombatantType.DragonOfChaos;
     }
   
     basicAttack(): Damage {
-        return { amount: 35, type: DamageType.Slash };
+        return { amount: 40, type: DamageType.Unstoppable };
     }
   }

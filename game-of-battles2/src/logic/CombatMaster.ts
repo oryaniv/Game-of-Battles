@@ -45,23 +45,33 @@ export class CombatMaster {
         }
 
         if(target.isDefending()) {
-            const baseDamage = this.calcaulateBaseDamage(attacker, target, damage);
-            const finalDamage = {amount: baseDamage.amount / 2, type: baseDamage.type};
-            this.handleInjuryAilmentAndDeath(target, finalDamage.amount);
-            return {
-                attackResult: AttackResult.Hit,
-                damage: {amount: baseDamage.amount / 2, type: baseDamage.type},
-                cost: 1,
-                reaction: DamageReaction.NONE,
-                position: position
-            };
+          const resistances = target.resistances;
+          const damageType = damage.type;
+          let cost = 1;
+          const baseDamage = this.calcaulateBaseDamage(attacker, target, damage);
+          const finalDamage = {amount: baseDamage.amount / 2, type: baseDamage.type};
+          const reaction: DamageReaction = resistances.find((r) => r.type === damageType)?.reaction || DamageReaction.NONE;
+          if(reaction === DamageReaction.RESISTANCE) {
+            finalDamage.amount = finalDamage.amount * 0.5;
+          } else if(reaction === DamageReaction.IMMUNITY) {
+              finalDamage.amount = 0;
+              cost *= 2;
+          } 
+          this.handleInjuryAilmentAndDeath(target, finalDamage.amount,attacker, board);
+          return {
+              attackResult: AttackResult.Hit,
+              damage: {amount: finalDamage.amount, type: finalDamage.type},
+              cost: cost,
+              reaction: (reaction === DamageReaction.RESISTANCE || reaction === DamageReaction.IMMUNITY) ? reaction : DamageReaction.NONE,
+              position: position
+          };
         }
 
         const attackResult = this.calculateAttackRoll(attacker, target);
         if(attackResult === AttackResult.Hit || attackResult === AttackResult.CriticalHit){
             const baseDamage = this.calcaulateBaseDamage(attacker, target, damage);
             const actionResult = this.finalizeDamage(target, baseDamage, attackResult, position);
-            this.handleInjuryAilmentAndDeath(target, actionResult.damage.amount);
+            this.handleInjuryAilmentAndDeath(target, actionResult.damage.amount, attacker, board);
             return actionResult;
         }  
 
@@ -81,9 +91,6 @@ export class CombatMaster {
             position: position
         };
     }
-
-
-
 
 
     public tryInflictStatusEffect(afflictor: Combatant, target: Position, board: Board,
@@ -181,10 +188,13 @@ export class CombatMaster {
 
       
 
-      private handleInjuryAilmentAndDeath(target: Combatant, finalDamage: number) {
+      private handleInjuryAilmentAndDeath(target: Combatant, finalDamage: number, attacker: Combatant, board: Board) {
         target.stats.hp -= finalDamage;
         if(target.stats.hp <= 0) {
           target.stats.hp = 0;
+        }
+        if(target.stats.hp <= 0) {
+          getResultsForStatusEffectHook(attacker, StatusEffectHook.OnKilling, target, undefined, 1, board);
         }
       }
 
@@ -217,6 +227,10 @@ export class CombatMaster {
         if(self.hasStatusEffect(StatusEffectType.FULL_METAL_JACKET) && damageType === DamageType.Lightning) {
           return DamageReaction.WEAKNESS;
         }
+        if(self.hasStatusEffect(StatusEffectType.FROZEN) && damageType === DamageType.Crush) {
+          return DamageReaction.WEAKNESS;
+        }
+
         return currentReaction;
       }
     

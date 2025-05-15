@@ -146,7 +146,7 @@ export class AssassinsMark implements SpecialMove {
     name: string = "Assassin's Mark";
     triggerType = SpecialMoveTriggerType.Active;
     cost: number = 0;
-    turnCost: number = 1;
+    turnCost: number = 0.5;
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Straight,
         align: SpecialMoveAlignment.Enemy,

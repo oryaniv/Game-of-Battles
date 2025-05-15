@@ -3,13 +3,14 @@ import { Board } from "./Board";
 import { DamageType } from "./Damage";
 import { Position } from "./Position";
 import { SpecialMove, SpecialMoveTriggerType } from "./SpecialMove";
-import { getResultsForStatusEffectHook, getStatusEffect, StatusEffect, StatusEffectApplication, StatusEffectHook, StatusEffectType } from "./StatusEffect";
+import { getResultsForStatusEffectHook, getStatusEffect, StatusEffect, StatusEffectAlignment, StatusEffectApplication, StatusEffectHook, StatusEffectType } from "./StatusEffect";
 import { Team } from "./Team";
 import { ActionResult, AttackResult } from "./attackResult";
 import { CombatantType } from "./Combatants/CombatantType";
 import { emitter } from "@/eventBus";
 import { AIAgent, AIAgentType } from "./AI/AIAgent";
 import { EventLogger } from "@/eventLogger";
+import { BoardPiece } from "./BoardObject";
 
 export interface CombatantStats {
     hp: number;
@@ -23,7 +24,7 @@ export interface CombatantStats {
     luck: number;
   }
 
-  export abstract class Combatant {
+  export abstract class Combatant implements BoardPiece {
     constructor(
       public name: string,
       public baseStats: CombatantStats,
@@ -132,14 +133,22 @@ export interface CombatantStats {
       }
     }
 
+    removeAllStatusEffects(): void {
+      this.statusEffects.forEach((effect) => {
+        const statusEffect = getStatusEffect(effect.name);
+        if(statusEffect?.alignment === StatusEffectAlignment.Permanent) {
+          return;
+        }
+        this.removeStatusEffect(effect.name);
+      });
+    }
+
     updateStatusEffect(effect: StatusEffectApplication): void {
       const effectToUpdate = this.statusEffects.find((effect) => effect.name === effect.name);
       if(effectToUpdate) {
         effectToUpdate.duration = effect.duration;
       }
     }
-    
-    
     
     updateStatusEffects(): void {
       for (let i = this.statusEffects.length - 1; i >= 0; i--) {

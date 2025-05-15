@@ -4,8 +4,8 @@ import { Combatant } from "../Combatant";
 import { CombatantType } from "../Combatants/CombatantType";
 import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Game } from "../Game";
-import { Position } from "../Position";
-import { SpecialMove, SpecialMoveAlignment } from "../SpecialMove";
+import { isSamePosition, Position } from "../Position";
+import { SpecialMove, SpecialMoveAlignment, SpecialMoveTriggerType } from "../SpecialMove";
 import { StatusEffectType } from "../StatusEffect";
 import { AIAgent, AIAgentType } from "./AIAgent";
 import { getValidAttacks, getValidMovePositions } from "./AIUtils";
@@ -40,8 +40,6 @@ export enum PlayActionType {
 export abstract class HeuristicalAIAgent implements AIAgent {
     playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
         const bestPlay: TurnPlay = getHeuristicBestPlay(combatant, game, board, this.evaluationFunction);
-        // eslint-disable-next-line
-        debugger;
         if(bestPlay.position !== combatant.position) {
             combatant.move(bestPlay.position, board);
         } 
@@ -65,12 +63,12 @@ export class RandomAIAgent extends HeuristicalAIAgent {
 function getHeuristicBestPlay(combatant: Combatant, game: Game, 
     board: Board, evaluationFunction: (combatant: Combatant, game: Game, board: Board, turnPlay: TurnPlay) => number): TurnPlay {   
     const allActions: TurnPlay[] = getAllPossibleCombatantActions(combatant, game, board);
-    // eslint-disable-next-line
-    debugger;
     const allActionsEvaluated: RankedTurnPlay[] = allActions.map(action => {
         return {score: evaluationFunction(combatant, game, board, action), play: action};
     });
     allActionsEvaluated.sort((a, b) => b.score - a.score);
+    // eslint-disable-next-line
+    //debugger;
     return allActionsEvaluated[0].play;
 }
 
@@ -85,7 +83,8 @@ function getAllPossibleCombatantActions(combatant: Combatant, game: Game, board:
     allActions.push(...getSpecialMovePlays(combatant, game, board, validNewPositions));
 
     // collect supers?
-
+    // eslint-disable-next-line
+    // debugger;
     return allActions;
 }
 
@@ -182,8 +181,8 @@ function getBasicAttackPlays(combatant: Combatant, game: Game, board: Board, val
 function getSpecialMovePlays(combatant: Combatant, game: Game, board: Board, validNewPositions: Position[]): TurnPlay[] {
     const allSpecialMoveActions: TurnPlay[] = [];
 
-    const allUsableSpecialMoves = combatant.specialMoves.filter(specialMove => canUseSpecialMove(specialMove, combatant));
-
+    const allUsableSpecialMoves = combatant.specialMoves.filter(specialMove => specialMove.triggerType === SpecialMoveTriggerType.Active)
+                                                        .filter(specialMove => canUseSpecialMove(specialMove, combatant));
     // Check special moves from current position
     allUsableSpecialMoves.forEach(specialMove => {
         const validTargets = board.getValidTargetsForSkill(combatant, specialMove.range);
@@ -203,13 +202,21 @@ function getSpecialMovePlays(combatant: Combatant, game: Game, board: Board, val
         });
     });
 
+
+
     // Check special moves from all valid new positions
     validNewPositions.forEach(newPosition => {
+        const originalPosition = combatant.position;
+        theoreticalReplacement(combatant, board, newPosition, true);
         allUsableSpecialMoves.forEach(specialMove => {
-            const validTargets = board.getValidTargetsForSkill(
-                Object.assign({}, combatant, { position: newPosition, hasStatusEffect: combatant.hasStatusEffect }),
-                specialMove.range
-            );
+            // const validTargets = board.getValidTargetsForSkill(
+            //     Object.assign({}, combatant, { position: newPosition, hasStatusEffect: combatant.hasStatusEffect }),
+            //     specialMove.range
+            // );
+            if(!canUseSpecialMove(specialMove, combatant)) {
+                return;
+            }
+            const validTargets = board.getValidTargetsForSkill(combatant, specialMove.range);
             validTargets.forEach(targetPosition => {
                 allSpecialMoveActions.push({
                     position: newPosition,
@@ -224,9 +231,17 @@ function getSpecialMovePlays(combatant: Combatant, game: Game, board: Board, val
                 });
             });
         });
+        theoreticalReplacement(combatant, board, originalPosition, false);
     });
    
     return allSpecialMoveActions;
+}
+
+
+function theoreticalReplacement(combatant: Combatant, board: Board, newPosition: Position, hasMoved: boolean) {
+    board.removeCombatant(combatant);
+    board.placeCombatant(combatant, newPosition);
+    combatant.hasMoved = hasMoved;
 }
 
 export function canUseSpecialMove(specialMove: SpecialMove, combatant: Combatant): boolean {
@@ -252,7 +267,7 @@ export function isFullyHealed(combatant: Combatant): boolean {
 }
 
 export function isSlightlyInjured(combatant: Combatant): boolean {
-    return combatant.stats.hp >= combatant.baseStats.hp  * 0.8;
+    return combatant.stats.hp >= combatant.baseStats.hp  * 0.8 && combatant.stats.hp < combatant.baseStats.hp;
 }
 
 export function isInjured(combatant: Combatant): boolean {
@@ -265,6 +280,23 @@ export function isBadlyInjured(combatant: Combatant): boolean {
 
 export function isNearDeath(combatant: Combatant): boolean {
     return combatant.stats.hp < combatant.baseStats.hp  * 0.2;
+}
+
+export function isLowStamina(combatant: Combatant): boolean {
+    return combatant.stats.stamina < combatant.baseStats.stamina  * 0.2;
+}
+
+
+export function isFatigued(combatant: Combatant): boolean {
+    return combatant.stats.stamina < combatant.baseStats.stamina  * 0.5 && combatant.stats.stamina >= combatant.baseStats.stamina  * 0.2;
+}
+
+export function isTargetInMelee(combatant: Combatant, target: Combatant, board: Board): boolean {
+    return board.getDistanceBetweenPositions(combatant.position, target.position) <= 1;
+}
+
+export function isTargetCaster(target: Combatant): boolean {
+    return isCombatantCaster(target);
 }
 
 export function isEnemyNearby(combatant: Combatant, board: Board, game: Game): boolean {
@@ -329,12 +361,32 @@ export function isTargetFast(target: Combatant): boolean {
     return target.stats.movementSpeed >= 4;
 }
 
+export function isTargetHighInitiative(target: Combatant): boolean {
+    return target.stats.initiative >= 4;
+}
+
 export function isTargetSlow(target: Combatant): boolean {
     return target.stats.movementSpeed <= 2;
 }
 
+export function isTargetCrawlingSlow(target: Combatant): boolean {
+    return target.stats.movementSpeed <= 1;
+}
+
 export function isTargetLowDefense(target: Combatant): boolean {
     return target.stats.defensePower <= 15;
+}
+
+export function isHighAttackPower(combatant: Combatant): boolean {
+    return combatant.stats.attackPower >= 20;
+}
+
+export function isVeryHighAttackPower(combatant: Combatant): boolean {
+    return combatant.stats.attackPower >= 30;
+}
+
+export function isPowerCharged(combatant: Combatant): boolean {
+    return [StatusEffectType.ARCANE_CHANNELING, StatusEffectType.FOCUS_AIM].some(statusEffect => combatant.hasStatusEffect(statusEffect));
 }
 
 export function isEngaging(combatant: Combatant, movePosition: Position, board: Board, game: Game): boolean {
@@ -359,11 +411,18 @@ function gettingAwayFromEnemies(combatant: Combatant, movePosition: Position, bo
     return distanceToClosestEnemy < distanceToClosestEnemyNewPosition;
 }
 
-function getDistanceToClosestEnemy(combatant: Combatant, board: Board, game: Game): number {
+export function getDistanceToClosestEnemy(combatant: Combatant, board: Board, game: Game): number {
     const nearbyEnemies = getAllEnemies(combatant, board, game);
     return nearbyEnemies.reduce((minDistance, enemy) => {
         return Math.min(minDistance, board.getDistanceBetweenPositions(combatant.position, enemy.position));
     }, Infinity);
+}
+
+export function getClosestEnemy(combatant: Combatant, board: Board, game: Game): Combatant {
+    const nearbyEnemies = getAllEnemies(combatant, board, game);
+    return nearbyEnemies.reduce((closestEnemy, enemy) => {
+        return board.getDistanceBetweenPositions(combatant.position, enemy.position) < board.getDistanceBetweenPositions(combatant.position, closestEnemy.position) ? enemy : closestEnemy;
+    }, nearbyEnemies[0]);
 }
 
 function gettingByEnemies(combatant: Combatant, movePosition: Position, board: Board, game: Game): boolean {
@@ -379,7 +438,7 @@ function gettingByLessEnemies(combatant: Combatant, movePosition: Position, boar
 }
 
 export function isFarFromEnemies(combatant: Combatant, board: Board, game: Game): boolean {
-    return getDistanceToClosestEnemy(combatant, board, game) > 6;
+    return getDistanceToClosestEnemy(combatant, board, game) > 8;
 }
 
 export function getDistanceClosingToEnemies(combatant: Combatant, movePosition: Position, board: Board, game: Game): number {
@@ -392,10 +451,25 @@ export function inEngagementDistance(combatant: Combatant, target: Position, boa
     return board.getDistanceBetweenPositions(combatant.position, target) <= combatant.stats.movementSpeed;
 }
 
+export function getAlliedCombatantsInRange(combatant: Combatant, board: Board, range: number): Combatant[] {
+    return board.getAllCombatants().filter(foundCombatant => 
+        foundCombatant.team === combatant.team &&  foundCombatant.stats.hp > 0 &&
+        board.getDistanceBetweenPositions(combatant.position, foundCombatant.position) <= range
+    );
+}
+
 export function isCombatantMartial(combatant: Combatant): boolean {
     return [
         CombatantType.Defender, CombatantType.Vanguard, CombatantType.Pikeman, CombatantType.FistWeaver,
-        CombatantType.StandardBearer,CombatantType.Hunter, CombatantType.Rogue, CombatantType.Militia
+        CombatantType.StandardBearer,CombatantType.Hunter, CombatantType.Rogue, CombatantType.Militia,
+        CombatantType.Gorilla
+    ].includes(combatant.getCombatantType());
+}
+
+export function isCombatantMelee(combatant: Combatant): boolean {
+    return [
+        CombatantType.Defender, CombatantType.Vanguard, CombatantType.Pikeman, CombatantType.FistWeaver,
+        CombatantType.StandardBearer,CombatantType.Gorilla, CombatantType.Rogue, CombatantType.Militia
     ].includes(combatant.getCombatantType());
 }
 
@@ -412,4 +486,23 @@ export function cannotUseSpecialMoves(combatant: Combatant): boolean {
     }, Infinity);
 }
 
+export function assertTargetIsExists(movePosition: Position, target: Position | undefined, board: Board): void {
+    if(!target) {
+        throw new Error("Target is undefined");
+    }
+    const targetCombatant = board.getCombatantAtPosition(target);
+    if(!targetCombatant && !isSamePosition(target, movePosition)) {
+        throw new Error("Target is not on the board");
+    }
+}
+
+export function getTargetCombatantForEvaluation(combatant: Combatant, movePosition: Position, target: Position, board: Board): Combatant {
+    let targetCombatant: Combatant;
+    if(!isSamePosition(target, movePosition)) {
+        targetCombatant = board.getCombatantAtPosition(target)!;
+    } else {
+        targetCombatant = combatant;
+    }
+    return targetCombatant;
+}
     

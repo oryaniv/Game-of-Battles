@@ -1,56 +1,45 @@
 import { Combatant } from "../Combatant";
 import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Position } from "../Position";
-import { FeralSwing, GuardBreaker, Rampage, UnstoppableCharge } from "../SpecialMoves/Singular/Offensive";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
 
-export class Vanguard extends Combatant {
+export class Gorilla extends Combatant {
     constructor(name: string, position: Position, team: Team) {
       super(
         name,
         {
-          hp: 90,
-          attackPower: 35,
-          defensePower: 10,
-          stamina: 25,
-          initiative: 6,
+          hp: 500,
+          attackPower: 50,
+          defensePower: 30,
+          stamina: 20,
+          initiative: 1,
           movementSpeed: 5,
           range: 1,
-          agility: 3,
-          luck: 4,
+          agility: 7,
+          luck: 1,
         },
         position,
         [
             {type: DamageType.Crush, reaction: DamageReaction.NONE},
-            {type: DamageType.Pierce, reaction: DamageReaction.WEAKNESS},
+            {type: DamageType.Pierce, reaction: DamageReaction.NONE},
             {type: DamageType.Slash, reaction: DamageReaction.NONE},
-            {type: DamageType.Fire, reaction: DamageReaction.RESISTANCE},
-            {type: DamageType.Ice, reaction: DamageReaction.WEAKNESS},
+            {type: DamageType.Fire, reaction: DamageReaction.NONE},
+            {type: DamageType.Ice, reaction: DamageReaction.NONE},
             {type: DamageType.Blight, reaction: DamageReaction.NONE},
             {type: DamageType.Lightning, reaction: DamageReaction.NONE},
             {type: DamageType.Holy, reaction: DamageReaction.NONE},
             {type: DamageType.Dark, reaction: DamageReaction.NONE},
         ],
-        [
-          new UnstoppableCharge(),
-          new FeralSwing(),
-          new GuardBreaker(),
-          new Rampage(),
-
-          // supers
-          // new WhirlwindAttack()
-          // new Frenzy()
-          // new HellScream()
-        ],
+        [],
       team);
     }
 
     getCombatantType(): CombatantType {
-        return CombatantType.Vanguard;
+        return CombatantType.Gorilla;
     }
   
     basicAttack(): Damage {
-        return { amount: 35, type: DamageType.Slash };
+        return { amount: 60, type: DamageType.Crush };
     }
   }

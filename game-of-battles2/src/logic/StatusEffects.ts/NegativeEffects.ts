@@ -40,15 +40,15 @@ export class FrozenStatusEffect implements StatusEffect {
         },
         [StatusEffectHook.OnAfterCalculateDamage]: (self: Combatant, attacker: Combatant, damage: Damage) => {
             self.removeStatusEffect(StatusEffectType.FROZEN);
-            return {
-                attackResult: AttackResult.NotFound,
-                damage: {
-                    amount: damage.type === DamageType.Crush ? damage.amount * 1.25 : damage.amount,
-                    type: damage.type
-                },
-                cost: 1,
-                reaction: DamageReaction.NONE
-            };
+            // return {
+            //     attackResult: AttackResult.NotFound,
+            //     damage: {
+            //         amount: damage.type === DamageType.Crush ? damage.amount * 1.25 : damage.amount,
+            //         type: damage.type
+            //     },
+            //     cost: 1,
+            //     reaction: DamageReaction.NONE
+            // };
         },
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;

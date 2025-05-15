@@ -38,7 +38,12 @@ export class Hunter extends Combatant {
             new FocusAim(),
             new PinDown(),
             new Ricochet(),
-            new ToxicArrow()
+            new ToxicArrow(),
+
+            // supers
+            // new ArrowRain()
+            // new BrimstoneRain()
+            // new SniperShot()
           ], team
         );
       }

@@ -123,7 +123,8 @@ export enum StatusEffectType {
   export enum StatusEffectAlignment {
     Negative = 0,
     Positive = 1,
-    Neutral = 2
+    Neutral = 2,
+    Permanent = 3
   }
 
   export interface StatusEffectApplication {

@@ -43,7 +43,12 @@ export class Artificer extends Combatant {
           // new ExplosiveTrap(),
           new ShockingGauntlet(),
           new FullMetalJacket(),
-          new ReinforceConstruct()
+          new ReinforceConstruct(),
+
+          // supers
+          // new BuildBallistaTurret()
+          // new FlameThrower()
+          // new CreateForceField()
         ],
         team
       );

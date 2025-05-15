@@ -42,7 +42,6 @@ export class Rogue extends Combatant {
             new SneakAttack(),
             new AssassinsMark(),
             new Sadist(),
-=
           ], team
         );
       }

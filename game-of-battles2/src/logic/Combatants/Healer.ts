@@ -42,6 +42,11 @@ export class Healer extends Combatant {
           new Regenerate(),
           new Purify(),
           new SacredFlame(),
+
+          // supers
+          // new RainOfGrace()
+          // new QueensWrathMothersLove()
+          // new Ressurection()
         ], team
       );
     }

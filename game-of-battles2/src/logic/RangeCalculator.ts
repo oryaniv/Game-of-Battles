@@ -294,6 +294,7 @@ export class RangeCalculator {
           if(range === SpecialMoveAlignment.Enemy && target.team !== caster.team ||
             range === SpecialMoveAlignment.All ||
             (range === SpecialMoveAlignment.SelfAndAlly && target.team === caster.team) ||
+            (range === SpecialMoveAlignment.Ally && target.team === caster.team && target.position !== caster.position) ||
             range === SpecialMoveAlignment.Self && target.position === caster.position) {
             return true;
           }

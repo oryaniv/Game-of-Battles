@@ -25,7 +25,7 @@
           @mouseover="showAoe({ x: x - 1, y: y - 1 })"
           @mouseleave="hideAoe"
         >
-          <div class="coordinates" style="font-size: 24px;">{{x -1}},{{y - 1}}</div>
+          <!-- <div class="coordinates" style="font-size: 24px;">{{x -1}},{{y - 1}}</div> -->
           <div
             v-if="getCombatant({ x , y})"
             class="combatant"
@@ -263,6 +263,9 @@ import { Pikeman } from './logic/Combatants/Pikeman';
 import { Vanguard } from './logic/Combatants/Vanguard';
 import { FistWeaver } from './logic/Combatants/FistWeaver';
 import { StandardBearer } from './logic/Combatants/StandardBearer';
+import { Artificer } from './logic/Combatants/Artificer';
+import { Rogue } from './logic/Combatants/Rogue';
+import { Gorilla } from './logic/Combatants/Gorilla';
 import { SpecialMove, SpecialMoveTriggerType } from './logic/SpecialMove';
 import { StatusEffect, StatusEffectType, StatusEffectAlignment } from './logic/StatusEffect';
 import { SimpleAIAgent } from './logic/AI/AIAgent';
@@ -271,30 +274,51 @@ import { RandomAIAgent } from './logic/AI/HeuristicalAgents';
 import { VeteranAIAgent } from './logic/AI/VeteranAIAgent';
 import { Howl } from 'howler';
 import { EventLogger } from './eventLogger';
-import { AllOfThem, standardVsSetup, theATeam, theBTeam, allMilitiaSetup } from './boardSetups';
+import { AllOfThem, standardVsSetup, theATeam, theBTeam, allMilitiaSetup, theGorillaTeam,
+ generateRandomTeam, placeAllCombatants } from './boardSetups';
 
 export default defineComponent({
   setup() {
     
     const board = ref(new Board(10, 10));
-    const whiteTeam = ref(new Team('White Team', 0, new RookieAIAgent()));
-    const blackTeam = ref(new Team('Black Team', 1, new VeteranAIAgent()));
+    const whiteTeam = ref(new Team('White Team', 0, new VeteranAIAgent()));
+    const blackTeam = ref(new Team('Black Team', 1, new RookieAIAgent()));
+    // const whiteTeam = ref(generateRandomTeam(0, new RookieAIAgent()));
+    // const blackTeam = ref(generateRandomTeam(1, new RookieAIAgent()));
+    // placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
 
-    allMilitiaSetup(whiteTeam.value, blackTeam.value);
+    // allMilitiaSetup(whiteTeam.value, blackTeam.value);
 
-  // whiteTeam.value.addCombatant(new Fool('Gobo', { x: 4, y: 3 }, whiteTeam.value));
-     // whiteTeam.value.addCombatant(new FistWeaver('fefe', { x: 3, y: 0 }, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new StandardBearer('Gobo', { x: 4, y: 0 }, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Hunter('fefe', { x: 7, y: 0 }, whiteTeam.value));
+    // // whiteTeam.value.addCombatant(new Defender('afaf', { x: 5, y: 4 }, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Defender('afaff', { x: 4, y: 5 }, whiteTeam.value));
+    // // whiteTeam.value.addCombatant(new Hunter('afaf', { x: 6, y: 0 }, whiteTeam.value));
 
-    // whiteTeam.value.addCombatant(new Hunter('afaf', { x: 5, y: 5 }, whiteTeam.value));
-    //  blackTeam.value.addCombatant(new Healer('fffobo', { x: 4, y: 2 }, blackTeam.value));
-    //  whiteTeam.value.addCombatant(new Militia('czve', { x: 4, y: 1 }, whiteTeam.value));
-    //  whiteTeam.value.addCombatant(new Militia('vr', { x: 4, y: 3 }, whiteTeam.value));
-    //  whiteTeam.value.addCombatant(new Militia('csq', { x: 5, y: 2 }, whiteTeam.value));
-    //  whiteTeam.value.addCombatant(new Militia('czve', { x: 3, y: 2 }, whiteTeam.value));
+    // // blackTeam.value.addCombatant(new Gorilla('Jojo', { x: 6, y: 9 }, blackTeam.value));
+
+    // blackTeam.value.addCombatant(new Healer('Jojo', { x: 4, y: 6 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Healer('Jojo', { x: 5, y: 5 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Defender('Jojo', { x: 5, y: 7 }, blackTeam.value));
+
+    // blackTeam.value.combatants[0].stats.hp = 5;
+    // blackTeam.value.combatants[1].stats.hp = 5;
+    // blackTeam.value.combatants[2].stats.hp = 5;
 
 
+    //blackTeam.value.addCombatant(new Wizard('fffobo', { x: 4, y: 2 }, blackTeam.value));
 
+   // blackTeam.value.addCombatant(new Defender('Jojo', { x: 4, y: 6 }, blackTeam.value));
+  //  blackTeam.value.addCombatant(new Militia('Jojo', { x: 1, y: 9 }, blackTeam.value));
+  //   blackTeam.value.addCombatant(new Militia('Jojo', { x: 4, y: 9 }, blackTeam.value));
 
+    // blackTeam.value.addCombatant(new Militia('Jojo', { x: 5, y: 9 }, blackTeam.value));
+
+    // blackTeam.value.addCombatant(new Militia('Jojo', { x: 3, y: 9 }, blackTeam.value));
+
+    // blackTeam.value.addCombatant(new Militia('Jojo', { x: 2, y: 9 }, blackTeam.value));
+
+   
     // blackTeam.value.addCombatant(new Wizard('Jezebel', { x: 4, y: 0 }, blackTeam.value));
     // blackTeam.value.addCombatant(new Hunter('jojo', { x: 3, y: 0 }, blackTeam.value));
     // blackTeam.value.addCombatant(new FistWeaver('gggjo', { x: 5, y: 1 }, blackTeam.value));
@@ -305,14 +329,15 @@ export default defineComponent({
    //  AllOfThem(whiteTeam.value);
     
     // whiteTeam.value.combatants[0].applyStatusEffect({
-    //         name: StatusEffectType.ARCANE_CHANNELING,
+    //         name: StatusEffectType.FOCUS_AIM,
     //         duration: 5,
     // }); 
 
     // whiteTeam.value.combatants[0].stats.stamina = 0;
+    theATeam(whiteTeam.value);
+    theBTeam(blackTeam.value);
 
-    // theATeam(whiteTeam.value);
-    // theBTeam(blackTeam.value);
+    //theBTeam(blackTeam.value);
     
 
     const teams = ref([whiteTeam.value, blackTeam.value]);
@@ -658,6 +683,12 @@ export default defineComponent({
           return require('./assets/Vanguard.svg');
         case CombatantType.FistWeaver:
           return require('./assets/FistWeaver.svg');
+        case CombatantType.Artificer:
+          return require('./assets/Artificer.svg');
+        case CombatantType.Rogue:
+          return require('./assets/Rogue.svg');
+        case CombatantType.Gorilla:
+          return require('./assets/Gorilla.svg');
       }
     }
 

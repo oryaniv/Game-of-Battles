@@ -75,7 +75,7 @@ export class CallOfVigor implements SpecialMove {
     turnCost: number = 1;
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Curve,
-        align: SpecialMoveAlignment.Ally,
+        align: SpecialMoveAlignment.SelfAndAlly,
         areaOfEffect: SpecialMoveAreaOfEffect.Single,
         range: 4
     };
@@ -155,7 +155,9 @@ export class FullMetalJacket implements SpecialMove {
         return getStandardActionResult();
     };
     checkRequirements = undefined;
-    description = `Raise the morale of an ally, giving them a small chance to gain extra action points after their turn for 5 rounds`
+    description = `Cover an ally with a thick layer of reinforced metal, increasing their defense power for 3 turns, and 
+    and potentially their attack power as well if they carry a physical weapon. However, they also become weak to
+    lightning damage.`
         
 }
 

@@ -165,7 +165,16 @@ export class Meditate implements SpecialMove {
         for(const statusEffect of negativeStatusEffects) {
             invoker?.removeStatusEffect(statusEffect.name);
         }
-        return getStandardActionResult();
+        invoker.stats.hp = Math.min(invoker.stats.hp + 15, invoker.baseStats.hp);
+        return {
+            attackResult: AttackResult.Hit,
+            damage: {
+                amount: 15,
+                type: DamageType.Healing
+            },
+            cost: 1,
+            reaction: DamageReaction.NONE
+        };
     };
     checkRequirements = undefined
     description = `Meditate, cleasing yourself of all negative effects tainting your body and soul`   
