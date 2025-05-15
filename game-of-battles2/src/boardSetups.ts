@@ -54,8 +54,8 @@ export function standardVsSetup(team1: Team, team2: Team) {
     // add to black team
     team2.addCombatant(new StandardBearer('Gary', { x: 5, y: 8 }, team2));
     team2.addCombatant(new Defender('Michael', { x: 6, y: 8 }, team2));
-    team2.addCombatant(new Hunter('Jake', { x: 6, y: 9 }, team2));
-    team2.addCombatant(new Wizard('Bran', { x: 5, y: 9 }, team2));
+    team2.addCombatant(new Wizard('Jake', { x: 6, y: 9 }, team2));
+    team2.addCombatant(new Hunter('Bran', { x: 5, y: 9 }, team2));
     team2.addCombatant(new Healer('Marianne', { x: 7, y: 9 }, team2));
 }
 
@@ -74,11 +74,11 @@ export function theATeam(team: Team) {
 }
 
 export function theBTeam(team: Team) {
-    team.addCombatant(new Healer('F', { x: 5, y: 9 }, team));
-    team.addCombatant(new Wizard('G', { x: 6, y: 9 }, team));
-    team.addCombatant(new StandardBearer('H', { x: 4, y: 8 }, team));
-    team.addCombatant(new Defender('I', { x: 5, y: 8 }, team));
-    team.addCombatant(new Hunter('J', { x: 4, y: 9 }, team));
+    team.addCombatant(new Healer('F', { x: 6, y: 9 }, team));
+    team.addCombatant(new Wizard('G', { x: 7, y: 9 }, team));
+    team.addCombatant(new StandardBearer('H', { x: 5, y: 8 }, team));
+    team.addCombatant(new Defender('I', { x: 6, y: 8 }, team));
+    team.addCombatant(new Hunter('J', { x: 5, y: 9 }, team));
 
 
     // team.addCombatant(new Witch('F', { x: 5, y: 9 }, team));

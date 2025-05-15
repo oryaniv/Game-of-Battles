@@ -206,21 +206,22 @@ export class Board {
     return Math.abs(position1.x - position2.x) + Math.abs(position1.y - position2.y);
   }
 
-  hasLineOfSight(position1: Position, position2: Position): boolean {
+  hasLineOfSight(position1: Position, position2: Position, combatant?: Combatant): boolean {
     const inStraightLine = checkInStraightLine(position1, position2);
-    return inStraightLine && this.nothingInTheWayBetween(position1, position2);
+    return inStraightLine && this.nothingInTheWayBetween(position1, position2, combatant);
 
     function checkInStraightLine(position1: Position, position2: Position): boolean {
       return position1.x === position2.x || position1.y === position2.y;
     }
   }
 
-  nothingInTheWayBetween(position1: Position, position2: Position): boolean {
+  nothingInTheWayBetween(position1: Position, position2: Position, combatant?: Combatant): boolean {
     if(position1.x === position2.x){
       const minY = Math.min(position1.y, position2.y);
       const maxY = Math.max(position1.y, position2.y);
       for(let y = minY + 1; y < maxY; y++){
-        if(this.getCombatantAtPosition({x: position1.x, y})){
+        const target = this.getCombatantAtPosition({x: position1.x, y});
+        if(target && target.name !== combatant?.name){
           return false;
         }
       }
@@ -231,7 +232,8 @@ export class Board {
       const minX = Math.min(position1.x, position2.x);
       const maxX = Math.max(position1.x, position2.x);
       for(let x = minX + 1; x < maxX; x++){
-        if(this.getCombatantAtPosition({x, y: position1.y})){
+        const target = this.getCombatantAtPosition({x, y: position1.y});
+        if(target && target.name !== combatant?.name){
           return false;
         }
       }

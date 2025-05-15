@@ -69,7 +69,16 @@ function getHeuristicBestPlay(combatant: Combatant, game: Game,
     allActionsEvaluated.sort((a, b) => b.score - a.score);
     // eslint-disable-next-line
     //debugger;
-    return allActionsEvaluated[0].play;
+    // return allActionsEvaluated[0].play;
+    return randomizedBestPlay(allActionsEvaluated);
+}
+
+function randomizedBestPlay(allActionsEvaluated: RankedTurnPlay[]): TurnPlay {
+    const bestPlays: TurnPlay[] = allActionsEvaluated.filter(action => action.score === allActionsEvaluated[0].score)
+                                        .map(action => action.play);
+    // eslint-disable-next-line                          
+    // debugger;
+    return bestPlays[Math.floor(Math.random() * bestPlays.length)];
 }
 
 function getAllPossibleCombatantActions(combatant: Combatant, game: Game, board: Board): TurnPlay[] {
@@ -362,7 +371,7 @@ export function isTargetFast(target: Combatant): boolean {
 }
 
 export function isTargetHighInitiative(target: Combatant): boolean {
-    return target.stats.initiative >= 4;
+    return target.stats.initiative >= 5;
 }
 
 export function isTargetSlow(target: Combatant): boolean {

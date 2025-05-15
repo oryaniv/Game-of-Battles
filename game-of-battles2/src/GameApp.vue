@@ -25,7 +25,7 @@
           @mouseover="showAoe({ x: x - 1, y: y - 1 })"
           @mouseleave="hideAoe"
         >
-          <!-- <div class="coordinates" style="font-size: 24px;">{{x -1}},{{y - 1}}</div> -->
+          <div class="coordinates" style="font-size: 24px;">{{x -1}},{{y - 1}}</div>
           <div
             v-if="getCombatant({ x , y})"
             class="combatant"
@@ -283,23 +283,15 @@ export default defineComponent({
     const board = ref(new Board(10, 10));
     const whiteTeam = ref(new Team('White Team', 0, new VeteranAIAgent()));
     const blackTeam = ref(new Team('Black Team', 1, new RookieAIAgent()));
-    // const whiteTeam = ref(generateRandomTeam(0, new RookieAIAgent()));
-    // const blackTeam = ref(generateRandomTeam(1, new RookieAIAgent()));
     // placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
 
     // allMilitiaSetup(whiteTeam.value, blackTeam.value);
 
     // whiteTeam.value.addCombatant(new StandardBearer('Gobo', { x: 4, y: 0 }, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Hunter('fefe', { x: 7, y: 0 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Wizard('fefe', { x: 5, y: 6 }, whiteTeam.value));
     // // whiteTeam.value.addCombatant(new Defender('afaf', { x: 5, y: 4 }, whiteTeam.value));
     // whiteTeam.value.addCombatant(new Defender('afaff', { x: 4, y: 5 }, whiteTeam.value));
     // // whiteTeam.value.addCombatant(new Hunter('afaf', { x: 6, y: 0 }, whiteTeam.value));
-
-    // // blackTeam.value.addCombatant(new Gorilla('Jojo', { x: 6, y: 9 }, blackTeam.value));
-
-    // blackTeam.value.addCombatant(new Healer('Jojo', { x: 4, y: 6 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Healer('Jojo', { x: 5, y: 5 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Defender('Jojo', { x: 5, y: 7 }, blackTeam.value));
 
     // blackTeam.value.combatants[0].stats.hp = 5;
     // blackTeam.value.combatants[1].stats.hp = 5;
@@ -308,22 +300,10 @@ export default defineComponent({
 
     //blackTeam.value.addCombatant(new Wizard('fffobo', { x: 4, y: 2 }, blackTeam.value));
 
-   // blackTeam.value.addCombatant(new Defender('Jojo', { x: 4, y: 6 }, blackTeam.value));
+   blackTeam.value.addCombatant(new Defender('Jojo', { x: 4, y: 6 }, blackTeam.value));
   //  blackTeam.value.addCombatant(new Militia('Jojo', { x: 1, y: 9 }, blackTeam.value));
   //   blackTeam.value.addCombatant(new Militia('Jojo', { x: 4, y: 9 }, blackTeam.value));
 
-    // blackTeam.value.addCombatant(new Militia('Jojo', { x: 5, y: 9 }, blackTeam.value));
-
-    // blackTeam.value.addCombatant(new Militia('Jojo', { x: 3, y: 9 }, blackTeam.value));
-
-    // blackTeam.value.addCombatant(new Militia('Jojo', { x: 2, y: 9 }, blackTeam.value));
-
-   
-    // blackTeam.value.addCombatant(new Wizard('Jezebel', { x: 4, y: 0 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Hunter('jojo', { x: 3, y: 0 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new FistWeaver('gggjo', { x: 5, y: 1 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Witch('gggjo', { x: 5, y: 2 }, blackTeam.value));
-    // whiteTeam.value.addCombatant(new Witch('Jezebel', { x: 5, y: 1 }, whiteTeam.value));
 
     // standardVsSetup(whiteTeam.value, blackTeam.value);
    //  AllOfThem(whiteTeam.value);
@@ -334,8 +314,8 @@ export default defineComponent({
     // }); 
 
     // whiteTeam.value.combatants[0].stats.stamina = 0;
-    theATeam(whiteTeam.value);
-    theBTeam(blackTeam.value);
+    // theATeam(whiteTeam.value);
+    // theBTeam(blackTeam.value);
 
     //theBTeam(blackTeam.value);
     

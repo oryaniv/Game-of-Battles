@@ -15,7 +15,7 @@ export class Pikeman extends Combatant {
           attackPower: 20,
           defensePower: 20,
           stamina: 25,
-          initiative: 4,
+          initiative: 3,
           movementSpeed: 3,
           range: 2,
           agility: 5,

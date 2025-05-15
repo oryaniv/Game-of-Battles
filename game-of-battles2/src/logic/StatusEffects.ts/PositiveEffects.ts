@@ -127,7 +127,8 @@ export class EncouragedStatusEffect implements StatusEffect {
     applicationHooks = {
         [StatusEffectHook.OnTurnEnd]: (caster: Combatant, target: Combatant) => {
             const roll = Math.random();
-            if (roll <= 0.2) {
+            const extraActionChance = 0.2 + (caster.stats.luck * 0.02);
+            if (roll <= extraActionChance) {
                 return {
                     attackResult: AttackResult.NotFound,
                     damage: { amount: 0, type: DamageType.Unstoppable },

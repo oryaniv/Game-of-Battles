@@ -151,7 +151,19 @@ abstract class VeteranAIAgentGenericPlayer implements VeteranAIAgentPlayer {
         }
 
         if(gettingAwayFromEnemy) {
-            baseValue -= 1;
+            const effectiveRange = customEffectiveRange || this.getMaxEnemyEffectiveRange();
+            if(effectiveRange === 1) {
+                baseValue -= 1;
+            // do the mangudai thing
+            } else {
+                const distanceToClosestEnemy = getDistanceToClosestEnemy(combatant, board, game);
+                const desiredAmountOfSteps = effectiveRange - distanceToClosestEnemy;
+                // remember that distanceClosing is negative!!!
+                const distanceRetreating = -distanceClosing;
+                const goodSteps = desiredAmountOfSteps >= distanceRetreating ? distanceRetreating : desiredAmountOfSteps;
+                const badSteps = distanceRetreating > desiredAmountOfSteps ? distanceRetreating - desiredAmountOfSteps : 0;
+                baseValue += (0.5 * goodSteps) - (0.7 * badSteps);
+            }
         }
 
 
@@ -379,11 +391,9 @@ class VeteranAIAgentHunterPlayer extends VeteranAIAgentGenericPlayer {
 
     protected evaluateMovement(combatant: Combatant, game: Game, board: Board, movePosition: Position): number {
         let baseValue = 0;
-        // let baseValue = super.evaluateMovement(combatant, game, board, movePosition);
-        // eslint-disable-next-line
-        // debugger;
+       
         const closestEnemy = getClosestEnemy(combatant, board, game);
-        const hasLineOfSight = board.hasLineOfSight(movePosition, closestEnemy.position);
+        const hasLineOfSight = board.hasLineOfSight(movePosition, closestEnemy.position, combatant);
         if(hasLineOfSight) {
             baseValue += super.evaluateMovement(combatant, game, board, movePosition, 8); 
         } else {
@@ -807,10 +817,11 @@ class VeteranAIAgentStandardBearerPlayer extends VeteranAIAgentGenericPlayer {
         assertTargetIsExists(movePosition, target, board);
 
         const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, target!, board);
-        let baseValue = 6;
+        let baseValue = 4;
         baseValue += this.evaluateMovement(combatant, game, board, movePosition);
         baseValue += combatant.hasStatusEffect(StatusEffectType.ENCOURAGED) ? -3 : 0;
         baseValue += isTargetHighInitiative(targetCombatant) ? 2 : 0;
+        baseValue += targetCombatant.stats.luck * 0.2;
         return baseValue;
     }
 

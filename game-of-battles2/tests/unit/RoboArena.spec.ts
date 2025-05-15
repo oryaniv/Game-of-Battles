@@ -33,12 +33,18 @@ describe('RoboArenta', () => {
 
     it('Ai Agent match 1', () => {
         let roundCounts = [];
-        for(let i = 0; i < 10; i++) {
-            const roundCount = exampleMatch();
-            roundCounts.push(roundCount);
+        let winnerCounts = [];
+        for(let i = 0; i < 100; i++) {
+            const matchResult = exampleMatch();
+            roundCounts.push(matchResult.roundCount);
+            winnerCounts.push(matchResult.winner);
         }
         console.log(`round count average is ${roundCounts
             .reduce((a, b) => a + b, 0) / roundCounts.length}`);
+
+        const veteranWinCount = winnerCounts.filter((winner) => winner === 'Team Veteran').length;
+        const veteranWinPercentage = veteranWinCount / winnerCounts.length;
+        console.log(`veteran win percentage is ${veteranWinPercentage}`);
 
         console.log(`error count is ${errorCount}`);
             expect(true).toBe(true);
@@ -84,9 +90,9 @@ describe('RoboArenta', () => {
 });
 
 
-function exampleMatch(): number {
-    const team1 = new Team('Team 1', 0, new VeteranAIAgent());
-    const team2 = new Team('Team 2', 1, new RookieAIAgent());
+function exampleMatch() {
+    const team1 = new Team('Team Rookie', 0, new KidAIAgent());
+    const team2 = new Team('Team Veteran', 1, new VeteranAIAgent());
     let board = new Board(10, 10);
     
     theATeam(team1);
@@ -111,7 +117,7 @@ function exampleMatch(): number {
     
     const winner = game.getWinner();
     console.log(`%cwinning team is ${winner?.getName()}`, 'color: red');
-    return game.getRoundCount();
+    return {roundCount: game.getRoundCount(), winner: winner?.getName()};
 }   
 
 function combatantBalancingMatch(team1: Team, team2: Team): MatchData {
