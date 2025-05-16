@@ -66,11 +66,11 @@ export function theATeam(team: Team) {
     team.addCombatant(new Hunter('D', { x: 4, y: 0 }, team));
     team.addCombatant(new Healer('E', { x: 3, y: 0 }, team));
 
-    // team.addCombatant(new Witch('F', { x: 3, y: 0 }, team));
-    // team.addCombatant(new Fool('G', { x: 4, y: 0 }, team));
-    // team.addCombatant(new Vanguard('H', { x: 5, y: 1 }, team));
-    // team.addCombatant(new FistWeaver('I', { x: 3, y: 1 }, team));
-    // team.addCombatant(new Pikeman('J', { x: 4, y: 1 }, team));
+    // team.addCombatant(new Witch('A', { x: 3, y: 0 }, team));
+    // team.addCombatant(new Fool('B', { x: 4, y: 0 }, team));
+    // team.addCombatant(new Vanguard('C', { x: 5, y: 1 }, team));
+    // team.addCombatant(new FistWeaver('D', { x: 3, y: 1 }, team));
+    // team.addCombatant(new Pikeman('E', { x: 4, y: 1 }, team));
 }
 
 export function theBTeam(team: Team) {

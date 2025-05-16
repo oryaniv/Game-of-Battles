@@ -40,11 +40,12 @@ export class Heal implements SpecialMove {
                 type: this.damage.type
             },
             cost: 1,
-            reaction: DamageReaction.NONE
+            reaction: DamageReaction.NONE,
+            position: target
         };
     };
     checkRequirements = undefined
-    description = `engulf an ally in a wave of healing energy, healing them for a medium amount of health`   
+    description = `engulf an ally in a wave of divine energy, healing them for a medium amount of health`   
 }
 
 export class Regenerate implements SpecialMove {

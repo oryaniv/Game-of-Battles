@@ -35,9 +35,14 @@ describe('RoboArenta', () => {
         let roundCounts = [];
         let winnerCounts = [];
         for(let i = 0; i < 100; i++) {
-            const matchResult = exampleMatch();
-            roundCounts.push(matchResult.roundCount);
-            winnerCounts.push(matchResult.winner);
+            try {
+                const matchResult = exampleMatch();
+                roundCounts.push(matchResult.roundCount);
+                winnerCounts.push(matchResult.winner);
+            } catch (error) {
+                console.log('an Error was thrown, restarting match', error);
+                continue;
+            }
         }
         console.log(`round count average is ${roundCounts
             .reduce((a, b) => a + b, 0) / roundCounts.length}`);
@@ -91,8 +96,13 @@ describe('RoboArenta', () => {
 
 
 function exampleMatch() {
-    const team1 = new Team('Team Rookie', 0, new KidAIAgent());
-    const team2 = new Team('Team Veteran', 1, new VeteranAIAgent());
+    // const team1 = new Team('Team Rookie', 0, new RookieAIAgent());
+    // const team2 = new Team('Team Veteran', 1, new VeteranAIAgent());
+
+    const team1 = new Team('Team Veteran', 0, new VeteranAIAgent());
+    const team2 = new Team('Team Rookie', 1, new RookieAIAgent());
+
+    
     let board = new Board(10, 10);
     
     theATeam(team1);
@@ -109,6 +119,10 @@ function exampleMatch() {
             deadCombatants.forEach((combatant) => {
                 board.removeCombatant(combatant);
             });
+
+            if(game.getRoundCount() > 40) {
+                break;
+            }
         }
     } catch (error) {
         errorCount++;
@@ -116,6 +130,10 @@ function exampleMatch() {
     }
     
     const winner = game.getWinner();
+
+    if(!winner) {
+        throw new Error('No winner found');
+    }
     console.log(`%cwinning team is ${winner?.getName()}`, 'color: red');
     return {roundCount: game.getRoundCount(), winner: winner?.getName()};
 }   

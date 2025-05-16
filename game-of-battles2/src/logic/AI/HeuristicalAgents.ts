@@ -68,7 +68,7 @@ function getHeuristicBestPlay(combatant: Combatant, game: Game,
     });
     allActionsEvaluated.sort((a, b) => b.score - a.score);
     // eslint-disable-next-line
-    //debugger;
+    // debugger;
     // return allActionsEvaluated[0].play;
     return randomizedBestPlay(allActionsEvaluated);
 }
@@ -247,7 +247,7 @@ function getSpecialMovePlays(combatant: Combatant, game: Game, board: Board, val
 }
 
 
-function theoreticalReplacement(combatant: Combatant, board: Board, newPosition: Position, hasMoved: boolean) {
+export function theoreticalReplacement(combatant: Combatant, board: Board, newPosition: Position, hasMoved: boolean) {
     board.removeCombatant(combatant);
     board.placeCombatant(combatant, newPosition);
     combatant.hasMoved = hasMoved;
@@ -300,8 +300,12 @@ export function isFatigued(combatant: Combatant): boolean {
     return combatant.stats.stamina < combatant.baseStats.stamina  * 0.5 && combatant.stats.stamina >= combatant.baseStats.stamina  * 0.2;
 }
 
-export function isTargetInMelee(combatant: Combatant, target: Combatant, board: Board): boolean {
-    return board.getDistanceBetweenPositions(combatant.position, target.position) <= 1;
+export function isTargetInMelee(combatant: Combatant | Position, target: Combatant, board: Board): boolean {
+    if(combatant instanceof Combatant) {
+        return board.getDistanceBetweenPositions(combatant.position, target.position) <= 1;
+    } else {
+        return board.getDistanceBetweenPositions(combatant, target.position) <= 1;
+    }
 }
 
 export function isTargetCaster(target: Combatant): boolean {
@@ -384,6 +388,18 @@ export function isTargetCrawlingSlow(target: Combatant): boolean {
 
 export function isTargetLowDefense(target: Combatant): boolean {
     return target.stats.defensePower <= 15;
+}
+
+export function isTargetHighDefense(target: Combatant): boolean {
+    return target.stats.defensePower >= 30;
+}
+
+export function isLowAttackPower(combatant: Combatant): boolean {
+    return combatant.stats.attackPower <= 10;
+}
+
+export function isMemeAttacker(combatant: Combatant): boolean {
+    return combatant.stats.attackPower <= 5;
 }
 
 export function isHighAttackPower(combatant: Combatant): boolean {

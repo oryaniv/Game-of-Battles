@@ -40,15 +40,6 @@ export class FrozenStatusEffect implements StatusEffect {
         },
         [StatusEffectHook.OnAfterCalculateDamage]: (self: Combatant, attacker: Combatant, damage: Damage) => {
             self.removeStatusEffect(StatusEffectType.FROZEN);
-            // return {
-            //     attackResult: AttackResult.NotFound,
-            //     damage: {
-            //         amount: damage.type === DamageType.Crush ? damage.amount * 1.25 : damage.amount,
-            //         type: damage.type
-            //     },
-            //     cost: 1,
-            //     reaction: DamageReaction.NONE
-            // };
         },
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
@@ -58,6 +49,7 @@ export class StrengthDowngradeStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.STRENGTH_DOWNGRADE;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant) => {
+            self.removeStatusEffect(StatusEffectType.STRENGTH_BOOST);
             self.stats.attackPower -= 20;
         },
         [StatusEffectHook.OnRemove]: (self: Combatant) => {
@@ -71,6 +63,7 @@ export class DefenseDowngradeStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.DEFENSE_DOWNGRADE;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant) => {
+            self.removeStatusEffect(StatusEffectType.FORTIFIED);
             self.stats.defensePower -= 20;
         },
         [StatusEffectHook.OnRemove]: (self: Combatant) => {
@@ -110,6 +103,7 @@ export class SlowStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.SLOW;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant) => {
+            self.removeStatusEffect(StatusEffectType.MOBILITY_BOOST);
             self.stats.movementSpeed -= 2;
             self.stats.agility -= 3;
         },

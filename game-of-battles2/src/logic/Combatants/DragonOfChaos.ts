@@ -34,7 +34,10 @@ export class DragonOfChaos extends Combatant {
         ],
         [
             // new SoulDevourer(),
-            // 
+            // new ChannelSoul(),
+            // new SoulPoolSynergy(),
+            // new HyperSpeedFighter(),
+
         ],
       team);
     }

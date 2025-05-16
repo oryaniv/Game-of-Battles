@@ -281,28 +281,49 @@ export default defineComponent({
   setup() {
     
     const board = ref(new Board(10, 10));
-    const whiteTeam = ref(new Team('White Team', 0, new VeteranAIAgent()));
+    const whiteTeam = ref(new Team('White Team', 0));
     const blackTeam = ref(new Team('Black Team', 1, new RookieAIAgent()));
     // placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
 
     // allMilitiaSetup(whiteTeam.value, blackTeam.value);
 
-    // whiteTeam.value.addCombatant(new StandardBearer('Gobo', { x: 4, y: 0 }, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Wizard('fefe', { x: 5, y: 6 }, whiteTeam.value));
-    // // whiteTeam.value.addCombatant(new Defender('afaf', { x: 5, y: 4 }, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Defender('afaff', { x: 4, y: 5 }, whiteTeam.value));
-    // // whiteTeam.value.addCombatant(new Hunter('afaf', { x: 6, y: 0 }, whiteTeam.value));
+    whiteTeam.value.addCombatant(new FistWeaver('Gobo', { x: 6, y: 4 }, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Wizard('fefe', { x: 5, y: 9 }, whiteTeam.value));
+    // // whiteTeam.value.addCombatant(new Rogue('afaf', { x: 5, y: 4 }, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Defender('afaff', { x: 4, y: 7 }, whiteTeam.value));
+    // // // whiteTeam.value.addCombatant(new Hunter('afaf', { x: 6, y: 0 }, whiteTeam.value));
 
-    // blackTeam.value.combatants[0].stats.hp = 5;
-    // blackTeam.value.combatants[1].stats.hp = 5;
-    // blackTeam.value.combatants[2].stats.hp = 5;
-
-
-    //blackTeam.value.addCombatant(new Wizard('fffobo', { x: 4, y: 2 }, blackTeam.value));
-
-   blackTeam.value.addCombatant(new Defender('Jojo', { x: 4, y: 6 }, blackTeam.value));
+    //blackTeam.value.addCombatant(new StandardBearer('fffobo', { x: 9, y: 9 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Defender('fffobo', { x: 6, y: 6 }, blackTeam.value));
+   // blackTeam.value.addCombatant(new Defender('Jojo', { x: 4, y: 6 }, blackTeam.value));
   //  blackTeam.value.addCombatant(new Militia('Jojo', { x: 1, y: 9 }, blackTeam.value));
-  //   blackTeam.value.addCombatant(new Militia('Jojo', { x: 4, y: 9 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Militia('Jojo', { x: 3, y: 5 }, blackTeam.value));
+
+    blackTeam.value.addCombatant(new Militia('Gobo', { x: 9, y: 6 }, blackTeam.value));
+
+    // whiteTeam.value.combatants[0].stats.hp = 10;
+    // whiteTeam.value.combatants[0].applyStatusEffect({
+    //         name: StatusEffectType.BLEEDING,
+    //         duration: 5,
+    // }); 
+    // whiteTeam.value.combatants[0].applyStatusEffect({
+    //         name: StatusEffectType.POISONED,
+    //         duration: 5,
+    // }); 
+    // whiteTeam.value.combatants[0].applyStatusEffect({
+    //         name: StatusEffectType.DEFENSE_DOWNGRADE,
+    //         duration: 5,
+    // }); 
+    // whiteTeam.value.combatants[0].applyStatusEffect({
+    //         name: StatusEffectType.STAGGERED,
+    //         duration: 5,
+    // }); 
+
+    // // blackTeam.value.combatants[1].stats.hp = 5;
+    // // blackTeam.value.combatants[2].stats.hp = 5;
+
+
+    
 
 
     // standardVsSetup(whiteTeam.value, blackTeam.value);
@@ -316,6 +337,9 @@ export default defineComponent({
     // whiteTeam.value.combatants[0].stats.stamina = 0;
     // theATeam(whiteTeam.value);
     // theBTeam(blackTeam.value);
+
+    //placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
+
 
     //theBTeam(blackTeam.value);
     

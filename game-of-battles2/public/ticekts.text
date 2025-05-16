@@ -32,11 +32,17 @@ small buff for encourage
 
 ranged combatants doing the mangudai
 
+target ranking by HP and defense rather than injured/near death etc.
+
+defense ranking doesn't show significant improvement
+
 ---------------------------------
 
 Veteran AI:
 
-target ranking by HP and defense rather than injured/near death etc.
+wizard & healer - take cover
+
+go on for other combatants
 
 check which combatant is subpar for this agent
 

@@ -1,7 +1,7 @@
 import { Combatant } from "../Combatant";
 import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Position } from "../Position";
-import { FeralSwing, GuardBreaker, Rampage, UnstoppableCharge } from "../SpecialMoves/Singular/Offensive";
+import { FeralSwing, ShieldBreaker as ShieldBreaker, Rampage, UnstoppableCharge } from "../SpecialMoves/Singular/Offensive";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
 
@@ -35,7 +35,7 @@ export class Vanguard extends Combatant {
         [
           new UnstoppableCharge(),
           new FeralSwing(),
-          new GuardBreaker(),
+          new ShieldBreaker(),
           new Rampage(),
 
           // supers

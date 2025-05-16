@@ -243,6 +243,26 @@ export class Board {
     return false;
   }
 
+  isCoveredFromEnemy(position: Position, enemy: Combatant): boolean {
+     const isYAxisCover = Math.abs(position.x - enemy.position.x) < Math.abs(position.y - enemy.position.y);
+     if(isYAxisCover){
+      for(let i=0; i < this.width; i++){
+        const currentEnemyCheckPosition = {x: i, y: enemy.position.y};
+        if(this.hasLineOfSight(position, currentEnemyCheckPosition)){
+          return false;
+        }
+      }
+     } else {
+      for(let i=0; i < this.height; i++){
+        const currentEnemyCheckPosition = {x: enemy.position.x, y: i};
+        if(this.hasLineOfSight(position, currentEnemyCheckPosition)){
+          return false;
+        }
+      }
+     }
+     return true;
+  }
+
   getPushResult(caster: Combatant, target: Combatant, range: number){
     const pushResult = this.rangeCalculator.getPushResult(caster, target, range, this);
     return pushResult;

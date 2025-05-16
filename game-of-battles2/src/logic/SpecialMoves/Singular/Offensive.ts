@@ -463,8 +463,8 @@ export class Rampage implements SpecialMove {
     description = `Strike at the enemy in a wild frenzy, Swinging 3 times but at the cost of a small chance to miss every time regardless.`   
 }
 
-export class GuardBreaker implements SpecialMove {
-    name: string = "Guard Breaker";
+export class ShieldBreaker implements SpecialMove {
+    name: string = "Shield Breaker";
     triggerType = SpecialMoveTriggerType.Active;
     cost: number = 3;
     turnCost: number = 1;
@@ -475,7 +475,7 @@ export class GuardBreaker implements SpecialMove {
         range: 1
     };
     damage: Damage = {
-        amount: 10,
+        amount: 15,
         type: DamageType.Slash
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
