@@ -291,13 +291,17 @@ export function isNearDeath(combatant: Combatant): boolean {
     return combatant.stats.hp < combatant.baseStats.hp  * 0.2;
 }
 
+
+export function isFatigued(combatant: Combatant): boolean {
+    return combatant.stats.stamina < combatant.baseStats.stamina  * 0.5 && combatant.stats.stamina >= combatant.baseStats.stamina  * 0.2;
+}
+
 export function isLowStamina(combatant: Combatant): boolean {
     return combatant.stats.stamina < combatant.baseStats.stamina  * 0.2;
 }
 
-
-export function isFatigued(combatant: Combatant): boolean {
-    return combatant.stats.stamina < combatant.baseStats.stamina  * 0.5 && combatant.stats.stamina >= combatant.baseStats.stamina  * 0.2;
+export function isStaminaDepleted(combatant: Combatant): boolean {
+    return combatant.stats.stamina <= 2;
 }
 
 export function isTargetInMelee(combatant: Combatant | Position, target: Combatant, board: Board): boolean {
@@ -370,6 +374,10 @@ export function isTargetLowLuck(target: Combatant): boolean {
     return target.stats.luck <= 4;
 }
 
+export function isTargetFateStruck(target: Combatant): boolean {
+    return target.stats.luck <= 1;
+}
+
 export function isTargetFast(target: Combatant): boolean {
     return target.stats.movementSpeed >= 4;
 }
@@ -378,12 +386,20 @@ export function isTargetHighInitiative(target: Combatant): boolean {
     return target.stats.initiative >= 5;
 }
 
+export function isTargetHighAgility(target: Combatant): boolean {
+    return target.stats.agility >= 6;
+}
+
+export function isTargetLowAgility(target: Combatant): boolean {
+    return target.stats.agility <= 2;
+}
+
 export function isTargetSlow(target: Combatant): boolean {
     return target.stats.movementSpeed <= 2;
 }
 
 export function isTargetCrawlingSlow(target: Combatant): boolean {
-    return target.stats.movementSpeed <= 1;
+    return target.stats.movementSpeed <= 2;
 }
 
 export function isTargetLowDefense(target: Combatant): boolean {

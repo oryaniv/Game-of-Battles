@@ -247,7 +247,7 @@ export class GraspOfZirash implements SpecialMove {
         const targetCombatant = board.getCombatantAtPosition(target);
         const negativeStatusEffects: StatusEffect[] = targetCombatant!.getStatusEffects().filter(status => status.alignment === StatusEffectAlignment.Negative);
         const result = CombatMaster.getInstance().executeAttack(invoker, target, board, {
-            amount: this.damage.amount * (1 + (negativeStatusEffects.length * 0.5)),
+            amount: this.damage.amount * (1 + (negativeStatusEffects.length * 0.25)),
             type: this.damage.type,
         });
         return result;

@@ -128,8 +128,9 @@ export class SiphonEnergy implements SpecialMove {
         if(!targetCombatant) {   
             return getStandardActionResult();
         }
-        targetCombatant.stats.stamina = Math.max(0, targetCombatant.stats.stamina - 10);
-        invoker.stats.stamina = Math.min(invoker.stats.stamina + 10, invoker.baseStats.stamina);
+        const staminaToSiphon = targetCombatant.stats.stamina < 10 ? targetCombatant.stats.stamina : 10;
+        targetCombatant.stats.stamina = Math.max(0, targetCombatant.stats.stamina - staminaToSiphon);
+        invoker.stats.stamina = Math.min(invoker.stats.stamina + staminaToSiphon, invoker.baseStats.stamina);
         invoker.applyStatusEffect({
             name: StatusEffectType.ENERGY_ABSORB,
             duration: 2,

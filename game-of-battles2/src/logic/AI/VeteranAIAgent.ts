@@ -31,11 +31,15 @@ import { HeuristicalAIAgent, PlayActionType, TurnPlay, areManyAlliesNearby, areM
       isTargetInMelee,
       isFatigued,
       isLowStamina,
+      isStaminaDepleted,
       getAlliedCombatantsInRange, getClosestEnemy,
       theoreticalReplacement,
       isTargetHighDefense,
       isLowAttackPower,
-      isMemeAttacker} from "./HeuristicalAgents";
+      isMemeAttacker,
+      isTargetHighAgility,
+      isTargetCaster,
+      isTargetFateStruck} from "./HeuristicalAgents";
 
 export enum AggressivenessLevel {
     FrontLine = 0,
@@ -103,7 +107,6 @@ abstract class VeteranAIAgentGenericPlayer implements VeteranAIAgentPlayer {
     protected getMaxEnemyEffectiveRange(): number {
         return 1;
     }
-
 
     evaluate(combatant: Combatant, game: Game, board: Board, turnPlay: TurnPlay): number {
         if(!turnPlay || !turnPlay.playAction) {
@@ -197,7 +200,7 @@ abstract class VeteranAIAgentGenericPlayer implements VeteranAIAgentPlayer {
     }  
 
     protected evaluateBasicAttack(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined,
-        damageType?: DamageType
+        damageType?: DamageType, range?: number
     ): number {
         assertTargetIsExists(movePosition, target, board);
         
@@ -205,7 +208,7 @@ abstract class VeteranAIAgentGenericPlayer implements VeteranAIAgentPlayer {
         let baseValue = this.getBaseBasicAttackValue();
         const targetIsDefending = isTargetDefending(targetCombatant);
         const targetIsWeak = isTargetWeak(targetCombatant, damageType || combatant.basicAttack().type);
-        baseValue += this.evaluateMovement(combatant, game, board, movePosition);
+        baseValue += this.evaluateMovement(combatant, game, board, movePosition, range);
         baseValue += isLastSurvivor(combatant) ? 5 : 0;
         // baseValue += isNearDeath(targetCombatant) ? 4 : 0;
         // baseValue += isBadlyInjured(targetCombatant) ? 3 : 0;
@@ -437,6 +440,7 @@ class VeteranAIAgentHunterPlayer extends VeteranAIAgentGenericPlayer {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, target!, board);
             baseValue += isTargetLowLuck(targetCombatant) ? 2 : 0;
             baseValue += targetCombatant.hasStatusEffect(StatusEffectType.POISONED) ? -3 : 0;
+            baseValue += 2;
         }
         return baseValue;
     }
@@ -850,7 +854,7 @@ class VeteranAIAgentStandardBearerPlayer extends VeteranAIAgentGenericPlayer {
             if(targetCombatant.team !== combatant.team) {
                 return;
             }
-            baseValue += targetCombatant.hasStatusEffect(StatusEffectType.RALLIED) ? 2 : 0;
+            baseValue += targetCombatant.hasStatusEffect(StatusEffectType.RALLIED) ? -2 : 0;
             baseValue += !targetCombatant.hasStatusEffect(StatusEffectType.RALLIED) ? 4 : 0;
             baseValue += isTargetLowLuck(targetCombatant) ? 1 : 0;
             baseValue += isTargetLowDefense(targetCombatant) ? 1 : 0;
@@ -876,11 +880,15 @@ class VeteranAIAgentWitchPlayer extends VeteranAIAgentGenericPlayer {
     }
 
     protected getBaseBasicAttackValue(): number {
-        return 2;
+        return 1;
     }
 
     protected getAggressivenessLevel(): number {
         return AggressivenessLevel.MiddleLine;
+    }
+
+    protected getMaxEnemyEffectiveRange(): number {
+        return 4;
     }
 
     protected evaluateMovement(combatant: Combatant, game: Game, board: Board, movePosition: Position): number {
@@ -937,19 +945,62 @@ class VeteranAIAgentWitchPlayer extends VeteranAIAgentGenericPlayer {
     }
 
     private evaluateEvilEye(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
-        return 0;
+        let baseValue = 0;
+        baseValue += this.evaluateMovement(combatant, game, board, movePosition);
+        const getAllTargets = board.getAreaOfEffectPositions(combatant, target!, SpecialMoveAreaOfEffect.Cross, SpecialMoveAlignment.Enemy);
+        getAllTargets.forEach(AOETarget => {
+            const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
+            if(!targetCombatant) {
+                return;
+            }
+            if(targetCombatant.team.index === combatant.team.index) {
+                return;
+            }
+            baseValue += targetCombatant.hasStatusEffect(StatusEffectType.LUCK_DOWNGRADE) ? -6 : 0;
+            baseValue += !targetCombatant.hasStatusEffect(StatusEffectType.LUCK_DOWNGRADE) ? 5 : 0;
+            baseValue += isTargetLowLuck(targetCombatant) ? 1 : 0;
+        });
+        return baseValue;
     }
 
     private evaluateSlow(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
-        return 0;
+        assertTargetIsExists(movePosition, target, board);
+
+        const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, target!, board);
+        let baseValue = 4;
+        baseValue += this.evaluateMovement(combatant, game, board, movePosition);
+        baseValue += targetCombatant.hasStatusEffect(StatusEffectType.MOBILITY_BOOST) ? 4 : 0;
+        baseValue += targetCombatant.hasStatusEffect(StatusEffectType.SLOW) ? -6 : 0;
+        baseValue += isTargetFast(targetCombatant) ? 2 : 0;
+        baseValue += isTargetCrawlingSlow(targetCombatant) ? 4 : 0;
+        baseValue += isTargetHighAgility(targetCombatant) ? 2 : 0;
+        return baseValue;
     }
 
     private evaluateSiphonEnergy(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
-        return 0;
+        assertTargetIsExists(movePosition, target, board);
+        const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, target!, board);
+        let baseValue = 2;
+        baseValue += this.evaluateMovement(combatant, game, board, movePosition);
+        baseValue += isFatigued(targetCombatant) ? 2 : 0;
+        baseValue += isLowStamina(targetCombatant) ? 3 : 0;
+        baseValue += isStaminaDepleted(targetCombatant) ? 5 : 0;
+
+        baseValue += isFatigued(combatant) ? 2 : 0;
+        baseValue += isLowStamina(targetCombatant) ? 3 : 0;
+        baseValue += isStaminaDepleted(targetCombatant) ? 5 : 0;
+        return baseValue;
     }
 
     private evaluateGraspOfZirash(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
-        return 0;
+        assertTargetIsExists(movePosition, target, board);
+        let baseValue = this.evaluateBasicAttack(combatant, game, board, movePosition, target, DamageType.Dark);
+        baseValue += 3;
+        const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, target!, board);
+        const allNegativeStatusEffects = targetCombatant.getStatusEffects()
+        .filter((statusEffect) => statusEffect.alignment === StatusEffectAlignment.Negative);
+        baseValue = baseValue * (1 + (allNegativeStatusEffects.length * 0.25));
+        return baseValue;
     }
 }
 
@@ -972,6 +1023,10 @@ class VeteranAIAgentFoolPlayer extends VeteranAIAgentGenericPlayer {
 
     protected getAggressivenessLevel(): number {
         return AggressivenessLevel.BackLine;
+    }
+
+    protected getMaxEnemyEffectiveRange(): number {
+        return 4;
     }
 
     protected evaluateMovement(combatant: Combatant, game: Game, board: Board, movePosition: Position): number {
@@ -1010,18 +1065,66 @@ class VeteranAIAgentFoolPlayer extends VeteranAIAgentGenericPlayer {
     }
 
     private evaluateYoMama(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
-        return 0;
+        assertTargetIsExists(movePosition, target, board);
+        const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, target!, board);
+        let baseValue = 4;
+        baseValue += this.evaluateMovement(combatant, game, board, movePosition);
+        baseValue += combatant.hasStatusEffect(StatusEffectType.TAUNTED) ? -6 : 0;
+        baseValue += isTargetLowLuck(targetCombatant) ? 3 : 0;
+        baseValue += isTargetSlow(targetCombatant) ? 2 : 0;
+        baseValue += isTargetCrawlingSlow(targetCombatant) ? 3 : 0;
+        baseValue += isTargetCaster(targetCombatant) ? 3 : 0;
+        // melee range of 1 is fine
+        baseValue -= (targetCombatant.stats.range - 1);
+        return baseValue;
     }
 
     private evaluateStupidestCrapEver(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
-        return 0;
+        let baseValue = 0;
+        baseValue += this.evaluateMovement(combatant, game, board, movePosition);
+        const getAllTargets = board.getAreaOfEffectPositions(combatant, target!, SpecialMoveAreaOfEffect.Line, SpecialMoveAlignment.Enemy);
+        getAllTargets.forEach(AOETarget => {
+            const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
+            if(!targetCombatant) {
+                return;
+            }
+            if(targetCombatant.team.index === combatant.team.index) {
+                return;
+            }
+            baseValue += targetCombatant.hasStatusEffect(StatusEffectType.STUPEFIED) ? -6 : 0;
+            baseValue += !targetCombatant.hasStatusEffect(StatusEffectType.STUPEFIED) ? 5 : 0;
+            baseValue += isTargetLowLuck(targetCombatant) ? 3 : 0;
+            baseValue += isTargetCaster(targetCombatant) ? 3 : 0;
+            baseValue += isCombatantMartial(targetCombatant) ? -2 : 0;
+        });
+        return baseValue;
     }
 
     private evaluateSmellitt(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
-        return 0;
+        const getAllTargets = board.getAreaOfEffectPositions(combatant, target!, SpecialMoveAreaOfEffect.Nova, SpecialMoveAlignment.All);
+        let baseValue = 0;
+        let totalEnemieshit = 0;
+        
+        getAllTargets.forEach(AOETarget => {
+            const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
+            if(!targetCombatant) {
+                return;
+            }
+            let targetHitValue = 6;
+            targetHitValue += isTargetLowLuck(targetCombatant) ? 3 : 0;
+            targetHitValue += isTargetFateStruck(targetCombatant) ? 3 : 0;
+            if(targetCombatant.team.getName() !== combatant.team.getName()) {
+                totalEnemieshit += 1;
+            }
+            baseValue += targetCombatant.team.getName() !== combatant.team.getName() ? targetHitValue : -targetHitValue;
+        });
+        baseValue += totalEnemieshit === 0 ? -10 : 0;
+        return baseValue;
     }
     
     private evaluateLookeyHere(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        const getAllTargets = board.getAreaOfEffectPositions(combatant, target!, SpecialMoveAreaOfEffect.Great_Nova, SpecialMoveAlignment.Enemy);
+        let baseValue = 0;
         return 0;
     }
 }
@@ -1045,6 +1148,10 @@ class VeteranAIAgentPikemanPlayer extends VeteranAIAgentGenericPlayer {
 
     protected getAggressivenessLevel(): number {
         return AggressivenessLevel.FrontLine;
+    }
+    
+    protected getMaxEnemyEffectiveRange(): number {
+        return 2;
     }
 
     evaluate(combatant: Combatant, game: Game, board: Board, turnPlay: TurnPlay): number {
@@ -1073,15 +1180,50 @@ class VeteranAIAgentPikemanPlayer extends VeteranAIAgentGenericPlayer {
     }
 
     private evaluateSkewer(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
-        return 0;
+        let baseValue = 0;
+        const moveValue = this.evaluateMovement(combatant, game, board, movePosition);
+        baseValue += moveValue;
+        const originalPosition = combatant.position;
+        let totalEnemieshit = 0;
+        theoreticalReplacement(combatant, board, movePosition, true);
+        const getAllTargets = board.getAreaOfEffectPositions(combatant, target!,
+             SpecialMoveAreaOfEffect.Line, SpecialMoveAlignment.All);
+
+        getAllTargets.forEach(AOETarget => {
+            const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
+            if(!targetCombatant) {
+                return;
+            }
+            const targetHitValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position);
+            if(targetCombatant.team.getName() !== combatant.team.getName()) {
+                totalEnemieshit += 1;
+            }
+            baseValue += targetCombatant.team.getName() !== combatant.team.getName() ? targetHitValue : -targetHitValue;
+        });
+        theoreticalReplacement(combatant, board, originalPosition, false);
+        baseValue += totalEnemieshit === 0 ? -10 : 0;
+        return baseValue;
     }
     
     private evaluateGapingStab(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
-        return 0;
+        let baseValue = this.evaluateBasicAttack(combatant, game, board, movePosition, target);
+        if(target) {
+            const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, target!, board);
+            baseValue += isTargetLowLuck(targetCombatant) ? 2 : 0;
+            baseValue += targetCombatant.hasStatusEffect(StatusEffectType.BLEEDING) ? -3 : 0;
+            baseValue += 2;
+        }
+        return baseValue;
     }
 
     private evaluateHaftStrike(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
-        return 0;
+        let baseValue = this.evaluateBasicAttack(combatant, game, board, movePosition, target, DamageType.Crush, 1);
+        if(target) {
+            const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, target!, board);
+            baseValue += isTargetLowLuck(targetCombatant) ? 2 : 0;
+            baseValue += targetCombatant.hasStatusEffect(StatusEffectType.STAGGERED) ? -3 : 0;
+        }
+        return baseValue;
     }
     
 }
