@@ -54,7 +54,8 @@ export enum SpecialMoveAlignment {
     "SelfAndAlly" = "SelfAndAlly",
     "Ally" = "Ally",
     "Enemy" = "Enemy",
-    "All" = "All"
+    "All" = "All",
+    "Empty_Space" = "Empty_Space"
 }
 
 

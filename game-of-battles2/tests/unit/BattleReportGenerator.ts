@@ -149,7 +149,7 @@ export function generateHtmlReport(matchDataCollection: MatchData[], teamRecords
 // Calculate Win/Loss Ratios
 const combatantRatios = combatantSummary.map(combatant => ({
     ...combatant,
-    winLossRatio: combatant.losses === 0 ? Infinity : combatant.wins / combatant.losses,
+    winLossRatio: combatant.losses === 0 ? Number.NEGATIVE_INFINITY : combatant.wins / combatant.losses,
 }));
 
 // Calculate mean and standard deviation
@@ -164,6 +164,8 @@ const tiers: { [tier: string]: string[] } = {
     'B': [],
     'C': [],
     'D': [],
+    'E': [],
+    'F': [],
 };
 
 combatantRatios.forEach(combatant => {
@@ -177,8 +179,14 @@ combatantRatios.forEach(combatant => {
      else if (combatant.winLossRatio >= meanRatio - stdDev) {
         tiers['C'].push(combatant.type);
     }
-    else {
+    else if (combatant.winLossRatio >= meanRatio - 2 * stdDev) {
         tiers['D'].push(combatant.type);
+    }
+    else if (combatant.winLossRatio >= meanRatio - 3 * stdDev) {
+      tiers['E'].push(combatant.type);
+    }
+    else {
+        tiers['F'].push(combatant.type);
     }
 });
 

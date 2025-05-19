@@ -449,7 +449,7 @@ export class Rampage implements SpecialMove {
                 rampageResults.push({
                     attackResult: AttackResult.Miss,
                     damage: { amount: 0, type: DamageType.Unstoppable },
-                    cost: -1, // Refund 1 action point
+                    cost: 1, // Refund 1 action point
                     reaction: DamageReaction.NONE,
                     position: target
                 });
@@ -658,7 +658,7 @@ export class AngelicTouch implements SpecialMove {
 export class VipersKiss implements SpecialMove {
     name: string = "Viper's Kiss";
     triggerType = SpecialMoveTriggerType.Active;
-    cost: number = 5;
+    cost: number = 4;
     turnCost: number = 1;
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Melee,
@@ -695,7 +695,7 @@ export class SneakAttack implements SpecialMove {
     };
     damage: Damage = {
         amount: 20,
-        type: DamageType.Pierce
+        type: DamageType.Slash
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
         const combatMaster = CombatMaster.getInstance();

@@ -23,9 +23,9 @@ export class Pikeman extends Combatant {
         },
         position,
         [
-            {type: DamageType.Crush, reaction: DamageReaction.WEAKNESS},
-            {type: DamageType.Pierce, reaction: DamageReaction.NONE},
             {type: DamageType.Slash, reaction: DamageReaction.NONE},
+            {type: DamageType.Pierce, reaction: DamageReaction.NONE},
+            {type: DamageType.Crush, reaction: DamageReaction.WEAKNESS},
             {type: DamageType.Fire, reaction: DamageReaction.NONE},
             {type: DamageType.Ice, reaction: DamageReaction.RESISTANCE},
             {type: DamageType.Blight, reaction: DamageReaction.WEAKNESS},

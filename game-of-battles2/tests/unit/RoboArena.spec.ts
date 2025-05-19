@@ -9,7 +9,7 @@ import { Game } from '@/logic/Game';
 import { StatusEffectType } from '@/logic/StatusEffect';
 import { CombatMaster } from '@/logic/CombatMaster';
 import { AttackResult } from '@/logic/attackResult';
-import { generateRandomTeam, placeAllCombatants, refreshTeam, theATeam, theBTeam, theGorillaTeam } from '@/boardSetups';
+import { generateCombatantIdenticalTeam, generateRandomTeam, placeAllCombatants, refreshTeam, theATeam, theBTeam, theGorillaTeam } from '@/boardSetups';
 import { RookieAIAgent, ToddlerAIAgent, KidAIAgent, TeenagerAIAgent } from '@/logic/AI/DeterministicAgents';
 import { shuffleArray } from '@/logic/AI/AIUtils';
 import { VeteranAIAgent } from '@/logic/AI/VeteranAIAgent';
@@ -96,17 +96,29 @@ describe('RoboArenta', () => {
 
 
 function exampleMatch() {
-    // const team1 = new Team('Team Rookie', 0, new RookieAIAgent());
-    // const team2 = new Team('Team Veteran', 1, new VeteranAIAgent());
+    // const team1 = generateRandomTeam(0, new RookieAIAgent());
+    // const team2 = generateCombatantIdenticalTeam(team1, 1, new RookieAIAgent());
 
-    const team1 = new Team('Team Veteran', 0, new VeteranAIAgent());
-    const team2 = new Team('Team Rookie', 1, new RookieAIAgent());
+    // team1.name = 'Team Rookie';
+    // team2.name = 'Team Veteran';
+
+    const team1 = generateRandomTeam(0, new ToddlerAIAgent());
+    const team2 = new Team('Team Gorilla', 1, new ToddlerAIAgent());
+
+    team1.name = 'Team Veteran';
+    team2.name = 'Team Gorilla';
+
+    theGorillaTeam(team2);
+
+    // const team1 = new Team('Team Veteran', 0, new RookieAIAgent());
+    // const team2 = new Team('Team Rookie', 1, new RookieAIAgent());
 
     
     let board = new Board(10, 10);
     
-    theATeam(team1);
-    theBTeam(team2);
+    // theATeam(team1);
+    // theBTeam(team2);
+    placeAllCombatants(team1, team2, board);
     const game = new Game([team1, team2], board);
 
 

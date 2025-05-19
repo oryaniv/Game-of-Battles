@@ -99,6 +99,8 @@ export class Game {
       eventLogger.logEvent(`${invoker.name} uses ${skill.name}`);
       invoker.stats.stamina -= skill.cost;
       getResultsForStatusEffectHook(invoker, StatusEffectHook.OnSkillUsed);
+      // eslint-disable-next-line 
+      debugger;
       const actionResult: ActionResult | ActionResult[] = skill.effect(invoker, target, board); 
       let maxCost:number = 0;
       if(Array.isArray(actionResult)) {

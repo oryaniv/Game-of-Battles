@@ -1,6 +1,6 @@
-import { DamageType } from "@/logic/Damage";
+import { DamageReaction, DamageType } from "@/logic/Damage";
 
-import { getStandardActionResult } from "@/logic/attackResult";
+import { AttackResult, getStandardActionResult } from "@/logic/attackResult";
 import { SpecialMoveAreaOfEffect } from "@/logic/SpecialMove";
 import { SpecialMoveAlignment } from "@/logic/SpecialMove";
 import { SpecialMoveRangeType } from "@/logic/SpecialMove";
@@ -146,7 +146,7 @@ export class SiphonEnergy implements SpecialMove {
 export class AssassinsMark implements SpecialMove {
     name: string = "Assassin's Mark";
     triggerType = SpecialMoveTriggerType.Active;
-    cost: number = 0;
+    cost: number = 2;
     turnCost: number = 0.5;
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Straight,
@@ -183,7 +183,16 @@ export class AssassinsMark implements SpecialMove {
                 duration: 5,
             });
         }
-        return getStandardActionResult();
+        return  {
+            attackResult: AttackResult.NotFound,
+            damage: {
+                amount: 0,
+                type: DamageType.Unstoppable
+            },
+            cost: 0.5,
+            reaction: DamageReaction.NONE,
+            position: target
+        };
     };
     checkRequirements = undefined;
     description = `cast the mark of the assassin on an enemy. the mark can get stronger with every cast.

@@ -17,6 +17,11 @@ import { CombatantType } from "./logic/Combatants/CombatantType";
 import { AIAgent } from "./logic/AI/AIAgent";
 import { shuffleArray } from "./logic/AI/AIUtils";
 import { compileToFunction } from "vue";
+import { DragonOfChaos } from "./logic/Combatants/DragonOfChaos";
+import { Rogue } from "./logic/Combatants/Rogue";
+import { Artificer } from "./logic/Combatants/Artificer";
+import { Iskariot } from "./logic/Combatants/Iskariot";
+import { Myrmidon } from "./logic/Combatants/Myrmidon";
 
 export function allMilitiaSetup(team1: Team, team2: Team) {
     team1.addCombatant(new Hunter('A', { x: 3, y: 0 }, team1));
@@ -60,39 +65,39 @@ export function standardVsSetup(team1: Team, team2: Team) {
 }
 
 export function theATeam(team: Team) {
-    team.addCombatant(new StandardBearer('A', { x: 4, y: 1 }, team));
-    team.addCombatant(new Defender('B', { x: 3, y: 1 }, team));
-    team.addCombatant(new Wizard('C', { x: 2, y: 0 }, team));
-    team.addCombatant(new Hunter('D', { x: 4, y: 0 }, team));
-    team.addCombatant(new Healer('E', { x: 3, y: 0 }, team));
+    // team.addCombatant(new StandardBearer('A', { x: 4, y: 1 }, team));
+    // team.addCombatant(new Defender('B', { x: 3, y: 1 }, team));
+    // team.addCombatant(new Wizard('C', { x: 2, y: 0 }, team));
+    // team.addCombatant(new Hunter('D', { x: 4, y: 0 }, team));
+    // team.addCombatant(new Healer('E', { x: 3, y: 0 }, team));
 
-    // team.addCombatant(new Witch('A', { x: 3, y: 0 }, team));
-    // team.addCombatant(new Fool('B', { x: 4, y: 0 }, team));
-    // team.addCombatant(new Vanguard('C', { x: 5, y: 1 }, team));
-    // team.addCombatant(new FistWeaver('D', { x: 3, y: 1 }, team));
-    // team.addCombatant(new Pikeman('E', { x: 4, y: 1 }, team));
+    team.addCombatant(new Witch('A', { x: 3, y: 0 }, team));
+    team.addCombatant(new Fool('B', { x: 4, y: 0 }, team));
+    team.addCombatant(new Vanguard('C', { x: 5, y: 1 }, team));
+    team.addCombatant(new FistWeaver('D', { x: 3, y: 1 }, team));
+    team.addCombatant(new Pikeman('E', { x: 4, y: 1 }, team));
 }
 
 export function theBTeam(team: Team) {
-    team.addCombatant(new Healer('F', { x: 6, y: 9 }, team));
-    team.addCombatant(new Wizard('G', { x: 7, y: 9 }, team));
-    team.addCombatant(new StandardBearer('H', { x: 5, y: 8 }, team));
-    team.addCombatant(new Defender('I', { x: 6, y: 8 }, team));
-    team.addCombatant(new Hunter('J', { x: 5, y: 9 }, team));
+    // team.addCombatant(new Healer('F', { x: 6, y: 9 }, team));
+    // team.addCombatant(new Wizard('G', { x: 7, y: 9 }, team));
+    // team.addCombatant(new StandardBearer('H', { x: 5, y: 8 }, team));
+    // team.addCombatant(new Defender('I', { x: 6, y: 8 }, team));
+    // team.addCombatant(new Hunter('J', { x: 5, y: 9 }, team));
 
 
-    // team.addCombatant(new Witch('F', { x: 5, y: 9 }, team));
-    // team.addCombatant(new Fool('G', { x: 6, y: 9 }, team));
-    // team.addCombatant(new Vanguard('H', { x: 4, y: 8 }, team));
-    // team.addCombatant(new FistWeaver('I', { x: 5, y: 8 }, team));
-    // team.addCombatant(new Pikeman('J', { x: 6, y: 8 }, team));
+    team.addCombatant(new Witch('F', { x: 5, y: 9 }, team));
+    team.addCombatant(new Fool('G', { x: 6, y: 9 }, team));
+    team.addCombatant(new Vanguard('H', { x: 4, y: 8 }, team));
+    team.addCombatant(new FistWeaver('I', { x: 5, y: 8 }, team));
+    team.addCombatant(new Pikeman('J', { x: 6, y: 8 }, team));
 }
 
 export function theGorillaTeam(team: Team) {
     team.addCombatant(new Gorilla('A', { x: 5, y: 0 }, team));
 }
 
-export function generateRandomTeam(teamIndex: number, agent:AIAgent) {
+export function generateRandomTeam(teamIndex: number, agent?:AIAgent) {
     const team = new Team(`Team ${generateRandomString()}`, teamIndex, agent);
     const combatantCandidates = [
         new StandardBearer(generateRandomString(), { x: 0, y: 0 }, team),
@@ -111,6 +116,31 @@ export function generateRandomTeam(teamIndex: number, agent:AIAgent) {
         team.addCombatant(combatantCandidates[i]);
     }
     return team;
+}
+
+export function generateCombatantIdenticalTeam(team: Team, teamIndex: number, agent?: AIAgent) {
+    const newTeam = new Team(`Team ${generateRandomString()}`, teamIndex, agent);
+    const combatantCandidates = [
+        new StandardBearer(generateRandomString(), { x: 0, y: 0 }, newTeam),
+        new Defender(generateRandomString(), { x: 0, y: 0 }, newTeam),
+        new Hunter(generateRandomString(), { x: 0, y: 0 }, newTeam),
+        new Wizard(generateRandomString(), { x: 0, y: 0 }, newTeam),
+        new Healer(generateRandomString(), { x: 0, y: 0 }, newTeam),
+        new Witch(generateRandomString(), { x: 0, y: 0 }, newTeam),
+        new Fool(generateRandomString(), { x: 0, y: 0 }, newTeam),
+        new Vanguard(generateRandomString(), { x: 0, y: 0 }, newTeam),
+        new FistWeaver(generateRandomString(), { x: 0, y: 0 }, newTeam),
+        new Pikeman(generateRandomString(), { x: 0, y: 0 }, newTeam),
+    ];
+    team.combatants.forEach((combatant) => {
+        const type: CombatantType = combatant.getCombatantType();
+        const combatantToAdd = combatantCandidates.find((combatant) => combatant.getCombatantType() === type);
+        if(!combatantToAdd) {
+            throw new Error("combatant does not exist in the copied team");
+        }
+        newTeam.addCombatant(combatantToAdd);
+    });
+    return newTeam;
 }
 
 export function placeAllCombatants(team1: Team, team2: Team, board: Board) {

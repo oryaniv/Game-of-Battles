@@ -54,7 +54,7 @@ export class ToddlerAIAgent implements AIAgent {
             for (let i = 0; i < validNewPositions.length; i++) {
                 const position = validNewPositions[i];
                 // can attack from new position
-                const validAttacks = getValidAttacks(Object.assign({}, combatant, { position, hasStatusEffect: combatant.hasStatusEffect }), board);
+                const validAttacks = getValidAttacks(Object.assign({}, combatant, { position, hasStatusEffect: combatant.hasStatusEffect, canUseSkill: combatant.canUseSkill }), board);
                 if(validAttacks.length > 0) {
                     combatant.move(position, board);
                     const randomTarget = validAttacks[Math.floor(Math.random() * validAttacks.length)];
@@ -100,7 +100,8 @@ export class KidAIAgent implements AIAgent {
                 const position = validNewPositions[i];
                 // can attack from new position
                 const skillAttacks = getValidAttackWithSkillsIncluded(Object.assign({}, combatant, { 
-                    position, hasStatusEffect: combatant.hasStatusEffect, hasMoved: true
+                    position, hasStatusEffect: combatant.hasStatusEffect, hasMoved: true,
+                    canUseSkill: combatant.canUseSkill
                 }), board);
                 if(skillAttacks) {
                     combatant.move(position, board);
@@ -108,7 +109,7 @@ export class KidAIAgent implements AIAgent {
                     return game.executeSkill(skillAttacks.skill, combatant, randomTarget, board);
                 }
 
-                const validAttacks = getValidAttacks(Object.assign({}, combatant, { position }), board);
+                const validAttacks = getValidAttacks(Object.assign({}, combatant, { position, canUseSkill: combatant.canUseSkill }), board);
                 if(validAttacks.length > 0) {
                     combatant.move(position, board);
                     const randomTarget = validAttacks[Math.floor(Math.random() * validAttacks.length)];
@@ -152,7 +153,8 @@ export class TeenagerAIAgent implements AIAgent {
                 const position = validNewPositions[i];
                 // can attack from new position
                 const skillAttacks = getValidAttackWithSkillsIncluded(Object.assign({}, combatant, { 
-                    position, hasStatusEffect: combatant.hasStatusEffect, hasMoved: true
+                    position, hasStatusEffect: combatant.hasStatusEffect, hasMoved: true,
+                    canUseSkill: combatant.canUseSkill
                 }), board);
                 if(skillAttacks) {
                     combatant.move(position, board);
@@ -160,7 +162,7 @@ export class TeenagerAIAgent implements AIAgent {
                     return game.executeSkill(skillAttacks.skill, combatant, randomTarget, board);
                 }
 
-                const validAttacks = getValidAttacks(Object.assign({}, combatant, { position, hasStatusEffect: combatant.hasStatusEffect }), board);
+                const validAttacks = getValidAttacks(Object.assign({}, combatant, { position, hasStatusEffect: combatant.hasStatusEffect, canUseSkill: combatant.canUseSkill }), board);
                 if(validAttacks.length > 0) {
                     combatant.move(position, board);
                     const randomTarget = validAttacks[Math.floor(Math.random() * validAttacks.length)];
@@ -201,7 +203,8 @@ export class RookieAIAgent implements AIAgent {
             const position = validNewPositions[i];
             // can attack from new position
             const skillAttacksOptimizedAfterCurrentPosition = getValidAttackWithSkillsIncludedOptimal(Object.assign({}, combatant, { 
-                position, hasStatusEffect: combatant.hasStatusEffect, hasMoved: true
+                position, hasStatusEffect: combatant.hasStatusEffect, hasMoved: true,
+                canUseSkill: combatant.canUseSkill
             }), board);
             if(skillAttacksOptimizedAfterCurrentPosition) {
                 skillAttacksOptimizedAfterMove.push(

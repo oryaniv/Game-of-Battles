@@ -22,9 +22,9 @@ export class Vanguard extends Combatant {
         },
         position,
         [
-            {type: DamageType.Crush, reaction: DamageReaction.NONE},
-            {type: DamageType.Pierce, reaction: DamageReaction.WEAKNESS},
             {type: DamageType.Slash, reaction: DamageReaction.NONE},
+            {type: DamageType.Pierce, reaction: DamageReaction.WEAKNESS},
+            {type: DamageType.Crush, reaction: DamageReaction.NONE},
             {type: DamageType.Fire, reaction: DamageReaction.RESISTANCE},
             {type: DamageType.Ice, reaction: DamageReaction.WEAKNESS},
             {type: DamageType.Blight, reaction: DamageReaction.NONE},

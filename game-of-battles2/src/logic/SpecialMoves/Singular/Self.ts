@@ -114,9 +114,9 @@ export class ShadowStep implements SpecialMove {
     turnCost: number = 1;
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Curve,
-        align: SpecialMoveAlignment.All,
+        align: SpecialMoveAlignment.Empty_Space,
         areaOfEffect: SpecialMoveAreaOfEffect.Single,
-        range: 4
+        range: 3
     };
     damage: Damage = {
         amount: 0,

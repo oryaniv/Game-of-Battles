@@ -19,9 +19,12 @@ export class CombatMaster {
     }
 
     executeAttack(attacker: Combatant, position: Position, board: Board, damage?: Damage, allowEmptyTarget: boolean = false): ActionResult {
-        const results = this.executeAttackInner(attacker, position, board, damage, allowEmptyTarget);
+        const result = this.executeAttackInner(attacker, position, board, damage, allowEmptyTarget);
         getResultsForStatusEffectHook(attacker, StatusEffectHook.OnAfterAttacking);
-        return results;
+        if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
+          getResultsForStatusEffectHook(attacker, StatusEffectHook.OnInflictingDamage, attacker,result.damage, 1);
+        }
+        return result;
     }
 
     private executeAttackInner(attacker: Combatant, position: Position, board: Board, damage?: Damage, allowEmptyTarget: boolean = false): ActionResult {
@@ -124,7 +127,8 @@ export class CombatMaster {
 
     calcaulateBaseDamage(attacker: Combatant, target: Combatant, damageToUse: Damage): Damage {
         const delta = attacker.stats.attackPower - target.stats.defensePower;
-        return {amount: (Math.random() * (1.3 - 0.7) + 0.70) * damageToUse.amount * (delta * 0.01 + 1), type: damageToUse.type};
+        // return {amount: (Math.random() * (1.3 - 0.7) + 0.70) * damageToUse.amount * (delta * 0.01 + 1), type: damageToUse.type};
+        return {amount: damageToUse.amount * (delta * 0.01 + 1), type: damageToUse.type};
     }
 
     private finalizeDamage(target: Combatant, damage: Damage, attackResult: AttackResult, position: Position) : ActionResult {
@@ -151,7 +155,8 @@ export class CombatMaster {
 
         finalDamage = Math.max(0, finalDamage);
 
-        const onAfterCalculateDamageHookResults = getResultsForStatusEffectHook(target, StatusEffectHook.OnAfterCalculateDamage, target, damage, 1);
+        const onAfterCalculateDamageHookResults = 
+        getResultsForStatusEffectHook(target, StatusEffectHook.OnAfterCalculateDamage, target,{amount: finalDamage, type: damage.type}, 1);
         if(onAfterCalculateDamageHookResults.length > 0) {
           const hookMaxDamage = onAfterCalculateDamageHookResults
           .map((r) => r.damage.amount)

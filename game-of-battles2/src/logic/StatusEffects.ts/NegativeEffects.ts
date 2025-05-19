@@ -197,7 +197,6 @@ export class NauseatedStatusEffect implements StatusEffect {
             if(Math.random() < chanceWithDelta) {
                 return;
             }
-            self.aiAgent && self.removeAiAgent(AIAgentType.STUNLOCKED);
             self.removeStatusEffect(StatusEffectType.NAUSEATED);
         },
         [StatusEffectHook.OnRemove]: (self: Combatant) => {
@@ -244,7 +243,7 @@ export class MarkedForPainStatusEffect implements StatusEffect {
             return {
                 attackResult: AttackResult.NotFound,
                 damage: {
-                    amount: damage.type === DamageType.Crush ? damage.amount * 1.25 : damage.amount,
+                    amount: damage.amount * 1.25,
                     type: damage.type
                 },
                 cost: 1,
@@ -267,6 +266,8 @@ export class MarkedForExecutionStatusEffect implements StatusEffect {
             }
         },
         [StatusEffectHook.OnAfterCalculateDamage]: (self: Combatant, attacker: Combatant, damage: Damage) => {
+            // eslint-disable-next-line 
+            debugger;
             if(!self.hasStatusEffect(StatusEffectType.MARKED_DETONATED)) {
                 return getStandardActionResult();
             }
@@ -275,7 +276,7 @@ export class MarkedForExecutionStatusEffect implements StatusEffect {
             return {
                 attackResult: AttackResult.NotFound,
                 damage: {
-                    amount: damage.type === DamageType.Crush ? damage.amount * 1.5 : damage.amount,
+                    amount: damage.amount * 1.5,
                     type: damage.type
                 },
                 cost: 1,
@@ -290,7 +291,7 @@ export class MarkedForOblivionStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.MARKED_FOR_OBLIVION;
     applicationHooks = {
         [StatusEffectHook.OnBeingAttacked]: (self: Combatant, attacker: Combatant) => {
-            if(attacker.specialMoves.map(m => m.name).includes("Assassin's Mark" )) {
+            if(!self.isDefending() && attacker.specialMoves.map(m => m.name).includes("Assassin's Mark" )) {
                 self.applyStatusEffect({
                     name: StatusEffectType.MARKED_DETONATED,
                     duration: 0,
@@ -306,7 +307,7 @@ export class MarkedForOblivionStatusEffect implements StatusEffect {
             return {
                 attackResult: AttackResult.NotFound,
                 damage: {
-                    amount: damage.type === DamageType.Crush ? damage.amount * 2 : damage.amount,
+                    amount: damage.amount * 2 ,
                     type: damage.type
                 },
                 cost: 1,

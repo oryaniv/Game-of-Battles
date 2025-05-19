@@ -25,7 +25,7 @@
           @mouseover="showAoe({ x: x - 1, y: y - 1 })"
           @mouseleave="hideAoe"
         >
-          <div class="coordinates" style="font-size: 24px;">{{x -1}},{{y - 1}}</div>
+          <!-- <div class="coordinates" style="font-size: 24px;">{{x -1}},{{y - 1}}</div> -->
           <div
             v-if="getCombatant({ x , y})"
             class="combatant"
@@ -275,37 +275,54 @@ import { VeteranAIAgent } from './logic/AI/VeteranAIAgent';
 import { Howl } from 'howler';
 import { EventLogger } from './eventLogger';
 import { AllOfThem, standardVsSetup, theATeam, theBTeam, allMilitiaSetup, theGorillaTeam,
- generateRandomTeam, placeAllCombatants } from './boardSetups';
+ generateRandomTeam, generateCombatantIdenticalTeam, placeAllCombatants } from './boardSetups';
 
 export default defineComponent({
   setup() {
     
     const board = ref(new Board(10, 10));
     const whiteTeam = ref(new Team('White Team', 0));
-    const blackTeam = ref(new Team('Black Team', 1, new RookieAIAgent()));
+    const blackTeam = ref(new Team('Black Team', 1));
+
+    // const whiteTeam = ref(generateRandomTeam(0, new VeteranAIAgent()));
+    // const blackTeam = ref(generateCombatantIdenticalTeam(whiteTeam.value, 1));
     // placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
 
     // allMilitiaSetup(whiteTeam.value, blackTeam.value);
 
-    whiteTeam.value.addCombatant(new FistWeaver('Gobo', { x: 6, y: 4 }, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Wizard('fefe', { x: 5, y: 9 }, whiteTeam.value));
-    // // whiteTeam.value.addCombatant(new Rogue('afaf', { x: 5, y: 4 }, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Defender('afaff', { x: 4, y: 7 }, whiteTeam.value));
-    // // // whiteTeam.value.addCombatant(new Hunter('afaf', { x: 6, y: 0 }, whiteTeam.value));
+    // const whiteTeam = ref(generateRandomTeam(0, new KidAIAgent()));
+    // const blackTeam = ref(new Team('Team Gorilla', 1, new ToddlerAIAgent()));
 
-    //blackTeam.value.addCombatant(new StandardBearer('fffobo', { x: 9, y: 9 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Defender('fffobo', { x: 6, y: 6 }, blackTeam.value));
-   // blackTeam.value.addCombatant(new Defender('Jojo', { x: 4, y: 6 }, blackTeam.value));
-  //  blackTeam.value.addCombatant(new Militia('Jojo', { x: 1, y: 9 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Militia('Jojo', { x: 3, y: 5 }, blackTeam.value));
+    // whiteTeam.value.name = 'Team Veteran';
+    // blackTeam.value.name = 'Team Rookie';
 
-    blackTeam.value.addCombatant(new Militia('Gobo', { x: 9, y: 6 }, blackTeam.value));
+    // theGorillaTeam(blackTeam.value);
+
+    // placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
+
+
+    
+    whiteTeam.value.addCombatant(new Rogue('Gobo', { x: 5, y: 5 }, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Vanguard('afaf', { x: 4, y: 6 }, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Artificer('afaff', { x: 4, y: 7 }, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Artificer('afaff', { x: 4, y: 9 }, whiteTeam.value));
+  // //   // // // whiteTeam.value.addCombatant(new Hunter('afaf', { x: 6, y: 0 }, whiteTeam.value));
+
+  // //   //blackTeam.value.addCombatant(new StandardBearer('fffobo', { x: 9, y: 9 }, blackTeam.value));
+  blackTeam.value.addCombatant(new Vanguard('fffobo', { x: 4, y: 5 }, blackTeam.value));
+  //    blackTeam.value.addCombatant(new Wizard('Jojo', { x: 4, y: 5 }, blackTeam.value));
+  //    blackTeam.value.addCombatant(new Wizard('Jojo', { x: 4, y: 4 }, blackTeam.value));
+  //   blackTeam.value.addCombatant(new Artificer('Jojo', { x: 3, y: 5 }, blackTeam.value));
+
+  //   blackTeam.value.addCombatant(new Artificer('Gobo', { x: 9, y: 6 }, blackTeam.value));
 
     // whiteTeam.value.combatants[0].stats.hp = 10;
-    // whiteTeam.value.combatants[0].applyStatusEffect({
-    //         name: StatusEffectType.BLEEDING,
+    // whiteTeam.value.combatants[0].stats.stamina = 10;
+    // blackTeam.value.combatants[0].applyStatusEffect({
+    //         name: StatusEffectType.MARKED_FOR_OBLIVION,
     //         duration: 5,
     // }); 
+
     // whiteTeam.value.combatants[0].applyStatusEffect({
     //         name: StatusEffectType.POISONED,
     //         duration: 5,
@@ -335,10 +352,10 @@ export default defineComponent({
     // }); 
 
     // whiteTeam.value.combatants[0].stats.stamina = 0;
-    // theATeam(whiteTeam.value);
-    // theBTeam(blackTeam.value);
+        // theATeam(whiteTeam.value);
+        // theBTeam(blackTeam.value);
 
-    //placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
+    // placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
 
 
     //theBTeam(blackTeam.value);
@@ -870,6 +887,10 @@ export default defineComponent({
       [StatusEffectType.MESMERIZING]: "ME",
       [StatusEffectType.STAGGERED]: "SG",
       [StatusEffectType.DEFENSE_DOWNGRADE]: "DD",
+      [StatusEffectType.CLOAKED]: "CL",
+      [StatusEffectType.MARKED_FOR_PAIN]: "MR1",
+      [StatusEffectType.MARKED_FOR_EXECUTION]: "MR2",
+      [StatusEffectType.MARKED_FOR_OBLIVION]: "MR3",
       // ... add mappings for other status effect types
     };
 
@@ -912,7 +933,6 @@ export default defineComponent({
     }
 
     const getCombatantStatusEffects = (position: Position, alignment: StatusEffectAlignment): StatusEffect[] => {
-      // debugger;
       const combatant = board.value.getCombatantAtPosition(position);
       return combatant ? combatant.getStatusEffects().filter((statusEffect) => statusEffect.alignment === alignment) : [];
     };
@@ -1093,9 +1113,27 @@ export default defineComponent({
           return "Idai No Hadou";
         case 28:
           return "Riposte";
+        case 29:
+          return "Struck First";
+        case 30:
+          return "Marching Defense";
+        case 31:
+          return "Cloaked";
+        case 32:
+          return "Sadist";
+        case 33:
+          return "Marked for Pain";
+        case 34:
+          return "Marked for Execution";
+        case 35:
+          return "Marked for Oblivion";
+        case 36:
+          return "Mark detonate";
+        case 37:
+          return "Full Metal Jacket";
+          
       }
     }
-
     const getEvents = () => {
       return eventLogger.getEvents();
     }

@@ -4,8 +4,8 @@ import { Combatant, CombatantStats } from "./Combatant";
 import { DamageType, Damage } from "./Damage";
 import { BlockingStance } from "./SpecialMoves/Singular/Self";
 import { FrozenStatusEffect, ImmobilizedStatusEffect, LuckDowngradeStatusEffect, SlowStatusEffect, StrengthDowngradeStatusEffect, PoisonedStatusEffect, BleedingStatusEffect, TauntedStatusEffect, StupefiedStatusEffect, NauseatedStatusEffect, MesmerizedStatusEffect, StaggeredStatusEffect, DefenseDowngradeStatusEffect, MarkedForPainStatusEffect, MarkedForOblivionStatusEffect, MarkedForExecutionStatusEffect } from "./StatusEffects.ts/NegativeEffects";
-import { EnergyAbsorbStatusEffect, FirstStrikeStatusEffect, FoolsLuckStatusEffect, InspiringKillerStatusEffect, MarchingDefenseStatusEffect, RiposteStatusEffect } from "./StatusEffects.ts/NeutralEffects";
-import { ArcaneChannelingStatusEffect, BlockingStanceStatusEffect, EncouragedStatusEffect, FocusAimStatusEffect, FortifiedStatusEffect, MesmerizingStatusEffect, MobilityBoostStatusEffect, RalliedStatusEffect, RegeneratingStatusEffect, StrengthBoostStatusEffect } from "./StatusEffects.ts/PositiveEffects";
+import { EnergyAbsorbStatusEffect, FirstStrikeStatusEffect, FoolsLuckStatusEffect, InspiringKillerStatusEffect, MarchingDefenseStatusEffect, RiposteStatusEffect, SadistStatusEffect } from "./StatusEffects.ts/NeutralEffects";
+import { ArcaneChannelingStatusEffect, BlockingStanceStatusEffect, CloakedStatusEffect, EncouragedStatusEffect, FocusAimStatusEffect, FortifiedStatusEffect, MesmerizingStatusEffect, MobilityBoostStatusEffect, RalliedStatusEffect, RegeneratingStatusEffect, StrengthBoostStatusEffect } from "./StatusEffects.ts/PositiveEffects";
 
 export enum StatusEffectType {
     // 0
@@ -177,6 +177,8 @@ export enum StatusEffectType {
     [StatusEffectType.MARKED_FOR_PAIN]: new MarkedForPainStatusEffect(),
     [StatusEffectType.MARKED_FOR_EXECUTION]: new MarkedForExecutionStatusEffect(),
     [StatusEffectType.MARKED_FOR_OBLIVION]: new MarkedForOblivionStatusEffect(),
+    [StatusEffectType.SADIST]: new SadistStatusEffect(),
+    [StatusEffectType.CLOAKED]: new CloakedStatusEffect(),
   };
 
   export function getStatusEffect(name: StatusEffectType) : StatusEffect | undefined {

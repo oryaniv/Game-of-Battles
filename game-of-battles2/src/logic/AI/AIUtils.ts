@@ -76,8 +76,9 @@ export function getValidAttackWithSkillsIncluded(combatant: Combatant, board: Bo
 
     let allCombatantOffensiveSkills = combatant.specialMoves.filter(
         (move) => move.range.align === SpecialMoveAlignment.Enemy &&
-        (move.checkRequirements === undefined || move.checkRequirements(combatant)) && 
-        combatant.stats.stamina >= move.cost
+        // (move.checkRequirements === undefined || move.checkRequirements(combatant)) && 
+        // combatant.stats.stamina >= move.cost
+        combatant.canUseSkill(move)
     );
     allCombatantOffensiveSkills = shuffleArray(allCombatantOffensiveSkills);
     
@@ -94,8 +95,9 @@ export function getValidAttackWithSkillsIncluded(combatant: Combatant, board: Bo
 export function getValidAttackWithSkillsIncludedOptimal(combatant: Combatant, board: Board) {
     let allCombatantOffensiveSkills = combatant.specialMoves.filter(
         (move) => move.range.align === SpecialMoveAlignment.Enemy &&
-        (move.checkRequirements === undefined || move.checkRequirements(combatant)) && 
-        combatant.stats.stamina >= move.cost
+        // (move.checkRequirements === undefined || move.checkRequirements(combatant)) && 
+        // combatant.stats.stamina >= move.cost
+        combatant.canUseSkill(move)
     );
     allCombatantOffensiveSkills = shuffleArray(allCombatantOffensiveSkills);
 

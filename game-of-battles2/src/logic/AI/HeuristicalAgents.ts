@@ -254,7 +254,8 @@ export function theoreticalReplacement(combatant: Combatant, board: Board, newPo
 }
 
 export function canUseSpecialMove(specialMove: SpecialMove, combatant: Combatant): boolean {
-    return combatant.stats.stamina >= specialMove.cost && (specialMove.checkRequirements === undefined || specialMove.checkRequirements(combatant));
+    //return combatant.stats.stamina >= specialMove.cost && (specialMove.checkRequirements === undefined || specialMove.checkRequirements(combatant));
+    return combatant.canUseSkill(specialMove);
 }
 
 export function positionToCombatant(position: Position, combatant: Combatant): Combatant {
