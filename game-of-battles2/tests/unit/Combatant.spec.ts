@@ -8,6 +8,7 @@ import { Defender } from '../../src/logic/Combatants/Defender';
 import { Wizard } from '../../src/logic/Combatants/Wizard';
 import { Hunter } from '../../src/logic/Combatants/Hunter';
 import { Healer } from '../../src/logic/Combatants/Healer';
+import { DamageType } from '@/logic/Damage';
 
 
 describe('Combatant - Militia', () => {
@@ -57,7 +58,7 @@ describe('Combatant - Militia', () => {
 
   it('should take damage', () => {
     const initialHp = combatant.stats.hp;
-    combatant.takeDamage(5);
+    combatant.takeDamage({amount: 5, type: DamageType.Unstoppable});
     expect(combatant.stats.hp).toBe(initialHp - 5);
   });
 

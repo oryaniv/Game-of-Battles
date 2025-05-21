@@ -155,6 +155,7 @@ function combatantBalancingMatch(team1: Team, team2: Team): MatchData {
     placeAllCombatants(team1, team2, board);
     
     const game = new Game([team1, team2], board);
+    game.recordSkillUsage();
     const allCombatants = board.getAllCombatants();
     const allCombatantStats: combatantReportStats[] = generateCombatantStats(allCombatants);
 

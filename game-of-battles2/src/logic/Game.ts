@@ -17,7 +17,8 @@ export class Game {
     private actionsRemaining: number = 0;
     private roundCount: number = 1;
     private combatMaster: CombatMaster;
-
+    private startingTeamIndex: number = 0;
+    private skillRecords: Record<string, number> = {};
     public getRoundCount(): number {
       return this.roundCount;
     }
@@ -33,7 +34,7 @@ export class Game {
       this.setupCombatants();
       this.determineStartingTeam();
       this.actionsRemaining = this.teams[this.currentTeamIndex].combatants.length;
-      this.combatMaster = CombatMaster.getInstance(); // new CombatMaster();
+      this.combatMaster = CombatMaster.getInstance();
       
       const eventLogger = EventLogger.getInstance();
       eventLogger.logEvent(`Round ${this.roundCount} begins`);
@@ -55,6 +56,7 @@ export class Game {
         if (this.teams[0].getAverageInitiative() < this.teams[1].getAverageInitiative()) {
           this.currentTeamIndex = 1;
         }
+        this.startingTeamIndex = this.currentTeamIndex;
       }
     }
   
@@ -95,12 +97,13 @@ export class Game {
       if(!skill.effect) {
         return [getStandardActionResult()]; 
       }
+
+      this.addSkillUsage(skill.name);
+
       const eventLogger = EventLogger.getInstance();
       eventLogger.logEvent(`${invoker.name} uses ${skill.name}`);
       invoker.stats.stamina -= skill.cost;
       getResultsForStatusEffectHook(invoker, StatusEffectHook.OnSkillUsed);
-      // eslint-disable-next-line 
-      debugger;
       const actionResult: ActionResult | ActionResult[] = skill.effect(invoker, target, board); 
       let maxCost:number = 0;
       if(Array.isArray(actionResult)) {
@@ -162,7 +165,7 @@ export class Game {
           this.nextTeam();
           
           // not just next turn, but also next round
-          if (this.currentTeamIndex === 0) {
+          if (this.currentTeamIndex === this.startingTeamIndex) {
             this.nextRound();
           }
         } else {
@@ -253,4 +256,23 @@ export class Game {
       }
       return null;
     } 
+
+    recordSkillUsage(): void {
+      this.skillRecords = {};
+    }
+
+    addSkillUsage(skillName: string): void {
+      if(!this.skillRecords) {
+        return;
+      }
+      if(this.skillRecords[skillName]) {
+        this.skillRecords[skillName]++;
+      } else {
+        this.skillRecords[skillName] = 1;
+      }
+    }
+
+    getSkillRecords(): Record<string, number> {
+      return this.skillRecords;
+    }
   }

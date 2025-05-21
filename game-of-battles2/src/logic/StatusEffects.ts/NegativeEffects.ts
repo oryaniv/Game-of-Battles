@@ -119,7 +119,8 @@ export class PoisonedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.POISONED;
     applicationHooks = {
         [StatusEffectHook.OnTurnEnd]: (self: Combatant, target: Combatant, board: Board) => {
-            self.stats.hp -= 10;
+            // self.stats.hp -= 10;
+            self.takeDamage({amount: 10, type: DamageType.Blight});
             if(self.stats.hp <= 0) {
                 self.stats.hp = 0;
             }
@@ -142,7 +143,8 @@ export class BleedingStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.BLEEDING;
     applicationHooks = {
         [StatusEffectHook.OnTurnEnd]: (caster: Combatant, target: Combatant, board: Board) => {
-            caster.stats.hp -= 10;
+            // caster.stats.hp -= 10;
+            caster.takeDamage({amount: 10, type: DamageType.Pierce});
             if(caster.stats.hp <= 0) {
                 caster.stats.hp = 0;
                 // board.removeCombatant(caster);
@@ -190,6 +192,7 @@ export class NauseatedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.NAUSEATED;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant, target: Combatant) => {
+            self.removeStatusEffect(StatusEffectType.CLOAKED);
             self.insertAiAgent(new StunLockedAIAgent("Nauseated"));
         },
         [StatusEffectHook.OnTurnStart]: (self: Combatant) => {
@@ -214,6 +217,7 @@ export class MesmerizedStatusEffect implements StatusEffect {
             caster.removeStatusEffect(StatusEffectType.BLOCKING_STANCE);
             caster.removeStatusEffect(StatusEffectType.FOCUS_AIM);
             caster.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
+            caster.removeStatusEffect(StatusEffectType.CLOAKED);
             caster.insertAiAgent(new StunLockedAIAgent("Mesmerized"));
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant) => {

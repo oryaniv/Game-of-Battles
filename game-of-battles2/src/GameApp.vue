@@ -281,8 +281,8 @@ export default defineComponent({
   setup() {
     
     const board = ref(new Board(10, 10));
-    const whiteTeam = ref(new Team('White Team', 0));
-    const blackTeam = ref(new Team('Black Team', 1));
+    const whiteTeam = ref(new Team('White Team', 0, new VeteranAIAgent()));
+    const blackTeam = ref(new Team('Black Team', 1, new RookieAIAgent()));
 
     // const whiteTeam = ref(generateRandomTeam(0, new VeteranAIAgent()));
     // const blackTeam = ref(generateCombatantIdenticalTeam(whiteTeam.value, 1));
@@ -302,15 +302,15 @@ export default defineComponent({
 
 
     
-    whiteTeam.value.addCombatant(new Rogue('Gobo', { x: 5, y: 5 }, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Vanguard('afaf', { x: 4, y: 6 }, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Artificer('afaff', { x: 4, y: 7 }, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Artificer('afaff', { x: 4, y: 9 }, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Rogue('Gobo', { x: 4, y: 0}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new StandardBearer('afaf', { x: 0, y: 0 }, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Artificer('afaff', { x: 6, y: 3 }, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Artificer('afaff', { x: 5, y: 4 }, whiteTeam.value));
   // //   // // // whiteTeam.value.addCombatant(new Hunter('afaf', { x: 6, y: 0 }, whiteTeam.value));
 
-  // //   //blackTeam.value.addCombatant(new StandardBearer('fffobo', { x: 9, y: 9 }, blackTeam.value));
-  blackTeam.value.addCombatant(new Vanguard('fffobo', { x: 4, y: 5 }, blackTeam.value));
-  //    blackTeam.value.addCombatant(new Wizard('Jojo', { x: 4, y: 5 }, blackTeam.value));
+   //  blackTeam.value.addCombatant(new Vanguard('fffobo', { x: 5, y: 9 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Wizard('fffobo', { x: 4, y: 5 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Wizard('Jojo', { x: 4, y: 7 }, blackTeam.value));
   //    blackTeam.value.addCombatant(new Wizard('Jojo', { x: 4, y: 4 }, blackTeam.value));
   //   blackTeam.value.addCombatant(new Artificer('Jojo', { x: 3, y: 5 }, blackTeam.value));
 
@@ -319,12 +319,12 @@ export default defineComponent({
     // whiteTeam.value.combatants[0].stats.hp = 10;
     // whiteTeam.value.combatants[0].stats.stamina = 10;
     // blackTeam.value.combatants[0].applyStatusEffect({
-    //         name: StatusEffectType.MARKED_FOR_OBLIVION,
+    //         name: StatusEffectType.ARCANE_CHANNELING,
     //         duration: 5,
     // }); 
 
     // whiteTeam.value.combatants[0].applyStatusEffect({
-    //         name: StatusEffectType.POISONED,
+    //         name: StatusEffectType.CLOAKED,
     //         duration: 5,
     // }); 
     // whiteTeam.value.combatants[0].applyStatusEffect({
@@ -352,8 +352,8 @@ export default defineComponent({
     // }); 
 
     // whiteTeam.value.combatants[0].stats.stamina = 0;
-        // theATeam(whiteTeam.value);
-        // theBTeam(blackTeam.value);
+        theATeam(whiteTeam.value);
+        theBTeam(blackTeam.value);
 
     // placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
 
@@ -422,9 +422,7 @@ export default defineComponent({
       }
     };
 
-    const getCombatant = (position: Position): Combatant | null => {
-      return board.value.getCombatantAtPosition({x: position.x -1, y: position.y - 1});
-    };
+    
 
     const getWhiteTeamCombatants = () => {
       return whiteTeam.value.combatants;
@@ -582,13 +580,6 @@ export default defineComponent({
               (e: any) => e.id !== effect.id
             );
           }, 1000);
-
-          // setTimeout(() => {
-          //   const hitCombatant = getCombatant({ x: position.x + 1, y: position.y + 1 });
-          //   if(hitCombatant && hitCombatant.stats.hp <= 0) {
-          //     board.value.removeCombatant(hitCombatant); 
-          //   }
-          // }, 500);
 
           playSound(actionResult.damage.type);
     };
@@ -931,6 +922,16 @@ export default defineComponent({
         (aoePosition) => aoePosition.x === position.x && aoePosition.y === position.y
       );
     }
+
+    const getCombatant = (position: Position): Combatant | null => {
+      // return board.value.getCombatantAtPosition({x: position.x -1, y: position.y - 1});
+      if(position.x === 7 && position.y === 5) {
+        // debugger;
+      }
+      const combatant = board.value.getVisibleCombatantAtPosition({x: position.x -1, y: position.y - 1}, currentTeam.value.index);
+      return combatant;
+      // return board.value.getVisibleCombatantAtPosition({x: position.x -1, y: position.y - 1}, currentTeam.value.index);
+    };
 
     const getCombatantStatusEffects = (position: Position, alignment: StatusEffectAlignment): StatusEffect[] => {
       const combatant = board.value.getCombatantAtPosition(position);

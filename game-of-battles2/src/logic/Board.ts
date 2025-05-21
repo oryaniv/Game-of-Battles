@@ -5,6 +5,7 @@ import { Combatant } from "./Combatant";
 import { Position } from "./Position";
 import { RangeCalculator } from "./RangeCalculator";
 import { SpecialMove, SpecialMoveAlignment, SpecialMoveAreaOfEffect, SpecialMoveRange, SpecialMoveRangeType } from "./SpecialMove";
+import { StatusEffectType } from "./StatusEffect";
 
 export class Board {
   private grid: (Combatant | null)[][];
@@ -22,8 +23,27 @@ export class Board {
       this.grid[position.y][position.x] = combatant;
       combatant.position = position;
     } else {
-      // console.error("Invalid position");
+      alert("invalid position " + position.x + " " + position.y);
     }
+  }
+
+  placeCombatantWherePossible(combatant: Combatant, newPosition: Position): void {
+    const possiblePositions = [
+      {x: newPosition.x - 1, y: newPosition.y},
+      {x: newPosition.x + 1, y: newPosition.y},
+      {x: newPosition.x, y: newPosition.y - 1},
+      {x: newPosition.x, y: newPosition.y + 1},
+    ].filter(position => this.isPositionEmpty(position));
+
+    // eslint-disable-next-line
+    debugger;
+    const closestPositionToCombatant = possiblePositions.reduce((closest, position) => {
+      const distance = this.getDistanceBetweenPositions(combatant.position, position);
+      const closestDistance = this.getDistanceBetweenPositions(combatant.position, closest);
+      return distance < closestDistance ? position : closest;
+    }, possiblePositions[0]);
+    
+    this.placeCombatant(combatant, closestPositionToCombatant);
   }
 
   removeCombatant(combatant: Combatant): void {
@@ -44,11 +64,16 @@ export class Board {
     return null;
   }
 
-  
+  getVisibleCombatantAtPosition(position: Position, teamIndex: number): Combatant | null {
+    const combatant = this.getCombatantAtPosition(position);
+    if(!combatant) return null;
+    if(!combatant.isCloaked()) return combatant;
+    if(combatant.team.index === teamIndex) return combatant;
+    return null;
+  }
 
-  private hasEnemy(combatant: Combatant, position: Position): boolean {
-    const target = this.getCombatantAtPosition(position);
-    return !!target && target.team.getName() !== combatant.team.getName();
+  isPositionEmpty(position: Position): boolean {
+    return this.grid[position.y][position.x] === null;
   }
 
   // note how this is only straight line attacks, for now
@@ -93,7 +118,12 @@ export class Board {
         ];
 
         neighbors.forEach((neighbor) => {
-          if (this.isValidPosition(neighbor) && !this.getCombatantAtPosition(neighbor)) {
+          if (
+            this.isValidPosition(neighbor) && 
+            // !this.getCombatantAtPosition(neighbor)
+            !this.getVisibleCombatantAtPosition(neighbor, combatant.team.index)
+          ) 
+          {
             queue.push({ position: neighbor, distance: distance + 1 });
           }
         });

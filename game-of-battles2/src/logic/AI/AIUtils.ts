@@ -18,6 +18,7 @@ export function getClosestEnemy(combatant: Combatant, game: Game, board: Board):
     const enemyTeam = game.teams.find(team => team.index !== combatant.team.index);
     const closestEnemy = enemyTeam?.combatants.reduce((closest, enemy) => {
         if (enemy.isKnockedOut()) return closest;
+        if(enemy.isCloaked()) return closest;
         const distanceToEnemy = Math.sqrt(
             Math.pow(enemy.position.x - combatant.position.x, 2) + 
             Math.pow(enemy.position.y - combatant.position.y, 2)

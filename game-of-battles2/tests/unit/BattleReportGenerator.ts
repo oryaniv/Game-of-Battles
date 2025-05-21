@@ -118,34 +118,6 @@ export function generateHtmlReport(matchDataCollection: MatchData[], teamRecords
   ])).join('');
 
 
-
-
-//   // Calculate tier list (simplified -  you can implement a more sophisticated standard deviation calculation)
-//   const sortedCombatants = [...combatantSummary].sort((a, b) => (b.wins / b.losses) - (a.wins / a.losses));
-//     const tierCutoffs = [
-//         sortedCombatants[Math.floor(sortedCombatants.length / 4)],
-//         sortedCombatants[Math.floor(sortedCombatants.length / 2)],
-//         sortedCombatants[Math.floor(sortedCombatants.length * 3 / 4)],
-//     ];
-
-//   let tierList = `<h2>Tier List</h2>
-//                     <ul>`;
-//     sortedCombatants.forEach(combatant => {
-//         let tier = "D";
-//          if (sortedCombatants.length > 0) {
-//             if (combatant.wins / combatant.losses >= (tierCutoffs[0]?.wins / tierCutoffs[0]?.losses || 0)) {
-//                 tier = "A";
-//             } else if (combatant.wins / combatant.losses >= (tierCutoffs[1]?.wins / tierCutoffs[1]?.losses || 0)) {
-//                 tier = "B";
-//             } else if (combatant.wins / combatant.losses >= (tierCutoffs[2]?.wins / tierCutoffs[2]?.losses || 0)) {
-//                 tier = "C";
-//             }
-//         }
-
-//     tierList += `<li>${combatant.type}: ${tier}</li>`;
-//   });
-//   tierList += `</ul>`;
-
 // Calculate Win/Loss Ratios
 const combatantRatios = combatantSummary.map(combatant => ({
     ...combatant,

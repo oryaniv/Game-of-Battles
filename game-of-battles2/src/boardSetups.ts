@@ -72,7 +72,7 @@ export function theATeam(team: Team) {
     // team.addCombatant(new Healer('E', { x: 3, y: 0 }, team));
 
     team.addCombatant(new Witch('A', { x: 3, y: 0 }, team));
-    team.addCombatant(new Fool('B', { x: 4, y: 0 }, team));
+    team.addCombatant(new Rogue('B', { x: 4, y: 0 }, team));
     team.addCombatant(new Vanguard('C', { x: 5, y: 1 }, team));
     team.addCombatant(new FistWeaver('D', { x: 3, y: 1 }, team));
     team.addCombatant(new Pikeman('E', { x: 4, y: 1 }, team));
@@ -87,7 +87,7 @@ export function theBTeam(team: Team) {
 
 
     team.addCombatant(new Witch('F', { x: 5, y: 9 }, team));
-    team.addCombatant(new Fool('G', { x: 6, y: 9 }, team));
+    team.addCombatant(new Rogue('G', { x: 6, y: 9 }, team));
     team.addCombatant(new Vanguard('H', { x: 4, y: 8 }, team));
     team.addCombatant(new FistWeaver('I', { x: 5, y: 8 }, team));
     team.addCombatant(new Pikeman('J', { x: 6, y: 8 }, team));

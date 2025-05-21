@@ -15,6 +15,7 @@ import { Witch } from '@/logic/Combatants/Witch';
 import { Rogue } from '@/logic/Combatants/Rogue';
 import { Healer } from '@/logic/Combatants/Healer';
 import { ToddlerAIAgent } from '@/logic/AI/DeterministicAgents';
+import { DamageType } from '@/logic/Damage';
 
 describe('VeteranAIAgent', () => {
     let board: Board;   
@@ -80,7 +81,7 @@ describe('VeteranAIAgent', () => {
 
         it('should prioritize healing allies', () => {
             const cleric = team1.combatants[0];
-            team1.combatants[1].takeDamage(10);
+            team1.combatants[1].takeDamage({amount: 10, type: DamageType.Unstoppable});
             const result = veteranAgent.playTurn(cleric, game, board);
             expect(result).toBeDefined();
         });

@@ -60,7 +60,7 @@ export class CombatMaster {
               finalDamage.amount = 0;
               cost *= 2;
           } 
-          this.handleInjuryAilmentAndDeath(target, finalDamage.amount,attacker, board);
+          this.handleInjuryAilmentAndDeath(target, finalDamage, attacker, board);
           return {
               attackResult: AttackResult.Hit,
               damage: {amount: finalDamage.amount, type: finalDamage.type},
@@ -74,7 +74,7 @@ export class CombatMaster {
         if(attackResult === AttackResult.Hit || attackResult === AttackResult.CriticalHit){
             const baseDamage = this.calcaulateBaseDamage(attacker, target, damage);
             const actionResult = this.finalizeDamage(target, baseDamage, attackResult, position);
-            this.handleInjuryAilmentAndDeath(target, actionResult.damage.amount, attacker, board);
+            this.handleInjuryAilmentAndDeath(target, actionResult.damage, attacker, board);
             return actionResult;
         }  
 
@@ -127,8 +127,8 @@ export class CombatMaster {
 
     calcaulateBaseDamage(attacker: Combatant, target: Combatant, damageToUse: Damage): Damage {
         const delta = attacker.stats.attackPower - target.stats.defensePower;
-        // return {amount: (Math.random() * (1.3 - 0.7) + 0.70) * damageToUse.amount * (delta * 0.01 + 1), type: damageToUse.type};
-        return {amount: damageToUse.amount * (delta * 0.01 + 1), type: damageToUse.type};
+        return {amount: (Math.random() * (1.3 - 0.7) + 0.70) * damageToUse.amount * (delta * 0.01 + 1), type: damageToUse.type};
+        // return {amount: damageToUse.amount * (delta * 0.01 + 1), type: damageToUse.type};
     }
 
     private finalizeDamage(target: Combatant, damage: Damage, attackResult: AttackResult, position: Position) : ActionResult {
@@ -193,11 +193,8 @@ export class CombatMaster {
 
       
 
-      private handleInjuryAilmentAndDeath(target: Combatant, finalDamage: number, attacker: Combatant, board: Board) {
-        target.stats.hp -= finalDamage;
-        if(target.stats.hp <= 0) {
-          target.stats.hp = 0;
-        }
+      private handleInjuryAilmentAndDeath(target: Combatant, finalDamage: Damage, attacker: Combatant, board: Board) {
+        target.takeDamage(finalDamage);
         if(target.stats.hp <= 0) {
           getResultsForStatusEffectHook(attacker, StatusEffectHook.OnKilling, target, undefined, 1, board);
         }

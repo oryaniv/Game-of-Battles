@@ -45,7 +45,7 @@ export class RangeCalculator {
 
     adjacentPositions.forEach((pos) => {
       if (board.isValidPosition(pos)) {
-        const target = board.getCombatantAtPosition(pos);
+        const target = board.getVisibleCombatantAtPosition(pos, caster.team.index);
         if (target) {
           if (
             (align === SpecialMoveAlignment.Enemy && target.team !== caster.team) ||
@@ -85,7 +85,7 @@ export class RangeCalculator {
           break; // Stop if out of bounds
         }
 
-        const target = board.getCombatantAtPosition(targetPos);
+        const target = board.getVisibleCombatantAtPosition(targetPos, caster.team.index);
         if (target) {
           if (
             (align === SpecialMoveAlignment.Enemy && target.team !== caster.team) ||
@@ -139,7 +139,7 @@ export class RangeCalculator {
       if (distance > 0) {
         //
         if (board.isValidPosition(position)) {
-          const target = board.getCombatantAtPosition(position);
+          const target = board.getVisibleCombatantAtPosition(position, caster.team.index);
           // if there is a combatant at the position, check if it is an enemy or ally
           if (target) {
             if (
@@ -311,7 +311,7 @@ export class RangeCalculator {
     board: Board
   ): Position[] {
     const chainTargets: Position[] = [targetPosition];
-    let currentTarget = board.getCombatantAtPosition(targetPosition);
+    let currentTarget = board.getVisibleCombatantAtPosition(targetPosition, caster.team.index);
     if (!currentTarget) return []; // If initial target is invalid
 
     let lastPosition = targetPosition;
@@ -321,7 +321,7 @@ export class RangeCalculator {
         caster,
         lastPosition,
         jumpRange,
-        chainTargets.map(pos => board.getCombatantAtPosition(pos)),
+        chainTargets.map(pos => board.getVisibleCombatantAtPosition(pos, caster.team.index)),
         board
       );
 
@@ -331,7 +331,7 @@ export class RangeCalculator {
 
       chainTargets.push(nextTargetPosition);
       lastPosition = nextTargetPosition;
-      currentTarget = board.getCombatantAtPosition(nextTargetPosition);
+      currentTarget = board.getVisibleCombatantAtPosition(nextTargetPosition, caster.team.index);
       if (!currentTarget) break; // Stop if no combatant at next position.
     }
 
@@ -361,7 +361,7 @@ export class RangeCalculator {
       visited[key] = true;
 
       if (distance > 0) {
-        const target = board.getCombatantAtPosition(position);
+        const target = board.getVisibleCombatantAtPosition(position, caster.team.index);
         if (target && target !== caster && !avoidTargets.includes(target) && target.team !== caster.team) {
           if (!nearestTarget || distance < nearestTarget.distance) {
             nearestTarget = { position, distance };

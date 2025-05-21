@@ -216,7 +216,7 @@ function getSpecialMovePlays(combatant: Combatant, game: Game, board: Board, val
     // Check special moves from all valid new positions
     validNewPositions.forEach(newPosition => {
         const originalPosition = combatant.position;
-        theoreticalReplacement(combatant, board, newPosition, true);
+        const positionPlaced = theoreticalReplacement(combatant, board, newPosition, true);
         allUsableSpecialMoves.forEach(specialMove => {
             // const validTargets = board.getValidTargetsForSkill(
             //     Object.assign({}, combatant, { position: newPosition, hasStatusEffect: combatant.hasStatusEffect }),
@@ -228,7 +228,7 @@ function getSpecialMovePlays(combatant: Combatant, game: Game, board: Board, val
             const validTargets = board.getValidTargetsForSkill(combatant, specialMove.range);
             validTargets.forEach(targetPosition => {
                 allSpecialMoveActions.push({
-                    position: newPosition,
+                    position: positionPlaced,
                     playAction: {
                         executionFunction: (combatant: Combatant, target: Position, game: Game, board: Board) => {
                             return game.executeSkill(specialMove, combatant, target, board);
@@ -249,8 +249,14 @@ function getSpecialMovePlays(combatant: Combatant, game: Game, board: Board, val
 
 export function theoreticalReplacement(combatant: Combatant, board: Board, newPosition: Position, hasMoved: boolean) {
     board.removeCombatant(combatant);
-    board.placeCombatant(combatant, newPosition);
+    // board.placeCombatant(combatant, newPosition);
+    if(!board.isPositionEmpty(newPosition)) {
+      board.placeCombatantWherePossible(combatant, newPosition);
+    } else{
+      board.placeCombatant(combatant, newPosition);
+    }
     combatant.hasMoved = hasMoved;
+    return combatant.position;
 }
 
 export function canUseSpecialMove(specialMove: SpecialMove, combatant: Combatant): boolean {
@@ -329,7 +335,7 @@ export function areManyEnemiesNearby(combatant: Combatant, board: Board, game: G
 
 export function getAllEnemies(combatant: Combatant, board: Board, game: Game): Combatant[] {
     const enemyTeamIndex = combatant.team.getIndex() === 0 ? 1 : 0;
-    return game.teams[enemyTeamIndex].getAliveCombatants();
+    return game.teams[enemyTeamIndex].getAliveCombatants().filter(enemy => !enemy.isCloaked());
 }
 
 export function getNearbyEnemies(combatant: Combatant, board: Board, game: Game): Combatant[] {

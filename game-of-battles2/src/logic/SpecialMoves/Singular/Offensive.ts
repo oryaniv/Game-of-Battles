@@ -431,7 +431,7 @@ export class Rampage implements SpecialMove {
     cost: number = 8;
     turnCost: number = 1;
     range: SpecialMoveRange = {
-        type: SpecialMoveRangeType.Straight,
+        type: SpecialMoveRangeType.Melee,
         align: SpecialMoveAlignment.Enemy,
         areaOfEffect: SpecialMoveAreaOfEffect.Single,
         range: 1
@@ -469,7 +469,7 @@ export class ShieldBreaker implements SpecialMove {
     cost: number = 3;
     turnCost: number = 1;
     range: SpecialMoveRange = {
-        type: SpecialMoveRangeType.Straight,
+        type: SpecialMoveRangeType.Melee,
         align: SpecialMoveAlignment.Enemy,
         areaOfEffect: SpecialMoveAreaOfEffect.Single,
         range: 1

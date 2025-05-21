@@ -180,6 +180,8 @@ export class MesmerizingStatusEffect implements StatusEffect {
         },
         [StatusEffectHook.OnTurnEnd]: (self: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
             const combatMaster = CombatMaster.getInstance();
+            // eslint-disable-next-line
+            debugger;
             const getAllTargets: Position[] = board.getAreaOfEffectPositions(self, self.position, SpecialMoveAreaOfEffect.Great_Nova, SpecialMoveAlignment.Enemy);
             getAllTargets.filter(AOETarget => board.getCombatantAtPosition(AOETarget) !== null)
                          .filter(AOETarget => board.getCombatantAtPosition(AOETarget)?.team.getName() !== self.team.getName())
@@ -195,11 +197,21 @@ export class CloakedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.CLOAKED;  
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
-            caster.stats.luck += 5;
+            caster.stats.attackPower += 25;
+        },
+        [StatusEffectHook.OnDamageTaken]: (caster: Combatant, target: Combatant, damage: Damage) => {
+            caster.removeStatusEffect(StatusEffectType.CLOAKED);
+        },
+        [StatusEffectHook.OnAfterAttacking]: (caster: Combatant, target: Combatant) => {
+            caster.removeStatusEffect(StatusEffectType.CLOAKED);
+        },
+        [StatusEffectHook.OnBeingSteppedOn]: (caster: Combatant, target: Combatant, board: Board) => {
+            caster.removeStatusEffect(StatusEffectType.CLOAKED);
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
-            caster.stats.luck -= 5;
+            caster.stats.attackPower -= 25;
         }
+        
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
 }

@@ -152,7 +152,7 @@ export class AssassinsMark implements SpecialMove {
         type: SpecialMoveRangeType.Straight,
         align: SpecialMoveAlignment.Enemy,
         areaOfEffect: SpecialMoveAreaOfEffect.Single,
-        range: 3
+        range: 2
     };
     damage: Damage = {
         amount: 0,

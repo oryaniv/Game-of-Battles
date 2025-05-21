@@ -79,11 +79,23 @@ export interface CombatantStats {
         const onMovingHookResults = getResultsForStatusEffectHook(this, StatusEffectHook.OnMoving);
 
         board.removeCombatant(this);
-        board.placeCombatant(this, newPosition);
+        if(!board.isPositionEmpty(newPosition)) {
+          board.placeCombatantWherePossible(this, newPosition);
+          const occupyingCombatant = board.getCombatantAtPosition(newPosition);
+          occupyingCombatant?.beingSteppedOn(board);
+        } else{
+          board.placeCombatant(this, newPosition);
+        }
+
         const eventLogger = EventLogger.getInstance();
         eventLogger.logEvent(`${this.name} moves to (${newPosition.x},${newPosition.y})`);
         this.hasMoved = true;
         // emitter.emit('play-move-sound');
+    }
+
+    beingSteppedOn(board: Board): boolean {
+      const onBeingSteppedOnHookResults = getResultsForStatusEffectHook(this, StatusEffectHook.OnBeingSteppedOn, this, undefined, undefined, board);
+      return false;
     }
   
     defend(): number {
@@ -104,10 +116,10 @@ export interface CombatantStats {
       return this.stats.hp <= 0;
     }
   
-    takeDamage(damageAmount: number): void {
-      this.stats.hp -= damageAmount;
-  
-      if (this.stats.hp < 0) this.stats.hp = 0;
+    takeDamage(damage: Damage): void {
+      this.stats.hp -= damage.amount;
+      getResultsForStatusEffectHook(this, StatusEffectHook.OnDamageTaken, this, damage, 1);
+      if (this.stats.hp <= 0) this.stats.hp = 0;
     }
     
     applyStatusEffect(effect: StatusEffectApplication, statusSource?: Combatant): void {
@@ -183,6 +195,10 @@ export interface CombatantStats {
         return this.stats.stamina >= skill.cost && 
         (!skill.checkRequirements || skill.checkRequirements(this)) &&
         !this.hasStatusEffect(StatusEffectType.STUPEFIED);
+      }
+
+      isCloaked(): boolean {
+        return this.statusEffects.some(effect => effect.name === StatusEffectType.CLOAKED);
       }
 
       insertAiAgent(aiAgent: AIAgent) {

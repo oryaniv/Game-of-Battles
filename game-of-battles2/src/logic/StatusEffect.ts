@@ -117,7 +117,8 @@ export enum StatusEffectType {
     OnMoving = "OnMoving",
     OnInflictingDamage = "OnInflictingDamage",
     OnKilling = "OnKilling",
-    OnBeingAilmentInflicted = "OnBeingAilmentInflicted"
+    OnBeingAilmentInflicted = "OnBeingAilmentInflicted",
+    OnBeingSteppedOn = "OnBeingSteppedOn"
   }
 
   export enum StatusEffectAlignment {

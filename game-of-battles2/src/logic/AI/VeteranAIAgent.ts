@@ -134,6 +134,8 @@ abstract class VeteranAIAgentGenericPlayer implements VeteranAIAgentPlayer {
     protected evaluateMovement(combatant: Combatant, game: Game, board: Board,
          movePosition: Position, customEffectiveRange?: number): number {
         let baseValue = 0;
+        // eslint-disable-next-line
+        debugger;
         const distanceClosing = getDistanceClosingToEnemies(combatant, movePosition, board, game);
         const gettingCloserToEnemy = distanceClosing > 0;
         const gettingAwayFromEnemy = distanceClosing < 0;
@@ -205,6 +207,9 @@ abstract class VeteranAIAgentGenericPlayer implements VeteranAIAgentPlayer {
         assertTargetIsExists(movePosition, target, board);
         
         const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, target!, board);
+        if(targetCombatant.isCloaked()) {
+            return 0;
+        }
         let baseValue = this.getBaseBasicAttackValue();
         const targetIsDefending = isTargetDefending(targetCombatant);
         const targetIsWeak = isTargetWeak(targetCombatant, damageType || combatant.basicAttack().type);
@@ -221,6 +226,8 @@ abstract class VeteranAIAgentGenericPlayer implements VeteranAIAgentPlayer {
         baseValue += !targetIsDefending && targetIsWeak ? 10 : 0;
         baseValue += isTargetResistant(targetCombatant, damageType || combatant.basicAttack().type) ? -3 : 0;
         baseValue += isTargetImmune(targetCombatant, damageType || combatant.basicAttack().type) ? -10 : 0;
+
+        
         return baseValue;
 
         function evaluateEnemyCombatant(enemyCombatant: Combatant): number {
@@ -409,6 +416,9 @@ class VeteranAIAgentHunterPlayer extends VeteranAIAgentGenericPlayer {
         let baseValue = 0;
        
         const closestEnemy = getClosestEnemy(combatant, board, game);
+        if(!closestEnemy) {
+            return super.evaluateMovement(combatant, game, board, movePosition);
+        }
         const hasLineOfSight = board.hasLineOfSight(movePosition, closestEnemy.position, combatant);
         if(hasLineOfSight) {
             baseValue += super.evaluateMovement(combatant, game, board, movePosition, 8); 
@@ -730,6 +740,9 @@ class VeteranAIAgentWizardPlayer extends VeteranAIAgentGenericPlayer {
 
         function fatStackOfTargets(combatant: Combatant, board: Board): boolean {
             const closestEnemy = getClosestEnemy(combatant, board, game);
+            if(!closestEnemy) {
+                return false;
+            }
             const enemiesCloseToClosestEnemy = getAlliedCombatantsInRange(closestEnemy, board, 2);
             return enemiesCloseToClosestEnemy.length > 2;
         }
@@ -1511,6 +1524,20 @@ class VeteranAIAgentRoguePlayer extends VeteranAIAgentGenericPlayer {
         return AggressivenessLevel.BackLine;
     }
 
+    protected evaluateBasicAttack(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined,
+        damageType?: DamageType
+    ): number {
+        let baseValue = super.evaluateBasicAttack(combatant, game, board, movePosition, target, damageType);  
+        if(target) {
+            const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, target!, board);
+            baseValue *= combatant.isCloaked() ? 1.25 : 1;
+            baseValue *= targetCombatant.hasStatusEffect(StatusEffectType.MARKED_FOR_PAIN) ? 1.25 : 1;
+            baseValue *= targetCombatant.hasStatusEffect(StatusEffectType.MARKED_FOR_EXECUTION) ? 1.5 : 1;
+            baseValue *= targetCombatant.hasStatusEffect(StatusEffectType.MARKED_FOR_OBLIVION) ? 2 : 1;
+        }
+        return baseValue;
+    }
+
     evaluate(combatant: Combatant, game: Game, board: Board, turnPlay: TurnPlay): number {
         const evaluation = super.evaluate(combatant, game, board, turnPlay);
         if(evaluation > -1000) {
@@ -1541,26 +1568,50 @@ class VeteranAIAgentRoguePlayer extends VeteranAIAgentGenericPlayer {
     }
 
     private evaluateShadowStep(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
-        let baseValue = 0;
+        let baseValue = 12;
+        baseValue += combatant.isCloaked() ? -25 : 0;
+        baseValue += isInjured(combatant) ? 3 : 0;
+        baseValue += isBadlyInjured(combatant) ? 5 : 0;
+        baseValue += isNearDeath(combatant) ? 7 : 0;
+        baseValue += isFatigued(combatant) ? -2 : 0;
+        baseValue += isLowStamina(combatant) ? -5 : 0;
         baseValue += this.evaluateMovement(combatant, game, board, movePosition);
         return baseValue;
     }
 
     private evaluateVipersKiss(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
-        let baseValue = 0;
-        baseValue += this.evaluateBasicAttack(combatant, game, board, movePosition, target);
+        let baseValue = this.evaluateBasicAttack(combatant, game, board, movePosition, target, DamageType.Blight);
+        if(target) {
+            const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, target!, board);
+            baseValue += isTargetLowLuck(targetCombatant) ? 2 : 0;
+            baseValue += targetCombatant.hasStatusEffect(StatusEffectType.POISONED) ? -3 : 0;
+            baseValue += 2;
+        }
         return baseValue;
     }
 
     private evaluateSneakAttack(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
         let baseValue = 0;
         baseValue += this.evaluateBasicAttack(combatant, game, board, movePosition, target);
+        
+        const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, target!, board);
+        if(board.isFlanked(targetCombatant) || combatant.isCloaked()) {
+            baseValue *= 1.5;
+        }
         return baseValue;
     }
 
     private evaluateAssassinsMark(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
-        let baseValue = 0;
-        baseValue += this.evaluateBasicAttack(combatant, game, board, movePosition, target);
+        let baseValue = 3;
+        baseValue += game.getActionsRemaining() > 0.5 ? 2 : 0;
+        const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, target!, board);
+        baseValue += targetCombatant.hasStatusEffect(StatusEffectType.MARKED_FOR_PAIN) ? 1 : 0;
+        baseValue += targetCombatant.hasStatusEffect(StatusEffectType.MARKED_FOR_EXECUTION) ? 2 : 0;
+        baseValue += targetCombatant.hasStatusEffect(StatusEffectType.MARKED_FOR_OBLIVION) ? -15 : 0;
+        baseValue += combatant.isCloaked() ? 4 : 0;
+        baseValue += !combatant.isCloaked() && isInjured(combatant) ? -3 : 0;
+        baseValue += !combatant.isCloaked() && isBadlyInjured(combatant) ? -5 : 0;
+        baseValue += !combatant.isCloaked() && isNearDeath(combatant) ? -7 : 0;
         return baseValue;
     }
     
@@ -1636,6 +1687,9 @@ function addCoverValue(combatant: Combatant, game: Game, board: Board, movePosit
 
     function isTakingCover(combatant: Combatant, game: Game, board: Board, movePosition: Position): boolean {
         const closestEnemy = getClosestEnemy(combatant, board, game);
+        if(!closestEnemy) {
+            return false;
+        }
         const isCovered = board.isCoveredFromEnemy(movePosition, closestEnemy);
         return isCovered;
     }

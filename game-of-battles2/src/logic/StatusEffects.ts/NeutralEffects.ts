@@ -71,7 +71,12 @@ export class FirstStrikeStatusEffect implements StatusEffect {
     applicationHooks = {
         [StatusEffectHook.OnBeingAttacked]: (self: Combatant, attacker: Combatant, damage: Damage, amount: number, board: Board) => {
             const rangeCalculator = new RangeCalculator();
-            if(self.hasStatusEffect(StatusEffectType.STRUCK_FIRST) || !rangeCalculator.areInMeleeRange(self, attacker)) {
+            if(
+                self.hasStatusEffect(StatusEffectType.STRUCK_FIRST) || 
+                !rangeCalculator.areInMeleeRange(self, attacker) ||
+                attacker.hasStatusEffect(StatusEffectType.CLOAKED) || 
+                attacker.hasStatusEffect(StatusEffectType.FIRST_STRIKE)
+            ) {
                 return;
             }
 
