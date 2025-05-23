@@ -222,8 +222,8 @@ for (const tier in tiers) {
         </tr>
         ${tableRows}
       </table>
-      ${tierListHtml}
       ${skillTableHtml}
+      ${tierListHtml}
     </body>
     </html>
   `;

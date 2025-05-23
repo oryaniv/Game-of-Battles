@@ -63,7 +63,7 @@ describe('RoboArenta', () => {
         let team1 = generateRandomTeam(0, new VeteranAIAgent());
         let team2 = generateRandomTeam(1, new VeteranAIAgent());
 
-        for(let i = 0; i < 1000; i++) {
+        for(let i = 0; i < 100; i++) {
             let matchData: MatchData;
             try{
                 matchData = combatantBalancingMatch(team1, team2);
@@ -75,14 +75,23 @@ describe('RoboArenta', () => {
             }
             matchDataCollection.push(matchData);
             if(matchData.winningTeamName === team1.getName()) {
-                team2 = generateRandomTeam(1, new RookieAIAgent());
+                team2 = generateRandomTeam(1, new VeteranAIAgent());
                 refreshTeam(team1);
                 updateOrCreateTeamRecord(team1.getName(), team1, teamRecords);
             } else {
-                team1 = generateRandomTeam(0, new RookieAIAgent());
+                team1 = generateRandomTeam(0, new VeteranAIAgent());
                 refreshTeam(team2);
                 updateOrCreateTeamRecord(team2.getName(), team2, teamRecords);
             }
+            // if(matchData.losingTeam.getName() === team1.getName()) {
+            //     team2 = generateRandomTeam(1, new VeteranAIAgent());
+            //     refreshTeam(team1);
+            //     updateOrCreateTeamRecordLoss(team1.getName(), team1, teamRecords);
+            // } else {
+            //     team1 = generateRandomTeam(0, new VeteranAIAgent());
+            //     refreshTeam(team2);
+            //     updateOrCreateTeamRecordLoss(team2.getName(), team2, teamRecords);
+            // }
         }
 
         console.log(`error count is ${errorCount}`);
@@ -192,6 +201,7 @@ function combatantBalancingMatch(team1: Team, team2: Team): MatchData {
             });
         }
     } catch (error) {
+
         errorCount++;
         console.log('an Error was thrown', error);
     }
@@ -333,6 +343,18 @@ function updateOrCreateTeamRecord(teamName: string, team: Team, teamRecords: Tea
         teamRecords.push({ teamName: teamName, team: team, longestWinStreak: 0, longestLossStreak: 0 });
     }
 }  
+
+function updateOrCreateTeamRecordLoss(teamName: string, team: Team, teamRecords: TeamRecord[]) {
+    const teamRecord = teamRecords.find((record) => record.teamName === teamName);
+    if(teamRecord) {
+        teamRecord.longestWinStreak--;
+    } else {
+        teamRecords.push({ teamName: teamName, team: team, longestWinStreak: 0, longestLossStreak: 0 });
+    }
+}  
+
+
+
 
 
   

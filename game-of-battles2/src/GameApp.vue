@@ -282,11 +282,29 @@ export default defineComponent({
   setup() {
     
     const board = ref(new Board(10, 10));
-    const whiteTeam = ref(new Team('White Team', 0, new VeteranAIAgent()));
+    const whiteTeam = ref(new Team('White Team', 0));
     const blackTeam = ref(new Team('Black Team', 1, new VeteranAIAgent()));
 
-    debugSetupWhiteTeam(whiteTeam.value);
-    debugSetupBlackTeam(blackTeam.value);
+    // whiteTeam.value.addCombatant(new Rogue('fobo', { x: 4, y: 3}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Witch('dobo', { x: 4, y: 3}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Hunter('tobo', { x: 4, y: 3}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Healer('aobo', { x: 4, y: 3}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new FistWeaver('Gobo', { x: 4, y: 3}, whiteTeam.value));
+
+    whiteTeam.value.addCombatant(new Hunter('fobo', { x: 4, y: 3}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Hunter('dobo', { x: 4, y: 3}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Hunter('tobo', { x: 4, y: 3}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Hunter('aobo', { x: 4, y: 3}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Hunter('Gobo', { x: 4, y: 3}, whiteTeam.value));
+    
+    blackTeam.value.addCombatant(new Vanguard('fffobo', { x: 5, y: 5 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Vanguard('fffobo', { x: 4, y: 5 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Vanguard('fffobo', { x: 4, y: 5 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Vanguard('fffobo', { x: 4, y: 5 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Vanguard('fffobo', { x: 4, y: 5 }, blackTeam.value));
+
+    // debugSetupWhiteTeam(whiteTeam.value);
+    // debugSetupBlackTeam(blackTeam.value);
 
     placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
 

@@ -33,7 +33,8 @@ export class Board {
       {x: newPosition.x + 1, y: newPosition.y},
       {x: newPosition.x, y: newPosition.y - 1},
       {x: newPosition.x, y: newPosition.y + 1},
-    ].filter(position => this.isPositionEmpty(position));
+    ].filter(position => this.isValidPosition(position))
+     .filter(position => this.isPositionEmpty(position));
 
 
     const closestPositionToCombatant = possiblePositions.reduce((closest, position) => {

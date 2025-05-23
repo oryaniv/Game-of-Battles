@@ -75,7 +75,7 @@ export class SmellIt implements SpecialMove {
         type: SpecialMoveRangeType.Curve,
         align: SpecialMoveAlignment.All,
         areaOfEffect: SpecialMoveAreaOfEffect.Nova,
-        range: 2
+        range: 3
     };
     damage: Damage = {
         amount: 0,
