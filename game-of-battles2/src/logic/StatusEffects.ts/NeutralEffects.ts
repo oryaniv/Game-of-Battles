@@ -143,3 +143,22 @@ export class SadistStatusEffect implements StatusEffect {
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
 }
+
+export class GoingOffStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.GOING_OFF;
+    applicationHooks = {
+        [StatusEffectHook.OnDeath]: (caster: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
+            const getAllTargets = board.getAreaOfEffectPositions(caster, target.position, SpecialMoveAreaOfEffect.Nova, SpecialMoveAlignment.Enemy);
+            getAllTargets.forEach((targetPosition) => {
+                const targetEnemy = board.getCombatantAtPosition(targetPosition);
+                if(targetEnemy) {
+                    targetEnemy.takeDamage({amount: 30, type: DamageType.Fire});
+                }
+            });
+        },
+        [StatusEffectHook.OnBeingSteppedOn]: (caster: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
+            caster.takeDamage({amount: 100, type: DamageType.Unstoppable});
+        },
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
+}

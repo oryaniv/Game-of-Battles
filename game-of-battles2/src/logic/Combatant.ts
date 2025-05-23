@@ -229,6 +229,14 @@ export interface CombatantStats {
           }
         }
       }
+
+      isConstruct(): boolean {
+        return this.hasStatusEffect(StatusEffectType.FULL_METAL_JACKET);
+      }
+
+      isExpendable(): boolean {
+        return false;
+      }
   }
 
   

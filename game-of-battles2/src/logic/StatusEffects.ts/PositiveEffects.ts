@@ -180,8 +180,7 @@ export class MesmerizingStatusEffect implements StatusEffect {
         },
         [StatusEffectHook.OnTurnEnd]: (self: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
             const combatMaster = CombatMaster.getInstance();
-            // eslint-disable-next-line
-            debugger;
+
             const getAllTargets: Position[] = board.getAreaOfEffectPositions(self, self.position, SpecialMoveAreaOfEffect.Great_Nova, SpecialMoveAlignment.Enemy);
             getAllTargets.filter(AOETarget => board.getCombatantAtPosition(AOETarget) !== null)
                          .filter(AOETarget => board.getCombatantAtPosition(AOETarget)?.team.getName() !== self.team.getName())

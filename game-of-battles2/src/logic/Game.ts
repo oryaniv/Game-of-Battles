@@ -186,6 +186,8 @@ export class Game {
     }
 
     private nextTeam(): void {
+      this.getCurrentTeam().updateStatusEffects();
+      
       this.currentTeamIndex = 1 - this.currentTeamIndex;
       this.actionsRemaining = this.teams[this.currentTeamIndex].getAliveCombatants().length;
       const eventLogger = EventLogger.getInstance();
@@ -208,7 +210,7 @@ export class Game {
       eventLogger.addBreak();
       eventLogger.logEvent(`Round ${this.roundCount} begins`);
       eventLogger.addBreak();
-      this.updateStatusEffects();
+      // this.updateStatusEffects();
     }
 
     getCurrentRound(): number {

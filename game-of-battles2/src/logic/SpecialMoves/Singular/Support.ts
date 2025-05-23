@@ -1,7 +1,9 @@
-import { AttackResult } from "@/logic/attackResult";
+import { ActionResult, AttackResult } from "@/logic/attackResult";
 import { getStandardActionResult } from "@/logic/attackResult";
 import { Board } from "@/logic/Board";
+// 
 import { Combatant } from "@/logic/Combatant";
+import { Bomb, Wall } from "@/logic/Combatants/ArtificerConstructs";
 import { CombatMaster } from "@/logic/CombatMaster";
 import { DamageReaction, DamageType } from "@/logic/Damage";
 import { Damage } from "@/logic/Damage";
@@ -193,17 +195,20 @@ export class ReinforceConstruct implements SpecialMove {
         range: 3
     };
     damage: Damage = {
-        amount: 40,
+        amount: 30,
         type: DamageType.Healing
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
         const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
-        getAllTargets.map(AOETarget => {
+        const results: ActionResult[] = getAllTargets.map(AOETarget => {
             const targetCombatant = board.getCombatantAtPosition(AOETarget);
             if(!targetCombatant) {
                 return getStandardActionResult();
             }
-            if(targetCombatant.hasStatusEffect(StatusEffectType.FULL_METAL_JACKET)) {
+            if(targetCombatant.team.index !== invoker.team.index) {
+                return getStandardActionResult();
+            }
+            if(targetCombatant.isConstruct()) {
                 targetCombatant.stats.hp = Math.min(targetCombatant.stats.hp + this.damage.amount, targetCombatant.baseStats.hp);
                 return {
                     attackResult: AttackResult.Hit,
@@ -212,12 +217,67 @@ export class ReinforceConstruct implements SpecialMove {
                         type: this.damage.type
                     },
                     cost: 1,
-                    reaction: DamageReaction.NONE
+                    reaction: DamageReaction.NONE,
+                    position: AOETarget
                 };
             }
-        });
-        return getStandardActionResult();
+            return getStandardActionResult();
+        }).filter(result => result !== undefined);
+        return results
     };
     checkRequirements = undefined
     description = `Fix and Reinforce a construct, or a Metal covered ally, healing them for a medium amount of health`
+}
+
+export class BuildWalls implements SpecialMove {
+    name: string = "Build Walls";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 8;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Straight,
+        align: SpecialMoveAlignment.Empty_Space,
+        areaOfEffect: SpecialMoveAreaOfEffect.Cone,
+        range: 5
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Unstoppable
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
+
+        for(const currentTarget of getAllTargets) {
+            const wall = new Wall('Wall', currentTarget, invoker.team);
+            board.placeCombatant(wall, currentTarget);
+        }
+
+        return getStandardActionResult();
+    };
+    checkRequirements = undefined
+    description = `Build a wall, blocking all movement and attacks to and from the target position`
+}
+
+export class ExplosiveTrap implements SpecialMove {
+    name: string = "Explosive Trap";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 10;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Curve,
+        align: SpecialMoveAlignment.Empty_Space,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 4
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Unstoppable
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const bomb = new Bomb('bomb', target, invoker.team);
+        board.placeCombatant(bomb, target);
+        return getStandardActionResult();
+    };
+    checkRequirements = undefined
+    description = `Build a wall, blocking all movement and attacks to and from the target position`
 }

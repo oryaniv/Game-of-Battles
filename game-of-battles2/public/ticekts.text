@@ -1,60 +1,26 @@
-status effects UI separation
-
-teenager AI
-
-grunt AI
-
-Rookie AI
-
-more skills (that have the right infra)
-
-stats button(UI)
-
-turn order strip(UI)
-
-event log(UI)
-
-Veteran AI:
-
-wizard - generally fine
-
-defender - stand to test
-
-healer - why attack when you can heal (they weren't weak or near death)
-
-standard bearer - check working by inspired killer
-
-hunter - move forward when line of sight blocked
-
-randomize best results
-
-small buff for encourage
-
-ranged combatants doing the mangudai
-
-target ranking by HP and defense rather than injured/near death etc.
-
-defense ranking doesn't show significant improvement
-
----------------------------------
-
-Veteran AI:
-
-wizard & healer - take cover
-
-go on for other combatants
-
-check which combatant is subpar for this agent
-
-standardBearer?
-defender?
-wizard?
-hunter?
-healer?
-
-----------------------------------------
 
 board oriented skills (landmine, wall, cloacking, etc.)
+
+------------------------- balancing reports anomalies --------------------
+
+check that skill count is actually accurate
+
+why is sacred flame so high?
+
+why is lookey here so high?
+
+why no feral swing?
+
+why no shadow step?
+
+why healer and fool so low?
+
+why skewer so low?
+
+why evil eye so low?
+
+
+--------------------------------------------------------------------------
 
 supers/co-op skills
 

@@ -35,8 +35,7 @@ export class Board {
       {x: newPosition.x, y: newPosition.y + 1},
     ].filter(position => this.isPositionEmpty(position));
 
-    // eslint-disable-next-line
-    debugger;
+
     const closestPositionToCombatant = possiblePositions.reduce((closest, position) => {
       const distance = this.getDistanceBetweenPositions(combatant.position, position);
       const closestDistance = this.getDistanceBetweenPositions(combatant.position, closest);
@@ -291,6 +290,25 @@ export class Board {
       }
      }
      return true;
+  }
+
+  isPositionBetweenPositions(position1: Position, position2: Position, position3: Position): boolean {
+    // Check if points are collinear (in a straight line)
+    if (position1.x === position2.x) {
+      // Vertical line
+      return position3.x === position1.x && 
+             position3.y >= Math.min(position1.y, position2.y) &&
+             position3.y <= Math.max(position1.y, position2.y);
+    }
+    
+    if (position1.y === position2.y) {
+      // Horizontal line  
+      return position3.y === position1.y &&
+             position3.x >= Math.min(position1.x, position2.x) &&
+             position3.x <= Math.max(position1.x, position2.x);
+    }
+
+    return false;
   }
 
   getPushResult(caster: Combatant, target: Combatant, range: number){

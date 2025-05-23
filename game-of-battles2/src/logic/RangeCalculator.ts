@@ -98,7 +98,9 @@ export class RangeCalculator {
         }
 
         // should Add even empty tiles?
-        if(range.areaOfEffect === SpecialMoveAreaOfEffect.Nova || 
+        if(
+          align === SpecialMoveAlignment.Empty_Space ||
+          range.areaOfEffect === SpecialMoveAreaOfEffect.Nova || 
           range.areaOfEffect === SpecialMoveAreaOfEffect.Line || 
           range.areaOfEffect === SpecialMoveAreaOfEffect.Cross || 
           range.areaOfEffect === SpecialMoveAreaOfEffect.Cone) {

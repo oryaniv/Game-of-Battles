@@ -67,8 +67,6 @@ function getHeuristicBestPlay(combatant: Combatant, game: Game,
         return {score: evaluationFunction(combatant, game, board, action), play: action};
     });
     allActionsEvaluated.sort((a, b) => b.score - a.score);
-    // eslint-disable-next-line
-    // debugger;
     // return allActionsEvaluated[0].play;
     return randomizedBestPlay(allActionsEvaluated);
 }
@@ -76,8 +74,6 @@ function getHeuristicBestPlay(combatant: Combatant, game: Game,
 function randomizedBestPlay(allActionsEvaluated: RankedTurnPlay[]): TurnPlay {
     const bestPlays: TurnPlay[] = allActionsEvaluated.filter(action => action.score === allActionsEvaluated[0].score)
                                         .map(action => action.play);
-    // eslint-disable-next-line                          
-    // debugger;
     return bestPlays[Math.floor(Math.random() * bestPlays.length)];
 }
 
@@ -92,8 +88,6 @@ function getAllPossibleCombatantActions(combatant: Combatant, game: Game, board:
     allActions.push(...getSpecialMovePlays(combatant, game, board, validNewPositions));
 
     // collect supers?
-    // eslint-disable-next-line
-    // debugger;
     return allActions;
 }
 

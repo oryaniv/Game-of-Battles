@@ -64,7 +64,48 @@ AI - 3 intermediate levels
 
 ---------
 
+
+*********************** <------------ you are here
+
+artificer
+
+artificer veteran AI
+
+balancing matches + balancing changes
+
+co-op abilities
+
+update all AI types
+
+new balancing matches + balancing changes
+
+big bug hunt
+
+complete all UI gaps
+
+start campaign for the prototype
+
+
 Modren Graphical interface
+
+
+----------------------------------
+
+list of changes for the real code
+
+standardized interface for application hooks 
+
+artificer and rogue are implemented first, including Co ops
+
+combatant range is now a complex type, just like the range of skills
+
+moving/walking is part of range calculator
+
+moving/walking will be calculated per step (for animations)
+
+every little thing that affects the board will be emitted to the UI
+
+----------------------------------
 
 go into reddit
 

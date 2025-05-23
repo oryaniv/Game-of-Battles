@@ -55,4 +55,10 @@ export class Team {
         }
     }
 
+    updateStatusEffects(): void {
+        this.combatants.forEach((combatant) => {
+            combatant.updateStatusEffects();
+        });
+    }
+
   }

@@ -31,66 +31,66 @@ let errorCount = 0;
 
 describe('RoboArenta', () => {
 
-    it('Ai Agent match 1', () => {
-        let roundCounts = [];
-        let winnerCounts = [];
-        for(let i = 0; i < 100; i++) {
-            try {
-                const matchResult = exampleMatch();
-                roundCounts.push(matchResult.roundCount);
-                winnerCounts.push(matchResult.winner);
-            } catch (error) {
-                console.log('an Error was thrown, restarting match', error);
-                continue;
-            }
-        }
-        console.log(`round count average is ${roundCounts
-            .reduce((a, b) => a + b, 0) / roundCounts.length}`);
-
-        const veteranWinCount = winnerCounts.filter((winner) => winner === 'Team Veteran').length;
-        const veteranWinPercentage = veteranWinCount / winnerCounts.length;
-        console.log(`veteran win percentage is ${veteranWinPercentage}`);
-
-        console.log(`error count is ${errorCount}`);
-            expect(true).toBe(true);
-    });
-
-
-
-    // it('Balancing battles', () => {
-    //     let matchDataCollection: MatchData[] = [];
-    //     const teamRecords: TeamRecord[] = [];
-    //     let team1 = generateRandomTeam(0, new RookieAIAgent());
-    //     let team2 = generateRandomTeam(1, new RookieAIAgent());
-
-    //     for(let i = 0; i < 1000; i++) {
-    //         let matchData: MatchData;
-    //         try{
-    //             matchData = combatantBalancingMatch(team1, team2);
+    // it('Ai Agent match 1', () => {
+    //     let roundCounts = [];
+    //     let winnerCounts = [];
+    //     for(let i = 0; i < 100; i++) {
+    //         try {
+    //             const matchResult = exampleMatch();
+    //             roundCounts.push(matchResult.roundCount);
+    //             winnerCounts.push(matchResult.winner);
     //         } catch (error) {
     //             console.log('an Error was thrown, restarting match', error);
-    //             refreshTeam(team1);
-    //             refreshTeam(team2);
     //             continue;
     //         }
-    //         matchDataCollection.push(matchData);
-    //         if(matchData.winningTeamName === team1.getName()) {
-    //             team2 = generateRandomTeam(1, new RookieAIAgent());
-    //             refreshTeam(team1);
-    //             updateOrCreateTeamRecord(team1.getName(), team1, teamRecords);
-    //         } else {
-    //             team1 = generateRandomTeam(0, new RookieAIAgent());
-    //             refreshTeam(team2);
-    //             updateOrCreateTeamRecord(team2.getName(), team2, teamRecords);
-    //         }
     //     }
+    //     console.log(`round count average is ${roundCounts
+    //         .reduce((a, b) => a + b, 0) / roundCounts.length}`);
+
+    //     const veteranWinCount = winnerCounts.filter((winner) => winner === 'Team Veteran').length;
+    //     const veteranWinPercentage = veteranWinCount / winnerCounts.length;
+    //     console.log(`veteran win percentage is ${veteranWinPercentage}`);
 
     //     console.log(`error count is ${errorCount}`);
     //         expect(true).toBe(true);
-
-    //     const date = generateDateString();
-    //     generateHtmlReport(matchDataCollection, teamRecords, `Battle_Report_${date}.html`);
     // });
+
+
+
+    it('Balancing battles', () => {
+        let matchDataCollection: MatchData[] = [];
+        const teamRecords: TeamRecord[] = [];
+        let team1 = generateRandomTeam(0, new VeteranAIAgent());
+        let team2 = generateRandomTeam(1, new VeteranAIAgent());
+
+        for(let i = 0; i < 1000; i++) {
+            let matchData: MatchData;
+            try{
+                matchData = combatantBalancingMatch(team1, team2);
+            } catch (error) {
+                console.log('an Error was thrown, restarting match', error);
+                refreshTeam(team1);
+                refreshTeam(team2);
+                continue;
+            }
+            matchDataCollection.push(matchData);
+            if(matchData.winningTeamName === team1.getName()) {
+                team2 = generateRandomTeam(1, new RookieAIAgent());
+                refreshTeam(team1);
+                updateOrCreateTeamRecord(team1.getName(), team1, teamRecords);
+            } else {
+                team1 = generateRandomTeam(0, new RookieAIAgent());
+                refreshTeam(team2);
+                updateOrCreateTeamRecord(team2.getName(), team2, teamRecords);
+            }
+        }
+
+        console.log(`error count is ${errorCount}`);
+            expect(true).toBe(true);
+
+        const date = generateDateString();
+        generateHtmlReport(matchDataCollection, teamRecords, `Battle_Report_${date}.html`);
+    });
     
 });
 
@@ -216,7 +216,8 @@ function combatantBalancingMatch(team1: Team, team2: Team): MatchData {
         winningTeamName: winner.getName(),
         winningTeam: winner,
         losingTeam: loser,
-        combatantStats: allCombatantStats
+        combatantStats: allCombatantStats,
+        skillRecord: game.getSkillRecords()
     }
 }
 

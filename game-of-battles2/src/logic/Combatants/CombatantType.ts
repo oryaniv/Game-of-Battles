@@ -17,4 +17,7 @@ export enum CombatantType {
     Myrmidon = "Myrmidon",
     Iskariot = "Iskariot",
     DragonOfChaos = "Dragon of Chaos",
+
+    Wall = "Wall",
+    Bomb = "Bomb",
 }

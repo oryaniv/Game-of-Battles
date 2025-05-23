@@ -20,6 +20,7 @@ import * as fs from 'fs';
     winningTeamName: string;
     winningTeam: Team;
     losingTeam: Team;
+    skillRecord : Record<string, number>;
     combatantStats: {
       name: string;
       type: CombatantType;
@@ -55,12 +56,13 @@ interface ReportData {
   time: string;
   roundCountAvg: number;
   combatantSummary: CombatantSummary[];
+  SkillRecordSummary: Record<string, number>;
 }
 
 export function generateHtmlReport(matchDataCollection: MatchData[], teamRecords: TeamRecord[], filename: string) {
   const reportData: ReportData = generateReportData(matchDataCollection);
 
-  const { combatantSummary, time, roundCountAvg } = reportData;
+  const { combatantSummary, time, roundCountAvg, SkillRecordSummary } = reportData;
 
   // Calculate averages
   combatantSummary.forEach(cs => {
@@ -170,6 +172,22 @@ for (const tier in tiers) {
     }
 }
 
+  // Generate skill usage table HTML
+  const skillTableHeaders = ['Skill', 'Count'];
+  const skillTableRows = Object.entries(SkillRecordSummary)
+    .sort(([,a], [,b]) => b - a) // Sort by count descending
+    .map(([skill, count]) => generateTableRow([skill, count.toString()]))
+    .join('');
+
+  const skillTableHtml = `
+    <h2>Skill Usage Summary</h2>
+    <table>
+      <tr>${skillTableHeaders.map(header => `<th>${header}</th>`).join('')}</tr>
+      ${skillTableRows}
+    </table>
+  `;
+
+
   const html = `
     <!DOCTYPE html>
     <html>
@@ -205,6 +223,7 @@ for (const tier in tiers) {
         ${tableRows}
       </table>
       ${tierListHtml}
+      ${skillTableHtml}
     </body>
     </html>
   `;
@@ -222,12 +241,22 @@ function generateReportData(matchDataCollection: MatchData[]): ReportData {
   const reportData: ReportData = {
     time: generateDateString(),
     roundCountAvg: matchDataCollection.reduce((acc, curr) => acc + curr.roundCount, 0) / matchDataCollection.length,
-    combatantSummary: generateCombatantSummery(matchDataCollection)
+    combatantSummary: generateCombatantSummery(matchDataCollection),
+    SkillRecordSummary: generateSkillRecordSummary(matchDataCollection)
   };
 
   return reportData;
 }
 
+function generateSkillRecordSummary(matchDataCollection: MatchData[]): Record<string, number> {
+  const skillRecordSummary: Record<string, number> = {};
+  matchDataCollection.forEach((matchData) => {
+    Object.entries(matchData.skillRecord).forEach(([skill, count]) => {
+      skillRecordSummary[skill] = (skillRecordSummary[skill] || 0) + count;
+    });
+  });
+  return skillRecordSummary;
+}
 function generateCombatantSummery(matchDataCollection: MatchData[]): CombatantSummary[] {
   const combatantSummery: CombatantSummary[] = [];
   [CombatantType.Artificer, CombatantType.Defender, CombatantType.FistWeaver,

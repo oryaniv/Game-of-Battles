@@ -16,11 +16,11 @@ export class Fool extends Combatant {
             attackPower: 1,
             defensePower: 10,
             stamina: 40,
-            initiative: 10,
+            initiative: 4,
             movementSpeed: 3,
             range: 2,
             agility: 7,
-            luck: 100,
+            luck: 10,
           },
           position,
           [

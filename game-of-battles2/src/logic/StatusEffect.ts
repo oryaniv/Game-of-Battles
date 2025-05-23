@@ -4,8 +4,8 @@ import { Combatant, CombatantStats } from "./Combatant";
 import { DamageType, Damage } from "./Damage";
 import { BlockingStance } from "./SpecialMoves/Singular/Self";
 import { FrozenStatusEffect, ImmobilizedStatusEffect, LuckDowngradeStatusEffect, SlowStatusEffect, StrengthDowngradeStatusEffect, PoisonedStatusEffect, BleedingStatusEffect, TauntedStatusEffect, StupefiedStatusEffect, NauseatedStatusEffect, MesmerizedStatusEffect, StaggeredStatusEffect, DefenseDowngradeStatusEffect, MarkedForPainStatusEffect, MarkedForOblivionStatusEffect, MarkedForExecutionStatusEffect } from "./StatusEffects.ts/NegativeEffects";
-import { EnergyAbsorbStatusEffect, FirstStrikeStatusEffect, FoolsLuckStatusEffect, InspiringKillerStatusEffect, MarchingDefenseStatusEffect, RiposteStatusEffect, SadistStatusEffect } from "./StatusEffects.ts/NeutralEffects";
-import { ArcaneChannelingStatusEffect, BlockingStanceStatusEffect, CloakedStatusEffect, EncouragedStatusEffect, FocusAimStatusEffect, FortifiedStatusEffect, MesmerizingStatusEffect, MobilityBoostStatusEffect, RalliedStatusEffect, RegeneratingStatusEffect, StrengthBoostStatusEffect } from "./StatusEffects.ts/PositiveEffects";
+import { EnergyAbsorbStatusEffect, FirstStrikeStatusEffect, FoolsLuckStatusEffect, InspiringKillerStatusEffect, MarchingDefenseStatusEffect, RiposteStatusEffect, SadistStatusEffect, GoingOffStatusEffect } from "./StatusEffects.ts/NeutralEffects";
+import { ArcaneChannelingStatusEffect, BlockingStanceStatusEffect, CloakedStatusEffect, EncouragedStatusEffect, FocusAimStatusEffect, FortifiedStatusEffect, FullMetalJacketStatusEffect, MesmerizingStatusEffect, MobilityBoostStatusEffect, RalliedStatusEffect, RegeneratingStatusEffect, StrengthBoostStatusEffect } from "./StatusEffects.ts/PositiveEffects";
 
 export enum StatusEffectType {
     // 0
@@ -85,6 +85,8 @@ export enum StatusEffectType {
     // 37
     FULL_METAL_JACKET,
     // 38
+    GOING_OFF,
+    // 39
     DEFENDING,
 }
 
@@ -118,7 +120,8 @@ export enum StatusEffectType {
     OnInflictingDamage = "OnInflictingDamage",
     OnKilling = "OnKilling",
     OnBeingAilmentInflicted = "OnBeingAilmentInflicted",
-    OnBeingSteppedOn = "OnBeingSteppedOn"
+    OnBeingSteppedOn = "OnBeingSteppedOn",
+    OnDeath = "OnDeath",
   }
 
   export enum StatusEffectAlignment {
@@ -180,6 +183,8 @@ export enum StatusEffectType {
     [StatusEffectType.MARKED_FOR_OBLIVION]: new MarkedForOblivionStatusEffect(),
     [StatusEffectType.SADIST]: new SadistStatusEffect(),
     [StatusEffectType.CLOAKED]: new CloakedStatusEffect(),
+    [StatusEffectType.GOING_OFF]: new GoingOffStatusEffect(),
+    [StatusEffectType.FULL_METAL_JACKET]: new FullMetalJacketStatusEffect(),
   };
 
   export function getStatusEffect(name: StatusEffectType) : StatusEffect | undefined {

@@ -264,6 +264,7 @@ import { Vanguard } from './logic/Combatants/Vanguard';
 import { FistWeaver } from './logic/Combatants/FistWeaver';
 import { StandardBearer } from './logic/Combatants/StandardBearer';
 import { Artificer } from './logic/Combatants/Artificer';
+import { Wall, Bomb } from './logic/Combatants/ArtificerConstructs';
 import { Rogue } from './logic/Combatants/Rogue';
 import { Gorilla } from './logic/Combatants/Gorilla';
 import { SpecialMove, SpecialMoveTriggerType } from './logic/SpecialMove';
@@ -275,14 +276,20 @@ import { VeteranAIAgent } from './logic/AI/VeteranAIAgent';
 import { Howl } from 'howler';
 import { EventLogger } from './eventLogger';
 import { AllOfThem, standardVsSetup, theATeam, theBTeam, allMilitiaSetup, theGorillaTeam,
- generateRandomTeam, generateCombatantIdenticalTeam, placeAllCombatants } from './boardSetups';
+ generateRandomTeam, generateCombatantIdenticalTeam, placeAllCombatants, debugSetupWhiteTeam, debugSetupBlackTeam} from './boardSetups';
 
 export default defineComponent({
   setup() {
     
     const board = ref(new Board(10, 10));
     const whiteTeam = ref(new Team('White Team', 0, new VeteranAIAgent()));
-    const blackTeam = ref(new Team('Black Team', 1, new RookieAIAgent()));
+    const blackTeam = ref(new Team('Black Team', 1, new VeteranAIAgent()));
+
+    debugSetupWhiteTeam(whiteTeam.value);
+    debugSetupBlackTeam(blackTeam.value);
+
+    placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
+
 
     // const whiteTeam = ref(generateRandomTeam(0, new VeteranAIAgent()));
     // const blackTeam = ref(generateCombatantIdenticalTeam(whiteTeam.value, 1));
@@ -302,17 +309,12 @@ export default defineComponent({
 
 
     
-    // whiteTeam.value.addCombatant(new Rogue('Gobo', { x: 4, y: 0}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new StandardBearer('afaf', { x: 0, y: 0 }, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Artificer('afaff', { x: 6, y: 3 }, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Artificer('afaff', { x: 5, y: 4 }, whiteTeam.value));
-  // //   // // // whiteTeam.value.addCombatant(new Hunter('afaf', { x: 6, y: 0 }, whiteTeam.value));
-
-   //  blackTeam.value.addCombatant(new Vanguard('fffobo', { x: 5, y: 9 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Wizard('fffobo', { x: 4, y: 5 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Wizard('Jojo', { x: 4, y: 7 }, blackTeam.value));
-  //    blackTeam.value.addCombatant(new Wizard('Jojo', { x: 4, y: 4 }, blackTeam.value));
-  //   blackTeam.value.addCombatant(new Artificer('Jojo', { x: 3, y: 5 }, blackTeam.value));
+  // whiteTeam.value.addCombatant(new Fool('Gobo', { x: 4, y: 3}, whiteTeam.value));
+  // whiteTeam.value.addCombatant(new StandardBearer('afaf', { x: 6, y: 5 }, whiteTeam.value));
+  
+    
+  //   blackTeam.value.addCombatant(new Vanguard('fffobo', { x: 5, y: 5 }, blackTeam.value));
+  //   blackTeam.value.addCombatant(new Vanguard('fffobo', { x: 4, y: 5 }, blackTeam.value));
 
   //   blackTeam.value.addCombatant(new Artificer('Gobo', { x: 9, y: 6 }, blackTeam.value));
 
@@ -324,14 +326,6 @@ export default defineComponent({
     // }); 
 
     // whiteTeam.value.combatants[0].applyStatusEffect({
-    //         name: StatusEffectType.CLOAKED,
-    //         duration: 5,
-    // }); 
-    // whiteTeam.value.combatants[0].applyStatusEffect({
-    //         name: StatusEffectType.DEFENSE_DOWNGRADE,
-    //         duration: 5,
-    // }); 
-    // whiteTeam.value.combatants[0].applyStatusEffect({
     //         name: StatusEffectType.STAGGERED,
     //         duration: 5,
     // }); 
@@ -339,26 +333,10 @@ export default defineComponent({
     // // blackTeam.value.combatants[1].stats.hp = 5;
     // // blackTeam.value.combatants[2].stats.hp = 5;
 
-
-    
-
-
-    // standardVsSetup(whiteTeam.value, blackTeam.value);
-   //  AllOfThem(whiteTeam.value);
-    
-    // whiteTeam.value.combatants[0].applyStatusEffect({
-    //         name: StatusEffectType.FOCUS_AIM,
-    //         duration: 5,
-    // }); 
-
-    // whiteTeam.value.combatants[0].stats.stamina = 0;
-        theATeam(whiteTeam.value);
-        theBTeam(blackTeam.value);
+        // theATeam(whiteTeam.value);
+        // theBTeam(blackTeam.value);
 
     // placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
-
-
-    //theBTeam(blackTeam.value);
     
 
     const teams = ref([whiteTeam.value, blackTeam.value]);
@@ -615,7 +593,6 @@ export default defineComponent({
         return;
       }
 
-      // debugger;
       // if the current combatant has an AI agent, let it play the turn
       const currentCombatant = game.value.getCurrentCombatant();
       if(currentCombatant && currentCombatant.getAiAgent() !== undefined) {
@@ -701,6 +678,10 @@ export default defineComponent({
           return require('./assets/Rogue.svg');
         case CombatantType.Gorilla:
           return require('./assets/Gorilla.svg');
+        case CombatantType.Bomb:
+          return require('./assets/Bomb.svg');
+        case CombatantType.Wall:
+          return require('./assets/Wall.svg');
       }
     }
 
@@ -882,6 +863,7 @@ export default defineComponent({
       [StatusEffectType.MARKED_FOR_PAIN]: "MR1",
       [StatusEffectType.MARKED_FOR_EXECUTION]: "MR2",
       [StatusEffectType.MARKED_FOR_OBLIVION]: "MR3",
+      [StatusEffectType.FULL_METAL_JACKET]: "FMJ",
       // ... add mappings for other status effect types
     };
 
@@ -925,9 +907,6 @@ export default defineComponent({
 
     const getCombatant = (position: Position): Combatant | null => {
       // return board.value.getCombatantAtPosition({x: position.x -1, y: position.y - 1});
-      if(position.x === 7 && position.y === 5) {
-        // debugger;
-      }
       const combatant = board.value.getVisibleCombatantAtPosition({x: position.x -1, y: position.y - 1}, currentTeam.value.index);
       return combatant;
       // return board.value.getVisibleCombatantAtPosition({x: position.x -1, y: position.y - 1}, currentTeam.value.index);
@@ -999,10 +978,8 @@ export default defineComponent({
     };
 
     const showStatus = () => {
-      // debugger;
       const stats = getCurrentCombatant()?.stats;
       for(const [statName, statValue] of Object.entries(stats)) {
-        // debugger;
         console.log(statName, statValue);
       }
       showStatusPopup.value = true;

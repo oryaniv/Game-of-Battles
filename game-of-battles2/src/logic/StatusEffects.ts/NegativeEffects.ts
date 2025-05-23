@@ -223,6 +223,9 @@ export class MesmerizedStatusEffect implements StatusEffect {
         [StatusEffectHook.OnRemove]: (caster: Combatant) => {
             caster.removeAiAgent(AIAgentType.STUNLOCKED);
         },
+        [StatusEffectHook.OnDamageTaken]: (caster: Combatant, damage: Damage) => {
+            caster.removeStatusEffect(StatusEffectType.MESMERIZED);
+        }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
 }
@@ -270,8 +273,7 @@ export class MarkedForExecutionStatusEffect implements StatusEffect {
             }
         },
         [StatusEffectHook.OnAfterCalculateDamage]: (self: Combatant, attacker: Combatant, damage: Damage) => {
-            // eslint-disable-next-line 
-            debugger;
+ 
             if(!self.hasStatusEffect(StatusEffectType.MARKED_DETONATED)) {
                 return getStandardActionResult();
             }

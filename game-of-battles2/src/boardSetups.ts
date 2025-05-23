@@ -65,17 +65,17 @@ export function standardVsSetup(team1: Team, team2: Team) {
 }
 
 export function theATeam(team: Team) {
-    // team.addCombatant(new StandardBearer('A', { x: 4, y: 1 }, team));
-    // team.addCombatant(new Defender('B', { x: 3, y: 1 }, team));
-    // team.addCombatant(new Wizard('C', { x: 2, y: 0 }, team));
-    // team.addCombatant(new Hunter('D', { x: 4, y: 0 }, team));
-    // team.addCombatant(new Healer('E', { x: 3, y: 0 }, team));
+    team.addCombatant(new StandardBearer('A', { x: 4, y: 1 }, team));
+    team.addCombatant(new Defender('B', { x: 3, y: 1 }, team));
+    team.addCombatant(new Wizard('C', { x: 2, y: 0 }, team));
+    team.addCombatant(new Hunter('D', { x: 4, y: 0 }, team));
+    team.addCombatant(new Healer('E', { x: 3, y: 0 }, team));
 
-    team.addCombatant(new Witch('A', { x: 3, y: 0 }, team));
-    team.addCombatant(new Rogue('B', { x: 4, y: 0 }, team));
-    team.addCombatant(new Vanguard('C', { x: 5, y: 1 }, team));
-    team.addCombatant(new FistWeaver('D', { x: 3, y: 1 }, team));
-    team.addCombatant(new Pikeman('E', { x: 4, y: 1 }, team));
+    // team.addCombatant(new Witch('A', { x: 3, y: 0 }, team));
+    // team.addCombatant(new Rogue('B', { x: 4, y: 0 }, team));
+    // team.addCombatant(new Vanguard('C', { x: 5, y: 1 }, team));
+    // team.addCombatant(new FistWeaver('D', { x: 3, y: 1 }, team));
+    // team.addCombatant(new Pikeman('E', { x: 4, y: 1 }, team));
 }
 
 export function theBTeam(team: Team) {
@@ -97,6 +97,23 @@ export function theGorillaTeam(team: Team) {
     team.addCombatant(new Gorilla('A', { x: 5, y: 0 }, team));
 }
 
+
+export function debugSetupWhiteTeam(team: Team) {
+    team.addCombatant(new Vanguard('A', { x: 4, y: 0 }, team));
+    team.addCombatant(new Fool('B', { x: 3, y: 0 }, team));
+    team.addCombatant(new Healer('C', { x: 2, y: 0 }, team));
+    team.addCombatant(new Rogue('D', { x: 4, y: 0 }, team));
+    team.addCombatant(new Pikeman('E', { x: 5, y: 0 }, team));
+}
+
+export function debugSetupBlackTeam(team: Team) {
+    team.addCombatant(new Vanguard('F', { x: 4, y: 0 }, team));
+    team.addCombatant(new Fool('G', { x: 3, y: 0 }, team));
+    team.addCombatant(new Healer('H', { x: 2, y: 0 }, team));
+    team.addCombatant(new Rogue('I', { x: 4, y: 0 }, team));
+    team.addCombatant(new Pikeman('J', { x: 5, y: 0 }, team));
+}
+
 export function generateRandomTeam(teamIndex: number, agent?:AIAgent) {
     const team = new Team(`Team ${generateRandomString()}`, teamIndex, agent);
     const combatantCandidates = [
@@ -110,6 +127,7 @@ export function generateRandomTeam(teamIndex: number, agent?:AIAgent) {
         new Vanguard(generateRandomString(), { x: 0, y: 0 }, team),
         new FistWeaver(generateRandomString(), { x: 0, y: 0 }, team),
         new Pikeman(generateRandomString(), { x: 0, y: 0 }, team),
+        new Rogue(generateRandomString(), { x: 0, y: 0 }, team),
     ];
     shuffleArray(combatantCandidates);
     for(let i = 0; i < 5; i++) {
@@ -131,6 +149,7 @@ export function generateCombatantIdenticalTeam(team: Team, teamIndex: number, ag
         new Vanguard(generateRandomString(), { x: 0, y: 0 }, newTeam),
         new FistWeaver(generateRandomString(), { x: 0, y: 0 }, newTeam),
         new Pikeman(generateRandomString(), { x: 0, y: 0 }, newTeam),
+        new Rogue(generateRandomString(), { x: 0, y: 0 }, newTeam),
     ];
     team.combatants.forEach((combatant) => {
         const type: CombatantType = combatant.getCombatantType();
@@ -145,7 +164,7 @@ export function generateCombatantIdenticalTeam(team: Team, teamIndex: number, ag
 
 export function placeAllCombatants(team1: Team, team2: Team, board: Board) {
     const frontLineTypes = [CombatantType.Defender, CombatantType.StandardBearer, CombatantType.Vanguard, CombatantType.Pikeman, CombatantType.FistWeaver];
-    const backLineTypes = [CombatantType.Hunter, CombatantType.Wizard, CombatantType.Healer, CombatantType.Witch, CombatantType.Fool];
+    const backLineTypes = [CombatantType.Rogue, CombatantType.Hunter, CombatantType.Wizard, CombatantType.Healer, CombatantType.Witch, CombatantType.Fool];
     const whiteTeamFrontY = 1;
     const whiteTeamBackY = 0;
     let whiteTeamBackXStart = 2;
