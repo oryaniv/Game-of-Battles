@@ -29,7 +29,7 @@ export class Fool extends Combatant {
             {type: DamageType.Crush, reaction: DamageReaction.WEAKNESS},
             {type: DamageType.Fire, reaction: DamageReaction.WEAKNESS},
             {type: DamageType.Ice, reaction: DamageReaction.RESISTANCE},
-            {type: DamageType.Lightning, reaction: DamageReaction.RESISTANCE},
+            {type: DamageType.Lightning, reaction: DamageReaction.NONE},
             {type: DamageType.Blight, reaction: DamageReaction.NONE},
             {type: DamageType.Holy, reaction: DamageReaction.NONE},
             {type: DamageType.Dark, reaction: DamageReaction.NONE},

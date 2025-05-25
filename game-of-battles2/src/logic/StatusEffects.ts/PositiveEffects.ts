@@ -68,7 +68,7 @@ export class RegeneratingStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.REGENERATING;
     applicationHooks = {
         [StatusEffectHook.OnTurnStart]: (self: Combatant) => {
-            const newHp = Math.min(self.stats.hp + 8, self.baseStats.hp);
+            const newHp = Math.min(self.stats.hp + 12, self.baseStats.hp);
             const deltaHp = newHp - self.stats.hp;
             self.stats.hp = newHp;
             return {

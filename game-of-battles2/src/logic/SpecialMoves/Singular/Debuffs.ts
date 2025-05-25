@@ -22,7 +22,7 @@ export class Weaken implements SpecialMove {
         type: SpecialMoveRangeType.Curve,
         align: SpecialMoveAlignment.Enemy,
         areaOfEffect: SpecialMoveAreaOfEffect.Single,
-        range: 5
+        range: 7
     };
     damage: Damage = {
         amount: 0,
@@ -49,10 +49,10 @@ export class Slow implements SpecialMove {
     cost: number = 6;
     turnCost: number = 1;
     range: SpecialMoveRange = {
-        type: SpecialMoveRangeType.Straight,
+        type: SpecialMoveRangeType.Curve,
         align: SpecialMoveAlignment.Enemy,
         areaOfEffect: SpecialMoveAreaOfEffect.Single,
-        range: 5
+        range: 7
     };
     damage: Damage = {
         amount: 0,
@@ -82,7 +82,7 @@ export class EvilEye implements SpecialMove {
         type: SpecialMoveRangeType.Curve,
         align: SpecialMoveAlignment.Enemy,
         areaOfEffect: SpecialMoveAreaOfEffect.Cross,
-        range: 4
+        range: 6
     };
     damage: Damage = {
         amount: 0,
@@ -114,10 +114,10 @@ export class SiphonEnergy implements SpecialMove {
     cost: number = 0;
     turnCost: number = 1;
     range: SpecialMoveRange = {
-        type: SpecialMoveRangeType.Straight,
+        type: SpecialMoveRangeType.Curve,
         align: SpecialMoveAlignment.Enemy,
         areaOfEffect: SpecialMoveAreaOfEffect.Single,
-        range: 5
+        range: 7
     };
     damage: Damage = {
         amount: 0,

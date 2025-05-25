@@ -15,7 +15,7 @@ import { shuffleArray } from '@/logic/AI/AIUtils';
 import { VeteranAIAgent } from '@/logic/AI/VeteranAIAgent';
 import { RandomAIAgent } from '@/logic/AI/HeuristicalAgents';
 import { MatchData, TeamRecord, combatantReportStats, generateDateString } from './BattleReportGenerator';
-import { generateHtmlReport } from './BattleReportGenerator';
+import { generateBattleReportHtml } from './BattleReportGenerator';
 import { StandardBearer } from '@/logic/Combatants/StandardBearer';
 import { Healer } from '@/logic/Combatants/Healer';
 import { Defender } from '@/logic/Combatants/Defender';
@@ -63,7 +63,7 @@ describe('RoboArenta', () => {
         let team1 = generateRandomTeam(0, new VeteranAIAgent());
         let team2 = generateRandomTeam(1, new VeteranAIAgent());
 
-        for(let i = 0; i < 100; i++) {
+        for(let i = 0; i < 1000; i++) {
             let matchData: MatchData;
             try{
                 matchData = combatantBalancingMatch(team1, team2);
@@ -83,22 +83,13 @@ describe('RoboArenta', () => {
                 refreshTeam(team2);
                 updateOrCreateTeamRecord(team2.getName(), team2, teamRecords);
             }
-            // if(matchData.losingTeam.getName() === team1.getName()) {
-            //     team2 = generateRandomTeam(1, new VeteranAIAgent());
-            //     refreshTeam(team1);
-            //     updateOrCreateTeamRecordLoss(team1.getName(), team1, teamRecords);
-            // } else {
-            //     team1 = generateRandomTeam(0, new VeteranAIAgent());
-            //     refreshTeam(team2);
-            //     updateOrCreateTeamRecordLoss(team2.getName(), team2, teamRecords);
-            // }
         }
 
         console.log(`error count is ${errorCount}`);
             expect(true).toBe(true);
 
         const date = generateDateString();
-        generateHtmlReport(matchDataCollection, teamRecords, `Battle_Report_${date}.html`);
+        generateBattleReportHtml(matchDataCollection, teamRecords, `Battle_Report_${date}.html`);
     });
     
 });
@@ -106,18 +97,18 @@ describe('RoboArenta', () => {
 
 function exampleMatch() {
     // const team1 = generateRandomTeam(0, new RookieAIAgent());
-    // const team2 = generateCombatantIdenticalTeam(team1, 1, new RookieAIAgent());
+    // const team2 = generateCombatantIdenticalTeam(team1, 1, new VeteranAIAgent());
 
     // team1.name = 'Team Rookie';
     // team2.name = 'Team Veteran';
 
-    const team1 = generateRandomTeam(0, new ToddlerAIAgent());
-    const team2 = new Team('Team Gorilla', 1, new ToddlerAIAgent());
+    const team1 = generateRandomTeam(0, new VeteranAIAgent());
+    const team2 =  generateCombatantIdenticalTeam(team1, 1, new RookieAIAgent());
 
     team1.name = 'Team Veteran';
     team2.name = 'Team Gorilla';
 
-    theGorillaTeam(team2);
+    // theGorillaTeam(team2);
 
     // const team1 = new Team('Team Veteran', 0, new RookieAIAgent());
     // const team2 = new Team('Team Rookie', 1, new RookieAIAgent());

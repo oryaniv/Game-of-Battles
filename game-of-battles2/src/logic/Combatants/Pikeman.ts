@@ -11,7 +11,7 @@ export class Pikeman extends Combatant {
       super(
         name,
         {
-          hp: 80,
+          hp: 70,
           attackPower: 20,
           defensePower: 20,
           stamina: 25,

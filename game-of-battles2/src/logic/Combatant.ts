@@ -119,7 +119,13 @@ export interface CombatantStats {
     takeDamage(damage: Damage): void {
       this.stats.hp -= damage.amount;
       getResultsForStatusEffectHook(this, StatusEffectHook.OnDamageTaken, this, damage, 1);
-      if (this.stats.hp <= 0) this.stats.hp = 0;
+      if (this.stats.hp <= 0) {
+        this.stats.hp = 0;
+        const onDeathHookResults = getResultsForStatusEffectHook(this, StatusEffectHook.OnDeath, this, {amount: 0, type: DamageType.Unstoppable}, 1);
+        onDeathHookResults.filter((result) => result.attackResult !== AttackResult.NotFound).forEach((result) => {
+          emitter.emit('trigger-method', result);
+        });
+      }
     }
     
     applyStatusEffect(effect: StatusEffectApplication, statusSource?: Combatant): void {

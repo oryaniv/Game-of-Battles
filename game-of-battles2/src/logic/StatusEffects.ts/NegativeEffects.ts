@@ -169,9 +169,13 @@ export class TauntedStatusEffect implements StatusEffect {
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
             caster.insertAiAgent(new TauntedAIAgent(target));
+            caster.stats.agility -= 5;
+            caster.stats.defensePower -= 15;
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
             caster.removeAiAgent(AIAgentType.TAUNTED);
+            caster.stats.agility += 5;
+            caster.stats.defensePower += 15;
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;

@@ -12,7 +12,7 @@ export class FistWeaver extends Combatant {
       super(
         name,
         {
-          hp: 70,
+          hp: 75,
           attackPower: 25,
           defensePower: 15,
           stamina: 35,

@@ -28,7 +28,7 @@ export class Rogue extends Combatant {
           [
             {type: DamageType.Slash, reaction: DamageReaction.WEAKNESS},
             {type: DamageType.Pierce, reaction: DamageReaction.NONE},
-            {type: DamageType.Crush, reaction: DamageReaction.WEAKNESS},
+            {type: DamageType.Crush, reaction: DamageReaction.NONE},
             {type: DamageType.Fire, reaction: DamageReaction.NONE},
             {type: DamageType.Ice, reaction: DamageReaction.NONE},
             {type: DamageType.Lightning, reaction: DamageReaction.NONE},

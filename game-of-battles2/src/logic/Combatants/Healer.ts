@@ -9,6 +9,8 @@ import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
 import { SacredFlame } from "../SpecialMoves/Singular/Offensive";
 import { Heal, Purify, Regenerate } from "../SpecialMoves/Singular/Support";
+import { DivineMircale } from "../SpecialMoves/Singular/Passives";
+// import { DivineMircale } from "../SpecialMoves/Singular/Passives";
 
 export class Healer extends Combatant {
     constructor(name: string, position: Position, team: Team) {
@@ -42,6 +44,7 @@ export class Healer extends Combatant {
           new Regenerate(),
           new Purify(),
           new SacredFlame(),
+          new DivineMircale(),
 
           // supers
           // new RainOfGrace()

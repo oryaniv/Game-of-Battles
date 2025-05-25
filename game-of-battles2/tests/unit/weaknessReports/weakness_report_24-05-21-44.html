@@ -1,0 +1,186 @@
+
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Weakness Analysis Report</title>
+                <style>
+                    table { border-collapse: collapse; margin: 20px 0; }
+                    th, td { border: 1px solid black; padding: 8px; text-align: left; }
+                    th { background-color: #f2f2f2; }
+                </style>
+            </head>
+            <body>
+                <h1>Weakness Analysis Report</h1>
+                
+                <h2>Damage Type Statistics</h2>
+                <table>
+                    <tr>
+                        <th>Damage Type</th>
+                        <th>Number of Weak To</th>
+                        <th>Number of Resistant To</th>
+                        <th>Weak Combatants</th>
+                        <th>Resistant Combatants</th>
+                    </tr>
+                    
+                        <tr>
+                            <td>Slash</td>
+                            <td>3</td>
+                            <td>1</td>
+                            <td>Wizard, Hunter, Witch</td>
+                            <td>Defender</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Pierce</td>
+                            <td>2</td>
+                            <td>1</td>
+                            <td>Wizard, Vanguard</td>
+                            <td>Defender</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Crush</td>
+                            <td>4</td>
+                            <td>1</td>
+                            <td>Wizard, Hunter, Fool, Pikeman</td>
+                            <td>Standard Bearer</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Fire</td>
+                            <td>3</td>
+                            <td>2</td>
+                            <td>Defender, Fool, Witch</td>
+                            <td>Wizard, Vanguard</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Ice</td>
+                            <td>2</td>
+                            <td>4</td>
+                            <td>Standard Bearer, Vanguard</td>
+                            <td>Wizard, Fool, Pikeman, Witch</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Blight</td>
+                            <td>3</td>
+                            <td>2</td>
+                            <td>Healer, Fistweaver, Pikeman</td>
+                            <td>Hunter, Witch</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Lightning</td>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>Defender</td>
+                            <td>Wizard, Fool</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Holy</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>Witch</td>
+                            <td>Fistweaver</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Dark</td>
+                            <td>3</td>
+                            <td>0</td>
+                            <td>Standard Bearer, Healer, Fistweaver</td>
+                            <td></td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Unstoppable</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Healing</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    
+                </table>
+
+                <h2>Combatant Weaknesses</h2>
+                <table>
+                    <tr>
+                        <th>Combatant Type</th>
+                        <th>Weaknesses</th>
+                        <th>Resistances</th>
+                    </tr>
+                    
+                        <tr>
+                            <td>Standard Bearer</td>
+                            <td>Ice, Dark</td>
+                            <td>Crush</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Healer</td>
+                            <td>Blight, Dark</td>
+                            <td></td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Defender</td>
+                            <td>Fire, Lightning</td>
+                            <td>Slash, Pierce</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Wizard</td>
+                            <td>Slash, Pierce, Crush</td>
+                            <td>Fire, Ice, Lightning</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Hunter</td>
+                            <td>Slash, Crush</td>
+                            <td>Blight</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Fistweaver</td>
+                            <td>Blight, Dark</td>
+                            <td>Holy</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Fool</td>
+                            <td>Crush, Fire</td>
+                            <td>Ice, Lightning</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Pikeman</td>
+                            <td>Crush, Blight</td>
+                            <td>Ice</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Witch</td>
+                            <td>Slash, Fire, Holy</td>
+                            <td>Ice, Blight</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Vanguard</td>
+                            <td>Pierce, Ice</td>
+                            <td>Fire</td>
+                        </tr>
+                    
+                </table>
+            </body>
+            </html>
+        

@@ -283,7 +283,7 @@ export default defineComponent({
     
     const board = ref(new Board(10, 10));
     const whiteTeam = ref(new Team('White Team', 0));
-    const blackTeam = ref(new Team('Black Team', 1, new VeteranAIAgent()));
+    const blackTeam = ref(new Team('Black Team', 1, new RookieAIAgent()));
 
     // whiteTeam.value.addCombatant(new Rogue('fobo', { x: 4, y: 3}, whiteTeam.value));
     // whiteTeam.value.addCombatant(new Witch('dobo', { x: 4, y: 3}, whiteTeam.value));
@@ -291,22 +291,22 @@ export default defineComponent({
     // whiteTeam.value.addCombatant(new Healer('aobo', { x: 4, y: 3}, whiteTeam.value));
     // whiteTeam.value.addCombatant(new FistWeaver('Gobo', { x: 4, y: 3}, whiteTeam.value));
 
-    whiteTeam.value.addCombatant(new Hunter('fobo', { x: 4, y: 3}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Hunter('dobo', { x: 4, y: 3}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Hunter('tobo', { x: 4, y: 3}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Hunter('aobo', { x: 4, y: 3}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Hunter('Gobo', { x: 4, y: 3}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Witch('dobo', { x: 2, y: 0}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Rogue('tobo', { x: 3, y: 1}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Healer('tobo', { x: 3, y: 0}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Hunter('aobo', { x: 4, y: 0}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new FistWeaver('Gobo', { x: 4, y: 1}, whiteTeam.value));
     
-    blackTeam.value.addCombatant(new Vanguard('fffobo', { x: 5, y: 5 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Vanguard('fffobo', { x: 4, y: 5 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Vanguard('fffobo', { x: 4, y: 5 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Vanguard('fffobo', { x: 4, y: 5 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Vanguard('fffobo', { x: 4, y: 5 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Vanguard('fffobo', { x: 5, y: 8 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Hunter('fffobo', { x: 6, y: 9 }, blackTeam.value));
+    blackTeam.value.addCombatant(new FistWeaver('fffobo', { x: 6, y: 8 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Pikeman('fffobo', { x: 4, y: 8 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Rogue('fffobo', { x: 7, y: 9 }, blackTeam.value));
 
     // debugSetupWhiteTeam(whiteTeam.value);
     // debugSetupBlackTeam(blackTeam.value);
 
-    placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
+    // placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
 
 
     // const whiteTeam = ref(generateRandomTeam(0, new VeteranAIAgent()));

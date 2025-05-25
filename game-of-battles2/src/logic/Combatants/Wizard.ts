@@ -29,7 +29,7 @@ export class Wizard extends Combatant {
         [
           {type: DamageType.Slash, reaction: DamageReaction.WEAKNESS},
           {type: DamageType.Pierce, reaction: DamageReaction.WEAKNESS},
-          {type: DamageType.Crush, reaction: DamageReaction.WEAKNESS},
+          {type: DamageType.Crush, reaction: DamageReaction.NONE},
           {type: DamageType.Fire, reaction: DamageReaction.RESISTANCE},
           {type: DamageType.Ice, reaction: DamageReaction.RESISTANCE},
           {type: DamageType.Lightning, reaction: DamageReaction.RESISTANCE},

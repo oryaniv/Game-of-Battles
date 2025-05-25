@@ -59,7 +59,7 @@ interface ReportData {
   SkillRecordSummary: Record<string, number>;
 }
 
-export function generateHtmlReport(matchDataCollection: MatchData[], teamRecords: TeamRecord[], filename: string) {
+export function generateBattleReportHtml(matchDataCollection: MatchData[], teamRecords: TeamRecord[], filename: string) {
   const reportData: ReportData = generateReportData(matchDataCollection);
 
   const { combatantSummary, time, roundCountAvg, SkillRecordSummary } = reportData;
@@ -235,6 +235,10 @@ for (const tier in tiers) {
   } catch (error) {
     console.error('Error writing HTML report:', error);
   }
+}
+
+export function generateWeaknessReportHtml(filename: string) {
+
 }
 
 function generateReportData(matchDataCollection: MatchData[]): ReportData {

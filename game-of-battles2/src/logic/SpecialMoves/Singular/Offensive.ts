@@ -268,7 +268,7 @@ export class PinDown implements SpecialMove {
         range: 8
     };
     damage: Damage = {
-        amount: 25,
+        amount: 20,
         type: DamageType.Pierce
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
@@ -295,13 +295,13 @@ export class Ricochet implements SpecialMove {
         range: 8
     };
     damage: Damage = {
-        amount: 25,
+        amount: 20,
         type: DamageType.Pierce
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
         invoker.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
         const combatMaster = CombatMaster.getInstance();
-        const chainTargets = board.getChainTargets(invoker, target, 1, 2);
+        const chainTargets = board.getChainTargets(invoker, target, 1, 1);
         const ricochetResults: ActionResult[] = [];
         for(const currentTarget of chainTargets) {
             const result = combatMaster.executeAttack(invoker, currentTarget, board, this.damage);
@@ -328,7 +328,7 @@ export class ToxicArrow implements SpecialMove {
         range: 8
     };
     damage: Damage = {
-        amount: 25,
+        amount: 20,
         type: DamageType.Blight
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
@@ -549,7 +549,7 @@ export class UnstoppableCharge implements SpecialMove {
         });
     };
     checkRequirements = (self: Combatant) => {
-        return !self.hasMoved
+        return !self.hasMoved && !self.hasStatusEffect(StatusEffectType.IMMOBILIZED)
     };
     description = `Charge at an enemy with a blade held high, damage increasees the more panels you move in the process`   
 }

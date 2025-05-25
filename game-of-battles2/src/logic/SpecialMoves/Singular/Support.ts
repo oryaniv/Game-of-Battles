@@ -26,7 +26,7 @@ export class Heal implements SpecialMove {
         range: 3
     };
     damage: Damage = {
-        amount: 30,
+        amount: 40,
         type: DamageType.Healing
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {

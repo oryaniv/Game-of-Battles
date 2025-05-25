@@ -372,7 +372,7 @@ class VeteranAIAgentHunterPlayer extends VeteranAIAgentGenericPlayer {
     }
 
     protected getBaseBasicAttackValue(): number {
-        return 4;
+        return 3;
     }
 
     protected getAggressivenessLevel(): number {
@@ -443,7 +443,7 @@ class VeteranAIAgentHunterPlayer extends VeteranAIAgentGenericPlayer {
     private evaluateRicochet(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
         let baseValue = 0;
         if(target) {
-            const chainTargets = board.getChainTargets(combatant, target, 1, 2);
+            const chainTargets = board.getChainTargets(combatant, target, 1, 1);
             chainTargets.forEach(chainTarget => {
                 baseValue += this.evaluateBasicAttack(combatant, game, board, movePosition, chainTarget);
             });
@@ -914,7 +914,7 @@ class VeteranAIAgentWitchPlayer extends VeteranAIAgentGenericPlayer {
     }
 
     protected getMaxEnemyEffectiveRange(): number {
-        return 4;
+        return 7;
     }
 
     protected evaluateMovement(combatant: Combatant, game: Game, board: Board, movePosition: Position): number {

@@ -193,6 +193,61 @@ export class GoOff implements SpecialMove {
     requirements = undefined;
     description = `When this combatant is killed, it explodes, dealing damage to all enemies in a 3x3 area.`
 }
+
+export class DivineMircale implements SpecialMove {
+    name: string = "Divine Mircale";
+    triggerType = SpecialMoveTriggerType.Passive;
+    cost: number = 0;
+    turnCost: number = 0;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.None,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Holy
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        invoker.applyStatusEffect({
+            name: StatusEffectType.DIVINE_MIRACLE,
+            duration: Number.POSITIVE_INFINITY,
+        });
+        return getStandardActionResult();
+    };
+    requirements = undefined;
+    description = `Once per combat, when this combatant is killed, it is immediately getting greatly healed and is purified from all negative status effects.`
+}
+
+export class LifeDrinker implements SpecialMove {
+    name: string = "Life Drinker";
+    triggerType = SpecialMoveTriggerType.Passive;
+    cost: number = 0;
+    turnCost: number = 0;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.None,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Healing
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        invoker.applyStatusEffect({
+            name: StatusEffectType.LIFE_DRINKER,
+            duration: Number.POSITIVE_INFINITY,
+        });
+        return getStandardActionResult();
+    };
+    requirements = undefined;
+    description = `When this combatant kills an enemy, it gains part of their max health as both healing and addition to their max health`
+}
+
+
+
     
 
 

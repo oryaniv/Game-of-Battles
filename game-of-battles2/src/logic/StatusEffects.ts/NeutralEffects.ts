@@ -46,19 +46,24 @@ export class EnergyAbsorbStatusEffect implements StatusEffect {
 export class FoolsLuckStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.FOOLS_LUCK;
     applicationHooks = {
-        [StatusEffectHook.OnBeingAttacked]: (attacker: Combatant, defender: Combatant, damage: Damage, attackCost: number) => {
-            const chance = 0.1;
+        [StatusEffectHook.OnBeingAttacked]: (attacked: Combatant, attacker: Combatant, damage: Damage, attackCost: number) => {
+            const chanceToMiss = attacked.stats.luck * 0.02;
+            const chanceToFumble = attacked.stats.luck * 0.01;
             const random = Math.random();
-            if (random < chance) {
-                return {attackResult: AttackResult.Miss, damage: {amount: 0, type: DamageType.Unstoppable}, cost: attackCost, reaction: DamageReaction.NONE};
+            
+            if (random <= chanceToFumble) {
+                return {attackResult: AttackResult.Fumble, damage: {amount: 0, type: DamageType.Unstoppable}, cost: attackCost, reaction: DamageReaction.NONE, position: attacked.position};
+            }
+            if (random <= chanceToMiss) {
+                return {attackResult: AttackResult.Miss, damage: {amount: 0, type: DamageType.Unstoppable}, cost: attackCost, reaction: DamageReaction.NONE, position: attacked.position};
             }
             return;
         },
-        [StatusEffectHook.OnBeingAilmentInflicted]: (attacker: Combatant, defender: Combatant, damage: Damage, attackCost: number) => {
-            const chance = 0.1;
+        [StatusEffectHook.OnBeingAilmentInflicted]: (attacked: Combatant, attacker: Combatant, damage: Damage, attackCost: number) => {
+            const chancToFail = attacked.stats.luck * 0.02;
             const random = Math.random();
-            if (random < chance) {
-                return {attackResult: AttackResult.Miss, damage: {amount: 0, type: DamageType.Unstoppable}, cost: attackCost, reaction: DamageReaction.NONE};
+            if (random <= chancToFail) {
+                return {attackResult: AttackResult.Miss, damage: {amount: 0, type: DamageType.Unstoppable}, cost: attackCost, reaction: DamageReaction.NONE, position: attacked.position};
             }
             return;
         },
@@ -158,6 +163,46 @@ export class GoingOffStatusEffect implements StatusEffect {
         },
         [StatusEffectHook.OnBeingSteppedOn]: (caster: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
             caster.takeDamage({amount: 100, type: DamageType.Unstoppable});
+        },
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
+}
+
+export class DivineMiracleStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.DIVINE_MIRACLE;
+    applicationHooks = {
+        [StatusEffectHook.OnDeath]: (caster: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
+            caster.stats.hp = Math.min(40, caster.baseStats.hp);
+            const negativeStatusEffects: StatusEffect[] = caster.getStatusEffects().filter(status => status.alignment === StatusEffectAlignment.Negative);
+            for(const statusEffect of negativeStatusEffects) {
+                caster?.removeStatusEffect(statusEffect.name);
+            }
+            caster.removeStatusEffect(StatusEffectType.DIVINE_MIRACLE);
+            return {
+                attackResult: AttackResult.Hit,
+                damage: {
+                    amount: 40,
+                    type: DamageType.Healing
+                },
+                cost: 0,
+                reaction: DamageReaction.NONE,
+                position: target
+            };
+        },
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
+}   
+
+export class LifeDrinkerStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.LIFE_DRINKER;
+    applicationHooks = {
+        [StatusEffectHook.OnKilling]: (caster: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
+            const victimMaxHp = target.baseStats.hp;
+            const victimNegativeEffectCount = target.getStatusEffects().filter(status => status.alignment === StatusEffectAlignment.Negative).length;
+            const lifeDrinkAmount = Math.floor((victimMaxHp * 0.3) + 
+            (victimNegativeEffectCount > 0 ? victimNegativeEffectCount * (victimMaxHp * 0.1) : 0));
+            caster.baseStats.hp += lifeDrinkAmount;
+            caster.stats.hp = Math.min(caster.stats.hp + lifeDrinkAmount, caster.baseStats.hp);
         },
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;

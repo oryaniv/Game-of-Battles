@@ -4,7 +4,7 @@ import { Combatant, CombatantStats } from "./Combatant";
 import { DamageType, Damage } from "./Damage";
 import { BlockingStance } from "./SpecialMoves/Singular/Self";
 import { FrozenStatusEffect, ImmobilizedStatusEffect, LuckDowngradeStatusEffect, SlowStatusEffect, StrengthDowngradeStatusEffect, PoisonedStatusEffect, BleedingStatusEffect, TauntedStatusEffect, StupefiedStatusEffect, NauseatedStatusEffect, MesmerizedStatusEffect, StaggeredStatusEffect, DefenseDowngradeStatusEffect, MarkedForPainStatusEffect, MarkedForOblivionStatusEffect, MarkedForExecutionStatusEffect } from "./StatusEffects.ts/NegativeEffects";
-import { EnergyAbsorbStatusEffect, FirstStrikeStatusEffect, FoolsLuckStatusEffect, InspiringKillerStatusEffect, MarchingDefenseStatusEffect, RiposteStatusEffect, SadistStatusEffect, GoingOffStatusEffect } from "./StatusEffects.ts/NeutralEffects";
+import { EnergyAbsorbStatusEffect, FirstStrikeStatusEffect, FoolsLuckStatusEffect, InspiringKillerStatusEffect, MarchingDefenseStatusEffect, RiposteStatusEffect, SadistStatusEffect, GoingOffStatusEffect, DivineMiracleStatusEffect, LifeDrinkerStatusEffect } from "./StatusEffects.ts/NeutralEffects";
 import { ArcaneChannelingStatusEffect, BlockingStanceStatusEffect, CloakedStatusEffect, EncouragedStatusEffect, FocusAimStatusEffect, FortifiedStatusEffect, FullMetalJacketStatusEffect, MesmerizingStatusEffect, MobilityBoostStatusEffect, RalliedStatusEffect, RegeneratingStatusEffect, StrengthBoostStatusEffect } from "./StatusEffects.ts/PositiveEffects";
 
 export enum StatusEffectType {
@@ -88,6 +88,10 @@ export enum StatusEffectType {
     GOING_OFF,
     // 39
     DEFENDING,
+    // 40
+    DIVINE_MIRACLE,
+    // 41
+    LIFE_DRINKER,
 }
 
   export enum StatusEffectHook {
@@ -185,6 +189,8 @@ export enum StatusEffectType {
     [StatusEffectType.CLOAKED]: new CloakedStatusEffect(),
     [StatusEffectType.GOING_OFF]: new GoingOffStatusEffect(),
     [StatusEffectType.FULL_METAL_JACKET]: new FullMetalJacketStatusEffect(),
+    [StatusEffectType.DIVINE_MIRACLE]: new DivineMiracleStatusEffect(),
+    [StatusEffectType.LIFE_DRINKER]: new LifeDrinkerStatusEffect(),
   };
 
   export function getStatusEffect(name: StatusEffectType) : StatusEffect | undefined {

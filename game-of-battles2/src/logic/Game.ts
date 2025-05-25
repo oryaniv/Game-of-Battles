@@ -10,6 +10,7 @@ import { getResultsForStatusEffectHook } from "./StatusEffect";
 import { Team } from "./Team";
 import { emitter } from '../eventBus';
 import { EventLogger } from '../eventLogger';
+import { CoopMove } from "./SpecialMoves/Coop/CoopMove";
 
 export class Game {
     private currentTeamIndex: number = 0;
@@ -113,6 +114,10 @@ export class Game {
       }
       this.spendActionPoints(maxCost);
       return Array.isArray(actionResult) ? actionResult : [actionResult];
+    }
+
+    executeCoopMove(coopMove: CoopMove, invoker: Combatant, supportingCombatants: Combatant[], target: Position, board: Board): ActionResult[] {
+      return coopMove.effect(invoker, target, board);
     }
     
     executeDefend(): void {

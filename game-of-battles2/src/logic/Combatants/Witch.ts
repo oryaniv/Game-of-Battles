@@ -9,6 +9,7 @@ import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
 import { GraspOfZirash, SacredFlame } from "../SpecialMoves/Singular/Offensive";
 import { EvilEye, SiphonEnergy, Slow, Weaken } from "../SpecialMoves/Singular/Debuffs";
+import { LifeDrinker } from "../SpecialMoves/Singular/Passives";
 
 export class Witch extends Combatant {
     constructor(name: string, position: Position, team: Team) {
@@ -27,11 +28,11 @@ export class Witch extends Combatant {
         },
         position,
         [
-          {type: DamageType.Slash, reaction: DamageReaction.WEAKNESS},
+          {type: DamageType.Slash, reaction: DamageReaction.NONE},
           {type: DamageType.Pierce, reaction: DamageReaction.NONE},
           {type: DamageType.Crush, reaction: DamageReaction.NONE},
           {type: DamageType.Fire, reaction: DamageReaction.WEAKNESS},
-          {type: DamageType.Ice, reaction: DamageReaction.RESISTANCE},
+          {type: DamageType.Ice, reaction: DamageReaction.NONE},
           {type: DamageType.Lightning, reaction: DamageReaction.NONE},
           {type: DamageType.Blight, reaction: DamageReaction.RESISTANCE},
           {type: DamageType.Holy, reaction: DamageReaction.WEAKNESS},
@@ -43,6 +44,7 @@ export class Witch extends Combatant {
           new Slow(),
           new GraspOfZirash(),
           new SiphonEnergy(),
+          new LifeDrinker(),
 
           // supers
           // new DevourDivinity()

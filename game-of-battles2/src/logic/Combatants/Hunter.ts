@@ -53,7 +53,7 @@ export class Hunter extends Combatant {
       }
 
       basicAttack(): Damage {
-        return { amount: 25, type: DamageType.Pierce };
+        return { amount: 20, type: DamageType.Pierce };
       }
       
       

@@ -16,7 +16,7 @@ export class Defender extends Combatant {
         name,
         {
           hp: 100,
-          attackPower: 10,
+          attackPower: 20,
           defensePower: 30,
           stamina: 20,
           initiative: 4,
@@ -35,7 +35,7 @@ export class Defender extends Combatant {
           {type: DamageType.Lightning, reaction: DamageReaction.WEAKNESS},
           {type: DamageType.Blight, reaction: DamageReaction.NONE},
           {type: DamageType.Holy, reaction: DamageReaction.NONE},
-          {type: DamageType.Dark, reaction: DamageReaction.NONE},
+          {type: DamageType.Dark, reaction: DamageReaction.WEAKNESS},
         ],
         [
           new MarchingDefense(),
