@@ -349,7 +349,7 @@ export class Skewer implements SpecialMove {
     cost: number = 5;
     turnCost: number = 1;
     range: SpecialMoveRange = {
-        type: SpecialMoveRangeType.Straight,
+        type: SpecialMoveRangeType.Melee,
         align: SpecialMoveAlignment.All,
         areaOfEffect: SpecialMoveAreaOfEffect.Line,
         range: 1
@@ -611,8 +611,8 @@ export class TitanicFist implements SpecialMove {
                 targetCombatant!.move(getPushResult.moveTo, board);
             }
             if(getPushResult.collisionObject) {
-                targetCombatant!.stats.hp -= 10;
-                getPushResult.collisionObject.stats.hp -= 10;
+                targetCombatant?.takeDamage({amount: 10, type: DamageType.Crush});
+                getPushResult.collisionObject?.takeDamage({amount: 10, type: DamageType.Crush});
             }
         }
         return result;
@@ -625,7 +625,7 @@ export class TitanicFist implements SpecialMove {
 export class AngelicTouch implements SpecialMove {
     name: string = "Angelic Touch";
     triggerType = SpecialMoveTriggerType.Active;
-    cost: number = 12;
+    cost: number = 8;
     turnCost: number = 1;
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Melee,

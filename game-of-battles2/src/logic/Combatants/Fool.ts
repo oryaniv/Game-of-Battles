@@ -1,6 +1,7 @@
 import { Combatant } from "../Combatant";
 import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Position } from "../Position";
+import { BlowAKiss, CircusDiabolique, StandUpComedyGoneWrong } from "../SpecialMoves/Coop/AilmentCoop";
 import { LookeyHere, SmellIt, StupidestCrapEver, YoMama } from "../SpecialMoves/Singular/Ailments";
 import { FoolsLuck } from "../SpecialMoves/Singular/Passives";
 import { Team } from "../Team";
@@ -40,6 +41,13 @@ export class Fool extends Combatant {
             new SmellIt(),
             new LookeyHere(),
             new FoolsLuck(),
+
+            // supers
+            // new NastyNastyDolly(),
+            new BlowAKiss(),
+            new StandUpComedyGoneWrong(),
+            new CircusDiabolique(),
+            
           ], team
         );
       }

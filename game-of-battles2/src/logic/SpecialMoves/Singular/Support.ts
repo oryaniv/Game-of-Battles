@@ -168,7 +168,7 @@ export class Meditate implements SpecialMove {
         for(const statusEffect of negativeStatusEffects) {
             invoker?.removeStatusEffect(statusEffect.name);
         }
-        invoker.stats.hp = Math.min(invoker.stats.hp + 15, invoker.baseStats.hp);
+        invoker.stats.hp = Math.min(invoker.stats.hp + 20, invoker.baseStats.hp);
         return {
             attackResult: AttackResult.Hit,
             damage: {

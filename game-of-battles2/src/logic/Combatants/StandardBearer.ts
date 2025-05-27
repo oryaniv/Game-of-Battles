@@ -40,6 +40,12 @@ export class StandardBearer extends Combatant {
           new CallOfVigor(),
           new Encourage(),
           new RallyToTheBanner(),
+
+          // supers
+          // new HammerOfJustice(),
+          // new CallOfHereos(),
+          // new RallyOfTheParagon(),
+          // new RightoousVengeance(),
         ],
       team);
     }

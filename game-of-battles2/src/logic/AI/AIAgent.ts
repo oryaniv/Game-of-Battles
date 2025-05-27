@@ -23,8 +23,10 @@ export class SimpleAIAgent implements AIAgent {
 export enum AIAgentType {
     PRIMITIVE,
     TAUNTED,
-    CHARMERD,
+    CHARMED,
     STUNLOCKED,
+    PANICKED,
+    ENRAGED,
     DETERMINISTIC,
     SPECIALIZED
 }

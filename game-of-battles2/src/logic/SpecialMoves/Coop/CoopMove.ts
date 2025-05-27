@@ -6,6 +6,15 @@ import { Damage, DamageType } from "@/logic/Damage";
 import { Position } from "@/logic/Position";
 import { SpecialMove, SpecialMoveAlignment, SpecialMoveAreaOfEffect, SpecialMoveRange, SpecialMoveRangeType, SpecialMoveTriggerType } from "@/logic/SpecialMove";
 
+export interface CoopPartnerRequirement {
+    combatantTypeOptions: CombatantType[];
+}
+
+export interface CoopMoveWithPartners {
+    move:CoopMove;
+    partners: Combatant[];
+}
+
 export abstract class CoopMove implements SpecialMove {
     // taken from SpecialMove
     name: string = "Coop Move";
@@ -24,13 +33,19 @@ export abstract class CoopMove implements SpecialMove {
     };
     description: string = "Coop Move";
     checkRequirements = (self: Combatant) => {
-        return true;
+        return this.checkCoopRequirements(self);
     };
-    effect = (invoker: Combatant, target: Position, board: Board) => {
+    effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         return [];
     };
 
     // these are new, and belong to COOP alone
-    abstract coopRequiredPartners: CombatantType[];
+    checkCoopRequirements = (invoker: Combatant): boolean => {
+        const invokerTeam = invoker.team;
+        const aliveSupporters = invokerTeam.getAliveCombatants().filter(combatant => combatant.name !== invoker.name);
+        return this.coopRequiredPartners.every(partner => aliveSupporters
+            .some(supporter => partner.combatantTypeOptions.includes(supporter.getCombatantType())));
+    };
+    abstract coopRequiredPartners: CoopPartnerRequirement[];
     abstract meterCost: number;
 }

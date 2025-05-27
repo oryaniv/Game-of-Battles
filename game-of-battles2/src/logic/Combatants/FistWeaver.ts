@@ -1,6 +1,8 @@
 import { Combatant } from "../Combatant";
 import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Position } from "../Position";
+import { MoonBeam } from "../SpecialMoves/Coop/OffensiveCoop";
+import { IdaiNoHadou } from "../SpecialMoves/Coop/SelfCoop";
 import { AngelicTouch, TitanicFist, WindRunAssault } from "../SpecialMoves/Singular/Offensive";
 import { Riposte } from "../SpecialMoves/Singular/Passives";
 import { Meditate } from "../SpecialMoves/Singular/Support";
@@ -42,9 +44,9 @@ export class FistWeaver extends Combatant {
           new Riposte(),
 
           // supers
-          // new WayOfTheDragon()
+          new MoonBeam(),
           // new WayOfTheTiger()
-          // new IdaiNoHadou()
+          new IdaiNoHadou()
         ],
       team);
     }

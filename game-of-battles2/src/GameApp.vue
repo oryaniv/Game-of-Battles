@@ -110,9 +110,9 @@
         <button :disabled="attackMode || moveMode || showSkillsMenu || skillMode" v-if="!hasMoved" @click="showMoveOptions">Move</button>
         <button v-if="hasMoved" @click="undoMove">Undo Move</button>
         <button :disabled="showSkillsMenu || !hasActiveSpecialMoves() || skillMode" @click="showSpecialSkills">Use Skill</button>
-        <button :disabled="true">Use Super</button>
+        <button :disabled="showSkillsMenu || skillMode || showCoopSkill" @click="showCoopSkillMenu">Use Co-op Skill</button>
         <button :disabled="attackMode || moveMode || showSkillsMenu || skillMode" @click="skip">Skip</button>
-        <button :disabled="!moveMode && !attackMode && !showSkillsMenu && !skillMode" @click="cancel">Cancel</button>
+        <button :disabled="!moveMode && !attackMode && !showSkillsMenu && !skillMode && !showCoopSkill && !coopSkillMode" @click="cancel">Cancel</button>
         <button v-if="!isGameOver()" @click="playAiTurn(currentCombatant)">AI Play</button>
         <button @click="showStatus">Status</button>
       </div>
@@ -122,6 +122,7 @@
 
     <div v-if="showSkillsMenu" class="skill-menu">
       <div class="skill-menu-header">
+        <div class="skill-menu-header-title">Use Skill</div>
         <div class="skill-menu-header-name">{{ currentCombatant?.name }} The {{ currentCombatant?.getCombatantType() }}</div>
         <div class="skill-menu-header-sp-remaining">Remaining SP : {{ currentCombatant?.stats.stamina }}</div>
       </div>
@@ -144,6 +145,41 @@
         {{ selectedSkillDescription }}
       </div>
     </div>
+
+    <div v-if="showCoopSkill" class="skill-menu coop-skill-menu">
+      <div class="skill-menu-header">
+        <div class="skill-menu-header-title">Use Co op Skill</div>
+        <div class="skill-menu-header-name">{{ currentCombatant?.name }} The {{ currentCombatant?.getCombatantType() }}</div>
+        <div class="skill-menu-header-sp-remaining">Remaining SP : {{ currentCombatant?.stats.stamina }}</div>
+      </div>
+      <div class="skill-menu-body">
+        <div
+          v-for="skill in getCombatantCoopMoves(currentCombatant)"
+          :key="skill.move.name"
+          class="skill-item"
+          :class="{ disabled: !isSkillEnabled(skill.move.name) }"
+          :disabled="!isSkillEnabled(skill.move.name)"
+          @click="showCoopSkillTargets(skill.move.name)"
+          @mouseover="showCoopSkillDescription(skill.move.name, skill.partners)"
+          @mouseleave="hideCoopSkillDescription"
+        >
+          <span class="skill-name">{{ skill.move.name }}</span>
+          <span class="skill-meter-cost">Meter: {{ skill.move.meterCost }}</span>
+          <span class="skill-turn-cost">Turns: {{ skill.move.turnCost }}</span>
+          <span class="skill-cost">{{ skill.move.cost }} SP</span>
+        </div>
+      </div>
+      <div v-if="selectedCoopSkillDescription" class="skill-description">
+        <div class="partner-list">
+          <div class="partner-list-header">Partners</div>
+          <div class="partner-list-item" v-for="partner in selectedCoopSkillPartners" :key="partner.name">
+            {{ partner.name }} - {{ partner.getCombatantType() }}
+          </div>
+        </div>
+        {{ selectedCoopSkillDescription }}
+      </div>
+    </div>
+
 
   <div v-if="getWhiteTeamCombatants().length > 0" class="white-team-turn-order-container">
     <div v-for="combatant in getWhiteTeamCombatants()" :key="combatant.name" class="turn-order-item" :style="{ filter: getCurrentTeamIndex() === 1 ? 'blur(4px)' : '' }">
@@ -268,6 +304,7 @@ import { Wall, Bomb } from './logic/Combatants/ArtificerConstructs';
 import { Rogue } from './logic/Combatants/Rogue';
 import { Gorilla } from './logic/Combatants/Gorilla';
 import { SpecialMove, SpecialMoveTriggerType } from './logic/SpecialMove';
+import { CoopMove, CoopMoveWithPartners } from './logic/SpecialMoves/Coop/CoopMove'
 import { StatusEffect, StatusEffectType, StatusEffectAlignment } from './logic/StatusEffect';
 import { SimpleAIAgent } from './logic/AI/AIAgent';
 import { DummyAIAgent, BunkerDummyAIAgent, ToddlerAIAgent, KidAIAgent, TeenagerAIAgent, RookieAIAgent } from './logic/AI/DeterministicAgents';
@@ -283,25 +320,29 @@ export default defineComponent({
     
     const board = ref(new Board(10, 10));
     const whiteTeam = ref(new Team('White Team', 0));
-    const blackTeam = ref(new Team('Black Team', 1, new RookieAIAgent()));
+    const blackTeam = ref(new Team('Black Team', 1));
 
-    // whiteTeam.value.addCombatant(new Rogue('fobo', { x: 4, y: 3}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Witch('dobo', { x: 4, y: 3}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Hunter('tobo', { x: 4, y: 3}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Healer('aobo', { x: 4, y: 3}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new FistWeaver('Gobo', { x: 4, y: 3}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Hunter('fobo', { x: 4, y: 3}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new StandardBearer('dobo', { x: 4, y: 2}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new FistWeaver('tobo', { x: 4, y: 1}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Fool('aobo', { x: 6, y: 3}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Witch('iiobo', { x: 4, y: 2}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new StandardBearer('momom', { x: 7, y: 1}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Wizard('Gobo', { x: 4, y: 1}, whiteTeam.value));
 
-    whiteTeam.value.addCombatant(new Witch('dobo', { x: 2, y: 0}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Rogue('tobo', { x: 3, y: 1}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Healer('tobo', { x: 3, y: 0}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Hunter('aobo', { x: 4, y: 0}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new FistWeaver('Gobo', { x: 4, y: 1}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Witch('dobo', { x: 2, y: 0}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Rogue('tobo', { x: 3, y: 1}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Healer('tobo', { x: 3, y: 0}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Hunter('aobo', { x: 4, y: 0}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new FistWeaver('Gobo', { x: 4, y: 1}, whiteTeam.value));
     
-    blackTeam.value.addCombatant(new Vanguard('fffobo', { x: 5, y: 8 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Hunter('fffobo', { x: 6, y: 9 }, blackTeam.value));
-    blackTeam.value.addCombatant(new FistWeaver('fffobo', { x: 6, y: 8 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Pikeman('fffobo', { x: 4, y: 8 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Rogue('fffobo', { x: 7, y: 9 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Vanguard('fffobo', { x: 5, y: 8 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Hunter('fffobo', { x: 6, y: 9 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new FistWeaver('fffobo', { x: 6, y: 8 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Pikeman('fffobo', { x: 3, y: 7 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Witch('fffobo', { x: 4, y: 8 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Defender('fffobo', { x: 5, y: 7 }, blackTeam.value));
+    blackTeam.value.addCombatant(new FistWeaver('fffobo', { x: 4, y: 6 }, blackTeam.value));
 
     // debugSetupWhiteTeam(whiteTeam.value);
     // debugSetupBlackTeam(blackTeam.value);
@@ -378,13 +419,17 @@ export default defineComponent({
 
     const attackMode = ref(false);
     const skillMode = ref(false);
+    const coopSkillMode = ref(false);
     const validAttacks = ref<Position[]>([]);
     const validTargetsForSkill = ref<Position[]>([]);
 
     const damageEffects = ref<{ [key: string]: any[] }>({});
 
     const showSkillsMenu = ref(false);
+    const showCoopSkill = ref(false);
     const selectedSkillDescription = ref<string | null>(null);
+    const selectedCoopSkillDescription = ref<string | null>(null);
+    const selectedCoopSkillPartners = ref<Combatant[] | null>(null);
     const currentSkill = ref<SpecialMove | null>(null);
     const aoePositions = ref<Position[]>([]);
     const eventLogger = EventLogger.getInstance();
@@ -453,6 +498,8 @@ export default defineComponent({
         attackTarget(position);
       } else if (skillMode.value) {
         performSkill(position);
+      } else if (coopSkillMode.value) {
+        performCoopSkill(position);
       }
     }
 
@@ -494,9 +541,11 @@ export default defineComponent({
       moveMode.value = false;
       attackMode.value = false;
       skillMode.value = false;
+      coopSkillMode.value = false;
       validMoves.value = [];
       validAttacks.value = [];
       showSkillsMenu.value = false;
+      showCoopSkill.value = false;
       validTargetsForSkill.value = [];
       currentSkill.value = null;
       aoePositions.value = [];
@@ -762,12 +811,58 @@ export default defineComponent({
       showSkillsMenu.value = true;
     };
 
+    const showCoopSkillMenu = () => {
+      showCoopSkill.value = true;
+    }
+
     const getCombatantSpecialMoves = (combatant: Combatant) => {
       return combatant.getSpecialMoves().filter((move) => move.triggerType === SpecialMoveTriggerType.Active);
     }
 
-    const getCombatantSupers = (combatant: Combatant) => {
-      return combatant.getSpecialMoves().filter((move) => move.triggerType === SpecialMoveTriggerType.Cooperative);
+    const getCombatantCoopMoves = (combatant: Combatant) => {
+      const coopMoves = combatant.getSpecialMoves()
+      .filter((move) => move.triggerType === SpecialMoveTriggerType.Cooperative) as CoopMove[];
+      // .filter((move) => enoughActionPointsForCoop(move)) as CoopMove[];
+      const possibleSupporters = combatant.team.getAliveCombatants().filter((ally) => combatant.name !== ally.name);
+      const expandedCoopMoves: CoopMoveWithPartners[] = [];
+
+      for (const move of coopMoves) {
+        if (!('coopRequiredPartners' in move)) continue;
+
+        // Get all possible combinations of supporters for each partner requirement
+        const partnerCombinations: Combatant[][] = [];
+        
+        for (const requirement of (move as CoopMove).coopRequiredPartners) {
+          // Find all supporters that match any of the required types for this slot
+          const validSupporters = possibleSupporters.filter(supporter => 
+            requirement.combatantTypeOptions.includes(supporter.getCombatantType())
+          );
+          partnerCombinations.push(validSupporters);
+        }
+
+        // Generate all possible combinations
+        const generateCombinations = (current: Combatant[], depth: number) => {
+          if (depth === partnerCombinations.length) {
+            // Create a new instance of the move for this combination
+            expandedCoopMoves.push({
+              move,
+              partners: [...current]
+            });
+            return;
+          }
+
+          for (const supporter of partnerCombinations[depth]) {
+            // Skip if supporter is already used in current combination
+            if (!current.includes(supporter)) {
+              generateCombinations([...current, supporter], depth + 1);
+            }
+          }
+        };
+
+        generateCombinations([], 0);
+      }
+
+      return expandedCoopMoves;
     }
 
     const hasActiveSpecialMoves = () => {
@@ -790,11 +885,58 @@ export default defineComponent({
       selectedSkillDescription.value = null;
     };
 
+    const showCoopSkillDescription = (skillName: string, partners: Combatant[]) => {
+      if (currentCombatant.value) {
+        const skill = currentCombatant.value.specialMoves.find(
+          (skill) => skill.name === skillName
+        );
+        if (skill) {
+          selectedCoopSkillDescription.value = skill.description || 'No description available.';
+          selectedCoopSkillPartners.value = partners;
+        }
+      }
+    }
+
+    const hideCoopSkillDescription = () => {
+      selectedCoopSkillDescription.value = null;
+      selectedCoopSkillPartners.value = null;
+    };
+
+    
+
     const isSkillEnabled = (skillName: string) => {
       const skill = currentCombatant.value?.specialMoves.find(
         (skill) => skill.name === skillName
       );
-      return !!skill && !!currentCombatant.value && currentCombatant.value.canUseSkill(skill);
+      return !!skill && !!currentCombatant.value && currentCombatant.value.canUseSkill(skill) && enoughActionPointsForCoop(skill);
+
+      function enoughActionPointsForCoop(move: SpecialMove): boolean {
+        return move.turnCost <= (actionsRemaining.value + 0.5);
+      }
+    }
+
+    const isCoopSkillEnabled = (skillName: string) => {
+      const coopSkill = currentCombatant.value?.specialMoves.find(
+        (skill) => skill.name === skillName
+      );
+      return !!coopSkill && coopSkill.turnCost <= (actionsRemaining.value + 0.5) && isSkillEnabled(coopSkill.name);
+    }
+
+    const showCoopSkillTargets = (skillName: string) => {
+      if(!currentCombatant.value) {
+        return;
+      }
+      const skill = currentCombatant.value.specialMoves.find(
+        (skill) => skill.name === skillName
+      );
+      if(!skill) {
+        return;
+      }
+      showCoopSkill.value = false;
+      coopSkillMode.value = true;
+      currentSkill.value = skill;
+      const range = skill.range;
+      validTargetsForSkill.value = board.value.getValidTargetsForSkill(currentCombatant.value, range);
     }
 
     const showSkillTargets = (skillName: string) => {
@@ -846,6 +988,25 @@ export default defineComponent({
           }
         });
         skillMode.value = false;
+        validTargetsForSkill.value = [];
+        aoePositions.value = [];
+        game.value.nextTurn();
+        prepareNextTurn();
+      }
+    }
+
+    const performCoopSkill = (position: Position) => {
+      if (isSkillTargetValid(position) && currentCombatant.value 
+      && currentSkill.value && currentSkill.value.effect && selectedCoopSkillPartners.value) {
+        const coopMove = currentSkill.value as CoopMove;
+        const actionResults = game.value.executeCoopSkill(coopMove, currentCombatant.value, selectedCoopSkillPartners.value, position, board.value as Board);
+        actionResults.forEach((actionResult) => {
+          if(actionResult.attackResult !== AttackResult.NotFound) {
+            const applyPosition = actionResult.position || position;
+            applyAttackEffects(actionResult, applyPosition);
+          }
+        });
+        coopSkillMode.value = false;
         validTargetsForSkill.value = [];
         aoePositions.value = [];
         game.value.nextTurn();
@@ -1134,6 +1295,8 @@ export default defineComponent({
       return eventLogger.getEvents();
     }
 
+    
+
     return {
       board,
       teams,
@@ -1168,7 +1331,7 @@ export default defineComponent({
       showSkillsMenu,
       getCombatantSprite,
       getCombatantSpecialMoves,
-      getCombatantSupers,
+      getCombatantCoopMoves,
       hasActiveSpecialMoves,
       showSkillDescription,
       hideSkillDescription,
@@ -1177,6 +1340,7 @@ export default defineComponent({
       showSkillTargets,
       isSkillTargetValid,
       skillMode,
+      coopSkillMode,
       isEnemy,
       isFriendly,
       isNeutral,
@@ -1199,7 +1363,14 @@ export default defineComponent({
       getStatUiName,
       getStatusScale,
       statusNameToText,
-      getEvents
+      getEvents,
+      showCoopSkill,
+      showCoopSkillMenu,
+      showCoopSkillDescription,
+      hideCoopSkillDescription,
+      selectedCoopSkillDescription,
+      selectedCoopSkillPartners,
+      showCoopSkillTargets
     };
   },
 });
@@ -1465,9 +1636,21 @@ button {
   color: white;
 }
 
+.skill-menu.coop-skill-menu {
+  width: 600px;
+  height: 600px;
+}
+
 .skill-menu-header {
   padding: 10px;
   border-bottom: 1px solid white;
+}
+
+.skill-menu-header-title {
+  font-size: 30px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 10px;
 }
 
 .skill-menu-header-name {
@@ -1508,6 +1691,10 @@ button {
   flex: 1;
 }
 
+.coop-skill-menu .skill-name {
+  flex: 0.7;
+}
+
 .skill-cost {
   width: 40px;
   text-align: right;
@@ -1523,6 +1710,18 @@ button {
   padding: 10px;
   border-top: 1px solid white;
   text-align: center;
+}
+
+.partner-list {
+  border-bottom: 1px solid white;
+}
+
+.partner-list-header {
+  font-size: 24px;
+}   
+
+.partner-list-item {
+  font-size: 20px;
 }
 
 .dragon-left {

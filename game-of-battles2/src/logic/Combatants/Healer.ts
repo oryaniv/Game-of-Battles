@@ -10,6 +10,8 @@ import { CombatantType } from "./CombatantType";
 import { SacredFlame } from "../SpecialMoves/Singular/Offensive";
 import { Heal, Purify, Regenerate } from "../SpecialMoves/Singular/Support";
 import { DivineMircale } from "../SpecialMoves/Singular/Passives";
+import { RainOfGrace } from "../SpecialMoves/Coop/SupportCoop";
+import { QueensWrathMothersLove } from "../SpecialMoves/Coop/OffensiveCoop";
 // import { DivineMircale } from "../SpecialMoves/Singular/Passives";
 
 export class Healer extends Combatant {
@@ -19,7 +21,7 @@ export class Healer extends Combatant {
         {
           hp: 50,
           attackPower: 10,
-          defensePower: 10,
+          defensePower: 15,
           stamina: 50,
           initiative: 2,
           movementSpeed: 3,
@@ -47,8 +49,8 @@ export class Healer extends Combatant {
           new DivineMircale(),
 
           // supers
-          // new RainOfGrace()
-          // new QueensWrathMothersLove()
+          new RainOfGrace(),
+          new QueensWrathMothersLove()
           // new Ressurection()
         ], team
       );

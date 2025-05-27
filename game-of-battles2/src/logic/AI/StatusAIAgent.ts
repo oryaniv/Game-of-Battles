@@ -63,3 +63,43 @@ export class TauntedAIAgent implements AIAgent {
         return getStandardActionResult();
     }       
 }
+
+export class PanickedAIAgent implements AIAgent {
+    playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
+        const eventLogger = EventLogger.getInstance();
+        eventLogger.logEvent(`${combatant.name} is panicked and cannot act!`);
+        game.executePassTurn();
+        return getStandardActionResult();
+    }
+
+    getAIAgentType(): AIAgentType {
+        return AIAgentType.PANICKED;
+    }
+}
+
+export class EnragedAIAgent implements AIAgent {
+    playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
+        const eventLogger = EventLogger.getInstance();
+        eventLogger.logEvent(`${combatant.name} is enraged and cannot act!`);
+        game.executePassTurn();
+        return getStandardActionResult();
+    }
+
+    getAIAgentType(): AIAgentType {
+        return AIAgentType.ENRAGED;
+    }
+}   
+
+
+export class CharmedAIAgent implements AIAgent {
+    playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
+        const eventLogger = EventLogger.getInstance();
+        eventLogger.logEvent(`${combatant.name} is charmed and cannot act!`);
+        game.executePassTurn();
+        return getStandardActionResult();
+    }
+    
+    getAIAgentType(): AIAgentType {
+        return AIAgentType.CHARMED;
+    }
+}

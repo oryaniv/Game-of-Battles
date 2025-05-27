@@ -116,8 +116,29 @@ export class Game {
       return Array.isArray(actionResult) ? actionResult : [actionResult];
     }
 
-    executeCoopMove(coopMove: CoopMove, invoker: Combatant, supportingCombatants: Combatant[], target: Position, board: Board): ActionResult[] {
-      return coopMove.effect(invoker, target, board);
+    executeCoopSkill(coopMove: CoopMove, invoker: Combatant, supportingCombatants: Combatant[], target: Position, board: Board): ActionResult[] {
+      if(!coopMove.effect) {
+        return [getStandardActionResult()]; 
+      }
+      if(supportingCombatants.some((combatant) => combatant.isKnockedOut())) {
+        throw new Error("One or more supporting combatants are knocked out");
+      }
+      const eventLogger = EventLogger.getInstance();
+      eventLogger.logEvent(`${invoker.name} uses ${coopMove.name}`);
+      [invoker, ...supportingCombatants].forEach((combatant) => {
+        combatant.stats.stamina -= coopMove.cost;
+      });
+
+      getResultsForStatusEffectHook(invoker, StatusEffectHook.OnSkillUsed);
+      const actionResult: ActionResult | ActionResult[] = coopMove.effect(invoker, target, board); 
+      let maxCost:number = 0;
+      if(Array.isArray(actionResult)) {
+        maxCost = this.determineCostOfManyActions(actionResult);
+      } else {
+        maxCost = actionResult.cost;
+      }
+      this.spendActionPoints(maxCost);
+      return Array.isArray(actionResult) ? actionResult : [actionResult];
     }
     
     executeDefend(): void {

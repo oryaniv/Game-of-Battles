@@ -192,6 +192,35 @@ export class MesmerizingStatusEffect implements StatusEffect {
     alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
 }
 
+export class CircusDiaboliqueStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.CIRCUS_DIABOLIQUE;
+    applicationHooks = {
+        [StatusEffectHook.OnAttacking]: (self: Combatant) => {
+            self.removeStatusEffect(StatusEffectType.CIRCUS_DIABOLIQUE);
+        },
+        [StatusEffectHook.OnDefending]: (self: Combatant) => {
+            self.removeStatusEffect(StatusEffectType.CIRCUS_DIABOLIQUE);
+        },
+        [StatusEffectHook.OnSkillUsed]: (self: Combatant) => {
+            self.removeStatusEffect(StatusEffectType.CIRCUS_DIABOLIQUE);
+        },
+        [StatusEffectHook.OnMoving]: (self: Combatant) => {
+            self.removeStatusEffect(StatusEffectType.CIRCUS_DIABOLIQUE);
+        },
+        [StatusEffectHook.OnTurnEnd]: (self: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
+            const combatMaster = CombatMaster.getInstance();
+
+            const getAllTargets: Position[] = board.getAreaOfEffectPositions(self, self.position, SpecialMoveAreaOfEffect.Great_Nova, SpecialMoveAlignment.Enemy);
+            getAllTargets.filter(AOETarget => board.getCombatantAtPosition(AOETarget) !== null)
+                         .filter(AOETarget => board.getCombatantAtPosition(AOETarget)?.team.getName() !== self.team.getName())
+                         .forEach(AOETarget => {
+                combatMaster.tryInflictStatusEffect(self, AOETarget, board, StatusEffectType.PANICKED, 1, 0.6);
+            });
+        } 
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
+}
+
 export class CloakedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.CLOAKED;  
     applicationHooks = {
@@ -231,6 +260,23 @@ export class FullMetalJacketStatusEffect implements StatusEffect {
                 caster.stats.attackPower -= 20;
             }
         },
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
+}
+
+export class IdaiNoHadouStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.IDAI_NO_HADOU;
+    applicationHooks = {
+        [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
+            caster.stats.agility += 10;
+            caster.stats.luck += 10;
+            caster.stats.movementSpeed += 2;
+        },
+        [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
+            caster.stats.agility -= 10;
+            caster.stats.luck -= 10;
+            caster.stats.movementSpeed -= 2;
+        }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
 }

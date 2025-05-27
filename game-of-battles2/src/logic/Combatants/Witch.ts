@@ -10,6 +10,8 @@ import { CombatantType } from "./CombatantType";
 import { GraspOfZirash, SacredFlame } from "../SpecialMoves/Singular/Offensive";
 import { EvilEye, SiphonEnergy, Slow, Weaken } from "../SpecialMoves/Singular/Debuffs";
 import { LifeDrinker } from "../SpecialMoves/Singular/Passives";
+import { DevourDivinity, UltimateCurse } from "../SpecialMoves/Coop/DebuffCoop";
+import { HungerOfZirash } from "../SpecialMoves/Coop/OffensiveCoop";
 
 export class Witch extends Combatant {
     constructor(name: string, position: Position, team: Team) {
@@ -18,12 +20,12 @@ export class Witch extends Combatant {
         {
           hp: 55,
           attackPower: 15,
-          defensePower: 5,
+          defensePower: 10,
           stamina: 40,
           initiative: 3,
           movementSpeed: 3,
           range: 1,
-          agility: 4,
+          agility: 5,
           luck: 9,
         },
         position,
@@ -47,9 +49,10 @@ export class Witch extends Combatant {
           new LifeDrinker(),
 
           // supers
-          // new DevourDivinity()
-          // new HungerOfZirash()
-          // new UltimateCurse()
+          // new SoulScythe(),
+          new DevourDivinity(),
+          new HungerOfZirash(), 
+          new UltimateCurse()
         ], team
       );
     }

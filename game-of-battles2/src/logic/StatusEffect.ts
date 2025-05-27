@@ -3,11 +3,12 @@ import { Board } from "./Board";
 import { Combatant, CombatantStats } from "./Combatant";
 import { DamageType, Damage } from "./Damage";
 import { BlockingStance } from "./SpecialMoves/Singular/Self";
-import { FrozenStatusEffect, ImmobilizedStatusEffect, LuckDowngradeStatusEffect, SlowStatusEffect, StrengthDowngradeStatusEffect, PoisonedStatusEffect, BleedingStatusEffect, TauntedStatusEffect, StupefiedStatusEffect, NauseatedStatusEffect, MesmerizedStatusEffect, StaggeredStatusEffect, DefenseDowngradeStatusEffect, MarkedForPainStatusEffect, MarkedForOblivionStatusEffect, MarkedForExecutionStatusEffect } from "./StatusEffects.ts/NegativeEffects";
+import { FrozenStatusEffect, ImmobilizedStatusEffect, LuckDowngradeStatusEffect, SlowStatusEffect, StrengthDowngradeStatusEffect, PoisonedStatusEffect, BleedingStatusEffect, TauntedStatusEffect, StupefiedStatusEffect, NauseatedStatusEffect, MesmerizedStatusEffect, StaggeredStatusEffect, DefenseDowngradeStatusEffect, MarkedForPainStatusEffect, MarkedForOblivionStatusEffect, MarkedForExecutionStatusEffect, PanickedStatusEffect, CharmedStatusEffect, NightmareLockedStatusEffect } from "./StatusEffects.ts/NegativeEffects";
 import { EnergyAbsorbStatusEffect, FirstStrikeStatusEffect, FoolsLuckStatusEffect, InspiringKillerStatusEffect, MarchingDefenseStatusEffect, RiposteStatusEffect, SadistStatusEffect, GoingOffStatusEffect, DivineMiracleStatusEffect, LifeDrinkerStatusEffect } from "./StatusEffects.ts/NeutralEffects";
-import { ArcaneChannelingStatusEffect, BlockingStanceStatusEffect, CloakedStatusEffect, EncouragedStatusEffect, FocusAimStatusEffect, FortifiedStatusEffect, FullMetalJacketStatusEffect, MesmerizingStatusEffect, MobilityBoostStatusEffect, RalliedStatusEffect, RegeneratingStatusEffect, StrengthBoostStatusEffect } from "./StatusEffects.ts/PositiveEffects";
+import { ArcaneChannelingStatusEffect, BlockingStanceStatusEffect, CircusDiaboliqueStatusEffect, CloakedStatusEffect, EncouragedStatusEffect, FocusAimStatusEffect, FortifiedStatusEffect, FullMetalJacketStatusEffect, IdaiNoHadouStatusEffect, MesmerizingStatusEffect, MobilityBoostStatusEffect, RalliedStatusEffect, RegeneratingStatusEffect, StrengthBoostStatusEffect } from "./StatusEffects.ts/PositiveEffects";
 
-export enum StatusEffectType {
+export enum 
+StatusEffectType {
     // 0
     BLOCKING_STANCE,
     // 1
@@ -92,6 +93,16 @@ export enum StatusEffectType {
     DIVINE_MIRACLE,
     // 41
     LIFE_DRINKER,
+    // 42
+    PANICKED, 
+    // 43
+    MYRMIDON_HOUR,
+    // 44
+    CHARMED,
+    // 45
+    CIRCUS_DIABOLIQUE,
+    // 46
+    NIGHTMARE_LOCKED,
 }
 
   export enum StatusEffectHook {
@@ -191,6 +202,11 @@ export enum StatusEffectType {
     [StatusEffectType.FULL_METAL_JACKET]: new FullMetalJacketStatusEffect(),
     [StatusEffectType.DIVINE_MIRACLE]: new DivineMiracleStatusEffect(),
     [StatusEffectType.LIFE_DRINKER]: new LifeDrinkerStatusEffect(),
+    [StatusEffectType.IDAI_NO_HADOU]: new IdaiNoHadouStatusEffect(),
+    [StatusEffectType.PANICKED]: new PanickedStatusEffect(),
+    [StatusEffectType.CHARMED]: new CharmedStatusEffect(),
+    [StatusEffectType.CIRCUS_DIABOLIQUE]: new CircusDiaboliqueStatusEffect(),
+    [StatusEffectType.NIGHTMARE_LOCKED]: new NightmareLockedStatusEffect(),
   };
 
   export function getStatusEffect(name: StatusEffectType) : StatusEffect | undefined {

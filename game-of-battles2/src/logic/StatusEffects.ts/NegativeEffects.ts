@@ -7,7 +7,7 @@ import { DamageType, Damage } from "../Damage";
 import { DamageReaction } from "../Damage";
 import { CombatMaster } from "../CombatMaster";
 import { Board } from "../Board";
-import { StunLockedAIAgent, TauntedAIAgent } from "../AI/StatusAIAgent";
+import { CharmedAIAgent, PanickedAIAgent, StunLockedAIAgent, TauntedAIAgent } from "../AI/StatusAIAgent";
 import { AIAgentType } from "../AI/AIAgent";
 
 export class ImmobilizedStatusEffect implements StatusEffect {
@@ -234,6 +234,27 @@ export class MesmerizedStatusEffect implements StatusEffect {
     alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
 }
 
+export class NightmareLockedStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.NIGHTMARE_LOCKED;
+    applicationHooks = {
+        [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
+            caster.removeStatusEffect(StatusEffectType.DEFENDING);
+            caster.removeStatusEffect(StatusEffectType.BLOCKING_STANCE);
+            caster.removeStatusEffect(StatusEffectType.FOCUS_AIM);
+            caster.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
+            caster.removeStatusEffect(StatusEffectType.CLOAKED);
+            caster.insertAiAgent(new StunLockedAIAgent("Nightmare Locked"));
+        },
+        [StatusEffectHook.OnRemove]: (caster: Combatant) => {
+            caster.removeAiAgent(AIAgentType.STUNLOCKED);
+        },
+        [StatusEffectHook.OnTurnStart]: (caster: Combatant) => {
+            caster.takeDamage({amount: 10, type: DamageType.Blight});
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
+}
+
 export class MarkedForPainStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.MARKED_FOR_PAIN;
     applicationHooks = {
@@ -335,6 +356,32 @@ export class MarkedDetonatedStatusEffect implements StatusEffect {
         [StatusEffectHook.OnBeingMissed]: (self: Combatant, attacker: Combatant) => {
             self.removeStatusEffect(StatusEffectType.MARKED_DETONATED);
         },
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
+}
+
+export class PanickedStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.PANICKED;
+    applicationHooks = {
+        [StatusEffectHook.OnApply]: (self: Combatant) => {
+            self.insertAiAgent(new PanickedAIAgent());
+        },
+        [StatusEffectHook.OnRemove]: (self: Combatant) => {
+            self.removeAiAgent(AIAgentType.PANICKED);
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
+}
+
+export class CharmedStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.CHARMED;
+    applicationHooks = {
+        [StatusEffectHook.OnApply]: (self: Combatant) => {
+            self.insertAiAgent(new CharmedAIAgent());
+        },
+        [StatusEffectHook.OnRemove]: (self: Combatant) => {
+            self.removeAiAgent(AIAgentType.CHARMED);
+        }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
 }
