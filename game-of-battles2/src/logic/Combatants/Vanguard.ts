@@ -2,7 +2,8 @@ import { Combatant } from "../Combatant";
 import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Position } from "../Position";
 import { HellScream } from "../SpecialMoves/Coop/AilmentCoop";
-import { WhirlwindAttack } from "../SpecialMoves/Coop/OffensiveCoop";
+import { SkySovereignsWrath, WhirlwindAttack } from "../SpecialMoves/Coop/OffensiveCoop";
+import { Frenzy } from "../SpecialMoves/Coop/SelfCoop";
 import { FeralSwing, ShieldBreaker as ShieldBreaker, Rampage, UnstoppableCharge } from "../SpecialMoves/Singular/Offensive";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
@@ -41,9 +42,9 @@ export class Vanguard extends Combatant {
           new Rampage(),
 
           // supers
-          // new WalkItOff(),
+          new SkySovereignsWrath(),
           new WhirlwindAttack(),
-          // new Frenzy()
+          new Frenzy(),
           new HellScream()
         ],
       team);

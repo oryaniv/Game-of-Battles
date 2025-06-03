@@ -32,6 +32,7 @@
             :style="{ 
               color: teamColors[getCombatant({ x, y }).team.getIndex() === 0 ? 0 : 1],
               boxShadow: isCurrentCombatant({ x, y }) ? '0 0 10px 5px rgba(0, 255, 0, 0.7)' : '',
+              
               animation: isCurrentCombatant({ x, y }) ? 'glow 2s infinite alternate' :  ''
               }"
             
@@ -322,75 +323,42 @@ export default defineComponent({
     const whiteTeam = ref(new Team('White Team', 0));
     const blackTeam = ref(new Team('Black Team', 1));
 
-    whiteTeam.value.addCombatant(new Hunter('fobo', { x: 4, y: 3}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new StandardBearer('dobo', { x: 4, y: 2}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new FistWeaver('tobo', { x: 4, y: 1}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Fool('aobo', { x: 6, y: 3}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Witch('iiobo', { x: 4, y: 2}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new StandardBearer('momom', { x: 7, y: 1}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Wizard('Gobo', { x: 4, y: 1}, whiteTeam.value));
-
-    // whiteTeam.value.addCombatant(new Witch('dobo', { x: 2, y: 0}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Wizard('fobo', { x: 5, y: 5}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Fool('dobo', { x: 3, y: 1}, whiteTeam.value));
     // whiteTeam.value.addCombatant(new Rogue('tobo', { x: 3, y: 1}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Healer('tobo', { x: 3, y: 0}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Hunter('aobo', { x: 4, y: 0}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new FistWeaver('Gobo', { x: 4, y: 1}, whiteTeam.value));
-    
-    // blackTeam.value.addCombatant(new Vanguard('fffobo', { x: 5, y: 8 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Hunter('fffobo', { x: 6, y: 9 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new FistWeaver('fffobo', { x: 6, y: 8 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Pikeman('fffobo', { x: 3, y: 7 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Witch('fffobo', { x: 4, y: 8 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Defender('fffobo', { x: 5, y: 7 }, blackTeam.value));
-    blackTeam.value.addCombatant(new FistWeaver('fffobo', { x: 4, y: 6 }, blackTeam.value));
-
-    // debugSetupWhiteTeam(whiteTeam.value);
-    // debugSetupBlackTeam(blackTeam.value);
-
-    // placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
-
-
-    // const whiteTeam = ref(generateRandomTeam(0, new VeteranAIAgent()));
-    // const blackTeam = ref(generateCombatantIdenticalTeam(whiteTeam.value, 1));
-    // placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
-
-    // allMilitiaSetup(whiteTeam.value, blackTeam.value);
-
-    // const whiteTeam = ref(generateRandomTeam(0, new KidAIAgent()));
-    // const blackTeam = ref(new Team('Team Gorilla', 1, new ToddlerAIAgent()));
-
-    // whiteTeam.value.name = 'Team Veteran';
-    // blackTeam.value.name = 'Team Rookie';
-
-    // theGorillaTeam(blackTeam.value);
-
-    // placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
-
-
-    
-  // whiteTeam.value.addCombatant(new Fool('Gobo', { x: 4, y: 3}, whiteTeam.value));
-  // whiteTeam.value.addCombatant(new StandardBearer('afaf', { x: 6, y: 5 }, whiteTeam.value));
-  
-    
-  //   blackTeam.value.addCombatant(new Vanguard('fffobo', { x: 5, y: 5 }, blackTeam.value));
-  //   blackTeam.value.addCombatant(new Vanguard('fffobo', { x: 4, y: 5 }, blackTeam.value));
-
-  //   blackTeam.value.addCombatant(new Artificer('Gobo', { x: 9, y: 6 }, blackTeam.value));
+    // whiteTeam.value.addCombatant(new Hunter('miobo', { x: 4, y: 1}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Defender('aobo', { x: 5, y: 3}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Wizard('iiobo', { x: 3, y: 0}, whiteTeam.value));
 
     // whiteTeam.value.combatants[0].stats.hp = 10;
-    // whiteTeam.value.combatants[0].stats.stamina = 10;
-    // blackTeam.value.combatants[0].applyStatusEffect({
-    //         name: StatusEffectType.ARCANE_CHANNELING,
-    //         duration: 5,
-    // }); 
+
+    // blackTeam.value.addCombatant(new Vanguard('dog', { x: 1, y: 2 }, blackTeam.value));
+   // blackTeam.value.addCombatant(new Defender('tog', { x: 5, y: 9 }, blackTeam.value));
+    
+
+    blackTeam.value.addCombatant(new Vanguard('dog', { x: 6, y: 8 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Pikeman('rob', { x: 4, y: 8 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Hunter('nana', { x: 5, y: 9 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Wizard('reqe', { x: 6, y: 9 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new FistWeaver('mfiem', { x: 5, y: 8 }, blackTeam.value));
+
+  //blackTeam.value.addCombatant(new Artificer('Gobo', { x: 9, y: 6 }, blackTeam.value));
+
+    // whiteTeam.value.combatants[0].stats.hp = 10;
+    whiteTeam.value.combatants[0].applyStatusEffect({
+            name: StatusEffectType.ARCANE_CHANNELING,
+            duration: 2,
+    }); 
+
+    whiteTeam.value.combatants[0].applyStatusEffect({
+            name: StatusEffectType.ARCANE_OVERCHARGE,
+            duration: 2,
+    }); 
 
     // whiteTeam.value.combatants[0].applyStatusEffect({
-    //         name: StatusEffectType.STAGGERED,
+    //         name: StatusEffectType.ARCANE_OVERCHARGE,
     //         duration: 5,
     // }); 
-
-    // // blackTeam.value.combatants[1].stats.hp = 5;
-    // // blackTeam.value.combatants[2].stats.hp = 5;
 
         // theATeam(whiteTeam.value);
         // theBTeam(blackTeam.value);
@@ -749,6 +717,8 @@ export default defineComponent({
           return require('./assets/Bomb.svg');
         case CombatantType.Wall:
           return require('./assets/Wall.svg');
+        case CombatantType.Doll:
+          return require('./assets/Fool.svg');
       }
     }
 
@@ -801,6 +771,8 @@ export default defineComponent({
             return require('./assets/Pentagram.svg');
           case DamageType.Healing:
             return require('./assets/Healing.svg');
+          case DamageType.Unstoppable:
+            return require('./assets/Unstoppable.svg');
           // ... other cases
           default:
             return require('./assets/Empty.svg'); // Or a default SVG path
@@ -902,7 +874,9 @@ export default defineComponent({
       selectedCoopSkillPartners.value = null;
     };
 
-    
+    const isCurrentSkillPartner = (combatant: Combatant) => {
+      return selectedCoopSkillPartners.value?.some((partner) => partner.name === combatant.name);
+    }
 
     const isSkillEnabled = (skillName: string) => {
       const skill = currentCombatant.value?.specialMoves.find(
@@ -926,6 +900,8 @@ export default defineComponent({
       if(!currentCombatant.value) {
         return;
       }
+      
+      selectedCoopSkillDescription.value = null;
       const skill = currentCombatant.value.specialMoves.find(
         (skill) => skill.name === skillName
       );
@@ -943,6 +919,7 @@ export default defineComponent({
       if(!currentCombatant.value) {
         return;
       }
+      hideSkillDescription();
       const skill = currentCombatant.value.specialMoves.find(
         (skill) => skill.name === skillName
       );
@@ -1043,6 +1020,20 @@ export default defineComponent({
       [StatusEffectType.MARKED_FOR_EXECUTION]: "MR2",
       [StatusEffectType.MARKED_FOR_OBLIVION]: "MR3",
       [StatusEffectType.FULL_METAL_JACKET]: "FMJ",
+      [StatusEffectType.PANICKED]: "PN",
+      [StatusEffectType.CHARMED]: "CHM",
+      [StatusEffectType.CIRCUS_DIABOLIQUE]: "CQ",
+      [StatusEffectType.NIGHTMARE_LOCKED]: "NQ",
+      [StatusEffectType.RUPTURE_TENDONS]: "RTN",
+      [StatusEffectType.DIVINE_RETRIBUTION]: "DR",
+      [StatusEffectType.SANCTUARY]: "SC",
+      [StatusEffectType.IDAI_NO_HADOU]: "INH",
+      [StatusEffectType.PLAGUED]: "PLG",
+      [StatusEffectType.BURNING]: "BRN",
+      [StatusEffectType.FRENZY]: "FZ",
+      [StatusEffectType.ARCANE_OVERCHARGE]: "AO",
+      [StatusEffectType.ARCANE_BARRIER]: "AB",
+      [StatusEffectType.ARCANE_CONDUIT]: "ACO",
       // ... add mappings for other status effect types
     };
 
@@ -1370,7 +1361,8 @@ export default defineComponent({
       hideCoopSkillDescription,
       selectedCoopSkillDescription,
       selectedCoopSkillPartners,
-      showCoopSkillTargets
+      showCoopSkillTargets,
+      isCurrentSkillPartner
     };
   },
 });

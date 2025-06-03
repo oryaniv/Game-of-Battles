@@ -1844,6 +1844,12 @@ class VeteranAIAgentBombPlayer implements VeteranAIAgentPlayer {
     }
 }
 
+class VeteranAIAgentDollPlayer implements VeteranAIAgentPlayer {
+    evaluate(combatant: Combatant, game: Game, board: Board, turnPlay: TurnPlay): number {
+        return 0;
+    }
+}
+
 const agentByCombatantType = {
     [CombatantType.Defender]: new VeteranAIAgentDefenderPlayer(),
     [CombatantType.Militia]: new VeteranAIAgentMilitiaPlayer(),
@@ -1869,6 +1875,7 @@ const agentByCombatantType = {
 
     [CombatantType.Wall]: new VeteranAIAgentWallPlayer(),
     [CombatantType.Bomb]: new VeteranAIAgentBombPlayer(),
+    [CombatantType.Doll]: new VeteranAIAgentDollPlayer(),
 }
 
 function addCoverValue(combatant: Combatant, game: Game, board: Board, movePosition: Position): number {

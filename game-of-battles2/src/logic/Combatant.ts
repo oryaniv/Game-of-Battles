@@ -43,6 +43,7 @@ export interface CombatantStats {
     public stats: CombatantStats; // Current stats, can be modified by effects
     public statusEffects: StatusEffectApplication[] = [];
     public aiAgent: AIAgent[] | undefined;
+    public relatedCombatants: Combatant[] = [];
     hasMoved: boolean = false;
 
     startTurn(): ActionResult[] {
@@ -76,7 +77,8 @@ export interface CombatantStats {
     }
   
     move(newPosition: Position, board: Board) {
-        const onMovingHookResults = getResultsForStatusEffectHook(this, StatusEffectHook.OnMoving);
+        const movingDistance = board.getDistanceBetweenPositions(this.position, newPosition);
+        const onMovingHookResults = getResultsForStatusEffectHook(this, StatusEffectHook.OnMoving, undefined, undefined, movingDistance, board);
 
         board.removeCombatant(this);
         if(!board.isPositionEmpty(newPosition)) {
@@ -116,13 +118,13 @@ export interface CombatantStats {
       return this.stats.hp <= 0;
     }
   
-    takeDamage(damage: Damage): void {
+    takeDamage(damage: Damage, board?: Board): void {
       this.stats.hp -= damage.amount;
       getResultsForStatusEffectHook(this, StatusEffectHook.OnDamageTaken, this, damage, 1);
       if (this.stats.hp <= 0) {
         this.stats.hp = 0;
-        const onDeathHookResults = getResultsForStatusEffectHook(this, StatusEffectHook.OnDeath, this, {amount: 0, type: DamageType.Unstoppable}, 1);
-        onDeathHookResults.filter((result) => result.attackResult !== AttackResult.NotFound).forEach((result) => {
+        const onDeathHookResults = getResultsForStatusEffectHook(this, StatusEffectHook.OnDeath, this, {amount: 0, type: DamageType.Unstoppable}, 1, board);
+        onDeathHookResults.flatMap(e => e).filter((result) => result.attackResult !== AttackResult.NotFound).forEach((result) => {
           emitter.emit('trigger-method', result);
         });
       }
@@ -162,14 +164,18 @@ export interface CombatantStats {
     }
 
     updateStatusEffect(effect: StatusEffectApplication): void {
-      const effectToUpdate = this.statusEffects.find((effect) => effect.name === effect.name);
+      const effectToUpdate = this.statusEffects.find((existingEffect) => existingEffect.name === effect.name);
       if(effectToUpdate) {
+        // eslint-disable-next-line
+        debugger;
         effectToUpdate.duration = effect.duration;
       }
     }
     
     updateStatusEffects(): void {
       for (let i = this.statusEffects.length - 1; i >= 0; i--) {
+        // eslint-disable-next-line
+        debugger;
           const effect = this.statusEffects[i];
           effect.duration--;
           if (effect.duration <= 0) {
@@ -242,6 +248,14 @@ export interface CombatantStats {
 
       isExpendable(): boolean {
         return false;
+      }
+
+      addRelatedCombatant(combatant: Combatant): void {
+        this.relatedCombatants.push(combatant);
+      }
+
+      getRelatedCombatants(): Combatant[] {
+        return this.relatedCombatants;
       }
   }
 

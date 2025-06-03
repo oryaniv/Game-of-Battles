@@ -6,6 +6,7 @@ import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Game } from "../Game";
 import { isSamePosition, Position } from "../Position";
 import { SpecialMove, SpecialMoveAlignment, SpecialMoveTriggerType } from "../SpecialMove";
+import { CoopMove } from "../SpecialMoves/Coop/CoopMove";
 import { StatusEffectType } from "../StatusEffect";
 import { AIAgent, AIAgentType } from "./AIAgent";
 import { getValidAttacks, getValidMovePositions } from "./AIUtils";
@@ -35,11 +36,12 @@ export enum PlayActionType {
     DEFEND,
     BASIC_ATTACK,
     USE_SPECIAL_MOVE,
+    USE_COOP_SPECIAL_MOVE
 }
 
 export abstract class HeuristicalAIAgent implements AIAgent {
     playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
-        const bestPlay: TurnPlay = getHeuristicBestPlay(combatant, game, board, this.evaluationFunction);
+        const bestPlay: TurnPlay = getHeuristicBestPlay(combatant, game, board, this.evaluationFunction, this.collectCoop);
         if(bestPlay.position !== combatant.position) {
             combatant.move(bestPlay.position, board);
         } 
@@ -52,6 +54,11 @@ export abstract class HeuristicalAIAgent implements AIAgent {
     }
 
     abstract evaluationFunction(combatant: Combatant, game: Game, board: Board, turnPlay: TurnPlay): any;
+
+    private collectCoop: boolean = false;
+    setCollectCoop(collectCoop: boolean) {
+        this.collectCoop = collectCoop;
+    }
 }
 
 export class RandomAIAgent extends HeuristicalAIAgent {
@@ -61,8 +68,8 @@ export class RandomAIAgent extends HeuristicalAIAgent {
 }
 
 function getHeuristicBestPlay(combatant: Combatant, game: Game, 
-    board: Board, evaluationFunction: (combatant: Combatant, game: Game, board: Board, turnPlay: TurnPlay) => number): TurnPlay {   
-    const allActions: TurnPlay[] = getAllPossibleCombatantActions(combatant, game, board);
+    board: Board, evaluationFunction: (combatant: Combatant, game: Game, board: Board, turnPlay: TurnPlay) => number, collectCoop: boolean): TurnPlay {   
+    const allActions: TurnPlay[] = getAllPossibleCombatantActions(combatant, game, board, collectCoop);
     const allActionsEvaluated: RankedTurnPlay[] = allActions.map(action => {
         return {score: evaluationFunction(combatant, game, board, action), play: action};
     });
@@ -77,7 +84,7 @@ function randomizedBestPlay(allActionsEvaluated: RankedTurnPlay[]): TurnPlay {
     return bestPlays[Math.floor(Math.random() * bestPlays.length)];
 }
 
-function getAllPossibleCombatantActions(combatant: Combatant, game: Game, board: Board): TurnPlay[] {
+function getAllPossibleCombatantActions(combatant: Combatant, game: Game, board: Board, collectCoop: boolean): TurnPlay[] {
 
     const allActions: TurnPlay[] = [];
 
@@ -87,7 +94,10 @@ function getAllPossibleCombatantActions(combatant: Combatant, game: Game, board:
     allActions.push(...getBasicAttackPlays(combatant, game, board, validNewPositions));
     allActions.push(...getSpecialMovePlays(combatant, game, board, validNewPositions));
 
-    // collect supers?
+    if(collectCoop) {
+        allActions.push(...getCoopPlays(combatant, game, board, validNewPositions));
+    }
+
     return allActions;
 }
 
@@ -240,6 +250,59 @@ function getSpecialMovePlays(combatant: Combatant, game: Game, board: Board, val
     return allSpecialMoveActions;
 }
 
+function getCoopPlays(combatant: Combatant, game: Game, board: Board, validNewPositions: Position[]): TurnPlay[] {
+    const allCoopActions: TurnPlay[] = [];
+
+
+
+    const allUsableCoopMoves = combatant.specialMoves.filter(specialMove => specialMove.triggerType === SpecialMoveTriggerType.Cooperative)
+                                                        .filter(specialMove => canUseSpecialMove(specialMove, combatant));
+
+    allUsableCoopMoves.forEach(coopMove => {
+        allCoopActions.push({
+            position: combatant.position,
+            playAction: {
+                executionFunction: (combatant: Combatant, target: Position, game: Game, board: Board) => {
+                    return game.executeCoopSkill(coopMove as CoopMove, combatant, [], target, board);
+                },
+                playActionType: PlayActionType.USE_COOP_SPECIAL_MOVE,
+                target: undefined,
+                skillName: coopMove.name
+            }
+        });
+    });
+
+    validNewPositions.forEach(newPosition => {
+        const originalPosition = combatant.position;
+        const positionPlaced = theoreticalReplacement(combatant, board, newPosition, true);
+        allUsableCoopMoves.forEach(coopMove => {
+            // const validTargets = board.getValidTargetsForSkill(
+            //     Object.assign({}, combatant, { position: newPosition, hasStatusEffect: combatant.hasStatusEffect }),
+            //     specialMove.range
+            // );
+            if(!canUseSpecialMove(coopMove, combatant)) {
+                return;
+            }
+            const validTargets = board.getValidTargetsForSkill(combatant, coopMove.range);
+            validTargets.forEach(targetPosition => {
+                allCoopActions.push({
+                    position: positionPlaced,
+                    playAction: {
+                        executionFunction: (combatant: Combatant, target: Position, game: Game, board: Board) => {
+                            return game.executeCoopSkill(coopMove as CoopMove, combatant, [], target, board);
+                        },
+                        playActionType: PlayActionType.USE_SPECIAL_MOVE,
+                        target: targetPosition,
+                        skillName: coopMove.name
+                    }
+                });
+            });
+        });
+        theoreticalReplacement(combatant, board, originalPosition, false);
+    });
+
+    return allCoopActions;
+}
 
 export function theoreticalReplacement(combatant: Combatant, board: Board, newPosition: Position, hasMoved: boolean) {
     board.removeCombatant(combatant);

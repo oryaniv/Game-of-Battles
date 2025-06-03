@@ -65,7 +65,7 @@ AI - 3 intermediate levels
 ---------
 
 
-*********************** <------------ you are here
+*************************
 
 artificer
 
@@ -73,7 +73,7 @@ artificer veteran AI
 
 balancing matches + balancing changes
 
-co-op abilities
+co-op abilities  <------------ you are here
 
 update all AI types
 
@@ -103,7 +103,19 @@ moving/walking is part of range calculator
 
 moving/walking will be calculated per step (for animations)
 
+in general, every effect on the screen is played immediately, yield/async style
+
 every little thing that affects the board will be emitted to the UI
+
+combatant ID (instead of just name) also display name instead of just real name
+
+AI agents all collect all moves, keep in mind chargmed/enraged for target picking
+
+standardized combatant duplicator(for all the AI stuff)
+
+skill not available with reason
+
+board/game/rangeCalculator/combatMaster need to be global
 
 ----------------------------------
 

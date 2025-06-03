@@ -1,6 +1,8 @@
 import { Combatant } from "../Combatant";
 import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Position } from "../Position";
+import { DanceOfDaggers, KarithrasBoon, RuptureTendons } from "../SpecialMoves/Coop/OffensiveCoop";
+import { BloodRite } from "../SpecialMoves/Coop/SupportCoop";
 import { AssassinsMark } from "../SpecialMoves/Singular/Debuffs";
 import { SneakAttack, VipersKiss } from "../SpecialMoves/Singular/Offensive";
 import { Sadist } from "../SpecialMoves/Singular/Passives";
@@ -44,7 +46,11 @@ export class Rogue extends Combatant {
             new Sadist(),
 
             // supers
-            // new DanceOfDaggers(),
+            new BloodRite(),
+            new RuptureTendons(),
+            new DanceOfDaggers(),
+            new KarithrasBoon(),
+            
 
           ], team
         );

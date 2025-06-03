@@ -197,5 +197,6 @@ export class AssassinsMark implements SpecialMove {
     checkRequirements = undefined;
     description = `cast the mark of the assassin on an enemy. the mark can get stronger with every cast.
     the mark will be detonated when the marked target is struck by a rogue. the stornger the mark is upon detonation,
-    the more damage the target will suffer from the detonating attack.`
+    the more damage the target will suffer from the detonating attack.`;
+    breaksCloaking = false;
 }

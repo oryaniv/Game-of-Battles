@@ -101,6 +101,7 @@ export class RangeCalculator {
         if(
           align === SpecialMoveAlignment.Empty_Space ||
           range.areaOfEffect === SpecialMoveAreaOfEffect.Nova || 
+          range.areaOfEffect === SpecialMoveAreaOfEffect.Great_Nova ||
           range.areaOfEffect === SpecialMoveAreaOfEffect.Line || 
           range.areaOfEffect === SpecialMoveAreaOfEffect.Cross || 
           range.areaOfEffect === SpecialMoveAreaOfEffect.Cone) {
@@ -158,6 +159,7 @@ export class RangeCalculator {
             // allow for AOE targeting
           } else if(range.align === SpecialMoveAlignment.Empty_Space ||
             range.areaOfEffect === SpecialMoveAreaOfEffect.Nova || 
+            range.areaOfEffect === SpecialMoveAreaOfEffect.Great_Nova ||
             range.areaOfEffect === SpecialMoveAreaOfEffect.Line || 
             range.areaOfEffect === SpecialMoveAreaOfEffect.Cross || 
             range.areaOfEffect === SpecialMoveAreaOfEffect.Cone) {
@@ -265,6 +267,12 @@ export class RangeCalculator {
       case SpecialMoveAreaOfEffect.Chain:
         // Implement chain logic (e.g., jumps to nearby enemies)
         // This can be complex and might require graph traversal
+        break;
+      case SpecialMoveAreaOfEffect.Four_Spread:
+        aoePositions.push({ x: targetPosition.x - 1, y: targetPosition.y });
+        aoePositions.push({ x: targetPosition.x + 1, y: targetPosition.y });
+        aoePositions.push({ x: targetPosition.x, y: targetPosition.y - 1 });
+        aoePositions.push({ x: targetPosition.x, y: targetPosition.y + 1 });
         break;
     }
 

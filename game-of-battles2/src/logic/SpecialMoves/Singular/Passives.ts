@@ -246,6 +246,58 @@ export class LifeDrinker implements SpecialMove {
     description = `When this combatant kills an enemy, it gains part of their max health as both healing and addition to their max health`
 }
 
+export class SurpriseBoom implements SpecialMove {
+    name: string = "Surprise Boom";
+    triggerType = SpecialMoveTriggerType.Passive;
+    cost: number = 0;
+    turnCost: number = 0;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.None,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Unstoppable
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        invoker.applyStatusEffect({
+            name: StatusEffectType.SURPRISE_BOOM,
+            duration: Number.POSITIVE_INFINITY,
+        });
+        return getStandardActionResult();
+    };
+    requirements = undefined;
+    description = `When this combatant is killed, it explodes, dealing blight damage to all enemies in a cross area`
+}
+
+export class Decoy implements SpecialMove {
+    name: string = "Decoy";
+    triggerType = SpecialMoveTriggerType.Passive;
+    cost: number = 0;
+    turnCost: number = 0;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.None,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Unstoppable
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        invoker.applyStatusEffect({
+            name: StatusEffectType.DECOY,
+            duration: Number.POSITIVE_INFINITY,
+        });
+        return getStandardActionResult();
+    };
+    requirements = undefined;
+    description = `this combatant is a decoy for another. when it is destroyed, the original combatant is revealed, and vice versa.`
+}
+
 
 
     

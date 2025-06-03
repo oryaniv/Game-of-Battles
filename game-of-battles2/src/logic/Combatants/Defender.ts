@@ -11,6 +11,7 @@ import { BlockingStance } from "../SpecialMoves/Singular/Self";
 import { DefensiveStrike } from "../SpecialMoves/Singular/Offensive";
 import { Fortify } from "../SpecialMoves/Singular/Buffs";
 import { ShieldBash } from "../SpecialMoves/Coop/OffensiveCoop";
+import { ArcaneShieldWall, Guardian, ShieldWall } from "../SpecialMoves/Coop/SupportCoop";
 export class Defender extends Combatant {
     constructor(name: string, position: Position, team: Team) {
       super(
@@ -45,9 +46,10 @@ export class Defender extends Combatant {
           new Fortify(),
 
           // supers
-          // new ShieldWall()
-          new ShieldBash()
-          // new ArcaneShieldWall()
+          new ShieldBash(),
+          new Guardian(),
+          new ShieldWall(),
+          new ArcaneShieldWall()
         ], team 
       );
     }

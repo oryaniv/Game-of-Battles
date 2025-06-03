@@ -14,6 +14,7 @@ export interface SpecialMove {
     damage: Damage;
     effect?: (invoker: Combatant, target: Position, board: Board) => ActionResult | ActionResult[];
     checkRequirements?: (self: Combatant) => boolean;
+    breaksCloaking?: boolean;
     description: string;
   }
 
@@ -46,7 +47,8 @@ export enum SpecialMoveAreaOfEffect {
     Great_Nova = "GreatNova",
     Line = "Line",
     Cone = "Cone",
-    Chain = "Chain"
+    Chain = "Chain",
+    Four_Spread = "FourSpread",
 }
 
 export enum SpecialMoveAlignment {

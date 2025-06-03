@@ -130,6 +130,9 @@ export class ShadowStep implements SpecialMove {
         });
         return getStandardActionResult();
     };  
+    checkRequirements = (self: Combatant) => {
+        return !self.hasStatusEffect(StatusEffectType.CLOAKED) && !self.hasMoved;
+    };
     description = `Step into the shadows, move to target position, and become cloaked for 5 round.
     cloaking breaks upon taking damage, losing focus or attacking.`
 }

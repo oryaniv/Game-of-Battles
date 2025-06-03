@@ -9,6 +9,9 @@ import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
 import { ChainLightning, FireBall, Flame, FrozenBurst, Icicle, LightningBolt } from "../SpecialMoves/Singular/Offensive";
 import { ArcaneChanneling } from "../SpecialMoves/Singular/Self";
+import { ArcaneBarrier, ArcaneOvercharge, Teleportation } from "../SpecialMoves/Coop/SelfCoop";
+import { CatastrophicCalamity } from "../SpecialMoves/Coop/OffensiveCoop";
+import { ArcaneConduit } from "../SpecialMoves/Coop/SupportCoop";
 
 export class Wizard extends Combatant {
     constructor(name: string, position: Position, team: Team) {
@@ -19,7 +22,7 @@ export class Wizard extends Combatant {
           attackPower: 20,
           defensePower: 20,
           stamina: 60,
-          initiative: 2,
+          initiative: 12,
           movementSpeed: 3,
           range: 1,
           agility: 6,
@@ -47,9 +50,11 @@ export class Wizard extends Combatant {
           new FrozenBurst(),
 
           // supers
-          // new ArcaneConduit()
-          // new ArcaneOvercharge()
-          // new CatastrophicCalamity()
+          new ArcaneConduit(),
+          new ArcaneOvercharge(),
+          new ArcaneBarrier(),
+          new Teleportation(),
+          new CatastrophicCalamity()
         ], team
       );
     }

@@ -1,7 +1,7 @@
 import { Combatant } from "../Combatant";
 import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Position } from "../Position";
-import { BrimstoneRain, RainOfArrows } from "../SpecialMoves/Coop/OffensiveCoop";
+import { BrimstoneRain, PlagueArrow, RainOfArrows, SnipeShot } from "../SpecialMoves/Coop/OffensiveCoop";
 import { PinDown, Ricochet, ToxicArrow } from "../SpecialMoves/Singular/Offensive";
 import { FocusAim } from "../SpecialMoves/Singular/Self";
 import { Team } from "../Team";
@@ -42,10 +42,10 @@ export class Hunter extends Combatant {
             new ToxicArrow(),
 
             // supers
-            
+             new PlagueArrow(),
+             new SnipeShot(),
              new RainOfArrows(),
              new BrimstoneRain()
-            // new SniperShot()
           ], team
         );
       }

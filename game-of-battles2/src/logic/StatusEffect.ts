@@ -3,9 +3,10 @@ import { Board } from "./Board";
 import { Combatant, CombatantStats } from "./Combatant";
 import { DamageType, Damage } from "./Damage";
 import { BlockingStance } from "./SpecialMoves/Singular/Self";
-import { FrozenStatusEffect, ImmobilizedStatusEffect, LuckDowngradeStatusEffect, SlowStatusEffect, StrengthDowngradeStatusEffect, PoisonedStatusEffect, BleedingStatusEffect, TauntedStatusEffect, StupefiedStatusEffect, NauseatedStatusEffect, MesmerizedStatusEffect, StaggeredStatusEffect, DefenseDowngradeStatusEffect, MarkedForPainStatusEffect, MarkedForOblivionStatusEffect, MarkedForExecutionStatusEffect, PanickedStatusEffect, CharmedStatusEffect, NightmareLockedStatusEffect } from "./StatusEffects.ts/NegativeEffects";
-import { EnergyAbsorbStatusEffect, FirstStrikeStatusEffect, FoolsLuckStatusEffect, InspiringKillerStatusEffect, MarchingDefenseStatusEffect, RiposteStatusEffect, SadistStatusEffect, GoingOffStatusEffect, DivineMiracleStatusEffect, LifeDrinkerStatusEffect } from "./StatusEffects.ts/NeutralEffects";
-import { ArcaneChannelingStatusEffect, BlockingStanceStatusEffect, CircusDiaboliqueStatusEffect, CloakedStatusEffect, EncouragedStatusEffect, FocusAimStatusEffect, FortifiedStatusEffect, FullMetalJacketStatusEffect, IdaiNoHadouStatusEffect, MesmerizingStatusEffect, MobilityBoostStatusEffect, RalliedStatusEffect, RegeneratingStatusEffect, StrengthBoostStatusEffect } from "./StatusEffects.ts/PositiveEffects";
+import { FrozenStatusEffect, ImmobilizedStatusEffect, LuckDowngradeStatusEffect, SlowStatusEffect, StrengthDowngradeStatusEffect, PoisonedStatusEffect, BleedingStatusEffect, TauntedStatusEffect, StupefiedStatusEffect, NauseatedStatusEffect, MesmerizedStatusEffect, StaggeredStatusEffect, DefenseDowngradeStatusEffect, MarkedForPainStatusEffect, MarkedForOblivionStatusEffect, MarkedForExecutionStatusEffect, PanickedStatusEffect, CharmedStatusEffect, NightmareLockedStatusEffect, RuptureTendonsStatusEffect, DivineRetributionStatusEffect, PlaguedStatusEffect, BurningStatusEffect } from "./StatusEffects.ts/NegativeEffects";
+import { EnergyAbsorbStatusEffect, FirstStrikeStatusEffect, FoolsLuckStatusEffect, InspiringKillerStatusEffect, MarchingDefenseStatusEffect, RiposteStatusEffect, SadistStatusEffect, GoingOffStatusEffect, DivineMiracleStatusEffect, LifeDrinkerStatusEffect, LastStandUsedStatusEffect, DecoyStatusEffect, SurpriseBoomStatusEffect } from "./StatusEffects.ts/NeutralEffects";
+import { ArcaneBarrierStatusEffect, ArcaneChannelingStatusEffect, ArcaneConduitStatusEffect, ArcaneOverchargeStatusEffect, BlockingStanceStatusEffect, CircusDiaboliqueStatusEffect, CloakedStatusEffect, DiamondSupremacyStatusEffect, EncouragedStatusEffect, FocusAimStatusEffect, FortifiedStatusEffect, FrenzyStatusEffect, FullMetalJacketStatusEffect, IdaiNoHadouStatusEffect, MesmerizingStatusEffect, MobilityBoostStatusEffect, RalliedStatusEffect, RegeneratingStatusEffect, SanctuaryStatusEffect, ShieldWallProtectedStatusEffect, ShieldWallStatusEffect, StrengthBoostStatusEffect } from "./StatusEffects.ts/PositiveEffects";
+import { SpecialMove } from "./SpecialMove";
 
 export enum 
 StatusEffectType {
@@ -96,13 +97,49 @@ StatusEffectType {
     // 42
     PANICKED, 
     // 43
-    MYRMIDON_HOUR,
+    DIAMOND_SUPREMACY,
     // 44
     CHARMED,
     // 45
     CIRCUS_DIABOLIQUE,
     // 46
     NIGHTMARE_LOCKED,
+    // 47
+    LAST_STAND_USED,
+    // 48
+    SHIELD_WALL,
+    // 49
+    SHIELD_WALL_PROTECTED,
+    // 50
+    ARCANE_SHIELD_WALL,
+    // 51
+    ARCANE_SHIELD_WALL_PROTECTED,
+    // 52
+    FRENZY,
+    // 53
+    RUPTURE_TENDONS,
+    // 54
+    SANCTUARY,
+    // 55
+    DIVINE_RETRIBUTION,
+    // 56
+    DECOY,
+    // 57
+    SURPRISE_BOOM,
+    // 58
+    PLAGUED,
+    // 59
+    BURNING,
+    // 60
+    ARCANE_OVERCHARGE,
+    // 61
+    ARCANE_BARRIER,
+    // 62
+    ARCANE_CONDUIT,
+    // 63
+    GUARDIAN,
+    // 64
+    GUARDIAN_PROTECTED,
 }
 
   export enum StatusEffectHook {
@@ -207,16 +244,31 @@ StatusEffectType {
     [StatusEffectType.CHARMED]: new CharmedStatusEffect(),
     [StatusEffectType.CIRCUS_DIABOLIQUE]: new CircusDiaboliqueStatusEffect(),
     [StatusEffectType.NIGHTMARE_LOCKED]: new NightmareLockedStatusEffect(),
+    [StatusEffectType.LAST_STAND_USED]: new LastStandUsedStatusEffect(),
+    [StatusEffectType.SHIELD_WALL]: new ShieldWallStatusEffect(),
+    [StatusEffectType.SHIELD_WALL_PROTECTED]: new ShieldWallProtectedStatusEffect(),
+    [StatusEffectType.RUPTURE_TENDONS]: new RuptureTendonsStatusEffect(),
+    [StatusEffectType.SANCTUARY]: new SanctuaryStatusEffect(),
+    [StatusEffectType.DIVINE_RETRIBUTION]: new DivineRetributionStatusEffect(),
+    [StatusEffectType.DECOY]: new DecoyStatusEffect(),
+    [StatusEffectType.SURPRISE_BOOM]: new SurpriseBoomStatusEffect(),
+    [StatusEffectType.PLAGUED]: new PlaguedStatusEffect(),
+    [StatusEffectType.BURNING]: new BurningStatusEffect(),
+    [StatusEffectType.FRENZY]: new FrenzyStatusEffect(),
+    [StatusEffectType.ARCANE_OVERCHARGE]: new ArcaneOverchargeStatusEffect(),
+    [StatusEffectType.ARCANE_BARRIER]: new ArcaneBarrierStatusEffect(),
+    [StatusEffectType.ARCANE_CONDUIT]: new ArcaneConduitStatusEffect(),
+    [StatusEffectType.DIAMOND_SUPREMACY]: new DiamondSupremacyStatusEffect(),
   };
 
   export function getStatusEffect(name: StatusEffectType) : StatusEffect | undefined {
     return StatusEffectsTable[name];
   }
 
-  export function getResultsForStatusEffectHook(invoker: Combatant, hookType: StatusEffectHook, target?: Combatant, damage?: Damage, amount?: number, board?: Board): ActionResult[] {
+  export function getResultsForStatusEffectHook(invoker: Combatant, hookType: StatusEffectHook, target?: Combatant, damage?: Damage, amount?: number, board?: Board, skill?: SpecialMove): ActionResult[] {
     const correspondingToTypeHooks: StatusEffect[] = invoker.getStatusEffectsOfHook(hookType);
     const correspondingToTypeHooksResults: ActionResult[] = correspondingToTypeHooks
-    .map((hook) => hook.applicationHooks[hookType]!(invoker, target, damage, amount, board))
+    .map((hook) => hook.applicationHooks[hookType]!(invoker, target, damage, amount, board, skill))
     .filter((result) => result !== undefined) as ActionResult[];
 
     return correspondingToTypeHooksResults;

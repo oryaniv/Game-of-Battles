@@ -4,7 +4,7 @@ import { StatusEffectHook, StatusEffectType } from "../StatusEffect";
 import { StatusEffect } from "../StatusEffect";
 import { Board } from "../Board";
 import { SpecialMoveAlignment, SpecialMoveAreaOfEffect } from "../SpecialMove";
-import { AttackResult, getStandardActionResult } from "../attackResult";
+import { ActionResult, AttackResult, getStandardActionResult } from "../attackResult";
 import { Damage, DamageType } from "../Damage";
 import { DamageReaction } from "../Damage";
 import { RangeCalculator } from "../RangeCalculator";
@@ -52,9 +52,13 @@ export class FoolsLuckStatusEffect implements StatusEffect {
             const random = Math.random();
             
             if (random <= chanceToFumble) {
+                attacked.baseStats.luck += 1;
+                attacked.stats.luck += 1;
                 return {attackResult: AttackResult.Fumble, damage: {amount: 0, type: DamageType.Unstoppable}, cost: attackCost, reaction: DamageReaction.NONE, position: attacked.position};
             }
             if (random <= chanceToMiss) {
+                attacked.baseStats.luck += 2;
+                attacked.stats.luck += 2;
                 return {attackResult: AttackResult.Miss, damage: {amount: 0, type: DamageType.Unstoppable}, cost: attackCost, reaction: DamageReaction.NONE, position: attacked.position};
             }
             return;
@@ -77,11 +81,17 @@ export class FirstStrikeStatusEffect implements StatusEffect {
         [StatusEffectHook.OnBeingAttacked]: (self: Combatant, attacker: Combatant, damage: Damage, amount: number, board: Board) => {
             const rangeCalculator = new RangeCalculator();
             if(
-                self.hasStatusEffect(StatusEffectType.STRUCK_FIRST) || 
                 !rangeCalculator.areInMeleeRange(self, attacker) ||
-                attacker.hasStatusEffect(StatusEffectType.CLOAKED) || 
-                attacker.hasStatusEffect(StatusEffectType.FIRST_STRIKE)
+                attacker.hasStatusEffect(StatusEffectType.CLOAKED) ||
+                attacker.hasStatusEffect(StatusEffectType.DIAMOND_SUPREMACY)
             ) {
+                return;
+            }
+
+            if(!self.hasStatusEffect(StatusEffectType.DIAMOND_SUPREMACY) && 
+                (self.hasStatusEffect(StatusEffectType.STRUCK_FIRST) || 
+                attacker.hasStatusEffect(StatusEffectType.FIRST_STRIKE))) {
+               
                 return;
             }
 
@@ -203,6 +213,51 @@ export class LifeDrinkerStatusEffect implements StatusEffect {
             (victimNegativeEffectCount > 0 ? victimNegativeEffectCount * (victimMaxHp * 0.1) : 0));
             caster.baseStats.hp += lifeDrinkAmount;
             caster.stats.hp = Math.min(caster.stats.hp + lifeDrinkAmount, caster.baseStats.hp);
+        },
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
+}
+
+export class LastStandUsedStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.LAST_STAND_USED;
+    applicationHooks = {
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Neutral;
+}
+
+export class DecoyStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.DECOY;
+    applicationHooks = {
+        [StatusEffectHook.OnDeath]: (caster: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
+            const team = caster.team;
+            const realTarget = team.combatants.find((combatant) => `${combatant.name}_doll` === target.name);
+            if(realTarget) {
+                realTarget.removeStatusEffect(StatusEffectType.CLOAKED);
+            }
+        },
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
+}
+
+export class SurpriseBoomStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.SURPRISE_BOOM;
+    applicationHooks = {
+        [StatusEffectHook.OnDeath]: (caster: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
+            const combatMaster = CombatMaster.getInstance();
+            const getAllTargets = board.getAreaOfEffectPositions(caster, target.position, SpecialMoveAreaOfEffect.Cross, SpecialMoveAlignment.All);
+            const results: ActionResult[] = getAllTargets.map((targetPosition) => {
+                const targetEnemy = board.getCombatantAtPosition(targetPosition);
+                if(!targetEnemy || targetEnemy.name === caster.name) {
+                    return getStandardActionResult();
+                }
+                const result = combatMaster.executeAttack(caster, targetEnemy.position, board, {amount: 20, type: DamageType.Blight});
+                if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
+                    combatMaster.tryInflictStatusEffect(caster, targetEnemy.position, board, StatusEffectType.POISONED, 3, 0.3);
+                }
+                return result;
+            });
+            // caster.takeDamage({amount: caster.stats.hp, type: DamageType.Unstoppable});
+            return results;
         },
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;

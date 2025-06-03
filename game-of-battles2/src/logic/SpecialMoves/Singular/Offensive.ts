@@ -738,3 +738,4 @@ export class ShockingGauntlet implements SpecialMove {
     checkRequirements = undefined
     description = `Use your handy electrified gauntlet to shock an enemy from up close, dealing medium Lightning damage and having a small chance to inflict Staggered for 3 turns.`   
 }   
+

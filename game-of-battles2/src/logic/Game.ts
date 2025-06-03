@@ -104,7 +104,7 @@ export class Game {
       const eventLogger = EventLogger.getInstance();
       eventLogger.logEvent(`${invoker.name} uses ${skill.name}`);
       invoker.stats.stamina -= skill.cost;
-      getResultsForStatusEffectHook(invoker, StatusEffectHook.OnSkillUsed);
+      getResultsForStatusEffectHook(invoker, StatusEffectHook.OnSkillUsed, undefined, undefined, 1, board, skill);
       const actionResult: ActionResult | ActionResult[] = skill.effect(invoker, target, board); 
       let maxCost:number = 0;
       if(Array.isArray(actionResult)) {
@@ -123,17 +123,18 @@ export class Game {
       if(supportingCombatants.some((combatant) => combatant.isKnockedOut())) {
         throw new Error("One or more supporting combatants are knocked out");
       }
+      this.addSkillUsage(coopMove.name);
       const eventLogger = EventLogger.getInstance();
       eventLogger.logEvent(`${invoker.name} uses ${coopMove.name}`);
       [invoker, ...supportingCombatants].forEach((combatant) => {
         combatant.stats.stamina -= coopMove.cost;
       });
 
-      getResultsForStatusEffectHook(invoker, StatusEffectHook.OnSkillUsed);
+      getResultsForStatusEffectHook(invoker, StatusEffectHook.OnSkillUsed, undefined, undefined, 1, board, coopMove);
       const actionResult: ActionResult | ActionResult[] = coopMove.effect(invoker, target, board); 
       let maxCost:number = 0;
       if(Array.isArray(actionResult)) {
-        maxCost = this.determineCostOfManyActions(actionResult);
+        maxCost = this.determineCostOfManyActions(actionResult, coopMove.turnCost);
       } else {
         maxCost = actionResult.cost;
       }
@@ -251,20 +252,20 @@ export class Game {
       });
     }
 
-    determineCostOfManyActions(actions: ActionResult[]): number {
+    determineCostOfManyActions(actions: ActionResult[], baseCost: number = 1): number {
       if(actions.length === 0) {
         return 0;
       }
-      if(actions.some((action) => action.cost === 2)) {
-        return 2;
-      } else if(actions.some((action) => action.cost === 0.5)) {
-        return 0.5;
+      if(actions.some((action) => action.cost === 2 * baseCost)) {
+        return 2 * baseCost;
+      } else if(actions.some((action) => action.cost === 0.5 * baseCost)) {
+        return 0.5 * baseCost;
       } else if(actions.some((action) => action.cost === 0)) {
         return 0;
       } else if(actions.some((action) => action.cost === -1)) {
         return -1;
       }
-      return 1;
+      return 1 * baseCost;
     }
   
     isGameOver(): boolean {

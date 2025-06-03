@@ -119,7 +119,6 @@ export class PoisonedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.POISONED;
     applicationHooks = {
         [StatusEffectHook.OnTurnEnd]: (self: Combatant, target: Combatant, board: Board) => {
-            // self.stats.hp -= 10;
             self.takeDamage({amount: 10, type: DamageType.Blight});
             if(self.stats.hp <= 0) {
                 self.stats.hp = 0;
@@ -381,6 +380,99 @@ export class CharmedStatusEffect implements StatusEffect {
         },
         [StatusEffectHook.OnRemove]: (self: Combatant) => {
             self.removeAiAgent(AIAgentType.CHARMED);
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
+}
+
+export class RuptureTendonsStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.RUPTURE_TENDONS;
+    applicationHooks = {
+        [StatusEffectHook.OnMoving]: (self: Combatant, attacker: Combatant, damage: Damage, amount: number, board: Board) => {
+            self.takeDamage({amount: amount * 6, type: DamageType.Pierce});
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
+}
+
+export class DivineRetributionStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.DIVINE_RETRIBUTION;
+    applicationHooks = {
+        [StatusEffectHook.OnInflictingDamage]: (self: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
+            // eslint-disable-next-line
+            debugger;
+            const damageAmount = damage.amount * 0.5;
+            self.takeDamage({amount: damageAmount, type: DamageType.Unstoppable});
+            return {
+                attackResult: AttackResult.Hit,
+                damage: {amount: damageAmount, type: DamageType.Unstoppable},
+                cost: 0,
+                reaction: DamageReaction.NONE,
+                position: self.position
+            }
+        },
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
+}
+
+export class PlaguedStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.PLAGUED;
+    applicationHooks = {
+        [StatusEffectHook.OnTurnEnd]: (self: Combatant) => {
+            self.takeDamage({amount: 10, type: DamageType.Blight});
+            if(self.stats.hp <= 0) {
+                self.stats.hp = 0;
+            }
+            return {
+                attackResult: AttackResult.Hit,
+                damage: {
+                    amount: 10,
+                    type: DamageType.Blight
+                },
+                cost: 0,
+                reaction: DamageReaction.NONE,
+                position: self.position
+            }
+        },
+        [StatusEffectHook.OnTurnStart]: (self: Combatant) => {
+            const selfTeam = self.team;
+            const adjacentCombatants = selfTeam.combatants.filter((combatant) => {
+                const selfPosition = self.position;
+                const combatantPosition = combatant.position;
+                return combatantPosition.y === selfPosition.y && combatantPosition.x === selfPosition.x + 1 ||
+                combatantPosition.y === selfPosition.y && combatantPosition.x === selfPosition.x - 1 ||
+                combatantPosition.x === selfPosition.x && combatantPosition.y === selfPosition.y + 1 ||
+                combatantPosition.x === selfPosition.x && combatantPosition.y === selfPosition.y - 1;
+            });
+            adjacentCombatants.forEach((combatant) => {
+                combatant.applyStatusEffect({
+                    name: StatusEffectType.PLAGUED,
+                    duration: 3,
+                });
+            });
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
+}
+
+export class BurningStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.BURNING;
+    applicationHooks = {
+        [StatusEffectHook.OnTurnEnd]: (self: Combatant) => {
+            self.takeDamage({amount: 10, type: DamageType.Fire});
+            if(self.stats.hp <= 0) {
+                self.stats.hp = 0;
+            }
+            return {
+                attackResult: AttackResult.Hit,
+                damage: {
+                    amount: 10,
+                    type: DamageType.Fire
+                },
+                cost: 0,
+                reaction: DamageReaction.NONE,
+                position: self.position
+            }
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;

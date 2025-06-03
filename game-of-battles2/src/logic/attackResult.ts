@@ -21,14 +21,14 @@ export interface ActionResult {
 }
 
 
-export function getStandardActionResult(position?: Position): ActionResult {
+export function getStandardActionResult(position?: Position, cost: number = 1): ActionResult {
     return {
         attackResult: AttackResult.NotFound,
         damage: {
             amount: 0,
             type: DamageType.Unstoppable
         },
-        cost: 1,
+        cost: cost,
         reaction: DamageReaction.NONE,
         position: position
     };

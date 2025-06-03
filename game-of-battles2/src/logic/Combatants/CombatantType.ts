@@ -20,4 +20,5 @@ export enum CombatantType {
 
     Wall = "Wall",
     Bomb = "Bomb",
+    Doll = "Doll",
 }

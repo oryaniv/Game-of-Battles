@@ -18,8 +18,8 @@ export class CombatMaster {
         return CombatMaster.instance;
     }
 
-    executeAttack(attacker: Combatant, position: Position, board: Board, damage?: Damage, allowEmptyTarget: boolean = false): ActionResult {
-        const result = this.executeAttackInner(attacker, position, board, damage, allowEmptyTarget);
+    executeAttack(attacker: Combatant, position: Position, board: Board, damage?: Damage, allowEmptyTarget: boolean = false, turnCost: number = 1): ActionResult {
+        const result = this.executeAttackInner(attacker, position, board, damage, allowEmptyTarget, turnCost);
         getResultsForStatusEffectHook(attacker, StatusEffectHook.OnAfterAttacking);
         if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
           getResultsForStatusEffectHook(attacker, StatusEffectHook.OnInflictingDamage, attacker,result.damage, 1);
@@ -27,12 +27,12 @@ export class CombatMaster {
         return result;
     }
 
-    private executeAttackInner(attacker: Combatant, position: Position, board: Board, damage?: Damage, allowEmptyTarget: boolean = false): ActionResult {
+    private executeAttackInner(attacker: Combatant, position: Position, board: Board, damage?: Damage, allowEmptyTarget: boolean = false, turnCost: number = 1): ActionResult {
         const target = board.getCombatantAtPosition(position);
 
         if(!target) {
           if(allowEmptyTarget) {
-            return getStandardActionResult();
+            return getStandardActionResult(position, turnCost);
           } else {
             throw new Error("No target found");
           }
@@ -50,7 +50,7 @@ export class CombatMaster {
         if(target.isDefending()) {
           const resistances = target.resistances;
           const damageType = damage.type;
-          let cost = 1;
+          let cost = turnCost;
           const baseDamage = this.calcaulateBaseDamage(attacker, target, damage);
           const finalDamage = {amount: baseDamage.amount / 2, type: baseDamage.type};
           const reaction: DamageReaction = resistances.find((r) => r.type === damageType)?.reaction || DamageReaction.NONE;
@@ -73,7 +73,7 @@ export class CombatMaster {
         const attackResult = this.calculateAttackRoll(attacker, target);
         if(attackResult === AttackResult.Hit || attackResult === AttackResult.CriticalHit){
             const baseDamage = this.calcaulateBaseDamage(attacker, target, damage);
-            const actionResult = this.finalizeDamage(target, baseDamage, attackResult, position);
+            const actionResult = this.finalizeDamage(target, baseDamage, attackResult, position, turnCost);
             this.handleInjuryAilmentAndDeath(target, actionResult.damage, attacker, board);
             return actionResult;
         }  
@@ -83,13 +83,13 @@ export class CombatMaster {
         return attackResult === AttackResult.Miss ? {
             attackResult: AttackResult.Miss,
             damage: {amount: 0, type: DamageType.Unstoppable},
-            cost: 1,
+            cost: turnCost,
             reaction: DamageReaction.NONE,
             position: position
         } : {
             attackResult: AttackResult.Fumble,
             damage: {amount: 0, type: DamageType.Unstoppable},
-            cost: 2,
+            cost: turnCost * 2,
             reaction: DamageReaction.NONE,
             position: position
         };
@@ -127,17 +127,17 @@ export class CombatMaster {
 
     calcaulateBaseDamage(attacker: Combatant, target: Combatant, damageToUse: Damage): Damage {
         const delta = attacker.stats.attackPower - target.stats.defensePower;
-        return {amount: (Math.random() * (1.3 - 0.7) + 0.70) * damageToUse.amount * (delta * 0.01 + 1), type: damageToUse.type};
+        return {amount: (Math.random() * (1.2 - 0.8) + 0.8) * damageToUse.amount * (delta * 0.01 + 1), type: damageToUse.type};
         // return {amount: damageToUse.amount * (delta * 0.01 + 1), type: damageToUse.type};
     }
 
-    private finalizeDamage(target: Combatant, damage: Damage, attackResult: AttackResult, position: Position) : ActionResult {
+    private finalizeDamage(target: Combatant, damage: Damage, attackResult: AttackResult, position: Position, turnCost: number = 1) : ActionResult {
         const resistances = target.resistances;
         const damageType = damage.type;
         let reaction: DamageReaction = resistances.find((r) => r.type === damageType)?.reaction || DamageReaction.NONE;
         reaction = this.getReactionFromStatusEffects(target, damageType, reaction);
         let finalDamage = damage.amount;
-        let cost = 1;
+        let cost = turnCost;
 
         if(reaction === DamageReaction.RESISTANCE) {
             finalDamage = damage.amount * 0.5;
@@ -194,14 +194,13 @@ export class CombatMaster {
       
 
       private handleInjuryAilmentAndDeath(target: Combatant, finalDamage: Damage, attacker: Combatant, board: Board) {
-        target.takeDamage(finalDamage);
+        target.takeDamage(finalDamage, board);
         if(target.stats.hp <= 0) {
           getResultsForStatusEffectHook(attacker, StatusEffectHook.OnKilling, target, undefined, 1, board);
         }
       }
 
       
-
       private getOnBeingAttackedHookResults(target: Combatant, attacker: Combatant, damage: Damage, board: Board): ActionResult | undefined {
         const onBeingAttackedHookResults = getResultsForStatusEffectHook(target, StatusEffectHook.OnBeingAttacked, attacker, damage, 1, board);
 

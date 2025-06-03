@@ -2,7 +2,7 @@ import { Board } from "../Board";
 import { Combatant } from "../Combatant";
 import { Position } from "../Position";
 import { Game } from "../Game";
-import { SpecialMove, SpecialMoveAlignment } from "../SpecialMove";
+import { SpecialMove, SpecialMoveAlignment, SpecialMoveTriggerType } from "../SpecialMove";
 import { DamageReaction } from "../Damage";
 
 interface SkillTargeting {
@@ -19,6 +19,7 @@ export function getClosestEnemy(combatant: Combatant, game: Game, board: Board):
     const closestEnemy = enemyTeam?.combatants.reduce((closest, enemy) => {
         if (enemy.isKnockedOut()) return closest;
         if(enemy.isCloaked()) return closest;
+        if(checkIsSameCombatant(combatant, enemy.position, board)) return closest;
         const distanceToEnemy = Math.sqrt(
             Math.pow(enemy.position.x - combatant.position.x, 2) + 
             Math.pow(enemy.position.y - combatant.position.y, 2)
@@ -77,8 +78,7 @@ export function getValidAttackWithSkillsIncluded(combatant: Combatant, board: Bo
 
     let allCombatantOffensiveSkills = combatant.specialMoves.filter(
         (move) => move.range.align === SpecialMoveAlignment.Enemy &&
-        // (move.checkRequirements === undefined || move.checkRequirements(combatant)) && 
-        // combatant.stats.stamina >= move.cost
+        move.triggerType === SpecialMoveTriggerType.Active &&
         combatant.canUseSkill(move)
     );
     allCombatantOffensiveSkills = shuffleArray(allCombatantOffensiveSkills);
@@ -96,6 +96,7 @@ export function getValidAttackWithSkillsIncluded(combatant: Combatant, board: Bo
 export function getValidAttackWithSkillsIncludedOptimal(combatant: Combatant, board: Board) {
     let allCombatantOffensiveSkills = combatant.specialMoves.filter(
         (move) => move.range.align === SpecialMoveAlignment.Enemy &&
+        move.triggerType === SpecialMoveTriggerType.Active &&
         // (move.checkRequirements === undefined || move.checkRequirements(combatant)) && 
         // combatant.stats.stamina >= move.cost
         combatant.canUseSkill(move)
@@ -235,7 +236,8 @@ export function isBasicAttackTargetingBetter(best: any, current: any) {
 export function getValidSupportSkills(combatant: Combatant, board: Board) {
     let allCombatantSupportSkills = combatant.getSpecialMoves().filter(skill => 
         [SpecialMoveAlignment.Ally, SpecialMoveAlignment.Self, SpecialMoveAlignment.SelfAndAlly].includes(skill.range.align) &&
-        (skill.checkRequirements === undefined || skill.checkRequirements(combatant))
+        (skill.checkRequirements === undefined || skill.checkRequirements(combatant)) &&
+        skill.triggerType === SpecialMoveTriggerType.Active
     );
 
     allCombatantSupportSkills = shuffleArray(allCombatantSupportSkills);
@@ -281,4 +283,12 @@ export function mergeDeep(target: any, source: any): any {
            }
        }
     return merged;
+}
+
+export function checkIsSameCombatant(combatant1: Combatant, target: Position, board: Board): boolean {
+    const combatant2 = board.getCombatantAtPosition(target);
+    if(combatant2) {
+        return combatant1.name === combatant2.name && combatant1.getCombatantType() === combatant2.getCombatantType();
+    }
+    return false;
 }

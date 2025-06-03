@@ -5,6 +5,7 @@ import { CombatantType } from "@/logic/Combatants/CombatantType";
 import { Damage, DamageType } from "@/logic/Damage";
 import { Position } from "@/logic/Position";
 import { SpecialMove, SpecialMoveAlignment, SpecialMoveAreaOfEffect, SpecialMoveRange, SpecialMoveRangeType, SpecialMoveTriggerType } from "@/logic/SpecialMove";
+import { StatusEffectType } from "@/logic/StatusEffect";
 
 export interface CoopPartnerRequirement {
     combatantTypeOptions: CombatantType[];
@@ -44,7 +45,20 @@ export abstract class CoopMove implements SpecialMove {
         const invokerTeam = invoker.team;
         const aliveSupporters = invokerTeam.getAliveCombatants().filter(combatant => combatant.name !== invoker.name);
         return this.coopRequiredPartners.every(partner => aliveSupporters
-            .some(supporter => partner.combatantTypeOptions.includes(supporter.getCombatantType())));
+            .some(supporter => partner.combatantTypeOptions.includes(supporter.getCombatantType()) && supporterCanCoop(supporter)));
+
+        function supporterCanCoop(supporter: Combatant): boolean {
+            return [
+                StatusEffectType.STUPEFIED,
+                StatusEffectType.CHARMED,
+                StatusEffectType.NIGHTMARE_LOCKED,
+                StatusEffectType.MESMERIZED,
+                StatusEffectType.FROZEN,
+                StatusEffectType.NAUSEATED,
+                StatusEffectType.TAUNTED,
+                StatusEffectType.PANICKED,
+            ].every(statusEffect => !supporter.hasStatusEffect(statusEffect));
+        }
     };
     abstract coopRequiredPartners: CoopPartnerRequirement[];
     abstract meterCost: number;

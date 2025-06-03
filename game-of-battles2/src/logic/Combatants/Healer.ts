@@ -10,9 +10,9 @@ import { CombatantType } from "./CombatantType";
 import { SacredFlame } from "../SpecialMoves/Singular/Offensive";
 import { Heal, Purify, Regenerate } from "../SpecialMoves/Singular/Support";
 import { DivineMircale } from "../SpecialMoves/Singular/Passives";
-import { RainOfGrace } from "../SpecialMoves/Coop/SupportCoop";
+import { RainOfGrace, Sanctuary } from "../SpecialMoves/Coop/SupportCoop";
 import { QueensWrathMothersLove } from "../SpecialMoves/Coop/OffensiveCoop";
-// import { DivineMircale } from "../SpecialMoves/Singular/Passives";
+import { DivineRetribution } from "../SpecialMoves/Coop/DebuffCoop";
 
 export class Healer extends Combatant {
     constructor(name: string, position: Position, team: Team) {
@@ -49,9 +49,10 @@ export class Healer extends Combatant {
           new DivineMircale(),
 
           // supers
+          new Sanctuary(),
+          new DivineRetribution(),
           new RainOfGrace(),
           new QueensWrathMothersLove()
-          // new Ressurection()
         ], team
       );
     }

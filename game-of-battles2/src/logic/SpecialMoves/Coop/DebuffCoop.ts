@@ -65,7 +65,7 @@ export class UltimateCurse extends CoopMove {
     name: string = "Ultimate Curse";
     description: string = "Bane your enemy with a crippling curse, weakening them in every way possible";
     coopRequiredPartners: CoopPartnerRequirement[] = [
-        { combatantTypeOptions: [CombatantType.Witch, CombatantType.Fool] }
+        { combatantTypeOptions: [CombatantType.Witch, CombatantType.Fool, CombatantType.Hunter] }
     ];
     damage: Damage = {
         amount: 0,
@@ -96,7 +96,7 @@ export class UltimateCurse extends CoopMove {
         }); 
         
         
-        return getStandardActionResult();
+        return getStandardActionResult(target, this.turnCost);
     };  
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Curve,
@@ -109,3 +109,82 @@ export class UltimateCurse extends CoopMove {
         return this.checkCoopRequirements(self);
     };
 }
+
+export class DivineRetribution extends CoopMove {
+    name: string = "Divine Retribution";
+    description: string = "Mark an enemy with the mark of vengeance. They will suffer half of any direct damage they inflict.";
+    coopRequiredPartners: CoopPartnerRequirement[] = [
+        { combatantTypeOptions: [CombatantType.Vanguard, CombatantType.Hunter, CombatantType.Pikeman] }
+    ];
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Unstoppable
+    };
+    cost: number = 10;
+    meterCost: number = 0;
+    effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
+        const targetCombatant = board.getCombatantAtPosition(target);
+        if(!targetCombatant) {
+            return getStandardActionResult(target, this.turnCost);
+        }
+        targetCombatant.applyStatusEffect({
+            name: StatusEffectType.DIVINE_RETRIBUTION,
+            duration: 3,
+        });
+        return getStandardActionResult(target, this.turnCost);
+    };
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Straight,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 5
+    };
+    turnCost: number = 2;
+    checkRequirements = (self: Combatant) => {
+        return this.checkCoopRequirements(self);
+    };
+}
+
+export class ShatterSteel extends CoopMove {
+    name: string = "Shatter Steel";
+    description: string = "Use your unbreakable edge to break your enemy's arms and armor. decreaseing their defense and attack power.";
+    coopRequiredPartners: CoopPartnerRequirement[] = [
+        { combatantTypeOptions: [CombatantType.Vanguard, CombatantType.Witch, CombatantType.Fool, CombatantType.Rogue] }
+    ];
+    damage: Damage = {
+        amount: 15,
+        type: DamageType.Pierce
+    };
+    cost: number = 9;
+    turnCost: number = 1;
+    meterCost: number = 0;
+    effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
+        const combatMaster = CombatMaster.getInstance();
+        const targetCombatant = board.getCombatantAtPosition(target);
+        if(!targetCombatant) {
+            return getStandardActionResult(target, this.turnCost);
+        }
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage, true, this.turnCost);
+        if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
+            targetCombatant.applyStatusEffect({
+                name: StatusEffectType.DEFENSE_DOWNGRADE,
+                duration: 3,
+            });
+            targetCombatant.applyStatusEffect({
+                name: StatusEffectType.STRENGTH_DOWNGRADE,
+                duration: 3,
+            });
+        }
+        return result;
+    };
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Straight,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 2
+    };
+    checkRequirements = (self: Combatant) => {
+        return this.checkCoopRequirements(self);
+    };
+    
+}   

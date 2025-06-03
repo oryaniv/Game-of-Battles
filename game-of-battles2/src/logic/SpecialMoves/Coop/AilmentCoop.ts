@@ -29,12 +29,8 @@ export class HellScream extends CoopMove {
         const combatMaster = CombatMaster.getInstance();
         const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
         getAllTargets.map(AOETarget => {
-            const targetCombatant = board.getCombatantAtPosition(AOETarget);
-            if(!targetCombatant) {
-                return getStandardActionResult();
-            }
-            combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.PANICKED, 1, 0.6);
-            return getStandardActionResult();
+            combatMaster.tryInflictStatusEffect(invoker, AOETarget, board, StatusEffectType.PANICKED, 3, 0.6);
+            return getStandardActionResult(AOETarget, this.turnCost);
         });
 
         return getStandardActionResult();
@@ -73,10 +69,10 @@ export class BlowAKiss extends CoopMove {
         const combatMaster = CombatMaster.getInstance();
         const targetCombatant = board.getCombatantAtPosition(target);
         if(!targetCombatant) {
-            return getStandardActionResult();
+            return getStandardActionResult(invoker.position, this.turnCost);
         }
         combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.CHARMED, 2, 0.6);
-        return getStandardActionResult();
+        return getStandardActionResult(invoker.position, this.turnCost);
     };
     checkRequirements = (self: Combatant) => {
         return this.checkCoopRequirements(self);
@@ -106,9 +102,9 @@ export class StandUpComedyGoneWrong extends CoopMove {
         const combatMaster = CombatMaster.getInstance();
         const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
         getAllTargets.map(AOETarget => {
-            combatMaster.tryInflictStatusEffect(invoker, AOETarget, board, StatusEffectType.PANICKED, 1, 0.6);
+            combatMaster.tryInflictStatusEffect(invoker, AOETarget, board, StatusEffectType.TAUNTED, 1, 0.6);
         });
-        return getStandardActionResult();
+        return getStandardActionResult(invoker.position, this.turnCost);
     };
     checkRequirements = (self: Combatant) => {
         return this.checkCoopRequirements(self);

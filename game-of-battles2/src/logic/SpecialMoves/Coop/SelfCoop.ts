@@ -11,7 +11,8 @@ import { SpecialMoveAlignment } from "@/logic/SpecialMove";
 import { SpecialMoveAreaOfEffect } from "@/logic/SpecialMove";
 import { SpecialMoveRange } from "@/logic/SpecialMove";
 import { CombatMaster } from "@/logic/CombatMaster";
-import { StatusEffectType } from "@/logic/StatusEffect";
+import { StatusEffect, StatusEffectAlignment, StatusEffectType } from "@/logic/StatusEffect";
+import { Doll } from "@/logic/Combatants/Fool";
 
 export class IdaiNoHadou extends CoopMove {
     name: string = "Idai no Hadou";
@@ -27,7 +28,21 @@ export class IdaiNoHadou extends CoopMove {
             name: StatusEffectType.IDAI_NO_HADOU,
             duration: 3,
         }); 
-        return getStandardActionResult();
+        invoker.stats.hp = Math.min(invoker.stats.hp + 20, invoker.baseStats.hp);
+        invoker.stats.stamina = Math.min(invoker.stats.stamina + 10, invoker.baseStats.stamina);
+        const negativeStatusEffects: StatusEffect[] = invoker.getStatusEffects().filter(status => status.alignment === StatusEffectAlignment.Negative);
+        for(const statusEffect of negativeStatusEffects) {
+            invoker?.removeStatusEffect(statusEffect.name);
+        }
+        return {
+            attackResult: AttackResult.Hit,
+            damage: {
+                amount: 20,
+                type: DamageType.Healing
+            },
+            cost: this.turnCost,
+            reaction: DamageReaction.NONE
+        };
     };
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Self,
@@ -41,17 +56,17 @@ export class IdaiNoHadou extends CoopMove {
     };
 }
 
-export class MyrmidonHour extends CoopMove {
-    name: string = "Myrmidon Hour";
-    description: string = "Myrmidon Hour";
+export class DiamondSupremacy extends CoopMove {
+    name: string = "Diamond Supremacy";
+    description: string = "Diamond Supremacy";
     coopRequiredPartners: CoopPartnerRequirement[] = [
-        { combatantTypeOptions: [CombatantType.FistWeaver, CombatantType.Vanguard, CombatantType.Defender] },
+        { combatantTypeOptions: [CombatantType.Pikeman, CombatantType.Vanguard, CombatantType.Defender, CombatantType.StandardBearer] },
     ];
     cost: number = 12;
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         invoker.applyStatusEffect({
-            name: StatusEffectType.MYRMIDON_HOUR,
+            name: StatusEffectType.DIAMOND_SUPREMACY,
             duration: 3,
         }); 
         return getStandardActionResult();
@@ -62,8 +77,167 @@ export class MyrmidonHour extends CoopMove {
         areaOfEffect: SpecialMoveAreaOfEffect.Single,
         range: 1
     };
-    turnCost: number = 3;
+    turnCost: number = 2;
     checkRequirements = (self: Combatant) => {
         return this.checkCoopRequirements(self);
     };
 }
+
+export class Frenzy extends CoopMove {
+    name: string = "Frenzy";
+    description: string = "Enter a state of screaming blood frenzy, in which your power increase significantly and you cannot die, however, you have no control over your actions.";
+    coopRequiredPartners: CoopPartnerRequirement[] = [
+        { combatantTypeOptions: [CombatantType.Witch, CombatantType.Vanguard, CombatantType.Fool, CombatantType.StandardBearer] },
+    ];
+    cost: number = 10;
+    meterCost: number = 0;
+    effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
+        invoker.applyStatusEffect({
+            name: StatusEffectType.FRENZY,
+            duration: 3,
+        });
+        return getStandardActionResult(invoker.position, this.turnCost);
+    };
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Self,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    turnCost: number = 2;
+    checkRequirements = (self: Combatant) => {
+        return this.checkCoopRequirements(self);
+    };
+}
+
+export class NastyNastyDolly extends CoopMove {
+    name: string = "Nasty Nasty Dolly";
+    description: string = "Slip away unnoticed, while putting a doll as a decoy in your place. Should anyone be foolish enough to attack it, they'll suffer a noxious explosion to their face.";
+    coopRequiredPartners: CoopPartnerRequirement[] = [
+        { combatantTypeOptions: [CombatantType.Rogue, CombatantType.Fool, CombatantType.Artificer] },
+    ];
+    cost: number = 11;
+    meterCost: number = 0;
+    effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
+        const originalPosition = invoker.position;
+        invoker.move(target, board);
+        invoker.applyStatusEffect({
+            name: StatusEffectType.CLOAKED,
+            duration: 5,
+        });
+        const doll = new Doll(invoker.name + "_doll", originalPosition, invoker.team);
+        board.placeCombatant(doll, originalPosition);
+        invoker.addRelatedCombatant(doll);
+        return getStandardActionResult(invoker.position, this.turnCost);
+    };
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Curve,
+        align: SpecialMoveAlignment.Empty_Space,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 3
+    };
+    turnCost: number = 1;
+    checkRequirements = (self: Combatant) => {
+        const hasDoll = self.getRelatedCombatants().some(combatant => combatant instanceof Doll);
+        return this.checkCoopRequirements(self) && !self.hasMoved  && !hasDoll;
+    };
+}
+
+export class Teleportation extends CoopMove {
+    name: string = "Teleportation";
+    description: string = "Teleport to a chosen location on the battelfield. Having Arcane Channeling or Arcane Overcharge statuses may entail additional effects.";
+    coopRequiredPartners: CoopPartnerRequirement[] = [
+        { combatantTypeOptions: [CombatantType.Wizard, CombatantType.FistWeaver, CombatantType.Rogue] },
+    ];
+    cost: number = 8;
+    meterCost: number = 0;
+    effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
+        invoker.move(target, board);
+        if(invoker.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING)) {
+            invoker.applyStatusEffect({
+                name: StatusEffectType.ARCANE_BARRIER,
+                duration: 50,
+            });
+            invoker.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
+        }
+        if(invoker.hasStatusEffect(StatusEffectType.ARCANE_OVERCHARGE)) {
+            const combatMaster = CombatMaster.getInstance();
+            const getAllTargets = board.getAreaOfEffectPositions(invoker, target, SpecialMoveAreaOfEffect.Cross, SpecialMoveAlignment.All);
+            const type = [DamageType.Fire, DamageType.Lightning, DamageType.Ice].sort(() => Math.random() - 0.5)[0];
+            const blastResults = getAllTargets.map(AOETarget => {
+                const targetCombatant = board.getCombatantAtPosition(AOETarget);
+                if(targetCombatant && targetCombatant.name !== invoker.name) {
+                    return combatMaster.executeAttack(invoker, AOETarget, board, { amount: 20, type }, true, this.turnCost);
+                }
+                return getStandardActionResult(AOETarget, this.turnCost);
+            });
+            invoker.removeStatusEffect(StatusEffectType.ARCANE_OVERCHARGE);
+            return blastResults;
+        }
+        return getStandardActionResult(invoker.position, this.turnCost);
+    };
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Curve,
+        align: SpecialMoveAlignment.Empty_Space,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 9
+    };
+    turnCost: number = 1;
+    checkRequirements = (self: Combatant) => {
+        return this.checkCoopRequirements(self) && !self.hasMoved;
+    };
+}
+
+export class ArcaneOvercharge extends CoopMove {
+    name: string = "Arcane Overcharge";
+    description: string = "Arcane Overcharge";
+    coopRequiredPartners: CoopPartnerRequirement[] = [
+        { combatantTypeOptions: [CombatantType.Wizard, CombatantType.Witch, CombatantType.Vanguard, CombatantType.Hunter] },
+    ];
+    cost: number = 10;
+    meterCost: number = 0;
+    effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
+        invoker.applyStatusEffect({
+            name: StatusEffectType.ARCANE_OVERCHARGE,
+            duration: Number.POSITIVE_INFINITY,
+        });
+        return getStandardActionResult(invoker.position, this.turnCost);
+    };
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Self,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    turnCost: number = 1;
+    checkRequirements = (self: Combatant) => {
+        return this.checkCoopRequirements(self);
+    };
+}
+
+export class ArcaneBarrier extends CoopMove {
+    name: string = "Arcane Barrier";
+    description: string = "Arcane Barrier";
+    coopRequiredPartners: CoopPartnerRequirement[] = [
+        { combatantTypeOptions: [CombatantType.Defender, CombatantType.Healer, CombatantType.StandardBearer] },
+    ];
+    cost: number = 8;
+    meterCost: number = 0;
+    effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
+        invoker.applyStatusEffect({
+            name: StatusEffectType.ARCANE_BARRIER,
+            duration: 50,
+        });
+        return getStandardActionResult(invoker.position, this.turnCost);
+    };
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Self,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    turnCost: number = 1;
+    checkRequirements = (self: Combatant) => {
+        return this.checkCoopRequirements(self);
+    };
+}   

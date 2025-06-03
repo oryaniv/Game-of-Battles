@@ -1,6 +1,9 @@
 import { Combatant } from "../Combatant";
 import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Position } from "../Position";
+import { UnitedWeStand } from "../SpecialMoves/Coop/BuffCoop";
+import { StrikeAsOne } from "../SpecialMoves/Coop/OffensiveCoop";
+import { LastStandOfHeroes, RenewedStrength } from "../SpecialMoves/Coop/SupportCoop";
 import { CallOfStrength, CallOfVigor, Encourage } from "../SpecialMoves/Singular/Buffs";
 import { InspiringKiller } from "../SpecialMoves/Singular/Passives";
 import { RallyToTheBanner } from "../SpecialMoves/Singular/Support";
@@ -42,10 +45,11 @@ export class StandardBearer extends Combatant {
           new RallyToTheBanner(),
 
           // supers
-          // new HammerOfJustice(),
-          // new CallOfHereos(),
-          // new RallyOfTheParagon(),
-          // new RightoousVengeance(),
+          new StrikeAsOne(),
+          new RenewedStrength(),
+          new UnitedWeStand(),
+          new LastStandOfHeroes(),
+          
         ],
       team);
     }
