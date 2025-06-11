@@ -3,21 +3,22 @@ import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Position } from "../Position";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
+import { DragonBreath, DragonFireBall, Claws, DieMortal } from "../SpecialMoves/Singular/Offensive";
 
-export class Gorilla extends Combatant {
+export class Dragon extends Combatant {
     constructor(name: string, position: Position, team: Team) {
       super(
         name,
         {
           hp: 400,
-          attackPower: 50,
-          defensePower: 30,
-          stamina: 20,
+          attackPower: 40,
+          defensePower: 40,
+          stamina: 2000,
           initiative: 1,
           movementSpeed: 5,
           range: 1,
-          agility: 7,
-          luck: 1,
+          agility: 8,
+          luck: 15,
         },
         position,
         [
@@ -25,21 +26,28 @@ export class Gorilla extends Combatant {
             {type: DamageType.Pierce, reaction: DamageReaction.NONE},
             {type: DamageType.Slash, reaction: DamageReaction.NONE},
             {type: DamageType.Fire, reaction: DamageReaction.NONE},
-            {type: DamageType.Ice, reaction: DamageReaction.NONE},
+            {type: DamageType.Ice, reaction: DamageReaction.WEAKNESS},
             {type: DamageType.Blight, reaction: DamageReaction.NONE},
             {type: DamageType.Lightning, reaction: DamageReaction.NONE},
             {type: DamageType.Holy, reaction: DamageReaction.NONE},
             {type: DamageType.Dark, reaction: DamageReaction.NONE},
         ],
-        [],
+        [
+          // new AdditionaTurns1(),
+          new DragonBreath(),
+          new DragonFireBall(),
+          new Claws(),
+          // new DragonRage(),
+          new DieMortal(),
+        ],
       team);
     }
 
     getCombatantType(): CombatantType {
-        return CombatantType.Gorilla;
+        return CombatantType.Dragon;
     }
   
     basicAttack(): Damage {
-        return { amount: 60, type: DamageType.Crush };
+        return { amount: 50, type: DamageType.Slash };
     }
   }

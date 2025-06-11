@@ -231,6 +231,9 @@ export class RangeCalculator {
       case SpecialMoveAreaOfEffect.Nova:
         aoePositions.push(...getNovaTargets(1));
         break;
+      case SpecialMoveAreaOfEffect.Nova_No_Empty_Space:
+        aoePositions.push(...getNovaTargets(1));
+        break;
       case SpecialMoveAreaOfEffect.Great_Nova:
         aoePositions.push(...getNovaTargets(2));
         break;
@@ -404,6 +407,43 @@ export class RangeCalculator {
     const targetPosition = target.position;
     const distance = Math.abs(casterPosition.x - targetPosition.x) + Math.abs(casterPosition.y - targetPosition.y);
     return distance <= 1;
+  }
+
+  getPullResult(caster: Combatant, target: Combatant, range: number, board: Board) {
+    // Get direction vector from target to caster
+    const dx = caster.position.x - target.position.x;
+    const dy = caster.position.y - target.position.y;
+
+    // Normalize to get unit direction vector
+    const dirX = dx === 0 ? 0 : dx / Math.abs(dx);
+    const dirY = dy === 0 ? 0 : dy / Math.abs(dy);
+
+    let pullDistance = 0;
+    let currentPosition = {...target.position};
+
+    // Check each position in pull direction up to range
+    for (let i = 1; i <= range; i++) {
+      const nextPosition = {
+        x: target.position.x + (dirX * i),
+        y: target.position.y + (dirY * i)
+      };
+
+      // Stop if position is invalid or we've reached the caster
+      if (!board.isValidPosition(nextPosition) || 
+          (nextPosition.x === caster.position.x && nextPosition.y === caster.position.y)) {
+        break;
+      }
+
+      pullDistance = i;
+      currentPosition = nextPosition;
+    }
+
+    if (pullDistance > 0) {
+      // Return the closest position to caster that is between caster and target
+      return {moveTo: currentPosition, pullDistance: pullDistance};
+    }
+
+    return null;
   }
 
   getPushResult(caster: Combatant, target: Combatant, range: number, board: Board) {

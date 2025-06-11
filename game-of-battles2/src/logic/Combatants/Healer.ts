@@ -26,7 +26,7 @@ export class Healer extends Combatant {
           initiative: 2,
           movementSpeed: 3,
           range: 1,
-          agility: 5,
+          agility: 4,
           luck: 8,
         },
         position,

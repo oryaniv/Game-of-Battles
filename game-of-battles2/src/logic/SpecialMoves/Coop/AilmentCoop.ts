@@ -28,6 +28,7 @@ export class HellScream extends CoopMove {
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const combatMaster = CombatMaster.getInstance();
         const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
+
         getAllTargets.map(AOETarget => {
             combatMaster.tryInflictStatusEffect(invoker, AOETarget, board, StatusEffectType.PANICKED, 3, 0.6);
             return getStandardActionResult(AOETarget, this.turnCost);
@@ -91,10 +92,10 @@ export class StandUpComedyGoneWrong extends CoopMove {
         type: DamageType.Unstoppable
     };
     range: SpecialMoveRange = {
-        type: SpecialMoveRangeType.Curve,
+        type: SpecialMoveRangeType.Straight,
         align: SpecialMoveAlignment.Enemy,
         areaOfEffect: SpecialMoveAreaOfEffect.Cross,
-        range: 4
+        range: 6
     };
     cost: number = 10;
     meterCost: number = 0;  

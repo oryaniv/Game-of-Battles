@@ -229,6 +229,7 @@ export class CloakedStatusEffect implements StatusEffect {
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
             caster.stats.attackPower += 25;
+            caster.stats.agility += 5;
         },
         [StatusEffectHook.OnDamageTaken]: (caster: Combatant, target: Combatant, damage: Damage) => {
             caster.removeStatusEffect(StatusEffectType.CLOAKED);
@@ -246,9 +247,9 @@ export class CloakedStatusEffect implements StatusEffect {
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
             caster.stats.attackPower -= 25;
-            // eslint-disable-next-line
-            debugger;
-            const doll = caster.getRelatedCombatants().find((combatant) => combatant instanceof Doll);
+            caster.stats.agility -= 5;
+
+            const doll = caster.getRelatedCombatants()["doll"];
             if(doll) {
                 // doll.takeDamage({amount: 100, type: DamageType.Unstoppable});
                 doll.stats.hp = 0;
@@ -301,33 +302,34 @@ export class ShieldWallStatusEffect implements StatusEffect {
     applicationHooks = {
         [StatusEffectHook.OnAttacking]: (self: Combatant) => {
             self.removeStatusEffect(StatusEffectType.SHIELD_WALL);
+            removeShieldWallRelatedCombatants(self);
         },
         [StatusEffectHook.OnDefending]: (self: Combatant) => {
             self.removeStatusEffect(StatusEffectType.SHIELD_WALL);
+            removeShieldWallRelatedCombatants(self);
         },
         [StatusEffectHook.OnSkillUsed]: (self: Combatant) => {
             self.removeStatusEffect(StatusEffectType.SHIELD_WALL);
+            removeShieldWallRelatedCombatants(self);
         },
         [StatusEffectHook.OnMoving]: (self: Combatant) => {
             self.removeStatusEffect(StatusEffectType.SHIELD_WALL);
-        },
-        [StatusEffectHook.OnTurnEnd]: (self: Combatant, target: Combatant, damage: Damage, amount: number, board: Board, skill: SpecialMove) => {
-            const combatMaster = CombatMaster.getInstance();
-
-            const getAllTargets: Position[] = board.getAreaOfEffectPositions(self, self.position, SpecialMoveAreaOfEffect.Nova, SpecialMoveAlignment.Enemy);
-            getAllTargets.filter(AOETarget => board.getCombatantAtPosition(AOETarget) !== null)
-                         .filter(AOETarget => board.getCombatantAtPosition(AOETarget)?.team.getName() !== self.team.getName())
-                         .forEach(AOETarget => {
-                if(board.getCombatantAtPosition(AOETarget)?.team.getName() === self.team.getName()) {
-                    board.getCombatantAtPosition(AOETarget)?.applyStatusEffect({
-                        name: StatusEffectType.SHIELD_WALL_PROTECTED,
-                        duration: 1,
-                    });
-                }
-            });
-        } 
+            removeShieldWallRelatedCombatants(self);
+        }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
+}
+
+function removeShieldWallRelatedCombatants(self: Combatant) {
+    Object.keys(self.relatedCombatants)
+        .filter(key => key.startsWith('SHIELD_WALL_PROTECTED_'))
+        .forEach(key => {
+            const relatedCombatant = self.relatedCombatants[key];
+            if(relatedCombatant) {
+                relatedCombatant.removeStatusEffect(StatusEffectType.SHIELD_WALL_PROTECTED);
+            }
+            delete self.relatedCombatants[key];
+    });
 }
 
 export class ShieldWallProtectedStatusEffect implements StatusEffect {
@@ -335,6 +337,53 @@ export class ShieldWallProtectedStatusEffect implements StatusEffect {
     applicationHooks = {
         [StatusEffectHook.OnMoving]: (caster: Combatant, target: Combatant) => { 
             caster.removeStatusEffect(StatusEffectType.SHIELD_WALL_PROTECTED);
+            caster.removeRelatedCombatant('SHIELD_WALL');
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
+}
+
+export class ArcaneShieldWallStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.ARCANE_SHIELD_WALL;
+    applicationHooks = {
+        [StatusEffectHook.OnAttacking]: (self: Combatant) => {
+            self.removeStatusEffect(StatusEffectType.ARCANE_SHIELD_WALL);
+            removeArcaneShieldWallRelatedCombatants(self);
+        },
+        [StatusEffectHook.OnDefending]: (self: Combatant) => {
+            self.removeStatusEffect(StatusEffectType.ARCANE_SHIELD_WALL);
+            removeArcaneShieldWallRelatedCombatants(self);
+        },
+        [StatusEffectHook.OnSkillUsed]: (self: Combatant) => {
+            self.removeStatusEffect(StatusEffectType.ARCANE_SHIELD_WALL);
+            removeArcaneShieldWallRelatedCombatants(self);
+        },
+        [StatusEffectHook.OnMoving]: (self: Combatant) => {
+            self.removeStatusEffect(StatusEffectType.ARCANE_SHIELD_WALL);
+            removeArcaneShieldWallRelatedCombatants(self);
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
+}
+
+function removeArcaneShieldWallRelatedCombatants(self: Combatant) {
+    Object.keys(self.relatedCombatants)
+        .filter(key => key.startsWith('ARCANE_SHIELD_WALL_PROTECTED_'))
+        .forEach(key => {
+            const relatedCombatant = self.relatedCombatants[key];
+            if(relatedCombatant) {
+                relatedCombatant.removeStatusEffect(StatusEffectType.ARCANE_SHIELD_WALL_PROTECTED);
+            }
+            delete self.relatedCombatants[key];
+    });
+}
+
+export class ArcaneShieldWallProtectedStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.ARCANE_SHIELD_WALL_PROTECTED;
+    applicationHooks = {
+        [StatusEffectHook.OnMoving]: (caster: Combatant, target: Combatant) => { 
+            caster.removeStatusEffect(StatusEffectType.ARCANE_SHIELD_WALL_PROTECTED);
+            caster.removeRelatedCombatant('ARCANE_SHIELD_WALL');
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
@@ -387,8 +436,7 @@ export class ArcaneBarrierStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.ARCANE_BARRIER;
     applicationHooks = {
         [StatusEffectHook.OnDamageTaken]: (self: Combatant, target: Combatant, damage: Damage) => {
-            // eslint-disable-next-line 
-            debugger;
+
             const ArcaneBarrierStatusEffect = self.statusEffects.find(statusEffect => statusEffect.name === StatusEffectType.ARCANE_BARRIER);
             if(!ArcaneBarrierStatusEffect) {
                 throw new Error("Arcane Overcharge Status Effect not found");
@@ -405,7 +453,7 @@ export class ArcaneBarrierStatusEffect implements StatusEffect {
                 self.removeStatusEffect(StatusEffectType.ARCANE_BARRIER);
             }
             if(damageToRestore > 0) {
-                self.stats.hp += damageToRestore;
+                self.stats.hp = Math.min(self.stats.hp + damageToRestore, self.baseStats.hp);
             }
             return getStandardActionResult();
         }
@@ -440,6 +488,88 @@ export class DiamondSupremacyStatusEffect implements StatusEffect {
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
             caster.stats.range = 2;
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
+}
+
+export class GuardianStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.GUARDIAN;
+    applicationHooks = {
+        [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
+            const guardianProtected = target.getRelatedCombatants()['GUARDIAN_PROTECTED'];
+            if(guardianProtected) {
+                guardianProtected.removeStatusEffect(StatusEffectType.GUARDIAN_PROTECTED);
+            }
+        },
+        [StatusEffectHook.OnDeath]: (caster: Combatant, target: Combatant) => {
+            const guardianProtected = target.getRelatedCombatants()['GUARDIAN_PROTECTED'];
+            if(guardianProtected) {
+                guardianProtected.removeStatusEffect(StatusEffectType.GUARDIAN_PROTECTED);
+            }
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
+}
+
+export class GuardianProtectedStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.GUARDIAN_PROTECTED;
+    applicationHooks = {
+        [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
+            const guardian = target.getRelatedCombatants()['GUARDIAN'];
+            if(guardian) {
+                guardian.removeStatusEffect(StatusEffectType.GUARDIAN);
+            }
+        },
+        [StatusEffectHook.OnDeath]: (caster: Combatant, target: Combatant) => {
+            const guardian = target.getRelatedCombatants()['GUARDIAN'];
+            if(guardian) {
+                guardian.removeStatusEffect(StatusEffectType.GUARDIAN);
+            }
+        },
+        [StatusEffectHook.OnDamageTaken]: (caster: Combatant, target: Combatant, damage: Damage) => {
+            const guardian = target.getRelatedCombatants()['GUARDIAN'];
+            if(!guardian) {
+                return getStandardActionResult();
+            }
+            const damageToRestore = damage.amount;
+            caster.stats.hp = Math.min(caster.stats.hp + damageToRestore, caster.baseStats.hp);
+            const damageToInflict = damage.amount * 0.5;
+            guardian.takeDamage({amount: damageToInflict, type: DamageType.Unstoppable});
+            return getStandardActionResult();
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
+}
+
+export class DiamondHookedHoldingStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.DIAMOND_HOOKED_HOLDING;
+    applicationHooks = {
+        [StatusEffectHook.OnMoving]: (self: Combatant) => {
+            const heldEnemy = self.getRelatedCombatants()['DIAMOND_HOOKED'];
+            if(heldEnemy) {
+                heldEnemy.removeStatusEffect(StatusEffectType.DIAMOND_HOOKED);
+                heldEnemy.removeRelatedCombatant('DIAMOND_HOOKED_HOLDING');
+            }
+            self.removeStatusEffect(StatusEffectType.DIAMOND_HOOKED_HOLDING);
+        },
+        [StatusEffectHook.OnDeath]: (self: Combatant) => {
+            const heldEnemy = self.getRelatedCombatants()['DIAMOND_HOOKED'];
+            if(heldEnemy) {
+                heldEnemy.removeStatusEffect(StatusEffectType.DIAMOND_HOOKED);
+                heldEnemy.removeRelatedCombatant('DIAMOND_HOOKED_HOLDING');
+            }
+            self.removeStatusEffect(StatusEffectType.DIAMOND_HOOKED_HOLDING);
+        },
+        [StatusEffectHook.OnKilling]: (caster: Combatant, target: Combatant) => {
+            const heldEnemy = target.getRelatedCombatants()['DIAMOND_HOOKED'];
+            if(heldEnemy && target.name === heldEnemy.name) {
+                caster.removeStatusEffect(StatusEffectType.DIAMOND_HOOKED_HOLDING);
+                caster.removeRelatedCombatant('DIAMOND_HOOKED');
+                caster.removeStatusEffect(StatusEffectType.DIAMOND_HOOKED_HOLDING);
+                caster.stats.hp = Math.min(caster.stats.hp + 20, caster.baseStats.hp);
+                caster.stats.stamina = Math.min(caster.stats.stamina + 10, caster.baseStats.stamina);
+            }
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;

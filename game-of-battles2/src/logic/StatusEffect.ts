@@ -3,9 +3,9 @@ import { Board } from "./Board";
 import { Combatant, CombatantStats } from "./Combatant";
 import { DamageType, Damage } from "./Damage";
 import { BlockingStance } from "./SpecialMoves/Singular/Self";
-import { FrozenStatusEffect, ImmobilizedStatusEffect, LuckDowngradeStatusEffect, SlowStatusEffect, StrengthDowngradeStatusEffect, PoisonedStatusEffect, BleedingStatusEffect, TauntedStatusEffect, StupefiedStatusEffect, NauseatedStatusEffect, MesmerizedStatusEffect, StaggeredStatusEffect, DefenseDowngradeStatusEffect, MarkedForPainStatusEffect, MarkedForOblivionStatusEffect, MarkedForExecutionStatusEffect, PanickedStatusEffect, CharmedStatusEffect, NightmareLockedStatusEffect, RuptureTendonsStatusEffect, DivineRetributionStatusEffect, PlaguedStatusEffect, BurningStatusEffect } from "./StatusEffects.ts/NegativeEffects";
-import { EnergyAbsorbStatusEffect, FirstStrikeStatusEffect, FoolsLuckStatusEffect, InspiringKillerStatusEffect, MarchingDefenseStatusEffect, RiposteStatusEffect, SadistStatusEffect, GoingOffStatusEffect, DivineMiracleStatusEffect, LifeDrinkerStatusEffect, LastStandUsedStatusEffect, DecoyStatusEffect, SurpriseBoomStatusEffect } from "./StatusEffects.ts/NeutralEffects";
-import { ArcaneBarrierStatusEffect, ArcaneChannelingStatusEffect, ArcaneConduitStatusEffect, ArcaneOverchargeStatusEffect, BlockingStanceStatusEffect, CircusDiaboliqueStatusEffect, CloakedStatusEffect, DiamondSupremacyStatusEffect, EncouragedStatusEffect, FocusAimStatusEffect, FortifiedStatusEffect, FrenzyStatusEffect, FullMetalJacketStatusEffect, IdaiNoHadouStatusEffect, MesmerizingStatusEffect, MobilityBoostStatusEffect, RalliedStatusEffect, RegeneratingStatusEffect, SanctuaryStatusEffect, ShieldWallProtectedStatusEffect, ShieldWallStatusEffect, StrengthBoostStatusEffect } from "./StatusEffects.ts/PositiveEffects";
+import { FrozenStatusEffect, ImmobilizedStatusEffect, LuckDowngradeStatusEffect, SlowStatusEffect, StrengthDowngradeStatusEffect, PoisonedStatusEffect, BleedingStatusEffect, TauntedStatusEffect, StupefiedStatusEffect, NauseatedStatusEffect, MesmerizedStatusEffect, StaggeredStatusEffect, DefenseDowngradeStatusEffect, MarkedForPainStatusEffect, MarkedForOblivionStatusEffect, MarkedForExecutionStatusEffect, PanickedStatusEffect, CharmedStatusEffect, NightmareLockedStatusEffect, RuptureTendonsStatusEffect, DivineRetributionStatusEffect, PlaguedStatusEffect, BurningStatusEffect, DiamondHookedStatusEffect } from "./StatusEffects.ts/NegativeEffects";
+import { EnergyAbsorbStatusEffect, FirstStrikeStatusEffect, FoolsLuckStatusEffect, InspiringKillerStatusEffect, MarchingDefenseStatusEffect, RiposteStatusEffect, SadistStatusEffect, GoingOffStatusEffect, DivineMiracleStatusEffect, LifeDrinkerStatusEffect, LastStandUsedStatusEffect, DecoyStatusEffect, SurpriseBoomStatusEffect, TrollRegenerationStatusEffect } from "./StatusEffects.ts/NeutralEffects";
+import { ArcaneBarrierStatusEffect, ArcaneChannelingStatusEffect, ArcaneConduitStatusEffect, ArcaneOverchargeStatusEffect, ArcaneShieldWallProtectedStatusEffect, ArcaneShieldWallStatusEffect, BlockingStanceStatusEffect, CircusDiaboliqueStatusEffect, CloakedStatusEffect, DiamondSupremacyStatusEffect, EncouragedStatusEffect, FocusAimStatusEffect, FortifiedStatusEffect, FrenzyStatusEffect, FullMetalJacketStatusEffect, GuardianProtectedStatusEffect, GuardianStatusEffect, IdaiNoHadouStatusEffect, MesmerizingStatusEffect, MobilityBoostStatusEffect, RalliedStatusEffect, RegeneratingStatusEffect, SanctuaryStatusEffect, ShieldWallProtectedStatusEffect, ShieldWallStatusEffect, StrengthBoostStatusEffect, DiamondHookedHoldingStatusEffect } from "./StatusEffects.ts/PositiveEffects";
 import { SpecialMove } from "./SpecialMove";
 
 export enum 
@@ -140,6 +140,12 @@ StatusEffectType {
     GUARDIAN,
     // 64
     GUARDIAN_PROTECTED,
+    // 65
+    DIAMOND_HOOKED,
+    // 66
+    DIAMOND_HOOKED_HOLDING,
+    // 67
+    TROLL_REGENERATION,
 }
 
   export enum StatusEffectHook {
@@ -247,6 +253,8 @@ StatusEffectType {
     [StatusEffectType.LAST_STAND_USED]: new LastStandUsedStatusEffect(),
     [StatusEffectType.SHIELD_WALL]: new ShieldWallStatusEffect(),
     [StatusEffectType.SHIELD_WALL_PROTECTED]: new ShieldWallProtectedStatusEffect(),
+    [StatusEffectType.ARCANE_SHIELD_WALL]: new ArcaneShieldWallStatusEffect(),
+    [StatusEffectType.ARCANE_SHIELD_WALL_PROTECTED]: new ArcaneShieldWallProtectedStatusEffect(),
     [StatusEffectType.RUPTURE_TENDONS]: new RuptureTendonsStatusEffect(),
     [StatusEffectType.SANCTUARY]: new SanctuaryStatusEffect(),
     [StatusEffectType.DIVINE_RETRIBUTION]: new DivineRetributionStatusEffect(),
@@ -259,6 +267,11 @@ StatusEffectType {
     [StatusEffectType.ARCANE_BARRIER]: new ArcaneBarrierStatusEffect(),
     [StatusEffectType.ARCANE_CONDUIT]: new ArcaneConduitStatusEffect(),
     [StatusEffectType.DIAMOND_SUPREMACY]: new DiamondSupremacyStatusEffect(),
+    [StatusEffectType.GUARDIAN]: new GuardianStatusEffect(),
+    [StatusEffectType.GUARDIAN_PROTECTED]: new GuardianProtectedStatusEffect(),
+    [StatusEffectType.DIAMOND_HOOKED]: new DiamondHookedStatusEffect(),
+    [StatusEffectType.DIAMOND_HOOKED_HOLDING]: new DiamondHookedHoldingStatusEffect(),
+    [StatusEffectType.TROLL_REGENERATION]: new TrollRegenerationStatusEffect(),
   };
 
   export function getStatusEffect(name: StatusEffectType) : StatusEffect | undefined {

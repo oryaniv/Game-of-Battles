@@ -3,43 +3,51 @@ import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Position } from "../Position";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
+import { VenomousSpit, Horns, Claws, TrollKick } from "../SpecialMoves/Singular/Offensive";
+import { TrollRegeneration } from "../SpecialMoves/Singular/Self";
 
-export class Gorilla extends Combatant {
+export class Troll extends Combatant {
     constructor(name: string, position: Position, team: Team) {
       super(
         name,
         {
           hp: 400,
-          attackPower: 50,
-          defensePower: 30,
-          stamina: 20,
-          initiative: 1,
-          movementSpeed: 5,
+          attackPower: 40,
+          defensePower: 40,
+          stamina: 100,
+          initiative: 2,
+          movementSpeed: 4,
           range: 1,
-          agility: 7,
-          luck: 1,
+          agility: 5,
+          luck: 2,
         },
         position,
         [
             {type: DamageType.Crush, reaction: DamageReaction.NONE},
             {type: DamageType.Pierce, reaction: DamageReaction.NONE},
             {type: DamageType.Slash, reaction: DamageReaction.NONE},
-            {type: DamageType.Fire, reaction: DamageReaction.NONE},
+            {type: DamageType.Fire, reaction: DamageReaction.WEAKNESS},
             {type: DamageType.Ice, reaction: DamageReaction.NONE},
             {type: DamageType.Blight, reaction: DamageReaction.NONE},
             {type: DamageType.Lightning, reaction: DamageReaction.NONE},
             {type: DamageType.Holy, reaction: DamageReaction.NONE},
             {type: DamageType.Dark, reaction: DamageReaction.NONE},
         ],
-        [],
+        [
+          new VenomousSpit(),
+          new Horns(),
+          new Claws(),
+          new TrollKick(),
+          new TrollRegeneration(),
+        ],
       team);
     }
 
     getCombatantType(): CombatantType {
-        return CombatantType.Gorilla;
+        return CombatantType.Troll;
     }
   
     basicAttack(): Damage {
-        return { amount: 60, type: DamageType.Crush };
+        return { amount: 50, type: DamageType.Crush };
     }
   }

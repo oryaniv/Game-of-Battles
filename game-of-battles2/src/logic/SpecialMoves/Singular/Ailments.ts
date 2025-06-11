@@ -17,7 +17,7 @@ export class YoMama implements SpecialMove {
         type: SpecialMoveRangeType.Straight,
         align: SpecialMoveAlignment.Enemy,
         areaOfEffect: SpecialMoveAreaOfEffect.Single,
-        range: 5
+        range: 6
     };
     damage: Damage = {
         amount: 0,
@@ -87,7 +87,8 @@ export class SmellIt implements SpecialMove {
         getAllTargets.forEach(AOETarget => {
             const targetCombatant = board.getCombatantAtPosition(AOETarget);
             if(targetCombatant) {
-                combatMaster.tryInflictStatusEffect(invoker, AOETarget, board, StatusEffectType.NAUSEATED, 3, 0.6);
+                // combatMaster.tryInflictStatusEffect(invoker, AOETarget, board, StatusEffectType.NAUSEATED, 3, 0.6);
+                targetCombatant.applyStatusEffect({name: StatusEffectType.NAUSEATED, duration: 3});
             }   
         });
         return getStandardActionResult(target);

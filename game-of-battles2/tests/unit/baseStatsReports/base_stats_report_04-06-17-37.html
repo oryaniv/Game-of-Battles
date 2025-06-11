@@ -1,0 +1,244 @@
+
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Base Stats Report</title>
+                <style>
+                    table {
+                        border-collapse: collapse;
+                        width: 100%;
+                        margin: 20px 0;
+                    }
+                    th, td {
+                        border: 1px solid #ddd;
+                        padding: 8px;
+                        text-align: left;
+                    }
+                    th {
+                        background-color: #f2f2f2;
+                        cursor: pointer;
+                    }
+                    tr:nth-child(even) {
+                        background-color: #f9f9f9;
+                    }
+                </style>
+                <script>
+                    function sortTable(n) {
+                        var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+                        table = document.getElementById("statsTable");
+                        switching = true;
+                        dir = "asc";
+                        
+                        while (switching) {
+                            switching = false;
+                            rows = table.rows;
+                            
+                            for (i = 1; i < (rows.length - 1); i++) {
+                                shouldSwitch = false;
+                                x = rows[i].getElementsByTagName("TD")[n];
+                                y = rows[i + 1].getElementsByTagName("TD")[n];
+                                
+                                if (dir == "asc") {
+                                    if (n === 0) {
+                                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                                            shouldSwitch = true;
+                                            break;
+                                        }
+                                    } else {
+                                        if (Number(x.innerHTML) > Number(y.innerHTML)) {
+                                            shouldSwitch = true;
+                                            break;
+                                        }
+                                    }
+                                } else if (dir == "desc") {
+                                    if (n === 0) {
+                                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                                            shouldSwitch = true;
+                                            break;
+                                        }
+                                    } else {
+                                        if (Number(x.innerHTML) < Number(y.innerHTML)) {
+                                            shouldSwitch = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            if (shouldSwitch) {
+                                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                                switching = true;
+                                switchcount++;
+                            } else {
+                                if (switchcount == 0 && dir == "asc") {
+                                    dir = "desc";
+                                    switching = true;
+                                }
+                            }
+                        }
+                    }
+                </script>
+            </head>
+            <body>
+                <h1>Base Stats Report</h1>
+                <table id="statsTable">
+                    <tr>
+                        <th onclick="sortTable(0)">Combatant Type</th>
+                        <th onclick="sortTable(1)">Attack Power</th>
+                        <th onclick="sortTable(2)">Defense</th>
+                        <th onclick="sortTable(3)">Agility</th>
+                        <th onclick="sortTable(4)">Luck</th>
+                        <th onclick="sortTable(5)">Initiative</th>
+                        <th onclick="sortTable(6)">HP</th>
+                        <th onclick="sortTable(7)">Stamina</th>
+                        <th onclick="sortTable(8)">Movement Speed</th>
+                        <th onclick="sortTable(9)">Range</th>
+                    </tr>
+                    
+                        <tr>
+                            <td>Standard Bearer</td>
+                            <td>15</td>
+                            <td>25</td>
+                            <td>6</td>
+                            <td>6</td>
+                            <td>5</td>
+                            <td>75</td>
+                            <td>35</td>
+                            <td>3</td>
+                            <td>1</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Healer</td>
+                            <td>10</td>
+                            <td>15</td>
+                            <td>4</td>
+                            <td>8</td>
+                            <td>2</td>
+                            <td>50</td>
+                            <td>50</td>
+                            <td>3</td>
+                            <td>1</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Defender</td>
+                            <td>20</td>
+                            <td>30</td>
+                            <td>5</td>
+                            <td>3</td>
+                            <td>4</td>
+                            <td>100</td>
+                            <td>20</td>
+                            <td>3</td>
+                            <td>1</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Wizard</td>
+                            <td>20</td>
+                            <td>20</td>
+                            <td>6</td>
+                            <td>7</td>
+                            <td>2</td>
+                            <td>40</td>
+                            <td>60</td>
+                            <td>3</td>
+                            <td>1</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Hunter</td>
+                            <td>25</td>
+                            <td>10</td>
+                            <td>8</td>
+                            <td>5</td>
+                            <td>5</td>
+                            <td>60</td>
+                            <td>30</td>
+                            <td>3</td>
+                            <td>8</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Fistweaver</td>
+                            <td>25</td>
+                            <td>15</td>
+                            <td>7</td>
+                            <td>6</td>
+                            <td>5</td>
+                            <td>75</td>
+                            <td>35</td>
+                            <td>4</td>
+                            <td>1</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Fool</td>
+                            <td>1</td>
+                            <td>10</td>
+                            <td>7</td>
+                            <td>10</td>
+                            <td>4</td>
+                            <td>50</td>
+                            <td>40</td>
+                            <td>4</td>
+                            <td>2</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Pikeman</td>
+                            <td>20</td>
+                            <td>20</td>
+                            <td>5</td>
+                            <td>5</td>
+                            <td>3</td>
+                            <td>70</td>
+                            <td>25</td>
+                            <td>3</td>
+                            <td>2</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Witch</td>
+                            <td>15</td>
+                            <td>10</td>
+                            <td>5</td>
+                            <td>9</td>
+                            <td>3</td>
+                            <td>55</td>
+                            <td>40</td>
+                            <td>3</td>
+                            <td>1</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Vanguard</td>
+                            <td>35</td>
+                            <td>10</td>
+                            <td>3</td>
+                            <td>4</td>
+                            <td>6</td>
+                            <td>90</td>
+                            <td>25</td>
+                            <td>5</td>
+                            <td>1</td>
+                        </tr>
+                    
+                        <tr>
+                            <td>Rogue</td>
+                            <td>25</td>
+                            <td>15</td>
+                            <td>9</td>
+                            <td>5</td>
+                            <td>7</td>
+                            <td>50</td>
+                            <td>30</td>
+                            <td>4</td>
+                            <td>1</td>
+                        </tr>
+                    
+                </table>
+            </body>
+            </html>
+        

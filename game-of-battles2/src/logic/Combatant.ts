@@ -43,12 +43,12 @@ export interface CombatantStats {
     public stats: CombatantStats; // Current stats, can be modified by effects
     public statusEffects: StatusEffectApplication[] = [];
     public aiAgent: AIAgent[] | undefined;
-    public relatedCombatants: Combatant[] = [];
+    public relatedCombatants: Record<string, Combatant> = {};
     hasMoved: boolean = false;
 
     startTurn(): ActionResult[] {
         const eventLogger = EventLogger.getInstance();
-        eventLogger.logEvent(`${this.name} the ${this.getCombatantType()} acts`);
+        // eventLogger.logEvent(`${this.name} the ${this.getCombatantType()} acts`);
         this.hasMoved = false;
         if(this.isDefending()) {
             this.removeStatusEffect(StatusEffectType.DEFENDING);
@@ -80,6 +80,10 @@ export interface CombatantStats {
         const movingDistance = board.getDistanceBetweenPositions(this.position, newPosition);
         const onMovingHookResults = getResultsForStatusEffectHook(this, StatusEffectHook.OnMoving, undefined, undefined, movingDistance, board);
 
+        if(this.isKnockedOut() || onMovingHookResults.some((result) => result.attackResult !== AttackResult.NotFound)) {
+          return true;
+        }
+
         board.removeCombatant(this);
         if(!board.isPositionEmpty(newPosition)) {
           board.placeCombatantWherePossible(this, newPosition);
@@ -90,7 +94,7 @@ export interface CombatantStats {
         }
 
         const eventLogger = EventLogger.getInstance();
-        eventLogger.logEvent(`${this.name} moves to (${newPosition.x},${newPosition.y})`);
+        // eventLogger.logEvent(`${this.name} moves to (${newPosition.x},${newPosition.y})`);
         this.hasMoved = true;
         // emitter.emit('play-move-sound');
     }
@@ -166,16 +170,12 @@ export interface CombatantStats {
     updateStatusEffect(effect: StatusEffectApplication): void {
       const effectToUpdate = this.statusEffects.find((existingEffect) => existingEffect.name === effect.name);
       if(effectToUpdate) {
-        // eslint-disable-next-line
-        debugger;
         effectToUpdate.duration = effect.duration;
       }
     }
     
     updateStatusEffects(): void {
       for (let i = this.statusEffects.length - 1; i >= 0; i--) {
-        // eslint-disable-next-line
-        debugger;
           const effect = this.statusEffects[i];
           effect.duration--;
           if (effect.duration <= 0) {
@@ -207,6 +207,20 @@ export interface CombatantStats {
         return this.stats.stamina >= skill.cost && 
         (!skill.checkRequirements || skill.checkRequirements(this)) &&
         !this.hasStatusEffect(StatusEffectType.STUPEFIED);
+      }
+      
+      canSupportSkill(skill: SpecialMove): boolean {
+        return this.stats.stamina >= skill.cost && 
+          [
+            StatusEffectType.STUPEFIED,
+            StatusEffectType.CHARMED,
+            StatusEffectType.NIGHTMARE_LOCKED,
+            StatusEffectType.MESMERIZED,
+            StatusEffectType.FROZEN,
+            StatusEffectType.NAUSEATED,
+            StatusEffectType.TAUNTED,
+            StatusEffectType.PANICKED,
+          ].every(statusEffect => !this.hasStatusEffect(statusEffect));
       }
 
       isCloaked(): boolean {
@@ -250,11 +264,15 @@ export interface CombatantStats {
         return false;
       }
 
-      addRelatedCombatant(combatant: Combatant): void {
-        this.relatedCombatants.push(combatant);
+      addRelatedCombatant(relation:string, combatant: Combatant): void {
+        this.relatedCombatants[relation] = combatant;
       }
 
-      getRelatedCombatants(): Combatant[] {
+      removeRelatedCombatant(relation:string): void {
+        delete this.relatedCombatants[relation];
+      }
+
+      getRelatedCombatants(): Record<string, Combatant> {
         return this.relatedCombatants;
       }
   }

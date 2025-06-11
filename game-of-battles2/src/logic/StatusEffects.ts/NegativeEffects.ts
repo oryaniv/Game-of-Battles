@@ -196,6 +196,10 @@ export class NauseatedStatusEffect implements StatusEffect {
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant, target: Combatant) => {
             self.removeStatusEffect(StatusEffectType.CLOAKED);
+            self.removeStatusEffect(StatusEffectType.MESMERIZING);
+            self.removeStatusEffect(StatusEffectType.CIRCUS_DIABOLIQUE);
+            self.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
+            self.removeStatusEffect(StatusEffectType.FOCUS_AIM);
             self.insertAiAgent(new StunLockedAIAgent("Nauseated"));
         },
         [StatusEffectHook.OnTurnStart]: (self: Combatant) => {
@@ -221,6 +225,11 @@ export class MesmerizedStatusEffect implements StatusEffect {
             caster.removeStatusEffect(StatusEffectType.FOCUS_AIM);
             caster.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
             caster.removeStatusEffect(StatusEffectType.CLOAKED);
+            caster.removeStatusEffect(StatusEffectType.MESMERIZING);
+            caster.removeStatusEffect(StatusEffectType.CIRCUS_DIABOLIQUE);
+            caster.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
+            caster.removeStatusEffect(StatusEffectType.SHIELD_WALL);
+            caster.removeStatusEffect(StatusEffectType.ARCANE_SHIELD_WALL);
             caster.insertAiAgent(new StunLockedAIAgent("Mesmerized"));
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant) => {
@@ -242,6 +251,11 @@ export class NightmareLockedStatusEffect implements StatusEffect {
             caster.removeStatusEffect(StatusEffectType.FOCUS_AIM);
             caster.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
             caster.removeStatusEffect(StatusEffectType.CLOAKED);
+            caster.removeStatusEffect(StatusEffectType.MESMERIZING);
+            caster.removeStatusEffect(StatusEffectType.CIRCUS_DIABOLIQUE);
+            caster.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
+            caster.removeStatusEffect(StatusEffectType.SHIELD_WALL);
+            caster.removeStatusEffect(StatusEffectType.ARCANE_SHIELD_WALL);
             caster.insertAiAgent(new StunLockedAIAgent("Nightmare Locked"));
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant) => {
@@ -389,7 +403,7 @@ export class RuptureTendonsStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.RUPTURE_TENDONS;
     applicationHooks = {
         [StatusEffectHook.OnMoving]: (self: Combatant, attacker: Combatant, damage: Damage, amount: number, board: Board) => {
-            self.takeDamage({amount: amount * 6, type: DamageType.Pierce});
+            self.takeDamage({amount: amount * 6, type: DamageType.Dark});
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
@@ -399,8 +413,7 @@ export class DivineRetributionStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.DIVINE_RETRIBUTION;
     applicationHooks = {
         [StatusEffectHook.OnInflictingDamage]: (self: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
-            // eslint-disable-next-line
-            debugger;
+
             const damageAmount = damage.amount * 0.5;
             self.takeDamage({amount: damageAmount, type: DamageType.Unstoppable});
             return {
@@ -472,6 +485,28 @@ export class BurningStatusEffect implements StatusEffect {
                 cost: 0,
                 reaction: DamageReaction.NONE,
                 position: self.position
+            }
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
+}
+
+export class DiamondHookedStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.DIAMOND_HOOKED;
+    applicationHooks = {
+        [StatusEffectHook.OnMoving]: (self: Combatant, attacker: Combatant, damage: Damage, amount: number, board: Board) => {
+            const holder = self.getRelatedCombatants()['DIAMOND_HOOKED'];
+            if(holder && board.isInMeleeRange(holder, self)) {
+                const combatMaster = CombatMaster.getInstance();
+                const result = combatMaster.executeAttack(holder, self.position, board, holder.basicAttack());
+                return result;
+            }
+        },
+        [StatusEffectHook.OnDeath]: (self: Combatant) => {
+            const holder = self.getRelatedCombatants()['DIAMOND_HOOKED'];
+            if(holder) {
+                holder.removeStatusEffect(StatusEffectType.DIAMOND_HOOKED_HOLDING);
+                holder.removeRelatedCombatant('DIAMOND_HOOKED_HOLDING');
             }
         }
     };

@@ -47,9 +47,9 @@ export class Defender extends Combatant {
 
           // supers
           new ShieldBash(),
-          new Guardian(),
-          new ShieldWall(),
-          new ArcaneShieldWall()
+          // new Guardian(),
+          // new ShieldWall(),
+          // new ArcaneShieldWall()
         ], team 
       );
     }

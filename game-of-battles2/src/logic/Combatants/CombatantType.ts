@@ -13,6 +13,8 @@ export enum CombatantType {
     Artificer = "Artificer",
     FistWeaver = "Fistweaver",
     Gorilla = "Gorilla",
+    Troll = "Troll",
+    Dragon = "Dragon",
     BallistaTurret = "Ballista Turret",
     Myrmidon = "Myrmidon",
     Iskariot = "Iskariot",

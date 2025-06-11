@@ -61,4 +61,8 @@ export class Team {
         });
     }
 
+    isHumanPlayerTeam(): boolean {
+        return this.aiAgent === undefined;
+    }
+
   }

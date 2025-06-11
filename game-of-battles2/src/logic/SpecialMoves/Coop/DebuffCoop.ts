@@ -44,7 +44,7 @@ export class DevourDivinity extends CoopMove {
             for(const statusEffect of positiveStatusEffects) {
                 targetCombatant?.removeStatusEffect(statusEffect.name);
             }
-            return getStandardActionResult();
+            return getStandardActionResult(AOETarget, this.turnCost);
         });
 
         return getStandardActionResult();
@@ -76,7 +76,7 @@ export class UltimateCurse extends CoopMove {
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const targetCombatant = board.getCombatantAtPosition(target);
         if(!targetCombatant) {
-            return getStandardActionResult();
+            return getStandardActionResult(target, this.turnCost);
         }
         targetCombatant.applyStatusEffect({
             name: StatusEffectType.STRENGTH_DOWNGRADE,
@@ -174,6 +174,7 @@ export class ShatterSteel extends CoopMove {
                 name: StatusEffectType.STRENGTH_DOWNGRADE,
                 duration: 3,
             });
+            targetCombatant.removeStatusEffect(StatusEffectType.FULL_METAL_JACKET);
         }
         return result;
     };

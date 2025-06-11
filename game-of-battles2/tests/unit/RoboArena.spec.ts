@@ -31,33 +31,33 @@ let errorCount = 0;
 
 describe('RoboArenta', () => {
 
-    // it('Ai Agent match 1', () => {
-    //     let roundCounts = [];
-    //     let winnerCounts = [];
-    //     for(let i = 0; i < 100; i++) {
-    //         try {
-    //             const matchResult = exampleMatch();
-    //             roundCounts.push(matchResult.roundCount);
-    //             winnerCounts.push(matchResult.winner);
-    //         } catch (error) {
-    //             console.log('an Error was thrown, restarting match', error);
-    //             continue;
-    //         }
-    //     }
-    //     console.log(`round count average is ${roundCounts
-    //         .reduce((a, b) => a + b, 0) / roundCounts.length}`);
+    it.only('Ai Agent match 1', () => {
+        let roundCounts = [];
+        let winnerCounts = [];
+        for(let i = 0; i < 100; i++) {
+            try {
+                const matchResult = exampleMatch();
+                roundCounts.push(matchResult.roundCount);
+                winnerCounts.push(matchResult.winner);
+            } catch (error) {
+                console.log('an Error was thrown, restarting match', error);
+                continue;
+            }
+        }
+        console.log(`round count average is ${roundCounts
+            .reduce((a, b) => a + b, 0) / roundCounts.length}`);
 
-    //     const veteranWinCount = winnerCounts.filter((winner) => winner === 'Team Veteran').length;
-    //     const veteranWinPercentage = veteranWinCount / winnerCounts.length;
-    //     console.log(`veteran win percentage is ${veteranWinPercentage}`);
+        const veteranWinCount = winnerCounts.filter((winner) => winner === 'Team Veteran').length;
+        const veteranWinPercentage = veteranWinCount / winnerCounts.length;
+        console.log(`veteran win percentage is ${veteranWinPercentage}`);
 
-    //     console.log(`error count is ${errorCount}`);
-    //         expect(true).toBe(true);
-    // });
+        console.log(`error count is ${errorCount}`);
+            expect(true).toBe(true);
+    });
 
 
 
-    it('Balancing battles', () => {
+    it.skip('Balancing battles', () => {
         let matchDataCollection: MatchData[] = [];
         const teamRecords: TeamRecord[] = [];
         let team1 = generateRandomTeam(0, new VeteranAIAgent());
@@ -102,11 +102,18 @@ function exampleMatch() {
     // team1.name = 'Team Rookie';
     // team2.name = 'Team Veteran';
 
-    const team1 = generateRandomTeam(0, new VeteranAIAgent());
-    const team2 =  generateCombatantIdenticalTeam(team1, 1, new RookieAIAgent());
+    const veteranAIAgentWithCoop = new VeteranAIAgent();
+    veteranAIAgentWithCoop.setCollectCoop(true);
+
+    const veteranAIAgentNoCoop = new VeteranAIAgent();
+    veteranAIAgentNoCoop.setCollectCoop(false);
+    const rookieAIAgent = new RookieAIAgent();
+
+    const team1 = generateRandomTeam(0, veteranAIAgentWithCoop);
+    const team2 =  generateCombatantIdenticalTeam(team1, 1, rookieAIAgent);
 
     team1.name = 'Team Veteran';
-    team2.name = 'Team Gorilla';
+    team2.name = 'Team Rookie';
 
     // theGorillaTeam(team2);
 

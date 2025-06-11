@@ -49,6 +49,7 @@ export enum SpecialMoveAreaOfEffect {
     Cone = "Cone",
     Chain = "Chain",
     Four_Spread = "FourSpread",
+    Nova_No_Empty_Space = "NovaNoEmptySpace"
 }
 
 export enum SpecialMoveAlignment {

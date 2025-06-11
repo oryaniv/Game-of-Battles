@@ -47,7 +47,7 @@ export class CombatMaster {
             return onBeingAttackedHookResult;
         }
 
-        if(target.isDefending()) {
+        if(isTargetDefending(target, damage.type)) {
           const resistances = target.resistances;
           const damageType = damage.type;
           let cost = turnCost;
@@ -235,4 +235,15 @@ export class CombatMaster {
         return currentReaction;
       }
     
+}
+
+function isTargetDefending(target: Combatant, damageType: DamageType): boolean {
+  if(target.isDefending()) {
+    return true;
+  }
+  if(target.hasStatusEffect(StatusEffectType.ARCANE_SHIELD_WALL) || target.hasStatusEffect(StatusEffectType.ARCANE_SHIELD_WALL_PROTECTED)) {
+    return damageType !== DamageType.Unstoppable;
+  }
+  const isDamagePhysical = damageType === DamageType.Slash || damageType === DamageType.Crush || damageType === DamageType.Pierce;
+  return isDamagePhysical && (target.hasStatusEffect(StatusEffectType.SHIELD_WALL) || target.hasStatusEffect(StatusEffectType.SHIELD_WALL_PROTECTED));
 }

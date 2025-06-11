@@ -73,18 +73,27 @@ artificer veteran AI
 
 balancing matches + balancing changes
 
-co-op abilities  <------------ you are here
+co-op abilities  
 
-update all AI types
+update all AI types 
 
-new balancing matches + balancing changes
+bug fixes + new balancing matches + balancing changes <------------ you are here
 
-big bug hunt
+big bug hunt - bug list:
+-------------------------------------------
+
+- are combatants bugging their movement(getting where they shouldn't be?)
+
+-are they able to spot invisible rogues?
+
+
+
+
+-------------------------------------------
 
 complete all UI gaps
 
 start campaign for the prototype
-
 
 Modren Graphical interface
 
@@ -93,7 +102,7 @@ Modren Graphical interface
 
 list of changes for the real code
 
-standardized interface for application hooks 
+standardized interface for application hooks that will passed to every applicationHook
 
 artificer and rogue are implemented first, including Co ops
 
@@ -116,6 +125,8 @@ standardized combatant duplicator(for all the AI stuff)
 skill not available with reason
 
 board/game/rangeCalculator/combatMaster need to be global
+
+SpecialMoveRange new field - allow empty space targeting
 
 ----------------------------------
 

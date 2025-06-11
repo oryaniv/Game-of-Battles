@@ -127,7 +127,8 @@ export class NastyNastyDolly extends CoopMove {
         });
         const doll = new Doll(invoker.name + "_doll", originalPosition, invoker.team);
         board.placeCombatant(doll, originalPosition);
-        invoker.addRelatedCombatant(doll);
+        invoker.addRelatedCombatant("doll", doll);
+        doll.addRelatedCombatant("doll_owner", invoker);
         return getStandardActionResult(invoker.position, this.turnCost);
     };
     range: SpecialMoveRange = {
@@ -138,7 +139,7 @@ export class NastyNastyDolly extends CoopMove {
     };
     turnCost: number = 1;
     checkRequirements = (self: Combatant) => {
-        const hasDoll = self.getRelatedCombatants().some(combatant => combatant instanceof Doll);
+        const hasDoll = self.getRelatedCombatants()["doll"] !== undefined;
         return this.checkCoopRequirements(self) && !self.hasMoved  && !hasDoll;
     };
 }

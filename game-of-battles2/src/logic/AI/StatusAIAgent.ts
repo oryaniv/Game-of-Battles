@@ -7,6 +7,8 @@ import { AIAgent, AIAgentType } from "./AIAgent";
 import { checkIsSameCombatant, getClosestEnemy, getValidAttacks, getValidAttackWithSkillsIncluded, getValidMovePositions, getValidSupportSkills, moveTowards } from "./AIUtils";
 import { Position } from "../Position";
 import { Team } from "../Team";
+import { off } from "process";
+import { StatusEffectType } from "../StatusEffect";
 
 
 export class StunLockedAIAgent implements AIAgent {
@@ -45,22 +47,40 @@ export class TauntedAIAgent implements AIAgent {
     }
 
     private chaseTheOffender(combatant: Combatant, game: Game, board: Board, offender: Combatant): ActionResult {
+
+        if(offender.isKnockedOut()) {
+            combatant.removeStatusEffect(StatusEffectType.TAUNTED);
+            const nextAgent = combatant.getAiAgent();
+            if(nextAgent) {
+                return nextAgent.playTurn(combatant, game, board) as ActionResult;
+            } else {
+                return getStandardActionResult();
+            }
+        }
+
+        let offenderTarget = offender;
+        
+        const offenderDoll = offender.getRelatedCombatants()['doll'];
+        if(offenderDoll) {
+            offenderTarget = offenderDoll
+        }
+
         const validAttacks = getValidAttacks(combatant, board);
-        if(validAttacks.length > 0 && validAttacks.some((attack) => attack.x === offender.position.x && attack.y === offender.position.y)) {
-            return game.executeBasicAttack(combatant, offender.position, board);
+        if(validAttacks.length > 0 && validAttacks.some((attack) => attack.x === offenderTarget.position.x && attack.y === offenderTarget.position.y)) {
+            return game.executeBasicAttack(combatant, offenderTarget.position, board);
         } else {
             const validNewPositions = getValidMovePositions(combatant, board);
             for (let i = 0; i < validNewPositions.length; i++) {
                 const position = validNewPositions[i];
                 // can attack from new position
                 const validAttacks = getValidAttacks(Object.assign({}, combatant, { position, hasStatusEffect: combatant.hasStatusEffect }), board);
-                if(validAttacks.length > 0 && validAttacks.some((attack) => attack.x === offender.position.x && attack.y === offender.position.y)) {
+                if(validAttacks.length > 0 && validAttacks.some((attack) => attack.x === offenderTarget.position.x && attack.y === offenderTarget.position.y)) {
                     combatant.move(position, board);
-                    return game.executeBasicAttack(combatant, offender.position, board);
+                    return game.executeBasicAttack(combatant, offenderTarget.position, board);
                 }
             }
         }
-        moveTowards(combatant, offender.position, board);
+        moveTowards(combatant, offenderTarget.position, board);
         game.executeSkipTurn();
         return getStandardActionResult();
     }       

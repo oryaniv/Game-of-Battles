@@ -79,18 +79,19 @@ export function theATeam(team: Team) {
 }
 
 export function theBTeam(team: Team) {
-    // team.addCombatant(new Healer('F', { x: 6, y: 9 }, team));
-    // team.addCombatant(new Wizard('G', { x: 7, y: 9 }, team));
-    // team.addCombatant(new StandardBearer('H', { x: 5, y: 8 }, team));
-    // team.addCombatant(new Defender('I', { x: 6, y: 8 }, team));
-    // team.addCombatant(new Hunter('J', { x: 5, y: 9 }, team));
+    team.addCombatant(new Healer('F', { x: 6, y: 9 }, team));
+    team.addCombatant(new Wizard('G', { x: 7, y: 9 }, team));
+    team.addCombatant(new StandardBearer('H', { x: 5, y: 8 }, team));
+    team.addCombatant(new Defender('I', { x: 6, y: 8 }, team));
+    team.addCombatant(new Hunter('J', { x: 5, y: 9 }, team));
 
 
-    team.addCombatant(new Witch('F', { x: 5, y: 9 }, team));
-    team.addCombatant(new Rogue('G', { x: 6, y: 9 }, team));
-    team.addCombatant(new Vanguard('H', { x: 4, y: 8 }, team));
-    team.addCombatant(new FistWeaver('I', { x: 5, y: 8 }, team));
-    team.addCombatant(new Pikeman('J', { x: 6, y: 8 }, team));
+//     team.addCombatant(new Witch('F', { x: 5, y: 9 }, team));
+//     team.addCombatant(new Rogue('G', { x: 6, y: 9 }, team));
+//     team.addCombatant(new Vanguard('H', { x: 4, y: 8 }, team));
+//     team.addCombatant(new FistWeaver('I', { x: 5, y: 8 }, team));
+//     team.addCombatant(new Pikeman('J', { x: 6, y: 8 }, team));
+// }
 }
 
 export function theGorillaTeam(team: Team) {

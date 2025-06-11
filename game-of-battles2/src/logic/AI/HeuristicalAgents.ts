@@ -6,7 +6,7 @@ import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Game } from "../Game";
 import { isSamePosition, Position } from "../Position";
 import { SpecialMove, SpecialMoveAlignment, SpecialMoveTriggerType } from "../SpecialMove";
-import { CoopMove } from "../SpecialMoves/Coop/CoopMove";
+import { CoopMove, CoopMoveWithPartners } from "../SpecialMoves/Coop/CoopMove";
 import { StatusEffectType } from "../StatusEffect";
 import { AIAgent, AIAgentType } from "./AIAgent";
 import { getValidAttacks, getValidMovePositions } from "./AIUtils";
@@ -28,22 +28,26 @@ interface PlayAction {
     playActionType: PlayActionType;
     // execution target
     target: Position | undefined;
-    skillName?:string
+    skillName?:string,
+    coopPartners?: Combatant[]
 }
 
 export enum PlayActionType {
-    SKIP,
-    DEFEND,
-    BASIC_ATTACK,
-    USE_SPECIAL_MOVE,
-    USE_COOP_SPECIAL_MOVE
+    SKIP,// 0
+    DEFEND, // 1
+    BASIC_ATTACK, // 2
+    USE_SPECIAL_MOVE, // 3
+    USE_COOP_SPECIAL_MOVE // 4
 }
 
 export abstract class HeuristicalAIAgent implements AIAgent {
     playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
         const bestPlay: TurnPlay = getHeuristicBestPlay(combatant, game, board, this.evaluationFunction, this.collectCoop);
         if(bestPlay.position !== combatant.position) {
-            combatant.move(bestPlay.position, board);
+            const shouldStop = combatant.move(bestPlay.position, board);
+            if(shouldStop) {
+                return [getStandardActionResult()];
+            }
         } 
         const actionTarget = bestPlay.playAction.target || combatant.position;
         return bestPlay.playAction.executionFunction(combatant, actionTarget, game, board);
@@ -74,6 +78,9 @@ function getHeuristicBestPlay(combatant: Combatant, game: Game,
         return {score: evaluationFunction(combatant, game, board, action), play: action};
     });
     allActionsEvaluated.sort((a, b) => b.score - a.score);
+    
+    // eslint-disable-next-line
+    // debugger;
     // return allActionsEvaluated[0].play;
     return randomizedBestPlay(allActionsEvaluated);
 }
@@ -95,8 +102,10 @@ function getAllPossibleCombatantActions(combatant: Combatant, game: Game, board:
     allActions.push(...getSpecialMovePlays(combatant, game, board, validNewPositions));
 
     if(collectCoop) {
+
         allActions.push(...getCoopPlays(combatant, game, board, validNewPositions));
     }
+
 
     return allActions;
 }
@@ -253,47 +262,45 @@ function getSpecialMovePlays(combatant: Combatant, game: Game, board: Board, val
 function getCoopPlays(combatant: Combatant, game: Game, board: Board, validNewPositions: Position[]): TurnPlay[] {
     const allCoopActions: TurnPlay[] = [];
 
+    const allUsableCoopMoves = getCombatantCoopMoves(combatant, game);
 
-
-    const allUsableCoopMoves = combatant.specialMoves.filter(specialMove => specialMove.triggerType === SpecialMoveTriggerType.Cooperative)
-                                                        .filter(specialMove => canUseSpecialMove(specialMove, combatant));
-
-    allUsableCoopMoves.forEach(coopMove => {
-        allCoopActions.push({
-            position: combatant.position,
-            playAction: {
-                executionFunction: (combatant: Combatant, target: Position, game: Game, board: Board) => {
-                    return game.executeCoopSkill(coopMove as CoopMove, combatant, [], target, board);
-                },
-                playActionType: PlayActionType.USE_COOP_SPECIAL_MOVE,
-                target: undefined,
-                skillName: coopMove.name
-            }
+    allUsableCoopMoves.forEach(coopMoveWithPartners => {
+        const validTargets = board.getValidTargetsForSkill(combatant, coopMoveWithPartners.move.range);
+        validTargets.forEach(targetPosition => {
+            allCoopActions.push({
+                position: combatant.position,
+                playAction: {
+                    executionFunction: (combatant: Combatant, target: Position, game: Game, board: Board) => {
+                        return game.executeCoopSkill(coopMoveWithPartners.move as CoopMove, combatant,coopMoveWithPartners.partners , target, board);
+                    },
+                    playActionType: PlayActionType.USE_COOP_SPECIAL_MOVE,
+                    target: targetPosition,
+                    skillName: coopMoveWithPartners.move.name,
+                    coopPartners: coopMoveWithPartners.partners
+                }
+            });
         });
     });
 
     validNewPositions.forEach(newPosition => {
         const originalPosition = combatant.position;
         const positionPlaced = theoreticalReplacement(combatant, board, newPosition, true);
-        allUsableCoopMoves.forEach(coopMove => {
-            // const validTargets = board.getValidTargetsForSkill(
-            //     Object.assign({}, combatant, { position: newPosition, hasStatusEffect: combatant.hasStatusEffect }),
-            //     specialMove.range
-            // );
-            if(!canUseSpecialMove(coopMove, combatant)) {
+        allUsableCoopMoves.forEach(coopMoveWithPartners => {
+            if(!canUseSpecialMove(coopMoveWithPartners.move, combatant)) {
                 return;
             }
-            const validTargets = board.getValidTargetsForSkill(combatant, coopMove.range);
+            const validTargets = board.getValidTargetsForSkill(combatant, coopMoveWithPartners.move.range);
             validTargets.forEach(targetPosition => {
                 allCoopActions.push({
                     position: positionPlaced,
                     playAction: {
                         executionFunction: (combatant: Combatant, target: Position, game: Game, board: Board) => {
-                            return game.executeCoopSkill(coopMove as CoopMove, combatant, [], target, board);
+                            return game.executeCoopSkill(coopMoveWithPartners.move as CoopMove, combatant, coopMoveWithPartners.partners, target, board);
                         },
                         playActionType: PlayActionType.USE_SPECIAL_MOVE,
                         target: targetPosition,
-                        skillName: coopMove.name
+                        skillName: coopMoveWithPartners.move.name,
+                        coopPartners: coopMoveWithPartners.partners
                     }
                 });
             });
@@ -316,8 +323,56 @@ export function theoreticalReplacement(combatant: Combatant, board: Board, newPo
     return combatant.position;
 }
 
+function getCombatantCoopMoves (combatant: Combatant, game: Game) {
+    const actionsRemaining = game.getActionsRemaining();
+    const coopMoves = combatant.getSpecialMoves()
+    .filter((move) => move.triggerType === SpecialMoveTriggerType.Cooperative)
+    .filter(move => canUseSpecialMove(move, combatant))
+    .filter(move => move.turnCost <= (actionsRemaining + 0.5)) as CoopMove[];
+
+    const possibleSupporters = combatant.team.getAliveCombatants().filter((ally) => combatant.name !== ally.name);
+    const expandedCoopMoves: CoopMoveWithPartners[] = [];
+
+    for (const move of coopMoves) {
+      if (!('coopRequiredPartners' in move)) continue;
+
+      // Get all possible combinations of supporters for each partner requirement
+      const partnerCombinations: Combatant[][] = [];
+      
+      for (const requirement of (move as CoopMove).coopRequiredPartners) {
+        // Find all supporters that match any of the required types for this slot
+        const validSupporters = possibleSupporters.filter(supporter => 
+          requirement.combatantTypeOptions.includes(supporter.getCombatantType()) && supporter.canSupportSkill(move)
+        );
+        partnerCombinations.push(validSupporters);
+      }
+
+      // Generate all possible combinations
+      const generateCombinations = (current: Combatant[], depth: number) => {
+        if (depth === partnerCombinations.length) {
+          // Create a new instance of the move for this combination
+          expandedCoopMoves.push({
+            move,
+            partners: [...current]
+          });
+          return;
+        }
+
+        for (const supporter of partnerCombinations[depth]) {
+          // Skip if supporter is already used in current combination
+          if (!current.includes(supporter)) {
+            generateCombinations([...current, supporter], depth + 1);
+          }
+        }
+      };
+
+      generateCombinations([], 0);
+    }
+
+    return expandedCoopMoves;
+  }
+
 export function canUseSpecialMove(specialMove: SpecialMove, combatant: Combatant): boolean {
-    //return combatant.stats.stamina >= specialMove.cost && (specialMove.checkRequirements === undefined || specialMove.checkRequirements(combatant));
     return combatant.canUseSkill(specialMove);
 }
 
@@ -434,6 +489,18 @@ export function isTargetDefending(target: Combatant): boolean {
     return target.hasStatusEffect(StatusEffectType.DEFENDING);
 }
 
+export function isTargetHighLuck(target: Combatant): boolean {
+    return target.stats.luck >= 7;
+}
+
+export function isVeryHighLuck(target: Combatant): boolean {
+    return target.stats.luck >= 10;
+}
+
+export function isLeprechaun(target: Combatant): boolean {
+    return target.stats.luck >= 15;
+}
+
 export function isTargetLowLuck(target: Combatant): boolean {
     return target.stats.luck <= 4;
 }
@@ -491,7 +558,7 @@ export function isVeryHighAttackPower(combatant: Combatant): boolean {
 }
 
 export function isPowerCharged(combatant: Combatant): boolean {
-    return [StatusEffectType.ARCANE_CHANNELING, StatusEffectType.FOCUS_AIM].some(statusEffect => combatant.hasStatusEffect(statusEffect));
+    return [StatusEffectType.ARCANE_CHANNELING, StatusEffectType.FOCUS_AIM, StatusEffectType.ARCANE_OVERCHARGE].some(statusEffect => combatant.hasStatusEffect(statusEffect));
 }
 
 export function isEngaging(combatant: Combatant, movePosition: Position, board: Board, game: Game): boolean {
@@ -571,6 +638,14 @@ export function isCombatantMartial(combatant: Combatant): boolean {
     ].includes(combatant.getCombatantType());
 }
 
+export function hasMeditateSkill(combatant: Combatant): boolean {
+    return combatant.specialMoves.some(skill => skill.name === "Meditate");
+}
+
+export function hasPurifySkill(combatant: Combatant): boolean {
+    return combatant.specialMoves.some(skill => skill.name === "Purify");
+}
+
 export function isCombatantMelee(combatant: Combatant): boolean {
     return [
         CombatantType.Defender, CombatantType.Vanguard, CombatantType.Pikeman, CombatantType.FistWeaver,
@@ -582,6 +657,19 @@ export function isCombatantCaster(combatant: Combatant): boolean {
     return [
         CombatantType.Wizard, CombatantType.Witch, CombatantType.Fool, CombatantType.Artificer,
         CombatantType.Healer
+    ].includes(combatant.getCombatantType());
+}
+
+export function isCombatantNonAttacker(combatant: Combatant): boolean {
+    return [
+        CombatantType.Fool, CombatantType.Healer
+    ].includes(combatant.getCombatantType());
+}
+
+export function isCombatantDPS(combatant: Combatant): boolean {
+    return [
+        CombatantType.Vanguard, CombatantType.Pikeman, CombatantType.Hunter,
+        CombatantType.Rogue, CombatantType.Wizard
     ].includes(combatant.getCombatantType());
 }
 
@@ -609,5 +697,30 @@ export function getTargetCombatantForEvaluation(combatant: Combatant, movePositi
         targetCombatant = combatant;
     }
     return targetCombatant;
+}
+
+export function normalizeCoopEvaluation(evaluation: number, turnCost:number): number {
+    return Math.ceil(evaluation / turnCost);
+}
+
+export function isSameTeam(combatant: Combatant, target: Combatant): boolean {
+    return combatant.team.getIndex() === target.team.getIndex();
+}
+
+export function hasBuffBrokenByMove(combatant: Combatant): boolean {
+    return [
+        StatusEffectType.SHIELD_WALL_PROTECTED,
+        StatusEffectType.ARCANE_SHIELD_WALL_PROTECTED,
+        StatusEffectType.SANCTUARY,
+    ].some(statusEffect => combatant.hasStatusEffect(statusEffect));
+}
+
+export function hasStrongsDebuffBrokenByMove(combatant: Combatant): boolean {
+    return [
+        StatusEffectType.SHIELD_WALL,
+        StatusEffectType.ARCANE_SHIELD_WALL,
+        StatusEffectType.MESMERIZING,
+        StatusEffectType.CIRCUS_DIABOLIQUE
+    ].some(statusEffect => combatant.hasStatusEffect(statusEffect));
 }
     

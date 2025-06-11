@@ -38,10 +38,10 @@ export class Game {
       this.combatMaster = CombatMaster.getInstance();
       
       const eventLogger = EventLogger.getInstance();
-      eventLogger.logEvent(`Round ${this.roundCount} begins`);
-      eventLogger.addBreak();
-      eventLogger.logEvent(`${this.teams[this.currentTeamIndex].name}'s Turn`);
-      eventLogger.logEvent(`${this.getCurrentCombatant().name} the ${this.getCurrentCombatant().getCombatantType()} acts`);
+      // eventLogger.logEvent(`Round ${this.roundCount} begins`);
+      // eventLogger.addBreak();
+      // eventLogger.logEvent(`${this.teams[this.currentTeamIndex].name}'s Turn`);
+      // eventLogger.logEvent(`${this.getCurrentCombatant().name} the ${this.getCurrentCombatant().getCombatantType()} acts`);
     }
   
     private setupCombatants(): void {
@@ -126,6 +126,7 @@ export class Game {
       this.addSkillUsage(coopMove.name);
       const eventLogger = EventLogger.getInstance();
       eventLogger.logEvent(`${invoker.name} uses ${coopMove.name}`);
+
       [invoker, ...supportingCombatants].forEach((combatant) => {
         combatant.stats.stamina -= coopMove.cost;
       });
@@ -180,7 +181,7 @@ export class Game {
       // if game over, return
       if(this.isGameOver()) {
         const eventLogger = EventLogger.getInstance();
-        eventLogger.logEvent(`Game Over`);
+        // eventLogger.logEvent(`Game Over`);
         return;
       }
 
@@ -235,7 +236,7 @@ export class Game {
       this.roundCount++;
       const eventLogger = EventLogger.getInstance();
       eventLogger.addBreak();
-      eventLogger.logEvent(`Round ${this.roundCount} begins`);
+      // eventLogger.logEvent(`Round ${this.roundCount} begins`);
       eventLogger.addBreak();
       // this.updateStatusEffects();
     }

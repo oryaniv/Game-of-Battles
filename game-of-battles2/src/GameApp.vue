@@ -158,8 +158,8 @@
           v-for="skill in getCombatantCoopMoves(currentCombatant)"
           :key="skill.move.name"
           class="skill-item"
-          :class="{ disabled: !isSkillEnabled(skill.move.name) }"
-          :disabled="!isSkillEnabled(skill.move.name)"
+          :class="{ disabled: !isSkillEnabled(skill.move.name, skill.partners) }"
+          :disabled="!isSkillEnabled(skill.move.name, skill.partners)"
           @click="showCoopSkillTargets(skill.move.name)"
           @mouseover="showCoopSkillDescription(skill.move.name, skill.partners)"
           @mouseleave="hideCoopSkillDescription"
@@ -207,6 +207,12 @@
       <div class="dead-x" v-if="combatant.stats.hp <= 0">
         <img  src="./assets/X.svg" alt="Dead" />
       </div>
+    </div>
+  </div>
+
+  <div class="event-indicator-container">
+    <div class="event-indicator-text">
+         {{getEvents()[getEvents().length - 1]}}
     </div>
   </div>
 
@@ -315,53 +321,49 @@ import { Howl } from 'howler';
 import { EventLogger } from './eventLogger';
 import { AllOfThem, standardVsSetup, theATeam, theBTeam, allMilitiaSetup, theGorillaTeam,
  generateRandomTeam, generateCombatantIdenticalTeam, placeAllCombatants, debugSetupWhiteTeam, debugSetupBlackTeam} from './boardSetups';
+ import { getGameOverMessage } from './GameOverMessageProvider';
 
 export default defineComponent({
   setup() {
     
     const board = ref(new Board(10, 10));
+    const veternAIAgentWithCoop = new VeteranAIAgent();
+    veternAIAgentWithCoop.setCollectCoop(true);
+    const veternAIAgentNoCoop = new VeteranAIAgent();
+    veternAIAgentNoCoop.setCollectCoop(false);
     const whiteTeam = ref(new Team('White Team', 0));
     const blackTeam = ref(new Team('Black Team', 1));
 
-    whiteTeam.value.addCombatant(new Wizard('fobo', { x: 5, y: 5}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Fool('dobo', { x: 3, y: 1}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Rogue('tobo', { x: 3, y: 1}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Hunter('miobo', { x: 4, y: 1}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Defender('aobo', { x: 5, y: 3}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Wizard('iiobo', { x: 3, y: 0}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Pikeman('aobo', { x: 3, y: 5}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Healer('bobo', { x: 6, y: 0}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Pikeman('cobo', { x: 4, y: 1}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Vanguard('dobo', { x: 7, y: 2}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Hunter('eobo', { x: 7, y: 9}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Witch('Gobo', { x: 3, y: 0 }, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Wizard('eobo', { x: 2, y: 0 }, whiteTeam.value));
 
-    // whiteTeam.value.combatants[0].stats.hp = 10;
-
-    // blackTeam.value.addCombatant(new Vanguard('dog', { x: 1, y: 2 }, blackTeam.value));
-   // blackTeam.value.addCombatant(new Defender('tog', { x: 5, y: 9 }, blackTeam.value));
-    
-
-    blackTeam.value.addCombatant(new Vanguard('dog', { x: 6, y: 8 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Pikeman('rob', { x: 4, y: 8 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Hunter('nana', { x: 5, y: 9 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Wizard('reqe', { x: 6, y: 9 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new FistWeaver('mfiem', { x: 5, y: 8 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Rogue('Gobo', { x: 4, y: 8 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Healer('dog', { x: 5, y: 8 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Pikeman('rob', { x: 4, y: 9 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Pikeman('nana', { x: 7, y: 5 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Hunter('reqe', { x: 6, y: 9 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Gorilla('feifne', { x: 5, y: 8 }, blackTeam.value));
 
   //blackTeam.value.addCombatant(new Artificer('Gobo', { x: 9, y: 6 }, blackTeam.value));
 
-    // whiteTeam.value.combatants[0].stats.hp = 10;
-    whiteTeam.value.combatants[0].applyStatusEffect({
-            name: StatusEffectType.ARCANE_CHANNELING,
-            duration: 2,
-    }); 
+    // blackTeam.value.combatants[0].stats.hp = 10;
+    whiteTeam.value.combatants[1].stats.hp = 35;
 
-    whiteTeam.value.combatants[0].applyStatusEffect({
-            name: StatusEffectType.ARCANE_OVERCHARGE,
-            duration: 2,
-    }); 
-
-    // whiteTeam.value.combatants[0].applyStatusEffect({
-    //         name: StatusEffectType.ARCANE_OVERCHARGE,
+    // whiteTeam.value.combatants[1].stats.stamina = 0;
+    // whiteTeam.value.combatants[2].stats.stamina = 0;
+    // whiteTeam.value.combatants[3].stats.stamina = 0;
+    // whiteTeam.value.combatants[1].applyStatusEffect({
+    //         name: StatusEffectType.CLOAKED,
     //         duration: 5,
     // }); 
 
-        // theATeam(whiteTeam.value);
-        // theBTeam(blackTeam.value);
+      // theATeam(whiteTeam.value);
+      // theBTeam(blackTeam.value);
 
     // placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
     
@@ -425,7 +427,8 @@ export default defineComponent({
 
     const updateTurnMessage = () => {
       if(game.value.isGameOver()) {
-        turnMessage.value = `Game Over`;
+        // turnMessage.value = `Game Over`;
+        turnMessage.value = getGameOverMessage(whiteTeam.value, blackTeam.value);
       } else {
         turnMessage.value = `${game.value.teams[(game.value as Game).getCurrentTeamIndex()].name}'s Turn`;
       }
@@ -480,7 +483,16 @@ export default defineComponent({
     const moveCombatant = (position: Position) => {
       if (isMoveValid(position) && currentCombatant.value) {
         previousPosition.value = { ...currentCombatant.value.position };
-        currentCombatant.value.move(position, board.value as Board);
+        const shouldStop = currentCombatant.value.move(position, board.value as Board);
+        if(shouldStop) {
+          game.value.spendActionPoints(1);
+          validMoves.value = [];
+          hasMoved.value = true;
+          moveMode.value = false;
+          game.value.nextTurn();
+          prepareNextTurn();
+          hasMoved.value = false;
+        }
         validMoves.value = [];
         hasMoved.value = true;
         moveMode.value = false;
@@ -878,11 +890,19 @@ export default defineComponent({
       return selectedCoopSkillPartners.value?.some((partner) => partner.name === combatant.name);
     }
 
-    const isSkillEnabled = (skillName: string) => {
+    const isSkillEnabled = (skillName: string, partners?: Combatant[]) => {
       const skill = currentCombatant.value?.specialMoves.find(
         (skill) => skill.name === skillName
       );
-      return !!skill && !!currentCombatant.value && currentCombatant.value.canUseSkill(skill) && enoughActionPointsForCoop(skill);
+
+      if(!skill || !currentCombatant.value) {
+        return false;
+      }
+
+      if(partners && partners.some(partner => !partner.canSupportSkill(skill))) {
+         return false;
+      }
+      return currentCombatant.value.canUseSkill(skill) && enoughActionPointsForCoop(skill);
 
       function enoughActionPointsForCoop(move: SpecialMove): boolean {
         return move.turnCost <= (actionsRemaining.value + 0.5);
@@ -1034,6 +1054,14 @@ export default defineComponent({
       [StatusEffectType.ARCANE_OVERCHARGE]: "AO",
       [StatusEffectType.ARCANE_BARRIER]: "AB",
       [StatusEffectType.ARCANE_CONDUIT]: "ACO",
+      [StatusEffectType.GUARDIAN_PROTECTED]: "GP",
+      [StatusEffectType.GUARDIAN]: "G",
+      [StatusEffectType.SHIELD_WALL_PROTECTED]: "SWP",
+      [StatusEffectType.SHIELD_WALL]: "SW",
+      [StatusEffectType.ARCANE_SHIELD_WALL_PROTECTED]: "ASP",
+      [StatusEffectType.ARCANE_SHIELD_WALL]: "ASW",
+      [StatusEffectType.DIAMOND_HOOKED]: "DH",
+      [StatusEffectType.DIAMOND_HOOKED_HOLDING]: "DHH",
       // ... add mappings for other status effect types
     };
 
@@ -1538,7 +1566,8 @@ button {
   font-size: 28px;
   color: white;
   width: 100%;
-  background-image: url(https://img.goodfon.com/original/3024x1964/8/46/tekstura-ametist-kamen.jpg);
+  /*background-image: url(https://img.goodfon.com/original/3024x1964/8/46/tekstura-ametist-kamen.jpg);*/
+  background: linear-gradient(to bottom, #000000,rgb(61, 8, 85));
   border-radius: 20px;
 }
 
@@ -1929,6 +1958,21 @@ button {
 
 .status-popup-close {
   margin-top: 20px;
+  text-align: center;
+}
+
+.event-indicator-container {
+  position: absolute;
+  top: 30%;
+  right: 3.5%;
+  width: 280px;
+  height: 30px;
+  z-index: 10;
+  border: 1px solid white;
+}
+
+.event-indicator-text {
+  font-size: 20px;
   text-align: center;
 }
 

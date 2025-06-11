@@ -50,8 +50,6 @@ export class Rogue extends Combatant {
             new RuptureTendons(),
             new DanceOfDaggers(),
             new KarithrasBoon(),
-            
-
           ], team
         );
       }

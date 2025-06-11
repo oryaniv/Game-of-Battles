@@ -35,6 +35,9 @@ export class DefensiveStrike implements SpecialMove {
     description = `Attack Quickly for low Slash damage, and immediately go into Defend mode.`   
 }
 
+function hasArcaneOvercharge(invoker: Combatant) {
+    return invoker.statusEffects.some((effect) => effect.name === StatusEffectType.ARCANE_OVERCHARGE);
+}
 
 export class Flame implements SpecialMove {
     name: string = "Flame";
@@ -52,7 +55,18 @@ export class Flame implements SpecialMove {
         type: DamageType.Fire
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
-        const result = CombatMaster.getInstance().executeAttack(invoker, target, board, this.damage);
+        const hasOvercharge = hasArcaneOvercharge(invoker);
+        const damage = hasOvercharge ? {
+            amount: this.damage.amount * 1.5,
+            type: this.damage.type
+        } : this.damage;
+        const result = CombatMaster.getInstance().executeAttack(invoker, target, board, damage);
+        if((result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit ) && hasOvercharge) {
+            CombatMaster.getInstance().tryInflictStatusEffect(invoker, target, board, StatusEffectType.BURNING, 1, 0.6);
+        }
+        if(hasOvercharge) {
+            invoker.removeStatusEffect(StatusEffectType.ARCANE_OVERCHARGE);
+        }
         return result;
     };
     checkRequirements = undefined
@@ -75,7 +89,18 @@ export class LightningBolt implements SpecialMove {
         type: DamageType.Lightning
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
-        const result = CombatMaster.getInstance().executeAttack(invoker, target, board, this.damage);
+        const hasOvercharge = hasArcaneOvercharge(invoker);
+        const damage = hasOvercharge ? {
+            amount: this.damage.amount * 1.5,
+            type: this.damage.type
+        } : this.damage;
+        const result = CombatMaster.getInstance().executeAttack(invoker, target, board, damage);
+        if((result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit ) && hasOvercharge) {
+            CombatMaster.getInstance().tryInflictStatusEffect(invoker, target, board, StatusEffectType.STAGGERED, 1, 0.6);
+        }
+        if(hasOvercharge) {
+            invoker.removeStatusEffect(StatusEffectType.ARCANE_OVERCHARGE);
+        }
         return result;
     };
     checkRequirements = undefined
@@ -98,7 +123,18 @@ export class Icicle implements SpecialMove {
         type: DamageType.Ice
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
-        const result = CombatMaster.getInstance().executeAttack(invoker, target, board, this.damage);
+        const hasOvercharge = hasArcaneOvercharge(invoker);
+        const damage = hasOvercharge ? {
+            amount: this.damage.amount * 1.5,
+            type: this.damage.type
+        } : this.damage;
+        const result = CombatMaster.getInstance().executeAttack(invoker, target, board, damage);
+        if((result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit ) && hasOvercharge) {
+            CombatMaster.getInstance().tryInflictStatusEffect(invoker, target, board, StatusEffectType.SLOW, 1, 0.6);
+        }
+        if(hasOvercharge) {
+            invoker.removeStatusEffect(StatusEffectType.ARCANE_OVERCHARGE);
+        }
         return result;
     };
     checkRequirements = undefined
@@ -122,10 +158,22 @@ export class FireBall implements SpecialMove {
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
         const combatMaster = CombatMaster.getInstance();
+        const hasOvercharge = hasArcaneOvercharge(invoker);
+        const damage = hasOvercharge ? {
+            amount: this.damage.amount * 1.5,
+            type: this.damage.type
+        } : this.damage;
+        if(hasOvercharge) {
+            invoker.removeStatusEffect(StatusEffectType.ARCANE_OVERCHARGE);
+        }
         invoker.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
         const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
         const fireBallResults = getAllTargets.map(AOETarget => {
-            return combatMaster.executeAttack(invoker, AOETarget, board, this.damage, true);
+            const result = combatMaster.executeAttack(invoker, AOETarget, board, damage, true);
+            if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
+                CombatMaster.getInstance().tryInflictStatusEffect(invoker, AOETarget, board, StatusEffectType.BURNING, 1, 0.6);
+            }
+            return result;
         });
 
         return fireBallResults;
@@ -154,10 +202,18 @@ export class ChainLightning implements SpecialMove {
     effect = (invoker: Combatant, target: Position, board: Board) => {
         invoker.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
         const combatMaster = CombatMaster.getInstance();
+        const hasOvercharge = hasArcaneOvercharge(invoker);
+        const damage = hasOvercharge ? {
+            amount: this.damage.amount * 1.5,
+            type: this.damage.type
+        } : this.damage;
+        if(hasOvercharge) {
+            invoker.removeStatusEffect(StatusEffectType.ARCANE_OVERCHARGE);
+        }
         const chainTargets = board.getChainTargets(invoker, target, 3, 3);
         const chainLightningResults: ActionResult[] = [];
         for(const currentTarget of chainTargets) {
-            const result = combatMaster.executeAttack(invoker, currentTarget, board, this.damage);
+            const result = combatMaster.executeAttack(invoker, currentTarget, board, damage);
             chainLightningResults.push(result);
             if(result.attackResult === AttackResult.Miss || result.attackResult === AttackResult.Fumble || result.attackResult === AttackResult.Blocked) {
                 break;
@@ -191,9 +247,18 @@ export class FrozenBurst implements SpecialMove {
     effect = (invoker: Combatant, target: Position, board: Board) => {
         const combatMaster = CombatMaster.getInstance();
         invoker.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
-        const result = combatMaster.executeAttack(invoker, target, board, this.damage);
+        const hasOvercharge = hasArcaneOvercharge(invoker);
+        const damage = hasOvercharge ? {
+            amount: this.damage.amount * 1.5,
+            type: this.damage.type
+        } : this.damage;
+        if(hasOvercharge) {
+            invoker.removeStatusEffect(StatusEffectType.ARCANE_OVERCHARGE);
+        }
+        const result = combatMaster.executeAttack(invoker, target, board, damage);
         if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
-            combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.FROZEN, 2, 0.9);
+            const duration = hasOvercharge ? 4 : 2;
+            combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.FROZEN, duration, 0.9);
         }
         return result;
     };
@@ -349,7 +414,7 @@ export class Skewer implements SpecialMove {
     cost: number = 5;
     turnCost: number = 1;
     range: SpecialMoveRange = {
-        type: SpecialMoveRangeType.Melee,
+        type: SpecialMoveRangeType.Straight,
         align: SpecialMoveAlignment.All,
         areaOfEffect: SpecialMoveAreaOfEffect.Line,
         range: 1
@@ -485,6 +550,11 @@ export class ShieldBreaker implements SpecialMove {
             const targetCombatant = board.getCombatantAtPosition(target);
             targetCombatant!.removeStatusEffect(StatusEffectType.DEFENDING);
             targetCombatant!.removeStatusEffect(StatusEffectType.BLOCKING_STANCE);
+            targetCombatant!.removeStatusEffect(StatusEffectType.SHIELD_WALL);
+            targetCombatant!.removeStatusEffect(StatusEffectType.SHIELD_WALL_PROTECTED);
+            targetCombatant!.removeStatusEffect(StatusEffectType.ARCANE_SHIELD_WALL);
+            targetCombatant!.removeStatusEffect(StatusEffectType.ARCANE_SHIELD_WALL_PROTECTED);
+            targetCombatant!.removeStatusEffect(StatusEffectType.ARCANE_BARRIER);
             targetCombatant!.applyStatusEffect({name: StatusEffectType.DEFENSE_DOWNGRADE, duration: 3});
         }
         return result;
@@ -738,4 +808,186 @@ export class ShockingGauntlet implements SpecialMove {
     checkRequirements = undefined
     description = `Use your handy electrified gauntlet to shock an enemy from up close, dealing medium Lightning damage and having a small chance to inflict Staggered for 3 turns.`   
 }   
+
+export class Horns implements SpecialMove {
+    name: string = "Horns";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 3;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Melee,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 1
+    };
+    damage: Damage = {
+        amount: 50,
+        type: DamageType.Pierce
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage);
+        return result;
+    };
+    checkRequirements = undefined
+    description = `Strike an enemy with your horns, dealing medium Pierce damage.`   
+}
+
+export class Claws implements SpecialMove {
+    name: string = "Claws";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 3;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Melee,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 1
+    };
+    damage: Damage = {
+        amount: 50,
+        type: DamageType.Slash
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage);
+        return result;
+    };
+    checkRequirements = undefined
+    description = `Strike an enemy with your claws, dealing medium Slash damage.`   
+}
+
+export class TrollKick implements SpecialMove {
+    name: string = "Troll Kick";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 3;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Melee,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 1
+    };
+    damage: Damage = {
+        amount: 50,
+        type: DamageType.Crush
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage);
+        return result;
+    };
+    checkRequirements = undefined
+    description = `Strike an enemy with your mighty foot, dealing medium Crush damage.`   
+}
+
+export class VenomousSpit implements SpecialMove {
+    name: string = "Venomous Spit";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 3;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Straight,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 3
+    };
+    damage: Damage = {
+        amount: 40,
+        type: DamageType.Blight
+    };  
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage);
+        if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
+            combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.POISONED, 3, 0.6);
+        }
+        return result;
+    };
+    checkRequirements = undefined
+    description = `Strike an enemy with your venomous spit, dealing medium Blight damage, may also poison them for 3 turns.`   
+}
+
+export class DragonBreath implements SpecialMove {
+    name: string = "Dragon's Breath";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 3;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Straight,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Line,
+        range: 1
+    };
+    damage: Damage = {
+        amount: 30,
+        type: DamageType.Fire   
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage);
+        if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
+            combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.BURNING, 3, 0.5);
+        }
+        return result;
+    };
+    checkRequirements = undefined
+    description = `Breathe fire on an enemy, dealing medium Fire damage and may inflict Burning for 3 turns.`   
+}
+
+export class DragonFireBall implements SpecialMove {
+    name: string = "Dragon Fire Ball";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 3;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Curve,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Nova,
+        range: 3
+    };
+    damage: Damage = {
+        amount: 30, 
+        type: DamageType.Fire
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const damage = this.damage;
+        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
+        const fireBallResults = getAllTargets.map(AOETarget => {
+            const result = combatMaster.executeAttack(invoker, AOETarget, board, damage, true);
+            return result;
+        });
+
+        return fireBallResults;
+    };  
+    checkRequirements = undefined
+    description = `Cast a ball of fire, dealing medium Fire damage.`   
+}
+
+export class DieMortal implements SpecialMove {
+    name: string = "Die, Mortal!";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 5;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Straight,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 4
+    };
+    damage: Damage = {
+        amount: 999,
+        type: DamageType.Unstoppable
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage, true);
+        return result;
+    };
+    checkRequirements = undefined
+    description = `Kills an enemy instantly in a flash of glory.`   
+}
+
+
 

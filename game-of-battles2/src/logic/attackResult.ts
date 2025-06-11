@@ -8,7 +8,10 @@ export enum AttackResult {
     Fumble,
     Blocked,
     // this should never happen
-    NotFound
+    NotFound,
+    // Buff,
+    // Debuff,
+    // Ailment,
 }
 
 

@@ -136,3 +136,51 @@ export class ShadowStep implements SpecialMove {
     description = `Step into the shadows, move to target position, and become cloaked for 5 round.
     cloaking breaks upon taking damage, losing focus or attacking.`
 }
+
+export class TrollRegeneration implements SpecialMove {
+    name: string = "Troll Regeneration";
+    triggerType = SpecialMoveTriggerType.Passive;
+    cost: number = 0;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Self,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Crush
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        invoker.applyStatusEffect({
+            name: StatusEffectType.TROLL_REGENERATION,
+            duration: Number.POSITIVE_INFINITY,
+        }); 
+        return getStandardActionResult();
+    };
+    checkRequirements = undefined
+    description = `Regenerate 15 health points every turn.`
+}       
+
+export class DragonRage implements SpecialMove {
+    name: string = "Dragon Rage";
+    description = `Rage like a dragon, and gain an additional action point.`
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 10;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Self,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Unstoppable
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        return getStandardActionResult(target, -1);
+    };
+    checkRequirements = undefined;
+}           

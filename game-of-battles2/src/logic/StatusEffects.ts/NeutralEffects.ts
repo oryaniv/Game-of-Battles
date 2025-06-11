@@ -79,19 +79,23 @@ export class FirstStrikeStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.FIRST_STRIKE;
     applicationHooks = {
         [StatusEffectHook.OnBeingAttacked]: (self: Combatant, attacker: Combatant, damage: Damage, amount: number, board: Board) => {
-            const rangeCalculator = new RangeCalculator();
+            let isAttackerHookedToSelf = false;
+            const isDiamondHookHolder = self.hasStatusEffect(StatusEffectType.DIAMOND_HOOKED_HOLDING);
+            if(isDiamondHookHolder) {
+                const heldCombatant = self.getRelatedCombatants()["DIAMOND_HOOKED_HOLDING"];
+                isAttackerHookedToSelf = !!heldCombatant && heldCombatant.name === attacker.name;
+            }
+            
             if(
-                !rangeCalculator.areInMeleeRange(self, attacker) ||
-                attacker.hasStatusEffect(StatusEffectType.CLOAKED) ||
-                attacker.hasStatusEffect(StatusEffectType.DIAMOND_SUPREMACY)
+                !board.isInMeleeRange(self, attacker) ||
+                attacker.hasStatusEffect(StatusEffectType.CLOAKED)
             ) {
                 return;
             }
 
-            if(!self.hasStatusEffect(StatusEffectType.DIAMOND_SUPREMACY) && 
+            if(!isAttackerHookedToSelf &&
                 (self.hasStatusEffect(StatusEffectType.STRUCK_FIRST) || 
                 attacker.hasStatusEffect(StatusEffectType.FIRST_STRIKE))) {
-               
                 return;
             }
 
@@ -230,7 +234,7 @@ export class DecoyStatusEffect implements StatusEffect {
     applicationHooks = {
         [StatusEffectHook.OnDeath]: (caster: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
             const team = caster.team;
-            const realTarget = team.combatants.find((combatant) => `${combatant.name}_doll` === target.name);
+            const realTarget = caster.getRelatedCombatants()["doll_owner"];
             if(realTarget) {
                 realTarget.removeStatusEffect(StatusEffectType.CLOAKED);
             }
@@ -259,6 +263,30 @@ export class SurpriseBoomStatusEffect implements StatusEffect {
             // caster.takeDamage({amount: caster.stats.hp, type: DamageType.Unstoppable});
             return results;
         },
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
+}
+
+export class TrollRegenerationStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.TROLL_REGENERATION;
+    applicationHooks = {
+        [StatusEffectHook.OnTurnStart]: (self: Combatant) => {
+            const newHp = Math.min(self.stats.hp + 12, self.baseStats.hp);
+            const deltaHp = newHp - self.stats.hp;
+            self.stats.hp = newHp;
+            return {
+                attackResult: AttackResult.Hit,
+                damage: {amount: deltaHp, type: DamageType.Healing},
+                cost: 0,
+                reaction: DamageReaction.NONE,
+                position: self.position
+            };
+        },
+        [StatusEffectHook.OnDamageTaken]: (self: Combatant, target: Combatant, damage: Damage) => {
+            if(damage.amount >= 1 && (damage.type  === DamageType.Fire || damage.type === DamageType.Blight)) {
+                self.removeStatusEffect(StatusEffectType.TROLL_REGENERATION);
+            }
+        }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
 }

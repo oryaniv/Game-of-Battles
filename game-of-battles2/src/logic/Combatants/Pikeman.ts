@@ -2,7 +2,7 @@ import { Combatant } from "../Combatant";
 import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Position } from "../Position";
 import { ShatterSteel } from "../SpecialMoves/Coop/DebuffCoop";
-import { ColdEdge, SkeweringHarppon } from "../SpecialMoves/Coop/OffensiveCoop";
+import { ColdEdge, SkeweringHarppon, DiamondHook } from "../SpecialMoves/Coop/OffensiveCoop";
 import { DiamondSupremacy } from "../SpecialMoves/Coop/SelfCoop";
 import { GapingStab, HaftStrike, Skewer } from "../SpecialMoves/Singular/Offensive";
 import { FirstStrike } from "../SpecialMoves/Singular/Passives";
@@ -46,7 +46,8 @@ export class Pikeman extends Combatant {
           new ColdEdge(),
           new ShatterSteel(),
           new SkeweringHarppon(),
-          new DiamondSupremacy()
+          // new DiamondSupremacy(),
+          new DiamondHook(),
         ],
       team);
     }

@@ -11,7 +11,7 @@ import { SpecialMoveAlignment } from "@/logic/SpecialMove";
 import { SpecialMoveAreaOfEffect } from "@/logic/SpecialMove";
 import { SpecialMoveRange } from "@/logic/SpecialMove";
 import { CombatMaster } from "@/logic/CombatMaster";
-import { StatusEffect, StatusEffectAlignment, StatusEffectType } from "@/logic/StatusEffect";
+import { getResultsForStatusEffectHook, StatusEffect, StatusEffectAlignment, StatusEffectHook, StatusEffectType } from "@/logic/StatusEffect";
 import { shuffleArray } from "@/logic/AI/AIUtils";
 import { FistWeaver } from "@/logic/Combatants/FistWeaver";
 
@@ -30,7 +30,7 @@ export class ShieldBash extends CoopMove {
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const combatMaster = CombatMaster.getInstance();
-        const result = combatMaster.executeAttack(invoker, target, board, this.damage);
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage, false, this.turnCost);
         if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
             const targetCombatant = board.getCombatantAtPosition(target);
             combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.STAGGERED, 3, 0.6);
@@ -79,8 +79,6 @@ export class RainOfArrows extends CoopMove {
             return combatMaster.executeAttack(invoker, AOETarget, board, this.damage, true, this.turnCost);
         });
 
-        // eslint-disable-next-line
-        debugger;
         return rainOfArrowsResults;
     };
     range: SpecialMoveRange = {
@@ -276,11 +274,11 @@ export class ColdEdge extends CoopMove {
     effect = (invoker: Combatant, target: Position, board: Board) => {
         const combatMaster = CombatMaster.getInstance();
         const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
-        const thunderLanceResults = getAllTargets.map(AOETarget => {
+        const coldEdgeResults = getAllTargets.map(AOETarget => {
             return combatMaster.executeAttack(invoker, AOETarget, board, this.damage, true, this.turnCost);
         });
 
-        return thunderLanceResults;
+        return coldEdgeResults;
     };
     checkRequirements = (self: Combatant) => {
         return this.checkCoopRequirements(self);
@@ -297,7 +295,7 @@ export class SkeweringHarppon extends CoopMove {
         { combatantTypeOptions: [CombatantType.Hunter, CombatantType.Pikeman] }
     ];
     damage: Damage = {
-        amount: 20,
+        amount: 25,
         type: DamageType.Pierce
     };
     range: SpecialMoveRange = {
@@ -415,7 +413,7 @@ export class RuptureTendons extends CoopMove {
     ];
     damage: Damage = {
         amount: 20,
-        type: DamageType.Slash
+        type: DamageType.Dark
     };  
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Melee,
@@ -423,6 +421,7 @@ export class RuptureTendons extends CoopMove {
         areaOfEffect: SpecialMoveAreaOfEffect.Single,
         range: 1
     };
+    cost: number = 8;
     turnCost: number = 1;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const targetCombatant = board.getCombatantAtPosition(target);
@@ -651,10 +650,16 @@ export class SoulScythe extends CoopMove {
         const targetHp = targetCombatant.stats.hp;
         const targetMaxHp = targetCombatant.baseStats.hp;
         const targetNegativeStatusEffects = targetCombatant.getStatusEffects().filter(status => status.alignment === StatusEffectAlignment.Negative);
-        const chanceToKill = 10 + (targetNegativeStatusEffects.length * 10) + calcChanceByMissingHealth(targetHp, targetMaxHp);
+        const chanceToKill = 10 + 
+                            (targetNegativeStatusEffects.length * 10) + 
+                            calcChanceByMissingHealth(targetHp, targetMaxHp) + 
+                            ((invoker.stats.luck - targetCombatant.stats.luck) * 0.02);
         const randomNumber = Math.floor(Math.random() * 100);
-        if(randomNumber < chanceToKill) {
+        if(randomNumber <= chanceToKill) {
             targetCombatant.takeDamage({amount: targetCombatant.stats.hp, type: DamageType.Unstoppable});
+            if(targetCombatant.isKnockedOut()) {
+                getResultsForStatusEffectHook(invoker, StatusEffectHook.OnKilling, targetCombatant, undefined, 1, board);
+            }
         }
         return getStandardActionResult(target, this.turnCost);
 
@@ -723,7 +728,7 @@ export class PlagueArrow extends CoopMove {
     cost: number = 7;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const combatMaster = CombatMaster.getInstance();
-        const result = combatMaster.executeAttack(invoker, target, board, this.damage);
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage, false, this.turnCost);
         if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
             combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.PLAGUED, 3, 0.6);
         }
@@ -743,7 +748,7 @@ export class CatastrophicCalamity extends CoopMove {
         { combatantTypeOptions: [CombatantType.Vanguard, CombatantType.Pikeman, CombatantType.FistWeaver, CombatantType.StandardBearer] }
     ];
     damage: Damage = {
-        amount: 80,
+        amount: 90,
         type: DamageType.Unstoppable
     };
     range: SpecialMoveRange = {
@@ -760,7 +765,7 @@ export class CatastrophicCalamity extends CoopMove {
         invoker.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
         const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
         const CatastrophicCalamityResults = getAllTargets.map(AOETarget => {
-            return combatMaster.executeAttack(invoker, AOETarget, board, this.damage, true);
+            return combatMaster.executeAttack(invoker, AOETarget, board, this.damage, true, this.turnCost);
         });
         invoker.removeStatusEffect(StatusEffectType.ARCANE_OVERCHARGE);
         invoker.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
@@ -778,19 +783,93 @@ export class SkySovereignsWrath extends CoopMove {
     description: string = "Fall on your enemies with a mighty blow powered with the wrath of the skies, striking the target and whoever behind with the power of lightning";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Wizard, CombatantType.Artificer, CombatantType.FistWeaver] },
-        { combatantTypeOptions: [CombatantType.Vanguard, CombatantType.Pikeman, CombatantType.FistWeaver, CombatantType.StandardBearer] }
     ];
     damage: Damage = {
-        amount: 45,
+        amount: 25,
         type: DamageType.Lightning
     };
     range: SpecialMoveRange = {
-        type: SpecialMoveRangeType.Melee,
+        type: SpecialMoveRangeType.Straight,
+        align: SpecialMoveAlignment.All,
+        areaOfEffect: SpecialMoveAreaOfEffect.Line,
+        range: 1
+    };
+    effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
+        const combatMaster = CombatMaster.getInstance();
+        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
+        const wrathResults = getAllTargets.map(AOETarget => {
+            return combatMaster.executeAttack(invoker, AOETarget, board, this.damage, true, this.turnCost);
+        });
+
+        return wrathResults;
+    };
+    checkRequirements = (self: Combatant) => {
+        return this.checkCoopRequirements(self);
+    };
+    turnCost: number = 1;
+    cost: number = 10;
+    meterCost: number = 0;
+}
+
+export class DiamondHook extends CoopMove {
+    name: string = "Diamond Hook";
+    description: string = "Grab an enemy, pull him to you, then strike him. He can not move or attack you without being struck again.";
+    coopRequiredPartners: CoopPartnerRequirement[] = [
+        { combatantTypeOptions: [CombatantType.Pikeman, CombatantType.Vanguard, CombatantType.Defender, CombatantType.StandardBearer] }
+    ];
+    damage: Damage = {
+        amount: 10,
+        type: DamageType.Pierce
+    };
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Straight,
         align: SpecialMoveAlignment.Enemy,
         areaOfEffect: SpecialMoveAreaOfEffect.Single,
-        range: 1
+        range: 5
     };
     turnCost: number = 2;
     cost: number = 12;
     meterCost: number = 0;
+    effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
+        const combatMaster = CombatMaster.getInstance();
+        const results = []
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage, true, this.turnCost);
+        results.push(result);
+        if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
+            const targetCombatant = board.getCombatantAtPosition(target);
+            if(!targetCombatant) {
+                return result;
+            }
+            const pullResult = board.getPullResult(invoker, targetCombatant, 5);
+            if(!pullResult || pullResult.pullDistance === 0) {
+                return result;
+            }
+            targetCombatant.move(pullResult.moveTo, board);
+
+            const afterPullAttackResult = combatMaster.executeAttack(invoker, pullResult.moveTo, board, {
+                type: DamageType.Pierce,
+                amount: invoker.basicAttack().amount * (1 + (0.1 * pullResult.pullDistance)),
+            }, true, this.turnCost);
+
+            results.push(afterPullAttackResult);
+
+            if(afterPullAttackResult.attackResult === AttackResult.Hit || afterPullAttackResult.attackResult === AttackResult.CriticalHit) {
+                targetCombatant.applyStatusEffect({
+                    name: StatusEffectType.DIAMOND_HOOKED,
+                    duration: 5,
+                });
+                targetCombatant.addRelatedCombatant('DIAMOND_HOOKED', invoker);
+    
+                invoker.applyStatusEffect({
+                    name: StatusEffectType.DIAMOND_HOOKED_HOLDING,
+                    duration: 5,
+                });
+                invoker.addRelatedCombatant('DIAMOND_HOOKED_HOLDING', targetCombatant);
+            }            
+        }
+        return results;
+    };
+    checkRequirements = (self: Combatant) => {
+        return this.checkCoopRequirements(self) && !self.hasStatusEffect(StatusEffectType.DIAMOND_HOOKED_HOLDING);
+    };
 }

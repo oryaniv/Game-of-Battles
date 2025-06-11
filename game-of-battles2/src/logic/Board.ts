@@ -317,9 +317,18 @@ export class Board {
     return pushResult;
   }
 
+  getPullResult(caster: Combatant, target: Combatant, range: number){
+    const pullResult = this.rangeCalculator.getPullResult(caster, target, range, this);
+    return pullResult;
+  }
+
   isFlanked(combatant: Combatant): boolean {
     const adjacentCombatants = this.getAdjacentCombatants(combatant, 1);
     return adjacentCombatants.filter(c => c.team.getName() !== combatant.team.getName()).length > 1;
+  }
+
+  isInMeleeRange(caster: Combatant, target: Combatant): boolean {
+    return this.rangeCalculator.areInMeleeRange(caster, target);
   }
 
 }
