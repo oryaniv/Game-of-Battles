@@ -1,6 +1,6 @@
 import { DamageReaction, DamageType } from "@/logic/Damage";
 import { Damage } from "@/logic/Damage";
-import { Position } from "@/logic/Position";
+import { isSamePosition, Position } from "@/logic/Position";
 import { SpecialMove, SpecialMoveAlignment, SpecialMoveAreaOfEffect, SpecialMoveRange, SpecialMoveRangeType, SpecialMoveTriggerType } from "@/logic/SpecialMove";
 import { Board } from "@/logic/Board";
 import { StatusEffectType, StatusEffectHook, StatusEffect, StatusEffectAlignment } from "@/logic/StatusEffect";
@@ -71,6 +71,75 @@ export class Flame implements SpecialMove {
     };
     checkRequirements = undefined
     description = `Ignite an enemy with Malicious fire and deal medium Fire damage.`   
+}
+
+export class FlameCannon implements SpecialMove {   
+    name: string = "Flame Cannon";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 5;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Curve,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 6
+    };
+    damage: Damage = {
+        amount: 30,
+        type: DamageType.Fire
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const result = CombatMaster.getInstance().executeAttack(invoker, target, board, this.damage);
+        return result;
+    };
+    checkRequirements = undefined
+    description = `medium fire damage at a long range` 
+}
+
+export class IceCannon implements SpecialMove {   
+    name: string = "Ice Cannon";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 5;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Curve,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 6
+    };
+    damage: Damage = {
+        amount: 30,
+        type: DamageType.Ice
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const result = CombatMaster.getInstance().executeAttack(invoker, target, board, this.damage);
+        return result;
+    };
+    checkRequirements = undefined
+    description = `medium Ice damage at a long range` 
+}
+
+export class ThunderDome implements SpecialMove {
+    name: string = "Thunder Dome";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 5;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Straight,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 8
+    };
+    damage: Damage = {
+        amount: 30,
+        type: DamageType.Lightning
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const result = CombatMaster.getInstance().executeAttack(invoker, target, board, this.damage);
+        return result;
+    };
+    checkRequirements = undefined
+    description = `medium Lightning damage at a long range, straight line`   
 }
 
 export class LightningBolt implements SpecialMove {
@@ -989,5 +1058,127 @@ export class DieMortal implements SpecialMove {
     description = `Kills an enemy instantly in a flash of glory.`   
 }
 
+export class ArcBolt implements SpecialMove {
+    name: string = "Arc Shot";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 3;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Curve,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 4
+    };
+    damage: Damage = {
+        amount: 25,
+        type: DamageType.Pierce
+    };  
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage);
+        return result;
+    };
+    checkRequirements = undefined
+    description = `Shoot a bolt in an arc, dealing medium Pierce damage.`   
+}
 
+export class SharpenalShell implements SpecialMove {
+    name: string = "Sharpenal Shell";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 5;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Curve,
+        align: SpecialMoveAlignment.All,
+        areaOfEffect: SpecialMoveAreaOfEffect.Nova,
+        range: 5
+    };
+    damage: Damage = {
+        amount: 25,
+        type: DamageType.Crush
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
+        const shellResults = getAllTargets.map(AOETarget => {
+            const shellDamage = {amount: 25, type: isSamePosition(AOETarget, target) ? DamageType.Crush : DamageType.Pierce};
+            const result = combatMaster.executeAttack(invoker, AOETarget, board, shellDamage, true);
+            return result;
+        });
+        invoker.applyStatusEffect({
+            name: StatusEffectType.RELOAD,
+            duration: 2,
+        }); 
 
+        return shellResults;
+    }
+    checkRequirements = (self: Combatant) => {
+        return self.hasStatusEffect(StatusEffectType.INGENIOUS_UPGRADE) && !self.hasStatusEffect(StatusEffectType.RELOAD);
+    }
+    description = 'medium crush damage to targtet, medium pierce damage to everyone around it. 2 rounds cooldown to reload.'
+}
+    
+
+export class ScorpionBolt implements SpecialMove {
+    name: string = "Scorpion Bolt";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 10;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Straight,
+        align: SpecialMoveAlignment.All,
+        areaOfEffect: SpecialMoveAreaOfEffect.Line,
+        range: 5
+    };
+    damage: Damage = {
+        amount: 25,
+        type: DamageType.Pierce
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
+        const scorpionResults = getAllTargets.map(AOETarget => {
+            return combatMaster.executeAttack(invoker, AOETarget, board, this.damage, true);
+        });
+
+        return scorpionResults;
+    }
+    checkRequirements = (self: Combatant) => {
+        return self.hasStatusEffect(StatusEffectType.INGENIOUS_UPGRADE);
+    }
+    description = `Shoot a bolt in an arc, dealing medium Pierce damage.`   
+}
+
+export class TeleportBlast implements SpecialMove {
+    name: string = "Teleport Blast";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 1;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Curve,
+        align: SpecialMoveAlignment.All,
+        areaOfEffect: SpecialMoveAreaOfEffect.Nova,
+        range: 4
+    };
+    damage: Damage = {
+        amount: 30,
+        type: DamageType.Fire
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        invoker.move(target, board);
+        const combatMaster = CombatMaster.getInstance();
+        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, SpecialMoveAreaOfEffect.Cross, SpecialMoveAlignment.All);
+        const blastResults = getAllTargets.map(AOETarget => {
+            const targetCombatant = board.getCombatantAtPosition(AOETarget);
+            if(targetCombatant && targetCombatant.name !== invoker.name) {
+                return combatMaster.executeAttack(invoker, AOETarget, board, this.damage, true);
+            }
+            return getStandardActionResult(AOETarget, this.turnCost);
+        });
+        return blastResults;
+    };
+    checkRequirements = (self: Combatant) => {
+        return self.hasStatusEffect(StatusEffectType.INGENIOUS_UPGRADE);
+    }
+    description = `Shoot a bolt in an arc, dealing medium Pierce damage.`
+}

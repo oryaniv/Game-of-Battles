@@ -1,10 +1,10 @@
-import { DamageType } from "@/logic/Damage";
+import { DamageReaction, DamageType } from "@/logic/Damage";
 import { Damage } from "@/logic/Damage";
 import { Position } from "@/logic/Position";
 import { SpecialMove, SpecialMoveAlignment, SpecialMoveAreaOfEffect, SpecialMoveRange, SpecialMoveRangeType, SpecialMoveTriggerType } from "@/logic/SpecialMove";
 import { Board } from "@/logic/Board";
 import { StatusEffectType, StatusEffectHook } from "@/logic/StatusEffect";
-import { getStandardActionResult } from "@/logic/attackResult";
+import { AttackResult, getStandardActionResult } from "@/logic/attackResult";
 import { Combatant } from "@/logic/Combatant";
 
 
@@ -184,3 +184,61 @@ export class DragonRage implements SpecialMove {
     };
     checkRequirements = undefined;
 }           
+
+export class SelfDestruct implements SpecialMove {
+    name: string = "Self Destruct";
+    description = `Self destruct, deal 100 damage to all enemies in range.`
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 0;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Self,
+        align: SpecialMoveAlignment.All,
+        areaOfEffect: SpecialMoveAreaOfEffect.Nova,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Unstoppable
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        invoker.takeDamage({ amount: 50, type: DamageType.Unstoppable }, board);
+        return getStandardActionResult();
+    };
+    checkRequirements = undefined;
+}
+
+export class ReplacementPart implements SpecialMove {
+    name: string = "Replacement Part";
+    description = `resotre some health and stamina. requires ingenius upgraded status.`
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 0;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Self,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    }
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Healing
+    }
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        invoker.stats.hp = Math.min(invoker.stats.hp + 20, invoker.baseStats.hp);
+        invoker.stats.stamina = Math.min(invoker.stats.stamina + 10, invoker.baseStats.stamina);
+        return {
+            attackResult: AttackResult.Hit,
+            damage: {
+                amount: 20,
+                type: this.damage.type
+            },
+            cost: 1,
+            reaction: DamageReaction.NONE,
+            position: target
+        };
+    }
+    checkRequirements = (self: Combatant) => {
+        return self.hasStatusEffect(StatusEffectType.INGENIOUS_UPGRADE);
+    }
+}

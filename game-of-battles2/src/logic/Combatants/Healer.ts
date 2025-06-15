@@ -38,7 +38,7 @@ export class Healer extends Combatant {
           {type: DamageType.Ice, reaction: DamageReaction.NONE},
           {type: DamageType.Lightning, reaction: DamageReaction.NONE},
           {type: DamageType.Blight, reaction: DamageReaction.WEAKNESS},
-          {type: DamageType.Holy, reaction: DamageReaction.IMMUNITY},
+          {type: DamageType.Holy, reaction: DamageReaction.RESISTANCE},
           {type: DamageType.Dark, reaction: DamageReaction.WEAKNESS},
         ],
         [

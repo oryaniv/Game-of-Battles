@@ -1,5 +1,5 @@
 import { CombatantType } from "@/logic/Combatants/CombatantType";
-import { CoopMove } from "./CoopMove";
+import { coopCostSlash, CoopMove } from "./CoopMove";
 import { CoopPartnerRequirement } from "./CoopMove";
 import { Damage, DamageReaction, DamageType } from "@/logic/Damage";
 import { Position } from "@/logic/Position";
@@ -24,7 +24,7 @@ export class RainOfGrace extends CoopMove {
         const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
         const rainOfGraceResults = getAllTargets.map(AOETarget => {
             const targetCombatant = board.getCombatantAtPosition(AOETarget);
-            if(targetCombatant) {
+            if(targetCombatant && targetCombatant.isOrganic()) {
                 targetCombatant.stats.hp = Math.min(targetCombatant.stats.hp + 40, targetCombatant.baseStats.hp);
                 const negativeStatusEffects: StatusEffect[] = targetCombatant.getStatusEffects().filter(status => status.alignment === StatusEffectAlignment.Negative);
                 for(const statusEffect of negativeStatusEffects) {
@@ -46,7 +46,7 @@ export class RainOfGrace extends CoopMove {
 
         return rainOfGraceResults;
     };
-    cost: number = 12;
+    cost: number = coopCostSlash ? 8 : 12;
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Curve,
         align: SpecialMoveAlignment.SelfAndAlly,
@@ -96,8 +96,8 @@ export class LastStandOfHeroes extends CoopMove {
     name: string = "Last Stand of Heroes";
     description: string = "When all is lost, summon the lost power of legends, and grant your team 5 action points. this can only be used once per battle";
     coopRequiredPartners: CoopPartnerRequirement[] = [
-        { combatantTypeOptions: [CombatantType.Healer, CombatantType.FistWeaver, CombatantType.Defender, CombatantType.StandardBearer, CombatantType.Pikeman] },
-        { combatantTypeOptions: [CombatantType.Witch, CombatantType.Rogue, CombatantType.Fool, CombatantType.Wizard, CombatantType.Hunter] },
+        { combatantTypeOptions: [CombatantType.Hunter, CombatantType.FistWeaver, CombatantType.Defender, CombatantType.Vanguard, CombatantType.Pikeman, CombatantType.Rogue] },
+        { combatantTypeOptions: [CombatantType.Witch, CombatantType.Artificer, CombatantType.Fool, CombatantType.Wizard, CombatantType.Healer] },
     ];
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
@@ -124,7 +124,7 @@ export class ShieldWall extends CoopMove {
     name: string = "Shield Wall";
     description: string = "Raise your shield to defend yourself and your allies. any ally in range of the wall, will be considered defending. This stance will break upon taking a non-skip action";
     coopRequiredPartners: CoopPartnerRequirement[] = [
-        { combatantTypeOptions: [CombatantType.Defender, CombatantType.StandardBearer] }
+        { combatantTypeOptions: [CombatantType.Defender, CombatantType.StandardBearer, CombatantType.Artificer] }
     ];
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
@@ -146,7 +146,7 @@ export class ShieldWall extends CoopMove {
         });
         return getStandardActionResult(invoker.position, this.turnCost);
     };
-    cost: number = 10;
+    cost: number = coopCostSlash ? 8 : 10;
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Self,
         align: SpecialMoveAlignment.Ally,
@@ -163,8 +163,8 @@ export class ArcaneShieldWall extends CoopMove {
     name: string = "Arcane Shield Wall";
     description: string = "Raise your shield to defend yourself and your allies. any ally in range of the wall, will be considered defending. This stance will break upon taking a non-skip action";
     coopRequiredPartners: CoopPartnerRequirement[] = [
-        { combatantTypeOptions: [CombatantType.Defender, CombatantType.StandardBearer] },
-        { combatantTypeOptions: [CombatantType.Wizard, CombatantType.Artificer, CombatantType.Witch] },
+        { combatantTypeOptions: [CombatantType.Defender, CombatantType.StandardBearer, CombatantType.Artificer] },
+        { combatantTypeOptions: [CombatantType.Wizard, CombatantType.Witch, CombatantType.Healer] },
     ];
 
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
@@ -198,7 +198,7 @@ export class ArcaneShieldWall extends CoopMove {
         return this.checkCoopRequirements(self);
     };
 
-    cost: number = 15;  
+    cost: number = coopCostSlash ? 10 : 15;  
     meterCost: number = 0; 
 }
 
@@ -225,7 +225,7 @@ export class BloodRite extends CoopMove {
         });
         return healingResults;
     };
-    cost: number = 9;
+    cost: number = coopCostSlash ? 7 : 9;
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Curve,
         align: SpecialMoveAlignment.SelfAndAlly,
@@ -264,7 +264,7 @@ export class SwappingGale extends CoopMove {
 
         return getStandardActionResult(invoker.position, this.turnCost);
     };
-    cost: number = 6;
+    cost: number = coopCostSlash ? 4 : 6;
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Curve,
         align: SpecialMoveAlignment.Ally,
@@ -295,7 +295,7 @@ export class Sanctuary extends CoopMove {
         });
         return getStandardActionResult(target, this.turnCost);
     };
-    cost: number = 10;
+    cost: number = coopCostSlash ? 8 : 10;
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Curve,
         align: SpecialMoveAlignment.Ally,
@@ -313,7 +313,7 @@ export class ArcaneConduit extends CoopMove {
     name: string = "Arcane Conduit";
     description: string = "Arcane Conduit";
     coopRequiredPartners: CoopPartnerRequirement[] = [
-        { combatantTypeOptions: [CombatantType.Wizard] },
+        { combatantTypeOptions: [CombatantType.Wizard, CombatantType.Artificer] },
     ];
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
@@ -350,12 +350,12 @@ export class Guardian extends CoopMove {
         }
         invoker.applyStatusEffect({
             name: StatusEffectType.GUARDIAN,
-            duration: 3,
+            duration: 1,
         });
         
         targetCombatant.applyStatusEffect({
             name: StatusEffectType.GUARDIAN_PROTECTED,
-            duration: 3,
+            duration: 1,
         });
         invoker.addRelatedCombatant('GUARDIAN_PROTECTED', targetCombatant);
         targetCombatant.addRelatedCombatant('GUARDIAN', invoker);

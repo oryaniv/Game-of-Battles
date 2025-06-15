@@ -7,6 +7,8 @@ import { Position } from "@/logic/Position";
 import { SpecialMove, SpecialMoveAlignment, SpecialMoveAreaOfEffect, SpecialMoveRange, SpecialMoveRangeType, SpecialMoveTriggerType } from "@/logic/SpecialMove";
 import { StatusEffectType } from "@/logic/StatusEffect";
 
+export const coopCostSlash = true;
+
 export interface CoopPartnerRequirement {
     combatantTypeOptions: CombatantType[];
 }

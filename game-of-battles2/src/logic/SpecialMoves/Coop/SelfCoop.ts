@@ -1,5 +1,5 @@
 import { CombatantType } from "@/logic/Combatants/CombatantType";
-import { CoopMove } from "./CoopMove";
+import { CoopMove, coopCostSlash } from "./CoopMove";
 import { CoopPartnerRequirement } from "./CoopMove";
 import { Damage, DamageReaction, DamageType } from "@/logic/Damage";
 import { Position } from "@/logic/Position";
@@ -21,7 +21,7 @@ export class IdaiNoHadou extends CoopMove {
         { combatantTypeOptions: [CombatantType.FistWeaver, CombatantType.Vanguard, CombatantType.Defender] },
         { combatantTypeOptions: [CombatantType.Healer, CombatantType.StandardBearer, CombatantType.Fool] }
     ];
-    cost: number = 12;
+    cost: number = coopCostSlash ? 8 : 12;
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         invoker.applyStatusEffect({
@@ -89,7 +89,7 @@ export class Frenzy extends CoopMove {
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Witch, CombatantType.Vanguard, CombatantType.Fool, CombatantType.StandardBearer] },
     ];
-    cost: number = 10;
+    cost: number = coopCostSlash ? 8 : 10;
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         invoker.applyStatusEffect({
@@ -116,7 +116,7 @@ export class NastyNastyDolly extends CoopMove {
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Rogue, CombatantType.Fool, CombatantType.Artificer] },
     ];
-    cost: number = 11;
+    cost: number = coopCostSlash ? 8 : 11;
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const originalPosition = invoker.position;
@@ -150,7 +150,7 @@ export class Teleportation extends CoopMove {
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Wizard, CombatantType.FistWeaver, CombatantType.Rogue] },
     ];
-    cost: number = 8;
+    cost: number = coopCostSlash ? 5 : 8;
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         invoker.move(target, board);
@@ -195,7 +195,7 @@ export class ArcaneOvercharge extends CoopMove {
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Wizard, CombatantType.Witch, CombatantType.Vanguard, CombatantType.Hunter] },
     ];
-    cost: number = 10;
+    cost: number = coopCostSlash ? 7 : 10;
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         invoker.applyStatusEffect({
@@ -222,7 +222,7 @@ export class ArcaneBarrier extends CoopMove {
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Defender, CombatantType.Healer, CombatantType.StandardBearer] },
     ];
-    cost: number = 8;
+    cost: number = coopCostSlash ? 5 : 8;
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         invoker.applyStatusEffect({

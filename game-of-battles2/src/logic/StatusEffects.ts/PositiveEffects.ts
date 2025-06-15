@@ -10,6 +10,7 @@ import { Position } from "../Position";
 import { EnragedAIAgent } from "../AI/StatusAIAgent";
 import { AIAgentType } from "../AI/AIAgent";
 import { Doll } from "../Combatants/Fool";
+import { ReplacementPart } from "../SpecialMoves/Singular/Self";
 
 export class BlockingStanceStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.BLOCKING_STANCE;
@@ -71,6 +72,10 @@ export class RegeneratingStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.REGENERATING;
     applicationHooks = {
         [StatusEffectHook.OnTurnStart]: (self: Combatant) => {
+            if(!self.isOrganic()) {
+                return;
+            }
+
             const newHp = Math.min(self.stats.hp + 12, self.baseStats.hp);
             const deltaHp = newHp - self.stats.hp;
             self.stats.hp = newHp;
@@ -269,12 +274,14 @@ export class FullMetalJacketStatusEffect implements StatusEffect {
             if([DamageType.Crush, DamageType.Pierce, DamageType.Slash].includes(target.basicAttack().type)) {
                 caster.stats.attackPower += 20;
             }
+            caster.specialMoves.push(new ReplacementPart());
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
             caster.stats.defensePower -= 20;
             if([DamageType.Crush, DamageType.Pierce, DamageType.Slash].includes(target.basicAttack().type)) {
                 caster.stats.attackPower -= 20;
             }
+            caster.specialMoves = caster.specialMoves.filter(move => move.name !== "Replacement Part");
         },
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
@@ -497,14 +504,16 @@ export class GuardianStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.GUARDIAN;
     applicationHooks = {
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
+            // eslint-disable-next-line
+            // debugger;
             const guardianProtected = target.getRelatedCombatants()['GUARDIAN_PROTECTED'];
-            if(guardianProtected) {
+            if(guardianProtected && !guardianProtected.isKnockedOut()) {
                 guardianProtected.removeStatusEffect(StatusEffectType.GUARDIAN_PROTECTED);
             }
         },
         [StatusEffectHook.OnDeath]: (caster: Combatant, target: Combatant) => {
             const guardianProtected = target.getRelatedCombatants()['GUARDIAN_PROTECTED'];
-            if(guardianProtected) {
+            if(guardianProtected && !guardianProtected.isKnockedOut()) {
                 guardianProtected.removeStatusEffect(StatusEffectType.GUARDIAN_PROTECTED);
             }
         }
@@ -516,14 +525,16 @@ export class GuardianProtectedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.GUARDIAN_PROTECTED;
     applicationHooks = {
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
+            // eslint-disable-next-line
+            //debugger;
             const guardian = target.getRelatedCombatants()['GUARDIAN'];
-            if(guardian) {
+            if(guardian && !guardian.isKnockedOut()) {
                 guardian.removeStatusEffect(StatusEffectType.GUARDIAN);
             }
         },
         [StatusEffectHook.OnDeath]: (caster: Combatant, target: Combatant) => {
             const guardian = target.getRelatedCombatants()['GUARDIAN'];
-            if(guardian) {
+            if(guardian && !guardian.isKnockedOut()) {
                 guardian.removeStatusEffect(StatusEffectType.GUARDIAN);
             }
         },
@@ -570,6 +581,19 @@ export class DiamondHookedHoldingStatusEffect implements StatusEffect {
                 caster.stats.hp = Math.min(caster.stats.hp + 20, caster.baseStats.hp);
                 caster.stats.stamina = Math.min(caster.stats.stamina + 10, caster.baseStats.stamina);
             }
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
+}
+
+export class IngeniousUpgradeStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.INGENIOUS_UPGRADE;
+    applicationHooks = {
+        [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
+            caster.stats.attackPower += 20;
+        },
+        [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
+            caster.stats.attackPower -= 20;
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;

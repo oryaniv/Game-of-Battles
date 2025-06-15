@@ -9,6 +9,7 @@ import { Damage, DamageType } from "../Damage";
 import { DamageReaction } from "../Damage";
 import { RangeCalculator } from "../RangeCalculator";
 import { CombatMaster } from "../CombatMaster";
+import { emitter } from "@/eventBus";
 
 
 export class InspiringKillerStatusEffect implements StatusEffect {
@@ -167,17 +168,23 @@ export class GoingOffStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.GOING_OFF;
     applicationHooks = {
         [StatusEffectHook.OnDeath]: (caster: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
-            const getAllTargets = board.getAreaOfEffectPositions(caster, target.position, SpecialMoveAreaOfEffect.Nova, SpecialMoveAlignment.Enemy);
+            const combatMaster = CombatMaster.getInstance();
+            // eslint-disable-next-line
+            debugger;
+            const getAllTargets = board.getAreaOfEffectPositions(caster, caster.position, SpecialMoveAreaOfEffect.Nova, SpecialMoveAlignment.All);
             getAllTargets.forEach((targetPosition) => {
                 const targetEnemy = board.getCombatantAtPosition(targetPosition);
-                if(targetEnemy) {
-                    targetEnemy.takeDamage({amount: 30, type: DamageType.Fire});
+                if(targetEnemy && targetEnemy.name !== caster.name) {
+                    const result = combatMaster.executeAttack(caster, targetEnemy.position, board, {amount: 30, type: DamageType.Fire});
+                    emitter.emit('trigger-method', result);
                 }
             });
         },
-        [StatusEffectHook.OnBeingSteppedOn]: (caster: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
-            caster.takeDamage({amount: 100, type: DamageType.Unstoppable});
-        },
+        [StatusEffectHook.OnDamageTaken]: (self: Combatant, target: Combatant, damage: Damage) => {
+            if(damage.amount >= 1 && (damage.type  === DamageType.Ice)) {
+                self.removeStatusEffect(StatusEffectType.GOING_OFF);
+            }
+        }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
 }
@@ -211,6 +218,9 @@ export class LifeDrinkerStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.LIFE_DRINKER;
     applicationHooks = {
         [StatusEffectHook.OnKilling]: (caster: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
+            if(!caster.isOrganic()) {
+                return;
+            }
             const victimMaxHp = target.baseStats.hp;
             const victimNegativeEffectCount = target.getStatusEffects().filter(status => status.alignment === StatusEffectAlignment.Negative).length;
             const lifeDrinkAmount = Math.floor((victimMaxHp * 0.3) + 
@@ -289,4 +299,11 @@ export class TrollRegenerationStatusEffect implements StatusEffect {
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
+}
+
+export class ReloadStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.RELOAD;
+    applicationHooks = {
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Neutral;
 }

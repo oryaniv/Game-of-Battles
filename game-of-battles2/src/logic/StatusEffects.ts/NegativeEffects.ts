@@ -118,6 +118,11 @@ export class SlowStatusEffect implements StatusEffect {
 export class PoisonedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.POISONED;
     applicationHooks = {
+        [StatusEffectHook.OnApply]: (self: Combatant) => {
+            if(!self.isOrganic()) {
+                self.removeStatusEffect(StatusEffectType.POISONED);
+            }
+        },
         [StatusEffectHook.OnTurnEnd]: (self: Combatant, target: Combatant, board: Board) => {
             self.takeDamage({amount: 10, type: DamageType.Blight});
             if(self.stats.hp <= 0) {
@@ -141,6 +146,11 @@ export class PoisonedStatusEffect implements StatusEffect {
 export class BleedingStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.BLEEDING;
     applicationHooks = {
+        [StatusEffectHook.OnApply]: (self: Combatant) => {
+            if(!self.isOrganic()) {
+                self.removeStatusEffect(StatusEffectType.BLEEDING);
+            }
+        },
         [StatusEffectHook.OnTurnEnd]: (caster: Combatant, target: Combatant, board: Board) => {
             // caster.stats.hp -= 10;
             caster.takeDamage({amount: 10, type: DamageType.Pierce});
@@ -167,11 +177,18 @@ export class TauntedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.TAUNTED;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
+            if(!caster.isOrganic()) {
+                caster.removeStatusEffect(StatusEffectType.TAUNTED);
+                return;
+            }
             caster.insertAiAgent(new TauntedAIAgent(target));
             caster.stats.agility -= 5;
             caster.stats.defensePower -= 15;
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
+            if(!caster.isOrganic()) {
+                return;
+            }
             caster.removeAiAgent(AIAgentType.TAUNTED);
             caster.stats.agility += 5;
             caster.stats.defensePower += 15;
@@ -184,6 +201,10 @@ export class StupefiedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.STUPEFIED;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
+            if(!caster.isOrganic()) {
+                caster.removeStatusEffect(StatusEffectType.STUPEFIED);
+                return;
+            }
             caster.removeStatusEffect(StatusEffectType.FOCUS_AIM);
             caster.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
         },  
@@ -195,6 +216,10 @@ export class NauseatedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.NAUSEATED;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant, target: Combatant) => {
+            if(!self.isOrganic()) {
+                self.removeStatusEffect(StatusEffectType.NAUSEATED);
+                return;
+            }
             self.removeStatusEffect(StatusEffectType.CLOAKED);
             self.removeStatusEffect(StatusEffectType.MESMERIZING);
             self.removeStatusEffect(StatusEffectType.CIRCUS_DIABOLIQUE);
@@ -210,6 +235,9 @@ export class NauseatedStatusEffect implements StatusEffect {
             self.removeStatusEffect(StatusEffectType.NAUSEATED);
         },
         [StatusEffectHook.OnRemove]: (self: Combatant) => {
+            if(!self.isOrganic()) {
+                return;
+            }
             self.aiAgent && self.removeAiAgent(AIAgentType.STUNLOCKED);
         }
     };
@@ -220,6 +248,10 @@ export class MesmerizedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.MESMERIZED;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
+            if(!caster.isOrganic()) {
+                caster.removeStatusEffect(StatusEffectType.MESMERIZED);
+                return;
+            }
             caster.removeStatusEffect(StatusEffectType.DEFENDING);
             caster.removeStatusEffect(StatusEffectType.BLOCKING_STANCE);
             caster.removeStatusEffect(StatusEffectType.FOCUS_AIM);
@@ -233,6 +265,9 @@ export class MesmerizedStatusEffect implements StatusEffect {
             caster.insertAiAgent(new StunLockedAIAgent("Mesmerized"));
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant) => {
+            if(!caster.isOrganic()) {
+                return;
+            }
             caster.removeAiAgent(AIAgentType.STUNLOCKED);
         },
         [StatusEffectHook.OnDamageTaken]: (caster: Combatant, damage: Damage) => {
@@ -246,6 +281,10 @@ export class NightmareLockedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.NIGHTMARE_LOCKED;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
+            if(!caster.isOrganic()) {
+                caster.removeStatusEffect(StatusEffectType.NIGHTMARE_LOCKED);
+                return;
+            }
             caster.removeStatusEffect(StatusEffectType.DEFENDING);
             caster.removeStatusEffect(StatusEffectType.BLOCKING_STANCE);
             caster.removeStatusEffect(StatusEffectType.FOCUS_AIM);
@@ -259,6 +298,9 @@ export class NightmareLockedStatusEffect implements StatusEffect {
             caster.insertAiAgent(new StunLockedAIAgent("Nightmare Locked"));
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant) => {
+            if(!caster.isOrganic()) {
+                return;
+            }
             caster.removeAiAgent(AIAgentType.STUNLOCKED);
         },
         [StatusEffectHook.OnTurnStart]: (caster: Combatant) => {
@@ -377,9 +419,16 @@ export class PanickedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.PANICKED;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant) => {
+            if(!self.isOrganic()) {
+                self.removeStatusEffect(StatusEffectType.PANICKED);
+                return;
+            }
             self.insertAiAgent(new PanickedAIAgent());
         },
         [StatusEffectHook.OnRemove]: (self: Combatant) => {
+            if(!self.isOrganic()) {
+                return;
+            }
             self.removeAiAgent(AIAgentType.PANICKED);
         }
     };
@@ -390,9 +439,16 @@ export class CharmedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.CHARMED;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant) => {
+            if(!self.isOrganic()) {
+                self.removeStatusEffect(StatusEffectType.CHARMED);
+                return;
+            }
             self.insertAiAgent(new CharmedAIAgent());
         },
         [StatusEffectHook.OnRemove]: (self: Combatant) => {
+            if(!self.isOrganic()) {
+                return;
+            }
             self.removeAiAgent(AIAgentType.CHARMED);
         }
     };
@@ -431,6 +487,12 @@ export class DivineRetributionStatusEffect implements StatusEffect {
 export class PlaguedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.PLAGUED;
     applicationHooks = {
+        [StatusEffectHook.OnApply]: (self: Combatant) => {
+            if(!self.isOrganic()) {
+                self.removeStatusEffect(StatusEffectType.PLAGUED);
+                return;
+            }
+        },
         [StatusEffectHook.OnTurnEnd]: (self: Combatant) => {
             self.takeDamage({amount: 10, type: DamageType.Blight});
             if(self.stats.hp <= 0) {

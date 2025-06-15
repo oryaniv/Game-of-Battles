@@ -101,9 +101,9 @@ function getDifficulty(aiTeam: Team): Difficulty {
 function getResultGap(team1: Team, team2: Team): ResultGap {
     const winnerTeam = determineWinner(team1, team2);
     const loserTeam = winnerTeam.getName() === team1.getName() ? team2 : team1;
-    const winnerTeamCombatants = winnerTeam.combatants;
-    const winnerTeamSurvivors = winnerTeam.getAliveCombatants();
-    const loserTeamSurvivors = loserTeam.getAliveCombatants();
+    const winnerTeamCombatants = winnerTeam.combatants.filter(combatant => !combatant.isExpendable());
+    const winnerTeamSurvivors = winnerTeam.getAliveCombatants().filter(combatant => !combatant.isExpendable());
+    const loserTeamSurvivors = loserTeam.getAliveCombatants().filter(combatant => !combatant.isExpendable());
     const survivorsGap = Math.abs(winnerTeamSurvivors.length - loserTeamSurvivors.length);
     const winnerTeamSurvivorsHealth = winnerTeamSurvivors.reduce((acc, combatant) => acc + combatant.stats.hp, 0);
     const winnerTeamFullHealth = winnerTeamCombatants.reduce((acc, combatant) => acc + combatant.baseStats.hp, 0);

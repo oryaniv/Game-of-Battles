@@ -9,7 +9,7 @@ import { Game } from '@/logic/Game';
 import { StatusEffectType } from '@/logic/StatusEffect';
 import { CombatMaster } from '@/logic/CombatMaster';
 import { AttackResult } from '@/logic/attackResult';
-import { generateCombatantIdenticalTeam, generateRandomTeam, placeAllCombatants, refreshTeam, theATeam, theBTeam, theGorillaTeam } from '@/boardSetups';
+import { generateCombatantIdenticalTeam, generateRandomTeam, placeAllCombatants, refreshTeam, theATeam, theBTeam, theCTeam, theDTeam, theGorillaTeam } from '@/boardSetups';
 import { RookieAIAgent, ToddlerAIAgent, KidAIAgent, TeenagerAIAgent } from '@/logic/AI/DeterministicAgents';
 import { shuffleArray } from '@/logic/AI/AIUtils';
 import { VeteranAIAgent } from '@/logic/AI/VeteranAIAgent';
@@ -31,12 +31,12 @@ let errorCount = 0;
 
 describe('RoboArenta', () => {
 
-    it.only('Ai Agent match 1', () => {
+    it.skip('Ai Agent match 1', () => {
         let roundCounts = [];
         let winnerCounts = [];
-        for(let i = 0; i < 100; i++) {
+        for(let i = 0; i < 1000; i++) {
             try {
-                const matchResult = exampleMatch();
+                const matchResult = exampleMatch(i);
                 roundCounts.push(matchResult.roundCount);
                 winnerCounts.push(matchResult.winner);
             } catch (error) {
@@ -57,16 +57,26 @@ describe('RoboArenta', () => {
 
 
 
-    it.skip('Balancing battles', () => {
+    it.only('Balancing battles', () => {
         let matchDataCollection: MatchData[] = [];
         const teamRecords: TeamRecord[] = [];
-        let team1 = generateRandomTeam(0, new VeteranAIAgent());
-        let team2 = generateRandomTeam(1, new VeteranAIAgent());
+
+        const veteranAIAgentWithCoop = new VeteranAIAgent();
+        veteranAIAgentWithCoop.setCollectCoop(true);
+
+        const veteranAIAgentNoCoop = new VeteranAIAgent();
+        veteranAIAgentNoCoop.setCollectCoop(false);
+
+        // const veteranAIAgentNoCoop = new VeteranAIAgent();
+        // veteranAIAgentNoCoop.setCollectCoop(false);
+
+        let team1 = generateRandomTeam(0, veteranAIAgentWithCoop);
+        let team2 = generateRandomTeam(1, veteranAIAgentWithCoop);
 
         for(let i = 0; i < 1000; i++) {
             let matchData: MatchData;
             try{
-                matchData = combatantBalancingMatch(team1, team2);
+                matchData = combatantBalancingMatch(team1, team2, i);
             } catch (error) {
                 console.log('an Error was thrown, restarting match', error);
                 refreshTeam(team1);
@@ -75,11 +85,11 @@ describe('RoboArenta', () => {
             }
             matchDataCollection.push(matchData);
             if(matchData.winningTeamName === team1.getName()) {
-                team2 = generateRandomTeam(1, new VeteranAIAgent());
+                team2 = generateRandomTeam(1, veteranAIAgentWithCoop);
                 refreshTeam(team1);
                 updateOrCreateTeamRecord(team1.getName(), team1, teamRecords);
             } else {
-                team1 = generateRandomTeam(0, new VeteranAIAgent());
+                team1 = generateRandomTeam(0, veteranAIAgentWithCoop);
                 refreshTeam(team2);
                 updateOrCreateTeamRecord(team2.getName(), team2, teamRecords);
             }
@@ -95,12 +105,7 @@ describe('RoboArenta', () => {
 });
 
 
-function exampleMatch() {
-    // const team1 = generateRandomTeam(0, new RookieAIAgent());
-    // const team2 = generateCombatantIdenticalTeam(team1, 1, new VeteranAIAgent());
-
-    // team1.name = 'Team Rookie';
-    // team2.name = 'Team Veteran';
+function exampleMatch(matchCount: number) {
 
     const veteranAIAgentWithCoop = new VeteranAIAgent();
     veteranAIAgentWithCoop.setCollectCoop(true);
@@ -111,20 +116,23 @@ function exampleMatch() {
 
     const team1 = generateRandomTeam(0, veteranAIAgentWithCoop);
     const team2 =  generateCombatantIdenticalTeam(team1, 1, rookieAIAgent);
-
     team1.name = 'Team Veteran';
     team2.name = 'Team Rookie';
 
-    // theGorillaTeam(team2);
+    // const team1 = generateRandomTeam(0, veteranAIAgentNoCoop);
+    // const team2 =  generateCombatantIdenticalTeam(team1, 1, veteranAIAgentWithCoop);
+    // team1.name = 'Team Rookie';
+    // team2.name = 'Team Veteran';
 
-    // const team1 = new Team('Team Veteran', 0, new RookieAIAgent());
-    // const team2 = new Team('Team Rookie', 1, new RookieAIAgent());
+    
 
     
     let board = new Board(10, 10);
     
     // theATeam(team1);
     // theBTeam(team2);
+     // const team1 = new Team('Team Veteran', 0, veteranAIAgentWithCoop);
+    // const team2 = new Team('Team Rookie', 1, veteranAIAgentNoCoop);
     placeAllCombatants(team1, team2, board);
     const game = new Game([team1, team2], board);
 
@@ -153,11 +161,11 @@ function exampleMatch() {
     if(!winner) {
         throw new Error('No winner found');
     }
-    console.log(`%cwinning team is ${winner?.getName()}`, 'color: red');
+    console.log(`match ${matchCount} winning team is ${winner?.getName()}`);
     return {roundCount: game.getRoundCount(), winner: winner?.getName()};
 }   
 
-function combatantBalancingMatch(team1: Team, team2: Team): MatchData {
+function combatantBalancingMatch(team1: Team, team2: Team, matchCount: number): MatchData {
     let board = new Board(10, 10);
     placeAllCombatants(team1, team2, board);
     
@@ -188,6 +196,9 @@ function combatantBalancingMatch(team1: Team, team2: Team): MatchData {
             const deadCombatants = board.getAllCombatants().filter((combatant) => combatant.stats.hp <= 0);
             deadCombatants.forEach((combatant) => {
                 // update the dead combatant's stats
+                if(combatant.name.endsWith('_doll')) {
+                    return;
+                }
                 const deadStat = getCombatantStats(combatant.name, allCombatantStats);
                 deadStat.finalHp = combatant.stats.hp;
                 deadStat.finalStamina = combatant.stats.stamina;
@@ -209,7 +220,7 @@ function combatantBalancingMatch(team1: Team, team2: Team): MatchData {
     if(!winner || !loser) {
         throw new Error('No winner found');
     }
-    console.log(`%cwinning team is ${winner?.getName()}`, 'color: red');
+    console.log(`match ${matchCount} winning team is ${winner?.getName()}`);
 
     winner.getAliveCombatants().forEach((combatant) => {
         const stat = getCombatantStats(combatant.name, allCombatantStats);
@@ -244,94 +255,13 @@ function generateCombatantStats(combatants: Combatant[]): combatantReportStats[]
     });
 }
 
-function getCombatantStats(combatantName: string, combatantStats: combatantReportStats[]): combatantReportStats {
+function getCombatantStats(combatantName: string, combatantStats: combatantReportStats[]): combatantReportStats { 
     const stat = combatantStats.find((stat) => stat.name === combatantName);
     if(!stat) {
         throw new Error(`Combatant ${combatantName} not found in combatantStats`);
     }
     return stat;
 }
-
-// function generateRandomTeam(teamIndex: number) {
-//     const team = new Team(`Team ${generateRandomString()}`, teamIndex, new RookieAIAgent());
-//     const combatantCandidates = [
-//         new StandardBearer(generateRandomString(), { x: 0, y: 0 }, team),
-//         new Defender(generateRandomString(), { x: 0, y: 0 }, team),
-//         new Hunter(generateRandomString(), { x: 0, y: 0 }, team),
-//         new Wizard(generateRandomString(), { x: 0, y: 0 }, team),
-//         new Healer(generateRandomString(), { x: 0, y: 0 }, team),
-//         new Witch(generateRandomString(), { x: 0, y: 0 }, team),
-//         new Fool(generateRandomString(), { x: 0, y: 0 }, team),
-//         new Vanguard(generateRandomString(), { x: 0, y: 0 }, team),
-//         new FistWeaver(generateRandomString(), { x: 0, y: 0 }, team),
-//         new Pikeman(generateRandomString(), { x: 0, y: 0 }, team),
-//     ];
-//     shuffleArray(combatantCandidates);
-//     for(let i = 0; i < 5; i++) {
-//         team.addCombatant(combatantCandidates[i]);
-//     }
-//     return team;
-// }
-
-// function placeAllCombatants(team1: Team, team2: Team, board: Board) {
-//     const frontLineTypes = [CombatantType.Defender, CombatantType.StandardBearer, CombatantType.Vanguard, CombatantType.Pikeman, CombatantType.FistWeaver];
-//     const backLineTypes = [CombatantType.Hunter, CombatantType.Wizard, CombatantType.Healer, CombatantType.Witch, CombatantType.Fool];
-//     const whiteTeamFrontY = 1;
-//     const whiteTeamBackY = 0;
-//     let whiteTeamBackXStart = 2;
-//     let whiteTeamfrontXStart = 3;
-//     const blackTeamFrontY = 8;
-//     const blackTeamBackY = 9;
-//     let blackTeamBackXStart = 7;
-//     let blackTeamFrontXStart = 6;
-    
-//     team1.combatants.forEach((combatant) => {
-//         const isFrontLine = frontLineTypes.includes(combatant.getCombatantType());
-//         const yPosition = isFrontLine ? whiteTeamFrontY : whiteTeamBackY;
-//         const xPosition = isFrontLine ? whiteTeamfrontXStart : whiteTeamBackXStart;
-//         const position = { x: xPosition, y: yPosition };
-//         board.placeCombatant(combatant, position);
-//         if(isFrontLine) {
-//             whiteTeamfrontXStart++;
-//         } else {
-//             whiteTeamBackXStart++;
-//         }
-//     });
-    
-//     team2.combatants.forEach((combatant) => {
-//         const isFrontLine = frontLineTypes.includes(combatant.getCombatantType());
-//         const yPosition = isFrontLine ? blackTeamFrontY : blackTeamBackY;
-//         const xPosition = isFrontLine ? blackTeamFrontXStart : blackTeamBackXStart;
-//         const position = { x: xPosition, y: yPosition };
-//         board.placeCombatant(combatant, position);
-//         if(isFrontLine) {
-//             blackTeamFrontXStart--;
-//         } else {
-//             blackTeamBackXStart--;
-//         }
-//     });
-// }
-
-// function generateRandomString(): string {
-//     const length = Math.floor(Math.random() * 3) + 8; // Length between 8 and 10
-//     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-//     let randomString = '';
-  
-//     // Use crypto.getRandomValues if available (for better randomness)
-//     if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
-//       const values = new Uint32Array(length);
-//       window.crypto.getRandomValues(values);
-//       for (let i = 0; i < length; i++) {
-//         randomString += characters[values[i] % characters.length];
-//       }
-//     } else {
-//       // Fallback to Math.random (less random, but still decent)
-//       for (let i = 0; i < length; i++) {
-//         randomString += characters.charAt(Math.floor(Math.random() * characters.length));
-//       }
-//     }
-//     return randomString;
-// }
 
 function updateOrCreateTeamRecord(teamName: string, team: Team, teamRecords: TeamRecord[]) {
     const teamRecord = teamRecords.find((record) => record.teamName === teamName);

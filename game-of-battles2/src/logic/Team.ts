@@ -40,7 +40,8 @@ export class Team {
     }
   
     isDefeated(): boolean {
-      return this.combatants.every((combatant) => combatant.isKnockedOut());
+      return this.combatants.filter((combatant) => !combatant.isExpendable())
+                            .every((combatant) => combatant.isKnockedOut());
     }
   
     getAliveCombatants(): Combatant[] {

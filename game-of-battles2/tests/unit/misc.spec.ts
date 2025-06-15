@@ -81,19 +81,19 @@ describe('misc', () => {
             },
             {
                 type: DamageType.Pierce,
-                sources: [CombatantType.Pikeman, CombatantType.Hunter]
+                sources: [CombatantType.Pikeman, CombatantType.Hunter, CombatantType.BabyBabel, CombatantType.BallistaTurret]
             },
             {
                 type: DamageType.Crush,
-                sources: [CombatantType.FistWeaver, CombatantType.Pikeman, CombatantType.StandardBearer, CombatantType.Defender]
+                sources: [CombatantType.FistWeaver, CombatantType.Pikeman, CombatantType.StandardBearer, CombatantType.Defender, CombatantType.BabyBabel]
             },
             {
                 type: DamageType.Fire,
-                sources: [CombatantType.Wizard, CombatantType.Hunter]
+                sources: [CombatantType.Wizard, CombatantType.Hunter, CombatantType.Artificer, CombatantType.BabyBabel, CombatantType.Bomb]
             },
             {
                 type: DamageType.Ice,
-                sources: [CombatantType.Wizard, CombatantType.Pikeman]
+                sources: [CombatantType.Wizard, CombatantType.Pikeman, CombatantType.BabyBabel]
             },
             {
                 type: DamageType.Blight,
@@ -101,7 +101,7 @@ describe('misc', () => {
             },
             {
                 type: DamageType.Lightning,
-                sources: [CombatantType.Wizard, CombatantType.Vanguard, CombatantType.FistWeaver]
+                sources: [CombatantType.Wizard, CombatantType.Vanguard, CombatantType.FistWeaver, CombatantType.Artificer, CombatantType.BabyBabel]
             },
             {
                 type: DamageType.Dark,

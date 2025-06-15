@@ -1,3 +1,4 @@
+import { NOMEM } from "dns";
 import { ActionResult, getStandardActionResult } from "../attackResult";
 import { Board } from "../Board";
 import { Combatant } from "../Combatant";
@@ -50,6 +51,7 @@ import { HeuristicalAIAgent, PlayActionType, TurnPlay, areManyAlliesNearby, areM
       hasPurifySkill,
       hasMeditateSkill,
       getNearbyAllies} from "./HeuristicalAgents";
+import { BoardObject } from "../BoardObject";
 
 export enum AggressivenessLevel {
     FrontLine = 0,
@@ -82,7 +84,7 @@ abstract class VeteranAIAgentGenericPlayer implements VeteranAIAgentPlayer {
     }
 
     protected getBaseDefendValue(): number {
-        return 2;
+        return 1;
     }
 
     protected getBaseBasicAttackValue(): number {
@@ -145,6 +147,7 @@ abstract class VeteranAIAgentGenericPlayer implements VeteranAIAgentPlayer {
             else {
                 baseValue += (-0.7 * distanceClosing);
             }
+            baseValue += isLastSurvivor(combatant) ? 10 : 0;
         }
 
         if(gettingAwayFromEnemy) {
@@ -227,7 +230,10 @@ abstract class VeteranAIAgentGenericPlayer implements VeteranAIAgentPlayer {
         baseValue += !enemyLastSurvivor && isTargetResistant(targetCombatant, damageType || combatant.basicAttack().type) ? -3 : 0;
         baseValue += isTargetImmune(targetCombatant, damageType || combatant.basicAttack().type) ? -10 : 0;
         baseValue += targetCombatant.hasStatusEffect(StatusEffectType.FRENZY) ? -8 : 0;
-        baseValue += targetCombatant.isExpendable() ? -4 : 0;
+        baseValue += targetCombatant.isExpendable() ? -5 : 0;
+
+        // just so these cowardly casters don't shy away from fighting tooth and nail
+        baseValue += isCombatantCaster(combatant) && isStaminaDepleted(combatant) ? 5 : 0;
         
         return baseValue;
 
@@ -865,7 +871,7 @@ class VeteranAIAgentHealerPlayer extends VeteranAIAgentGenericPlayer {
         
         baseValue += isTargetFast(targetCombatant) ? 2 : 0;
         baseValue += combatant.name === targetCombatant.name ? -2 : 0;
-        baseValue += targetCombatant.isExpendable() ? -10 : 0;
+        baseValue += targetCombatant.isExpendable() ? -30 : 0;
         return baseValue;
     }
 
@@ -880,7 +886,7 @@ class VeteranAIAgentHealerPlayer extends VeteranAIAgentGenericPlayer {
         baseValue += isSlightlyInjured(targetCombatant) ? 1 : 0;
         baseValue += isFullyHealed(targetCombatant) ? -10 : 0;
         baseValue += isEnemyNearby(combatant, board, game) ? 2 : 0;
-        baseValue += targetCombatant.isExpendable() ? -10 : 0;
+        baseValue += targetCombatant.isExpendable() ? -30 : 0;
         return baseValue;
     }
 
@@ -1555,12 +1561,12 @@ class VeteranAIAgentWitchPlayer extends VeteranAIAgentGenericPlayer {
         baseValue += this.evaluateMovement(combatant, game, board, movePosition);
         baseValue += isFatigued(targetCombatant) ? 2 : 0;
         baseValue += isLowStamina(targetCombatant) ? 1 : 0;
-        baseValue += isStaminaDepleted(targetCombatant) ? -5 : 0;
+        baseValue += isStaminaDepleted(targetCombatant) ? -15 : 0;
 
         baseValue += isFatigued(combatant) ? 2 : 0;
         baseValue += isLowStamina(combatant) ? 3 : 0;
         baseValue += isStaminaDepleted(combatant) ? 5 : 0;
-        baseValue += targetCombatant.isExpendable() ? -10 : 0;
+        baseValue += targetCombatant.isExpendable() ? -4 : 0;
         return baseValue;
     }
 
@@ -1757,7 +1763,7 @@ class VeteranAIAgentFoolPlayer extends VeteranAIAgentGenericPlayer {
         baseValue += hasStrongsDebuffBrokenByMove(targetCombatant) ? 3 : 0;
         // melee range of 1 is fine
         baseValue -= (targetCombatant.stats.range - 1);
-        baseValue += targetCombatant.isExpendable() ? -10 : 0;
+        baseValue += targetCombatant.isExpendable() ? -30 : 0;
         return normalizeCoopEvaluation(baseValue, 2);
     }
 
@@ -1816,7 +1822,7 @@ class VeteranAIAgentFoolPlayer extends VeteranAIAgentGenericPlayer {
         baseValue += hasStrongsDebuffBrokenByMove(targetCombatant) ? 3 : 0;
         // melee range of 1 is fine
         baseValue -= (targetCombatant.stats.range - 1);
-        baseValue += targetCombatant.isExpendable() ? -10 : 0;
+        baseValue += targetCombatant.isExpendable() ? -20 : 0;
         return baseValue;
     }
 
@@ -1880,7 +1886,7 @@ class VeteranAIAgentFoolPlayer extends VeteranAIAgentGenericPlayer {
             targetHitValue += isTargetLowLuck(targetCombatant) ? 3 : 0;
             targetHitValue += isTargetFateStruck(targetCombatant) ? 3 : 0;
             baseValue += targetHitValue;
-            baseValue += targetCombatant.isExpendable() ? -5 : 0;
+            baseValue += targetCombatant.isExpendable() ? -7 : 0;
         });
         return baseValue;
     }
@@ -2728,7 +2734,7 @@ class VeteranAIAgentRoguePlayer extends VeteranAIAgentGenericPlayer {
         baseValue += !combatant.isCloaked() && isInjured(combatant) ? -3 : 0;
         baseValue += !combatant.isCloaked() && isBadlyInjured(combatant) ? -5 : 0;
         baseValue += !combatant.isCloaked() && isNearDeath(combatant) ? -7 : 0;
-        baseValue += targetCombatant.isExpendable() ? -10 : 0;
+        baseValue += targetCombatant.isExpendable() ? -5 : 0;
         return baseValue;
     }
     
@@ -2769,8 +2775,8 @@ class VeteranAIAgentArtificerPlayer extends VeteranAIAgentGenericPlayer {
             return this.evaluateBuildWalls(combatant, game, board, movePosition, target);
         }
 
-        if(specialMove === "Explosive Trap") {
-            return this.evaluateExplosiveTrap(combatant, game, board, movePosition, target);
+        if(specialMove === "Deploy Boom Gremlin") {
+            return this.evaluateDeployBoomGremlin(combatant, game, board, movePosition, target);
         }
 
         if(specialMove === "Shocking Gauntlet") {
@@ -2785,7 +2791,25 @@ class VeteranAIAgentArtificerPlayer extends VeteranAIAgentGenericPlayer {
             return this.evaluateReinforceConstruct(combatant, game, board, movePosition, target);
         }
 
-        
+        // co ops
+
+        if(specialMove === "Deploy Ballista Turret") {
+            return this.evaluateDeployBallistaTurret(combatant, game, board, movePosition, target);
+        }
+
+        if(specialMove === "Flame Thrower") {
+            return this.evaluateFlameThrower(combatant, game, board, movePosition, target);
+        }
+
+        if(specialMove === "Ingenious Upgrade") {
+            return this.evaluateIngeniousUpgrade(combatant, game, board, movePosition, target);
+        }
+
+        if(specialMove === "Build Death Tower") {
+            return this.evaluateBuildDeathTower(combatant, game, board, movePosition, target);
+        }
+
+            
         return 0;
     }
 
@@ -2800,6 +2824,19 @@ class VeteranAIAgentArtificerPlayer extends VeteranAIAgentGenericPlayer {
         const originalPosition = combatant.position;
         theoreticalReplacement(combatant, board, movePosition, true);
 
+        const wallBadCTypes = [
+             CombatantType.Vanguard, CombatantType.Defender, CombatantType.Pikeman,
+             CombatantType.Hunter, CombatantType.StandardBearer,CombatantType.BallistaTurret, CombatantType.Rogue,
+        ];
+
+        const wallGoodTypes = [
+            CombatantType.Wizard, CombatantType.Artificer, CombatantType.Witch, CombatantType.Fool, CombatantType.Healer,
+            CombatantType.BabyBabel
+        ];
+        
+        let team1WallValue = 0;
+        let team2WallValue = 0;
+
         const getAllTargets = board.getAreaOfEffectPositions(combatant, target!, SpecialMoveAreaOfEffect.Line, SpecialMoveAlignment.Empty_Space);
         getAllTargets.forEach(AOETarget => {
             const team1Combatants = game.teams[0].getAliveCombatants();
@@ -2807,42 +2844,61 @@ class VeteranAIAgentArtificerPlayer extends VeteranAIAgentGenericPlayer {
             for(let i = 0; i < team1Combatants.length; i++) {
                 for(let j = 0; j < team2Combatants.length; j++) {
                     if(board.isPositionBetweenPositions(team1Combatants[i].position,team2Combatants[j].position, AOETarget)) {
-                        baseValue += 3;
+                        const team1Combatant = team1Combatants[i];
+                        const team2Combatant = team2Combatants[j];
+                        if(wallBadCTypes.includes(team1Combatant.getCombatantType())) {
+                            team1WallValue -= 3;
+                        }
+                        if(wallGoodTypes.includes(team1Combatant.getCombatantType())) {
+                            team1WallValue += 3;
+                        }
+                        if(wallBadCTypes.includes(team2Combatant.getCombatantType())) {
+                            team2WallValue -= 3;
+                        }
+                        if(wallGoodTypes.includes(team2Combatant.getCombatantType())) {
+                            team2WallValue += 3;
+                        }
                     }
                 }
-            }
-                
+            }    
         });
+        if(combatant.team.getName() === game.teams[0].getName()) {
+            baseValue += team1WallValue - team2WallValue;
+        } else {
+            baseValue += team2WallValue - team1WallValue;
+        }
         theoreticalReplacement(combatant, board, originalPosition, false);
         return baseValue;
     }
 
-    private evaluateExplosiveTrap(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
-        const getAllTargets = board.getAreaOfEffectPositions(combatant, target!, SpecialMoveAreaOfEffect.Nova, SpecialMoveAlignment.All);
-        let baseValue = 0;
-        let totalEnemieshit = 0;
+    private evaluateDeployBoomGremlin(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        if(!target) {
+            return 0;
+        }
+        let baseValue = 5;
+        baseValue += this.evaluateMovement(combatant, game, board, movePosition);
+        const originalPosition = combatant.position;
+        theoreticalReplacement(combatant, board, target, true);
+
+        const adjacentAllies = board.getAdjacentCombatants(combatant, 1).filter(c => c.team.getName() === combatant.team.getName()).length; 
+
+        baseValue -= adjacentAllies * 3;
         
-        getAllTargets.forEach(AOETarget => {
-            const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant) {
-                return;
-            }
-            const targetHitValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position, DamageType.Fire) + 3;
-            if(targetCombatant.team.getName() !== combatant.team.getName()) {
-                totalEnemieshit += 1;
-            }
-            baseValue += targetCombatant.team.getName() !== combatant.team.getName() ? targetHitValue : -targetHitValue;
-        });
-        baseValue += totalEnemieshit === 0 ? -5 : 0;
+        const nearbyEnemies = getNearbyEnemies(combatant, board, game);
+
+        baseValue += nearbyEnemies.length * 4;
+
+        theoreticalReplacement(combatant, board, originalPosition, false);
         return baseValue;
     }
 
     private evaluateShockingGauntlet(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
-        let baseValue = this.evaluateBasicAttack(combatant, game, board, movePosition, target, DamageType.Lightning, 1) + 3;
+        let baseValue = this.evaluateBasicAttack(combatant, game, board, movePosition, target, DamageType.Lightning, 1) + 2;
         if(target) {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, target!, board);
             baseValue += isTargetLowLuck(targetCombatant) ? 1 : 0;
-            baseValue += targetCombatant.hasStatusEffect(StatusEffectType.STAGGERED) ? -2 : 0;
+            baseValue += isTargetFateStruck(targetCombatant) ? 1 : 0;
+            baseValue += targetCombatant.hasStatusEffect(StatusEffectType.STAGGERED) ? -2 : 2;
         }
         return baseValue;
     }
@@ -2851,19 +2907,15 @@ class VeteranAIAgentArtificerPlayer extends VeteranAIAgentGenericPlayer {
         assertTargetIsExists(movePosition, target, board);
 
         const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, target!, board);
-        let baseValue = 6;
+        let baseValue = 4;
         baseValue += this.evaluateMovement(combatant, game, board, movePosition);
-        baseValue += combatant.hasStatusEffect(StatusEffectType.FULL_METAL_JACKET) ? -3 : 0;
-        baseValue -= targetCombatant.isExpendable() ? -20 : 0;
+        baseValue += combatant.hasStatusEffect(StatusEffectType.FULL_METAL_JACKET) ? -5 : 0;
         baseValue += isNearDeath(targetCombatant) ? 2 : 0;
-        baseValue += isBadlyInjured(targetCombatant) ? 3 : 0;
-        baseValue += isInjured(targetCombatant) ? 2 : 0;
-        baseValue += isSlightlyInjured(targetCombatant) ? 1 : 0;
+        baseValue += isBadlyInjured(targetCombatant) ? 1 : 0;
+        baseValue += isInjured(targetCombatant) ? 1 : 0;
         baseValue += isTargetLowDefense(targetCombatant) ? 2 : 0;
         if([DamageType.Crush, DamageType.Pierce, DamageType.Slash].includes(targetCombatant.basicAttack().type)) {
-            baseValue += 4;
-            baseValue += this.evaluateMovement(combatant, game, board, movePosition);
-            baseValue += targetCombatant.hasStatusEffect(StatusEffectType.FULL_METAL_JACKET) ? -3 : 0;
+            baseValue += 2;
             baseValue += isHighAttackPower(targetCombatant) ? 2 : 0;
             baseValue += isVeryHighAttackPower(targetCombatant) ? 2 : 0;
             baseValue += isPowerCharged(targetCombatant) ? 3 : 0;
@@ -2882,9 +2934,10 @@ class VeteranAIAgentArtificerPlayer extends VeteranAIAgentGenericPlayer {
         baseValue += this.evaluateMovement(combatant, game, board, movePosition);
         const getAllTargets = board.getAreaOfEffectPositions(combatant, target!, SpecialMoveAreaOfEffect.Cross, SpecialMoveAlignment.Ally);
         getAllTargets.forEach(AOETarget => {
+            let healValue = 2;
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
             if(!targetCombatant) {
-                return;
+                return; 
             }
             if(targetCombatant.team !== combatant.team) {
                 return;
@@ -2892,21 +2945,157 @@ class VeteranAIAgentArtificerPlayer extends VeteranAIAgentGenericPlayer {
             if(!targetCombatant.isConstruct()) {
                 return;
             }
-            baseValue += isNearDeath(targetCombatant) ? 4 : 0;
-            baseValue += isBadlyInjured(targetCombatant) ? 3 : 0;
-            baseValue += isInjured(targetCombatant) ? 2 : 0;
-            baseValue += isSlightlyInjured(targetCombatant) ? 1 : 0;
-            baseValue += isFullyHealed(targetCombatant) ? -10 : 0;
-            baseValue += isEnemyNearby(combatant, board, game) ? 2 : 0;
-            baseValue /= targetCombatant.isExpendable() ? 2 : 1;
+            healValue += isNearDeath(targetCombatant) ? 4 : 0;
+            healValue += isBadlyInjured(targetCombatant) ? 3 : 0;
+            healValue += isInjured(targetCombatant) ? 2 : 0;
+            healValue += isSlightlyInjured(targetCombatant) ? 1 : 0;
+            healValue += isFullyHealed(targetCombatant) ? -10 : 0;
+            healValue += isEnemyNearby(combatant, board, game) ? 2 : 0;
+            healValue /= targetCombatant.isExpendable() ? 2 : 1;
+            baseValue += healValue;
         });
         return baseValue;
     }
+
+    private evaluateDeployBallistaTurret(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        let baseValue = 15;
+        baseValue += this.evaluateMovement(combatant, game, board, movePosition);
+        
+        const ballisteExists = combatant.team.getAliveCombatants().filter(c => c.getCombatantType() === CombatantType.BallistaTurret).length > 1;
+        if(ballisteExists) {
+            baseValue -= 100;
+        }
+
+        const closestEnemy = getClosestEnemy(combatant, board, game);
+        const hasLineOfSight = closestEnemy && board.hasLineOfSight(movePosition, closestEnemy.position, combatant);
+        if(hasLineOfSight || board.getDistanceBetweenPositions(target!, closestEnemy.position) <= 4) {
+            baseValue += 10;
+        }
+        return normalizeCoopEvaluation(baseValue, 2);
+    }
+
+    private evaluateFlameThrower(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        let baseValue = 0;
+        baseValue += this.evaluateMovement(combatant, game, board, movePosition);
+        const originalPosition = combatant.position;
+        let totalEnemieshit = 0;
+        theoreticalReplacement(combatant, board, movePosition, true);
+        const getAllTargets = board.getAreaOfEffectPositions(combatant, target!,
+             SpecialMoveAreaOfEffect.Line, SpecialMoveAlignment.All);
+
+        getAllTargets.forEach(AOETarget => {
+            const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
+            if(!targetCombatant) {
+                return;
+            }
+            const targetHitValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position, DamageType.Fire);
+            if(targetCombatant.team.getName() !== combatant.team.getName()) {
+                totalEnemieshit += 1;
+            }
+            baseValue += targetCombatant.team.getName() !== combatant.team.getName() ? targetHitValue : -targetHitValue;
+        });
+        theoreticalReplacement(combatant, board, originalPosition, false);
+        baseValue += totalEnemieshit === 0 ? -10 : 0;
+        return normalizeCoopEvaluation(baseValue, 2);
+    }
+
+    private evaluateIngeniousUpgrade(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        assertTargetIsExists(movePosition, target, board);
+
+        const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, target!, board);
+        let baseValue = 2;
+        baseValue += this.evaluateMovement(combatant, game, board, movePosition);
+        baseValue += combatant.hasStatusEffect(StatusEffectType.INGENIOUS_UPGRADE) ? -6 : 0;
+        baseValue += isHighAttackPower(targetCombatant) ? 2 : 0;
+        baseValue += isVeryHighAttackPower(targetCombatant) ? 2 : 0;
+        baseValue += isPowerCharged(targetCombatant) ? 3 : 0;
+        baseValue += targetCombatant.getCombatantType() === CombatantType.BabyBabel ? 7 : 0;
+        baseValue += targetCombatant.getCombatantType() === CombatantType.BallistaTurret ? 5 : 0;
+        baseValue += targetCombatant.getCombatantType() === CombatantType.Bomb ? 4 : 0;
+        baseValue += !targetCombatant.isExpendable() && targetCombatant.hasStatusEffect(StatusEffectType.FULL_METAL_JACKET) ? 2 : 0;
+        return normalizeCoopEvaluation(baseValue, 1);
+    }
+
+    private evaluateBuildDeathTower(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        let baseValue = 22;
+        baseValue += this.evaluateMovement(combatant, game, board, movePosition);
+        const towerExists = combatant.team.getAliveCombatants().some(c => c.getCombatantType() === CombatantType.BabyBabel);
+        if(towerExists) {
+            baseValue -= 100;
+        }
+        const closestEnemy = getClosestEnemy(combatant, board, game);
+        const hasLineOfSight = closestEnemy && board.hasLineOfSight(movePosition, closestEnemy.position, combatant);
+        if(hasLineOfSight || board.getDistanceBetweenPositions(target!, closestEnemy.position) <= 4) {
+            baseValue += 15;
+        }
+        return normalizeCoopEvaluation(baseValue, 3);
+    }
 }
 
-class VeteranAIAgentBallistaTurretPlayer implements VeteranAIAgentPlayer {
-    evaluate(combatant: Combatant, game: Game, board: Board, turnPlay: TurnPlay): number {
+class VeteranAIAgentBallistaTurretPlayer extends VeteranAIAgentGenericPlayer {
+    protected getBaseMovementValue(): number {
+        return super.getBaseMovementValue();
+    }
+
+    protected getBaseSkipValue(): number {
         return 0;
+    }
+
+    protected getBaseDefendValue(): number {
+        return -1000;
+    }
+
+    protected getBaseBasicAttackValue(): number {
+        return 5;
+    }
+
+    protected getAggressivenessLevel(): number {
+        return AggressivenessLevel.BackLine;
+    }
+
+    evaluate(combatant: Combatant, game: Game, board: Board, turnPlay: TurnPlay): number {
+        const evaluation = super.evaluate(combatant, game, board, turnPlay);
+        if(evaluation > -1000) {
+            return evaluation;
+        }
+
+        const movePosition = turnPlay.position;
+        const target = turnPlay.playAction.target;
+        const specialMove = turnPlay.playAction.skillName;
+
+
+        if(specialMove === "Arc Shot") {
+            return this.evaluateArcBolt(combatant, game, board, movePosition, target);
+        }
+
+        if(specialMove === "Scorpion Bolt") {
+            return this.evaluateScorpionBolt(combatant, game, board, movePosition, target);
+        }
+       
+        return 0;
+    }
+
+    private evaluateArcBolt(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        return this.evaluateBasicAttack(combatant, game, board, movePosition, target, DamageType.Pierce);
+    }
+
+    private evaluateScorpionBolt(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        const getAllTargets = board.getAreaOfEffectPositions(combatant, target!, SpecialMoveAreaOfEffect.Line, SpecialMoveAlignment.All);
+        let baseValue = 0;
+        let totalEnemieshit = 0;
+        getAllTargets.forEach(AOETarget => {
+            const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
+            if(!targetCombatant) {
+                return;
+            }
+            const targetHitValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position, DamageType.Pierce);
+            if(targetCombatant.team.getName() !== combatant.team.getName()) {
+                totalEnemieshit += 1;
+            }
+            baseValue += targetCombatant.team.getName() !== combatant.team.getName() ? targetHitValue : -targetHitValue;
+        });
+        baseValue += totalEnemieshit === 0 ? -10 : 0;
+        return baseValue
     }
 }   
 
@@ -2950,15 +3139,76 @@ class VeteranAIAgentDragonPlayer implements VeteranAIAgentPlayer {
 
 // that is just bollocks 
 
-class VeteranAIAgentWallPlayer implements VeteranAIAgentPlayer {
+class VeteranAIAgentWallPlayer extends VeteranAIAgentGenericPlayer {
     evaluate(combatant: Combatant, game: Game, board: Board, turnPlay: TurnPlay): number {
         return 0;
     }
 }
 
-class VeteranAIAgentBombPlayer implements VeteranAIAgentPlayer {
-    evaluate(combatant: Combatant, game: Game, board: Board, turnPlay: TurnPlay): number {
+class VeteranAIAgentBombPlayer extends VeteranAIAgentGenericPlayer {
+    protected getBaseMovementValue(): number {
+        return super.getBaseMovementValue();
+    }
+
+    protected getBaseSkipValue(): number {
         return 0;
+    }
+
+    protected getBaseDefendValue(): number {
+        return -1000;
+    }
+
+    protected getBaseBasicAttackValue(): number {
+        return -10;
+    }
+
+    protected getAggressivenessLevel(): number {
+        return AggressivenessLevel.BackLine;
+    }
+
+    evaluate(combatant: Combatant, game: Game, board: Board, turnPlay: TurnPlay): number {
+        const evaluation = super.evaluate(combatant, game, board, turnPlay);
+        if(evaluation > -1000) {
+            return evaluation;
+        }
+
+        const movePosition = turnPlay.position;
+        const target = turnPlay.playAction.target;
+        const specialMove = turnPlay.playAction.skillName;
+
+        if(specialMove === "Self Destruct") {
+            return this.evaluateSelfDestruct(combatant, game, board, movePosition, target);
+        }
+
+        if(specialMove === "Teleport Blast") {
+            return this.evaluateTeleportBlast(combatant, game, board, movePosition, target);
+        }
+               
+        return 0;
+    }
+
+    private evaluateSelfDestruct(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        let baseValue = 0;
+        const getAllTargets = board.getAreaOfEffectPositions(combatant, target!, SpecialMoveAreaOfEffect.Nova, SpecialMoveAlignment.All);
+        let totalEnemieshit = 0;
+        
+        getAllTargets.forEach(AOETarget => {
+            const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
+            if(!targetCombatant) {
+                return;
+            }
+            const targetHitValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position, DamageType.Fire) + 10;
+            if(targetCombatant.team.getName() !== combatant.team.getName()) {
+                totalEnemieshit += 1;
+            }
+            baseValue += targetCombatant.team.getName() !== combatant.team.getName() ? targetHitValue : -targetHitValue;
+        });
+        baseValue += totalEnemieshit === 0 ? -10 : 0;
+        return baseValue;
+    }
+
+    private evaluateTeleportBlast(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        return this.evaluateSelfDestruct(combatant, game, board, movePosition, target);
     }
 }
 
@@ -2966,6 +3216,91 @@ class VeteranAIAgentDollPlayer implements VeteranAIAgentPlayer {
     evaluate(combatant: Combatant, game: Game, board: Board, turnPlay: TurnPlay): number {
         return 0;
     }
+}
+
+class VeteranAIAgentBabyBabelPlayer extends VeteranAIAgentGenericPlayer {
+    protected getBaseMovementValue(): number {
+        return super.getBaseMovementValue();
+    }
+
+    protected getBaseSkipValue(): number {
+        return 0;
+    }
+
+    protected getBaseDefendValue(): number {
+        return -1000;
+    }
+
+    protected getBaseBasicAttackValue(): number {
+        return -5;
+    }
+
+    protected getAggressivenessLevel(): number {
+        return AggressivenessLevel.BackLine;
+    }
+
+    evaluate(combatant: Combatant, game: Game, board: Board, turnPlay: TurnPlay): number {
+        const evaluation = super.evaluate(combatant, game, board, turnPlay);
+        if(evaluation > -1000) {
+            return evaluation;
+        }
+
+        const movePosition = turnPlay.position;
+        const target = turnPlay.playAction.target;
+        const specialMove = turnPlay.playAction.skillName;
+
+        if(specialMove === "Flame Cannon") {
+            return this.evaluateFlameCannon(combatant, game, board, movePosition, target);
+        }
+
+        if(specialMove === "Ice Cannon") {
+            return this.evaluateIceCannon(combatant, game, board, movePosition, target);
+        }
+
+        if(specialMove === "Thunder Dome") {
+            return this.evaluateThunderDome(combatant, game, board, movePosition, target);
+        }
+
+        if(specialMove === "Sharpenal Shell") {
+            return this.evaluateSharpenalShell(combatant, game, board, movePosition, target);
+        }
+
+        return 0;
+    }
+
+    private evaluateFlameCannon(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        return this.evaluateBasicAttack(combatant, game, board, movePosition, target, DamageType.Fire) + 10;
+    }
+
+    private evaluateIceCannon(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        return this.evaluateBasicAttack(combatant, game, board, movePosition, target, DamageType.Ice) + 10;  
+    }
+
+    private evaluateThunderDome(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        return this.evaluateBasicAttack(combatant, game, board, movePosition, target, DamageType.Lightning) + 10;
+    }
+
+    private evaluateSharpenalShell(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        const getAllTargets = board.getAreaOfEffectPositions(combatant, target!, SpecialMoveAreaOfEffect.Nova, SpecialMoveAlignment.All);
+        let baseValue = 0;
+        let totalEnemieshit = 0;
+        
+        getAllTargets.forEach(AOETarget => {
+            const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
+            if(!targetCombatant) {
+                return;
+            }
+            const damageType = isSamePosition(target!, AOETarget) ? DamageType.Crush : DamageType.Pierce;
+            const targetHitValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position, damageType) + 10;
+            if(targetCombatant.team.getName() !== combatant.team.getName()) {
+                totalEnemieshit += 1;
+            }
+            baseValue += targetCombatant.team.getName() !== combatant.team.getName() ? targetHitValue : -targetHitValue;
+        });
+        baseValue += totalEnemieshit === 0 ? -10 : 0;
+        return baseValue;
+    }
+
 }
 
 const agentByCombatantType = {
@@ -2983,19 +3318,21 @@ const agentByCombatantType = {
     [CombatantType.Rogue]: new VeteranAIAgentRoguePlayer(),
     [CombatantType.Artificer]: new VeteranAIAgentArtificerPlayer(),
     // later
-    [CombatantType.BallistaTurret]: new VeteranAIAgentBallistaTurretPlayer(),
+    
+    // also not real, but from the other side
+    [CombatantType.DragonOfChaos]: new VeteranAIAgentDragonOfChaosPlayer(),
     [CombatantType.Myrmidon]: new VeteranAIAgentMyrmidonPlayer(),
     [CombatantType.Iskariot]: new VeteranAIAgentIskariotPlayer(),
     // this one isn't actually real
     [CombatantType.Gorilla]: new VeteranAIAgentGorillaPlayer(),
     [CombatantType.Troll]: new VeteranAIAgentTrollPlayer(),
     [CombatantType.Dragon]: new VeteranAIAgentDragonPlayer(),
-    // also not real, but from the other side
-    [CombatantType.DragonOfChaos]: new VeteranAIAgentDragonOfChaosPlayer(),
-
+    
     [CombatantType.Wall]: new VeteranAIAgentWallPlayer(),
     [CombatantType.Bomb]: new VeteranAIAgentBombPlayer(),
     [CombatantType.Doll]: new VeteranAIAgentDollPlayer(),
+    [CombatantType.BallistaTurret]: new VeteranAIAgentBallistaTurretPlayer(),
+    [CombatantType.BabyBabel]: new VeteranAIAgentBabyBabelPlayer(),
 }
 
 function addCoverValue(combatant: Combatant, game: Game, board: Board, movePosition: Position): number {

@@ -46,7 +46,6 @@ export class Pikeman extends Combatant {
           new ColdEdge(),
           new ShatterSteel(),
           new SkeweringHarppon(),
-          // new DiamondSupremacy(),
           new DiamondHook(),
         ],
       team);

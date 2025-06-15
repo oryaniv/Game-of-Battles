@@ -3,6 +3,7 @@
   <div class="game-container">
     <div class="message">{{ turnMessage }}</div>
     <div class="round-count">Round: {{ roundCount }}</div>
+    
     <div class="board">
       <div
         v-for="y in 10"
@@ -96,6 +97,8 @@
         </div>
       </div>
     </div>
+
+    <!-- Actions Remaining indicator -->
     <div v-if="actionsRemaining > 0" class="actions">
       <span class="actions-remaining-label">Actions Remaining</span>
       <div  v-for="x in Math.floor(actionsRemaining)" class="turn-icon" :key="x">
@@ -104,10 +107,11 @@
       </div>
     </div>
 
+    <!-- Turn Play Menu -->
     <div class="action-menu" v-if="!isGameOver()">
       <div class="action-menu-button-container" v-if="currentCombatant">
-        <button :disabled="attackMode || moveMode || showSkillsMenu || skillMode" @click="showAttackOptions">Attack</button>
-        <button :disabled="hasMoved && !canDefendAndMove() || attackMode || moveMode || showSkillsMenu || skillMode" @click="defend">Defend</button>
+        <button :disabled="!canAttack() || attackMode || moveMode || showSkillsMenu || skillMode" @click="showAttackOptions">Attack</button>
+        <button :disabled="hasMoved && !canDefendAndMove() || !canDefend() || attackMode || moveMode || showSkillsMenu || skillMode" @click="defend">Defend</button>
         <button :disabled="attackMode || moveMode || showSkillsMenu || skillMode" v-if="!hasMoved" @click="showMoveOptions">Move</button>
         <button v-if="hasMoved" @click="undoMove">Undo Move</button>
         <button :disabled="showSkillsMenu || !hasActiveSpecialMoves() || skillMode" @click="showSpecialSkills">Use Skill</button>
@@ -121,6 +125,7 @@
     
 
 
+    <!-- Regular Skill Menu -->
     <div v-if="showSkillsMenu" class="skill-menu">
       <div class="skill-menu-header">
         <div class="skill-menu-header-title">Use Skill</div>
@@ -147,6 +152,7 @@
       </div>
     </div>
 
+    <!-- Co-op Skill Menu -->
     <div v-if="showCoopSkill" class="skill-menu coop-skill-menu">
       <div class="skill-menu-header">
         <div class="skill-menu-header-title">Use Co op Skill</div>
@@ -181,7 +187,7 @@
       </div>
     </div>
 
-
+  <!-- Turn Order: white team-->
   <div v-if="getWhiteTeamCombatants().length > 0" class="white-team-turn-order-container">
     <div v-for="combatant in getWhiteTeamCombatants()" :key="combatant.name" class="turn-order-item" :style="{ filter: getCurrentTeamIndex() === 1 ? 'blur(4px)' : '' }">
       <div class="turn-order-combatant-icon" :style="{ boxShadow: getCurrentCombatant()?.name === combatant.name ? '0 0 10px 5px rgba(0, 255, 0, 0.7)' : '' }">
@@ -196,6 +202,7 @@
     </div>
   </div>
 
+  <!-- Turn Order: black team -->
   <div v-if="getBlackTeamCombatants().length > 0" class="black-team-turn-order-container" >
     <div v-for="combatant in getBlackTeamCombatants()" :key="combatant.name" class="turn-order-item" :style="{ filter: getCurrentTeamIndex() === 0 ? 'blur(4px)' : '' }">
       <div class="turn-order-combatant-icon" :style="{ boxShadow: getCurrentCombatant()?.name === combatant.name ? '0 0 10px 5px rgba(0, 255, 0, 0.7)' : '' }">
@@ -210,6 +217,7 @@
     </div>
   </div>
 
+  <!-- Turn Event Message Box -->
   <div class="event-indicator-container">
     <div class="event-indicator-text">
          {{getEvents()[getEvents().length - 1]}}
@@ -228,9 +236,11 @@
     </div>
   </div> -->
 
-    <!-- <img class="dragon-left" src="./assets/white_dragon_black_back.png" alt="left dragon" />
-    <img class="dragon-right" src="./assets/white_dragon_black_back.png" alt="right dragon" />
-     -->
+      <!-- <img class="dragon-left" src="./assets/white_dragon_black_back.png" alt="left dragon" />
+      <img class="dragon-right" src="./assets/white_dragon_black_back.png" alt="right dragon" />
+      -->
+
+      <!-- Status Popup -->
      <div v-if="showStatusPopup" class="status-popup">
       <div class="status-popup-header">
         {{ currentCombatant?.name }} the {{ currentCombatant?.getCombatantType() }}'s Status
@@ -307,7 +317,7 @@ import { Vanguard } from './logic/Combatants/Vanguard';
 import { FistWeaver } from './logic/Combatants/FistWeaver';
 import { StandardBearer } from './logic/Combatants/StandardBearer';
 import { Artificer } from './logic/Combatants/Artificer';
-import { Wall, Bomb } from './logic/Combatants/ArtificerConstructs';
+import { Wall, Bomb, BabyBabel, BallistaTurret } from './logic/Combatants/ArtificerConstructs';
 import { Rogue } from './logic/Combatants/Rogue';
 import { Gorilla } from './logic/Combatants/Gorilla';
 import { SpecialMove, SpecialMoveTriggerType } from './logic/SpecialMove';
@@ -331,28 +341,39 @@ export default defineComponent({
     veternAIAgentWithCoop.setCollectCoop(true);
     const veternAIAgentNoCoop = new VeteranAIAgent();
     veternAIAgentNoCoop.setCollectCoop(false);
-    const whiteTeam = ref(new Team('White Team', 0));
-    const blackTeam = ref(new Team('Black Team', 1));
+    const rookieAIAgent = new RookieAIAgent();
+    const whiteTeam = ref(new Team('White Team', 0, veternAIAgentWithCoop));
+    const blackTeam = ref(new Team('Black Team', 1, veternAIAgentWithCoop));
 
-    whiteTeam.value.addCombatant(new Pikeman('aobo', { x: 3, y: 5}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Healer('bobo', { x: 6, y: 0}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Pikeman('cobo', { x: 4, y: 1}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Vanguard('dobo', { x: 7, y: 2}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Hunter('eobo', { x: 7, y: 9}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Witch('Gobo', { x: 3, y: 0 }, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Wizard('eobo', { x: 2, y: 0 }, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Defender('aobo', { x: 3, y: 5}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Artificer('bobo', { x: 7, y: 0}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Wizard('cobo', { x: 6, y: 0}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Hunter('dobo', { x: 5, y: 0}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new FistWeaver('eobo', { x: 4, y: 0}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Pikeman('tnguobo', { x: 3, y: 0}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new BabyBabel('Gobo', { x: 5, y: 1}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new BallistaTurret('Gobo', { x: 6, y: 1}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Wall('Gobo', { x: 4, y: 3}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Wall('Gobo', { x: 5, y: 3}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Wall('Gobo', { x: 6, y: 3}, whiteTeam.value));
 
-    // blackTeam.value.addCombatant(new Rogue('Gobo', { x: 4, y: 8 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Healer('dog', { x: 5, y: 8 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Pikeman('rob', { x: 4, y: 9 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Pikeman('nana', { x: 7, y: 5 }, blackTeam.value));
+    // whiteTeam.value.addCombatant(new Vanguard('Gobo', { x: 1, y: 8 }, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Witch('eobo', { x: 4, y: 4 }, whiteTeam.value));
+
+    blackTeam.value.addCombatant(new Artificer('tobo', { x: 5, y: 5 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Wizard('dog', { x: 6, y: 8 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Hunter('rob', { x: 5, y: 8 }, blackTeam.value));
+    blackTeam.value.addCombatant(new FistWeaver('nana', { x: 5, y: 7 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Pikeman('fefw', { x: 9, y: 9 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Vanguard('nana', { x: 7, y: 9 }, blackTeam.value));
     // blackTeam.value.addCombatant(new Hunter('reqe', { x: 6, y: 9 }, blackTeam.value));
     // blackTeam.value.addCombatant(new Gorilla('feifne', { x: 5, y: 8 }, blackTeam.value));
 
   //blackTeam.value.addCombatant(new Artificer('Gobo', { x: 9, y: 6 }, blackTeam.value));
 
-    // blackTeam.value.combatants[0].stats.hp = 10;
-    whiteTeam.value.combatants[1].stats.hp = 35;
+    // whiteTeam.value.combatants[0].stats.hp = 10;
+    // whiteTeam.value.combatants[1].stats.hp = 10;
+    // whiteTeam.value.combatants[2].stats.hp = 10;
 
     // whiteTeam.value.combatants[1].stats.stamina = 0;
     // whiteTeam.value.combatants[2].stats.stamina = 0;
@@ -365,7 +386,7 @@ export default defineComponent({
       // theATeam(whiteTeam.value);
       // theBTeam(blackTeam.value);
 
-    // placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
+    placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
     
 
     const teams = ref([whiteTeam.value, blackTeam.value]);
@@ -616,6 +637,16 @@ export default defineComponent({
       }
     }
 
+    const canAttack = (): boolean => {
+      const currentCombatant = game.value.getCurrentCombatant();
+      return currentCombatant?.basicAttack().amount > 0;
+    }
+
+    const canDefend = (): boolean => {
+      const currentCombatant = game.value.getCurrentCombatant();
+      return !currentCombatant?.isExpendable();
+    }
+
     const canDefendAndMove = () => {
       const currentCombatant = game.value.getCurrentCombatant();
       return currentCombatant?.getSpecialMoves().some((move) => move.name === "Marching Defense");
@@ -654,6 +685,11 @@ export default defineComponent({
         const deadCombatants = board.value.getAllCombatants().filter((combatant) => combatant.stats.hp <= 0);
         deadCombatants.forEach((combatant) => {
           board.value.removeCombatant(combatant);
+          const combatantIndex = combatant.team.combatants.indexOf(combatant);
+          if(combatant.isExpendable() && combatantIndex > -1) {
+            debugger;
+            combatant.team.combatants.splice(combatantIndex, 1);
+          }
         });
       }, 500);
     }
@@ -731,6 +767,10 @@ export default defineComponent({
           return require('./assets/Wall.svg');
         case CombatantType.Doll:
           return require('./assets/Fool.svg');
+        case CombatantType.BallistaTurret:
+          return require('./assets/Ballista.svg');
+        case CombatantType.BabyBabel:
+          return require('./assets/Babel.svg');
       }
     }
 
@@ -1062,6 +1102,7 @@ export default defineComponent({
       [StatusEffectType.ARCANE_SHIELD_WALL]: "ASW",
       [StatusEffectType.DIAMOND_HOOKED]: "DH",
       [StatusEffectType.DIAMOND_HOOKED_HOLDING]: "DHH",
+      [StatusEffectType.INGENIOUS_UPGRADE]: "IU",
       // ... add mappings for other status effect types
     };
 
@@ -1328,6 +1369,8 @@ export default defineComponent({
       skip,
       currentCombatant,
       canDefendAndMove,
+      canDefend,
+      canAttack,
       canUndo,
       isDefending,
       roundCount,
@@ -1807,7 +1850,16 @@ button {
 }
 
 .white-team-turn-order-container, .black-team-turn-order-container {
-  display: flex;
+    display: flex;
+    max-width: 335px;
+}
+
+.white-team-turn-order-container {
+  flex-wrap: wrap;
+}
+
+.black-team-turn-order-container {
+  flex-wrap: wrap-reverse;
 }
 
 .turn-order-item {

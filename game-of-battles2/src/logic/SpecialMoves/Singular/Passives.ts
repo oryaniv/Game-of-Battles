@@ -167,33 +167,6 @@ export class Sadist implements SpecialMove {
     as well as attack power buff for 3 turns.`
 }  
 
-
-export class GoOff implements SpecialMove {
-    name: string = "Go Off";
-    triggerType = SpecialMoveTriggerType.Active;
-    cost: number = 0;
-    turnCost: number = 0;
-    range: SpecialMoveRange = {
-        type: SpecialMoveRangeType.None,
-        align: SpecialMoveAlignment.Self,
-        areaOfEffect: SpecialMoveAreaOfEffect.Single,
-        range: 0
-    };
-    damage: Damage = {
-        amount: 0,
-        type: DamageType.Unstoppable
-    };
-    effect = (invoker: Combatant, target: Position, board: Board) => {
-        invoker.applyStatusEffect({
-            name: StatusEffectType.GOING_OFF,
-            duration: Number.POSITIVE_INFINITY,
-        });
-        return getStandardActionResult();
-    };
-    requirements = undefined;
-    description = `When this combatant is killed, it explodes, dealing damage to all enemies in a 3x3 area.`
-}
-
 export class DivineMircale implements SpecialMove {
     name: string = "Divine Mircale";
     triggerType = SpecialMoveTriggerType.Passive;
@@ -244,6 +217,32 @@ export class LifeDrinker implements SpecialMove {
     };
     requirements = undefined;
     description = `When this combatant kills an enemy, it gains part of their max health as both healing and addition to their max health`
+}
+
+export class GoOff implements SpecialMove {
+    name: string = "Go Off";
+    triggerType = SpecialMoveTriggerType.Passive;
+    cost: number = 0;
+    turnCost: number = 0;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.None,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Unstoppable
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        invoker.applyStatusEffect({
+            name: StatusEffectType.GOING_OFF,
+            duration: Number.POSITIVE_INFINITY,
+        });
+        return getStandardActionResult();
+    };
+    requirements = undefined;
+    description = `When this combatant is killed, it explodes, dealing damage to all enemies in a 3x3 area.`
 }
 
 export class SurpriseBoom implements SpecialMove {

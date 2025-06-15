@@ -4,6 +4,7 @@ import { Board } from "@/logic/Board";
 // 
 import { Combatant } from "@/logic/Combatant";
 import { Bomb, Wall } from "@/logic/Combatants/ArtificerConstructs";
+import { CombatantType } from "@/logic/Combatants/CombatantType";
 import { CombatMaster } from "@/logic/CombatMaster";
 import { DamageReaction, DamageType } from "@/logic/Damage";
 import { Damage } from "@/logic/Damage";
@@ -33,6 +34,9 @@ export class Heal implements SpecialMove {
         const targetCombatant = board.getCombatantAtPosition(target);
         if(!targetCombatant) {
             return getStandardActionResult();  
+        }
+        if(!targetCombatant.isOrganic()) {
+            return getStandardActionResult();
         }
         targetCombatant.stats.hp = Math.min(targetCombatant.stats.hp + this.damage.amount, targetCombatant.baseStats.hp);
         return {
@@ -238,7 +242,7 @@ export class BuildWalls implements SpecialMove {
         type: SpecialMoveRangeType.Straight,
         align: SpecialMoveAlignment.Empty_Space,
         areaOfEffect: SpecialMoveAreaOfEffect.Cone,
-        range: 5
+        range: 2
     };
     damage: Damage = {
         amount: 0,
@@ -258,8 +262,8 @@ export class BuildWalls implements SpecialMove {
     description = `Build a wall, blocking all movement and attacks to and from the target position`
 }
 
-export class ExplosiveTrap implements SpecialMove {
-    name: string = "Explosive Trap";
+export class BoomBoomJack implements SpecialMove {
+    name: string = "Deploy Boom Gremlin";
     triggerType = SpecialMoveTriggerType.Active;
     cost: number = 10;
     turnCost: number = 1;
@@ -267,14 +271,23 @@ export class ExplosiveTrap implements SpecialMove {
         type: SpecialMoveRangeType.Curve,
         align: SpecialMoveAlignment.Empty_Space,
         areaOfEffect: SpecialMoveAreaOfEffect.Single,
-        range: 4
+        range: 2
     };
     damage: Damage = {
         amount: 0,
         type: DamageType.Unstoppable
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
-        const bomb = new Bomb('bomb', target, invoker.team);
+        const invokverTeam = invoker.team;
+        if(invokverTeam.getAliveCombatants().filter(c => c.getCombatantType() === CombatantType.Bomb).length >= 7) {
+            const bomb = invokverTeam.getAliveCombatants().find(c => c.getCombatantType() === CombatantType.Bomb);
+            if(bomb) {
+                board.removeCombatant(bomb);
+                invokverTeam.combatants.splice(invokverTeam.combatants.indexOf(bomb), 1);
+            }
+        }
+        const bomb = new Bomb('bomb', target, invokverTeam);
+        invokverTeam.addCombatant(bomb);
         board.placeCombatant(bomb, target);
         return getStandardActionResult();
     };

@@ -1,5 +1,5 @@
 import { CombatantType } from "@/logic/Combatants/CombatantType";
-import { CoopMove } from "./CoopMove";
+import { coopCostSlash, CoopMove } from "./CoopMove";
 import { CoopPartnerRequirement } from "./CoopMove";
 import { Damage, DamageReaction, DamageType } from "@/logic/Damage";
 import { Position } from "@/logic/Position";
@@ -26,7 +26,7 @@ export class ShieldBash extends CoopMove {
         amount: 20,
         type: DamageType.Crush
     };
-    cost: number = 5;
+    cost: number = coopCostSlash ? 3 : 5;
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const combatMaster = CombatMaster.getInstance();
@@ -70,7 +70,7 @@ export class RainOfArrows extends CoopMove {
         amount: 20,
         type: DamageType.Pierce
     };
-    cost: number = 10;
+    cost: number = coopCostSlash ? 6 : 10;
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const combatMaster = CombatMaster.getInstance();
@@ -98,13 +98,13 @@ export class BrimstoneRain extends CoopMove {
     description: string = "Ignite your arrows with fire and brimstone, and launch them in a massive crosse shaped volley";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Hunter, CombatantType.StandardBearer, CombatantType.Pikeman, CombatantType.Rogue] },
-        { combatantTypeOptions: [CombatantType.Wizard, CombatantType.Witch] }
+        { combatantTypeOptions: [CombatantType.Wizard, CombatantType.Artificer] }
     ];
     damage: Damage = {
         amount: 30,
         type: DamageType.Fire
     };
-    cost: number = 12;
+    cost: number = coopCostSlash ? 8 : 12;
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const combatMaster = CombatMaster.getInstance();
@@ -142,7 +142,7 @@ export class QueensWrathMothersLove extends CoopMove {
         amount: 30,
         type: DamageType.Holy
     };
-    cost: number = 15;
+    cost: number = coopCostSlash ? 10 : 15;
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const combatMaster = CombatMaster.getInstance();
@@ -152,7 +152,7 @@ export class QueensWrathMothersLove extends CoopMove {
             if(!targetCombatant) {  
                 return getStandardActionResult();
             }
-            if(targetCombatant.team === invoker.team) {
+            if(targetCombatant.team === invoker.team && targetCombatant.isOrganic()) {
                 targetCombatant.stats.hp = Math.min(targetCombatant.stats.hp + 40, targetCombatant.baseStats.hp);
                 return {
                     attackResult: AttackResult.Hit,
@@ -190,10 +190,10 @@ export class MoonBeam extends CoopMove {
         { combatantTypeOptions: [CombatantType.Wizard, CombatantType.Healer] }
     ];
     damage: Damage = {
-        amount: 30,
+        amount: 35,
         type: DamageType.Holy
     };
-    cost: number = 9;
+    cost: number = coopCostSlash ? 6 : 9;
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const combatMaster = CombatMaster.getInstance();
@@ -226,7 +226,7 @@ export class WhirlwindAttack extends CoopMove {
         amount: 35,
         type: DamageType.Slash
     };
-    cost: number = 10;
+    cost: number = coopCostSlash ? 7 : 10;
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const combatMaster = CombatMaster.getInstance();
@@ -256,10 +256,10 @@ export class WhirlwindAttack extends CoopMove {
 export class ColdEdge extends CoopMove {
     name: string = "Cold Edge";
     triggerType = SpecialMoveTriggerType.Cooperative;
-    cost: number = 8;
+    cost: number = coopCostSlash ? 6 : 8;
     turnCost: number = 1;
     coopRequiredPartners: CoopPartnerRequirement[] = [
-        { combatantTypeOptions: [CombatantType.Wizard, CombatantType.FistWeaver, CombatantType.Healer] }
+        { combatantTypeOptions: [CombatantType.Wizard, CombatantType.Artificer, CombatantType.Healer] }
     ];
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Straight,
@@ -304,7 +304,7 @@ export class SkeweringHarppon extends CoopMove {
         areaOfEffect: SpecialMoveAreaOfEffect.Line,
         range: 4
     };
-    cost: number = 10;
+    cost: number = coopCostSlash ? 4 : 10;
     meterCost: number = 0;
     turnCost: number = 2;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
@@ -338,7 +338,7 @@ export class HungerOfZirash extends CoopMove {
         areaOfEffect: SpecialMoveAreaOfEffect.Nova,
         range: 6
     };
-    cost: number = 15;
+    cost: number = coopCostSlash ? 9 : 15;
     meterCost: number = 0;
     turnCost: number = 3;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
@@ -375,7 +375,7 @@ export class StrikeAsOne extends CoopMove {
         { combatantTypeOptions: [CombatantType.Vanguard, CombatantType.FistWeaver, 
             CombatantType.Pikeman] }
     ];
-    cost: number = 8;
+    cost: number = coopCostSlash ? 5 : 8;
     meterCost: number = 0;
     damage: Damage = {
         amount: 20,
@@ -421,7 +421,7 @@ export class RuptureTendons extends CoopMove {
         areaOfEffect: SpecialMoveAreaOfEffect.Single,
         range: 1
     };
-    cost: number = 8;
+    cost: number = coopCostSlash ? 5 : 8;
     turnCost: number = 1;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const targetCombatant = board.getCombatantAtPosition(target);
@@ -456,7 +456,7 @@ export class DanceOfDaggers extends CoopMove {
         range: 1
     };
     turnCost: number = 2;
-    cost: number = 9;
+    cost: number = coopCostSlash ? 7 : 9;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const combatMaster = CombatMaster.getInstance();
         const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
@@ -585,7 +585,7 @@ export class KarithrasBoon extends CoopMove {
         return this.checkCoopRequirements(self);
     };
     meterCost: number = 0;
-    cost: number = 15;
+    cost: number = coopCostSlash ? 10 : 15;
 }
 
 export class LightningKicks extends CoopMove {
@@ -605,7 +605,7 @@ export class LightningKicks extends CoopMove {
         range: 1
     };
     turnCost: number = 2;
-    cost: number = 10;
+    cost: number = coopCostSlash ? 7 : 10;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const combatMaster = CombatMaster.getInstance();
         const kickResults: ActionResult[] = [];
@@ -641,6 +641,7 @@ export class SoulScythe extends CoopMove {
         areaOfEffect: SpecialMoveAreaOfEffect.Single,
         range: 1
     };
+    cost: number = coopCostSlash ? 6 : 10;
     turnCost: number = 1;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const targetCombatant = board.getCombatantAtPosition(target);
@@ -692,7 +693,7 @@ export class SnipeShot extends CoopMove {
         range: 5
     };
     turnCost: number = 1;
-    cost: number = 9;
+    cost: number = coopCostSlash ? 5 : 9;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const combatMaster = CombatMaster.getInstance();
         invoker.stats.agility += 10;
@@ -712,7 +713,7 @@ export class PlagueArrow extends CoopMove {
     name: string = "Plague Arrow";
     description: string = "Launch a poisoned arrow at your enemy, causing them to bleed out.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
-        { combatantTypeOptions: [CombatantType.Healer, CombatantType.Artificer, CombatantType.Witch, CombatantType.Fool] }
+        { combatantTypeOptions: [CombatantType.Artificer, CombatantType.Witch, CombatantType.Fool] }
     ];
     damage: Damage = {
         amount: 20,
@@ -725,7 +726,7 @@ export class PlagueArrow extends CoopMove {
         range: 8
     };
     turnCost: number = 1;
-    cost: number = 7;
+    cost: number = coopCostSlash ? 5 : 7;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const combatMaster = CombatMaster.getInstance();
         const result = combatMaster.executeAttack(invoker, target, board, this.damage, false, this.turnCost);
@@ -758,7 +759,7 @@ export class CatastrophicCalamity extends CoopMove {
         range: 5
     };
     turnCost: number = 3;
-    cost: number = 18;
+    cost: number = coopCostSlash ? 12 : 18;
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const combatMaster = CombatMaster.getInstance();
@@ -807,7 +808,7 @@ export class SkySovereignsWrath extends CoopMove {
         return this.checkCoopRequirements(self);
     };
     turnCost: number = 1;
-    cost: number = 10;
+    cost: number = coopCostSlash ? 6 : 10;
     meterCost: number = 0;
 }
 
@@ -815,7 +816,7 @@ export class DiamondHook extends CoopMove {
     name: string = "Diamond Hook";
     description: string = "Grab an enemy, pull him to you, then strike him. He can not move or attack you without being struck again.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
-        { combatantTypeOptions: [CombatantType.Pikeman, CombatantType.Vanguard, CombatantType.Defender, CombatantType.StandardBearer] }
+        { combatantTypeOptions: [CombatantType.Artificer, CombatantType.Vanguard, CombatantType.Defender, CombatantType.StandardBearer] }
     ];
     damage: Damage = {
         amount: 10,
@@ -828,7 +829,7 @@ export class DiamondHook extends CoopMove {
         range: 5
     };
     turnCost: number = 2;
-    cost: number = 12;
+    cost: number = coopCostSlash ? 8 : 12;
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const combatMaster = CombatMaster.getInstance();
@@ -871,5 +872,41 @@ export class DiamondHook extends CoopMove {
     };
     checkRequirements = (self: Combatant) => {
         return this.checkCoopRequirements(self) && !self.hasStatusEffect(StatusEffectType.DIAMOND_HOOKED_HOLDING);
+    };
+}
+
+export class FlameThrower extends CoopMove {
+    name: string = "Flame Thrower";
+    description: string = "Medium fire damage in a line, chance to inflinct burn";
+    coopRequiredPartners: CoopPartnerRequirement[] = [
+        { combatantTypeOptions: [CombatantType.Wizard, CombatantType.Artificer, CombatantType.Vanguard] }
+    ];
+    damage: Damage = {
+        amount: 20,
+        type: DamageType.Fire
+    };
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Straight,
+        align: SpecialMoveAlignment.All,
+        areaOfEffect: SpecialMoveAreaOfEffect.Line,
+        range: 1
+    };
+    turnCost: number = 1;
+    cost: number = coopCostSlash ? 5 : 8;
+    meterCost: number = 0;
+    effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
+        const combatMaster = CombatMaster.getInstance();
+        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
+        const flameThrowerResults = getAllTargets.map(AOETarget => {
+            const result = combatMaster.executeAttack(invoker, AOETarget, board, this.damage, true, this.turnCost);
+            if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
+                combatMaster.tryInflictStatusEffect(invoker, AOETarget, board, StatusEffectType.BURNING, 3, 0.6);
+            }
+            return result;
+        });
+        return flameThrowerResults;
+    };
+    checkRequirements = (self: Combatant) => {
+        return this.checkCoopRequirements(self);
     };
 }

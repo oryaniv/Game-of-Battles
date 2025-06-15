@@ -4,7 +4,7 @@ import { Combatant } from "./Combatant";
 import { CombatMaster } from "./CombatMaster";
 import { Damage } from "./Damage";
 import { Position } from "./Position";
-import { SpecialMove } from "./SpecialMove";
+import { SpecialMove, SpecialMoveTriggerType } from "./SpecialMove";
 import { StatusEffectHook } from "./StatusEffect";
 import { getResultsForStatusEffectHook } from "./StatusEffect";
 import { Team } from "./Team";
@@ -99,7 +99,7 @@ export class Game {
         return [getStandardActionResult()]; 
       }
 
-      this.addSkillUsage(skill.name);
+      this.addSkillUsage(skill);
 
       const eventLogger = EventLogger.getInstance();
       eventLogger.logEvent(`${invoker.name} uses ${skill.name}`);
@@ -123,7 +123,7 @@ export class Game {
       if(supportingCombatants.some((combatant) => combatant.isKnockedOut())) {
         throw new Error("One or more supporting combatants are knocked out");
       }
-      this.addSkillUsage(coopMove.name);
+      this.addSkillUsage(coopMove);
       const eventLogger = EventLogger.getInstance();
       eventLogger.logEvent(`${invoker.name} uses ${coopMove.name}`);
 
@@ -155,8 +155,11 @@ export class Game {
       const eventLogger = EventLogger.getInstance();
       const currentCombatant = this.getCurrentCombatant();
       eventLogger.logEvent(`${currentCombatant.name}  skips their turn`);
-      this.spendActionPoints(currentCombatant.hasMoved || this.getCurrentTeam().getAliveCombatants().length === 1 ? 1 : 0.5);
-      //this.spendActionPoints(this.getCurrentTeam().getAliveCombatants().length === 1 ? 1 : 0.5);
+      this.spendActionPoints(currentCombatant.hasMoved || 
+        currentCombatant.isExpendable() ||
+        this.getCurrentTeam().getAliveCombatants().length === 1 ? 
+        1 : 0.5
+      );
     }
 
     executePassTurn(): void {
@@ -288,21 +291,49 @@ export class Game {
     } 
 
     recordSkillUsage(): void {
-      this.skillRecords = {};
+      this.initRecords();
     }
 
-    addSkillUsage(skillName: string): void {
+    initRecords(): void {
+      const allCombatants = this.board.getAllCombatants();
+      allCombatants.forEach((combatant) => {
+        combatant.specialMoves.filter(skill => skill.triggerType !== SpecialMoveTriggerType.Passive).forEach((skill) => {
+          const skillName =  this.getSkillNameForRecord(skill);
+          if(!this.skillRecords[skillName]) {
+            this.skillRecords[skillName] = 0;
+          }
+        });
+      });
+      
+      
+
+    }
+
+    addSkillUsage(skill: SpecialMove): void {
       if(!this.skillRecords) {
         return;
       }
-      if(this.skillRecords[skillName]) {
-        this.skillRecords[skillName]++;
+      const nameForRecord = this.getSkillNameForRecord(skill);
+      if(this.skillRecords[nameForRecord]) {
+        this.skillRecords[nameForRecord]++;
       } else {
-        this.skillRecords[skillName] = 1;
+        this.skillRecords[nameForRecord] = 1;
       }
     }
 
     getSkillRecords(): Record<string, number> {
       return this.skillRecords;
+    }
+
+    private getSkillNameForRecord(skill: SpecialMove): string {
+      if(skill instanceof CoopMove) { 
+        const coopMove = skill as CoopMove;
+        return coopMove.turnCost === 1 ? `${skill.name} (Co-op)` : 
+        coopMove.turnCost === 2 ? `${skill.name} (Super)` :
+         `${skill.name} (Ultimate)`;
+      }
+      else {
+        return skill.name;
+      }
     }
   }

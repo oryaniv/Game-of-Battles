@@ -238,19 +238,37 @@ export class RangeCalculator {
         aoePositions.push(...getNovaTargets(2));
         break;
       case SpecialMoveAreaOfEffect.Line:
-        if(caster.position.x === targetPosition.x -1) { 
+        // if(caster.position.x === targetPosition.x -1) { 
+        //   for(let i = 0; i <= 2; i++) {
+        //     aoePositions.push({ x: targetPosition.x + i, y: targetPosition.y });
+        //   }
+        // } else if(caster.position.x === targetPosition.x + 1) {
+        //   for(let i = 0; i <= 2; i++) {
+        //     aoePositions.push({ x: targetPosition.x - i, y: targetPosition.y });
+        //   }
+        // } else if(caster.position.y === targetPosition.y - 1) {
+        //   for(let i = 0; i <= 2; i++) {
+        //     aoePositions.push({ x: targetPosition.x, y: targetPosition.y + i });
+        //   }
+        // } else if(caster.position.y === targetPosition.y + 1) {
+        //   for(let i = 0; i <= 2; i++) {
+        //     aoePositions.push({ x: targetPosition.x, y: targetPosition.y - i });
+        //   }
+        // }
+
+        if(caster.position.x < targetPosition.x) { 
           for(let i = 0; i <= 2; i++) {
             aoePositions.push({ x: targetPosition.x + i, y: targetPosition.y });
           }
-        } else if(caster.position.x === targetPosition.x + 1) {
+        } else if(caster.position.x > targetPosition.x) {
           for(let i = 0; i <= 2; i++) {
             aoePositions.push({ x: targetPosition.x - i, y: targetPosition.y });
           }
-        } else if(caster.position.y === targetPosition.y - 1) {
+        } else if(caster.position.y < targetPosition.y) {
           for(let i = 0; i <= 2; i++) {
             aoePositions.push({ x: targetPosition.x, y: targetPosition.y + i });
           }
-        } else if(caster.position.y === targetPosition.y + 1) {
+        } else if(caster.position.y > targetPosition.y) {
           for(let i = 0; i <= 2; i++) {
             aoePositions.push({ x: targetPosition.x, y: targetPosition.y - i });
           }

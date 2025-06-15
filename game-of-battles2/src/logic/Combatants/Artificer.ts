@@ -9,7 +9,9 @@ import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
 import { ShockingGauntlet } from "../SpecialMoves/Singular/Offensive";
 import { FullMetalJacket } from "../SpecialMoves/Singular/Buffs";
-import { BuildWalls, ExplosiveTrap, ReinforceConstruct } from "../SpecialMoves/Singular/Support";
+import { BuildWalls, BoomBoomJack, ReinforceConstruct } from "../SpecialMoves/Singular/Support";
+import { FlameThrower } from "../SpecialMoves/Coop/OffensiveCoop";
+import { BuildBallistaTurret, BuildBabyBabel, IngeniousUpgrade } from "../SpecialMoves/Coop/BuffCoop";
 
 export class Artificer extends Combatant {
     constructor(name: string, position: Position, team: Team) {
@@ -40,15 +42,16 @@ export class Artificer extends Combatant {
         ],
         [
           new BuildWalls(),
-          new ExplosiveTrap(),
+          new BoomBoomJack(),
           new ShockingGauntlet(),
           new FullMetalJacket(),
           new ReinforceConstruct(),
 
           // supers
-          // new BuildBallistaTurret()
-          // new FlameThrower()
-          // new CreateForceField()
+          new BuildBallistaTurret(),
+          new FlameThrower(),
+          new IngeniousUpgrade(),
+          new BuildBabyBabel()
         ],
         team
       );

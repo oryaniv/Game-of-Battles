@@ -1,5 +1,5 @@
 import { CombatantType } from "@/logic/Combatants/CombatantType";
-import { CoopMove } from "./CoopMove";
+import { coopCostSlash, CoopMove } from "./CoopMove";
 import { CoopPartnerRequirement } from "./CoopMove";
 import { Damage, DamageReaction, DamageType } from "@/logic/Damage";
 import { Position } from "@/logic/Position";
@@ -25,7 +25,7 @@ export class DevourDivinity extends CoopMove {
         amount: 0,
         type: DamageType.Unstoppable
     };
-    cost: number = 10;
+    cost: number = coopCostSlash ? 7 : 10;
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
@@ -71,7 +71,7 @@ export class UltimateCurse extends CoopMove {
         amount: 0,
         type: DamageType.Unstoppable
     };
-    cost: number = 12;
+    cost: number = coopCostSlash ? 8 : 12;
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const targetCombatant = board.getCombatantAtPosition(target);
@@ -120,7 +120,7 @@ export class DivineRetribution extends CoopMove {
         amount: 0,
         type: DamageType.Unstoppable
     };
-    cost: number = 10;
+    cost: number = coopCostSlash ? 7 : 10;
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const targetCombatant = board.getCombatantAtPosition(target);
@@ -155,7 +155,7 @@ export class ShatterSteel extends CoopMove {
         amount: 15,
         type: DamageType.Pierce
     };
-    cost: number = 9;
+    cost: number = coopCostSlash ? 6 : 9;
     turnCost: number = 1;
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {

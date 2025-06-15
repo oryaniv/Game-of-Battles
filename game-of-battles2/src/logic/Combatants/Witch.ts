@@ -38,7 +38,7 @@ export class Witch extends Combatant {
           {type: DamageType.Lightning, reaction: DamageReaction.NONE},
           {type: DamageType.Blight, reaction: DamageReaction.RESISTANCE},
           {type: DamageType.Holy, reaction: DamageReaction.WEAKNESS},
-          {type: DamageType.Dark, reaction: DamageReaction.IMMUNITY},
+          {type: DamageType.Dark, reaction: DamageReaction.RESISTANCE},
         ],
         [
           new Weaken(),

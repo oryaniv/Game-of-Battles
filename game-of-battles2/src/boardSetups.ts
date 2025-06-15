@@ -65,33 +65,51 @@ export function standardVsSetup(team1: Team, team2: Team) {
 }
 
 export function theATeam(team: Team) {
-    team.addCombatant(new StandardBearer('A', { x: 4, y: 1 }, team));
-    team.addCombatant(new Defender('B', { x: 3, y: 1 }, team));
-    team.addCombatant(new Wizard('C', { x: 2, y: 0 }, team));
-    team.addCombatant(new Hunter('D', { x: 4, y: 0 }, team));
-    team.addCombatant(new Healer('E', { x: 3, y: 0 }, team));
+    // team.addCombatant(new StandardBearer('A', { x: 4, y: 1 }, team));
+    // team.addCombatant(new Defender('B', { x: 3, y: 1 }, team));
+    // team.addCombatant(new Healer('E', { x: 3, y: 0 }, team));
+    // team.addCombatant(new Wizard('C', { x: 2, y: 0 }, team));
+    // team.addCombatant(new Hunter('D', { x: 4, y: 0 }, team));
+    
 
-    // team.addCombatant(new Witch('A', { x: 3, y: 0 }, team));
-    // team.addCombatant(new Rogue('B', { x: 4, y: 0 }, team));
-    // team.addCombatant(new Vanguard('C', { x: 5, y: 1 }, team));
-    // team.addCombatant(new FistWeaver('D', { x: 3, y: 1 }, team));
-    // team.addCombatant(new Pikeman('E', { x: 4, y: 1 }, team));
+    team.addCombatant(new Witch('A', { x: 3, y: 0 }, team));
+    team.addCombatant(new Rogue('B', { x: 4, y: 0 }, team));
+    team.addCombatant(new Vanguard('C', { x: 5, y: 1 }, team));
+    team.addCombatant(new FistWeaver('D', { x: 3, y: 1 }, team));
+    team.addCombatant(new Pikeman('E', { x: 4, y: 1 }, team));
 }
 
 export function theBTeam(team: Team) {
-    team.addCombatant(new Healer('F', { x: 6, y: 9 }, team));
-    team.addCombatant(new Wizard('G', { x: 7, y: 9 }, team));
-    team.addCombatant(new StandardBearer('H', { x: 5, y: 8 }, team));
-    team.addCombatant(new Defender('I', { x: 6, y: 8 }, team));
-    team.addCombatant(new Hunter('J', { x: 5, y: 9 }, team));
+    // team.addCombatant(new StandardBearer('H', { x: 5, y: 8 }, team));
+    // team.addCombatant(new Defender('I', { x: 6, y: 8 }, team));
+    // team.addCombatant(new Healer('F', { x: 6, y: 9 }, team));
+    // team.addCombatant(new Wizard('G', { x: 7, y: 9 }, team));
+    // team.addCombatant(new Hunter('J', { x: 5, y: 9 }, team));
 
 
-//     team.addCombatant(new Witch('F', { x: 5, y: 9 }, team));
-//     team.addCombatant(new Rogue('G', { x: 6, y: 9 }, team));
-//     team.addCombatant(new Vanguard('H', { x: 4, y: 8 }, team));
-//     team.addCombatant(new FistWeaver('I', { x: 5, y: 8 }, team));
-//     team.addCombatant(new Pikeman('J', { x: 6, y: 8 }, team));
+    team.addCombatant(new Witch('F', { x: 5, y: 9 }, team));
+    team.addCombatant(new Rogue('G', { x: 6, y: 9 }, team));
+    team.addCombatant(new Vanguard('H', { x: 4, y: 8 }, team));
+    team.addCombatant(new FistWeaver('I', { x: 5, y: 8 }, team));
+    team.addCombatant(new Pikeman('J', { x: 6, y: 8 }, team));
 // }
+}
+
+
+export function theCTeam(team: Team) {
+    team.addCombatant(new Wizard('A', { x: 3, y: 0 }, team));
+    team.addCombatant(new Healer('B', { x: 4, y: 0 }, team));
+    team.addCombatant(new Hunter('C', { x: 5, y: 0 }, team));
+    team.addCombatant(new StandardBearer('D', { x: 6, y: 0 }, team));
+    team.addCombatant(new FistWeaver('E', { x: 7, y: 0 }, team));
+}
+
+export function theDTeam(team: Team) {
+    team.addCombatant(new Wizard('F', { x: 3, y: 0 }, team));
+    team.addCombatant(new Healer('I', { x: 4, y: 0 }, team));
+    team.addCombatant(new Hunter('H', { x: 5, y: 0 }, team));
+    team.addCombatant(new StandardBearer('Q', { x: 6, y: 0 }, team));
+    team.addCombatant(new FistWeaver('T', { x: 7, y: 0 }, team));
 }
 
 export function theGorillaTeam(team: Team) {
@@ -129,6 +147,19 @@ export function generateRandomTeam(teamIndex: number, agent?:AIAgent) {
         new FistWeaver(generateRandomString(), { x: 0, y: 0 }, team),
         new Pikeman(generateRandomString(), { x: 0, y: 0 }, team),
         new Rogue(generateRandomString(), { x: 0, y: 0 }, team),
+
+        // 2nd wave
+        // new StandardBearer(generateRandomString(), { x: 0, y: 0 }, team),
+        // new Defender(generateRandomString(), { x: 0, y: 0 }, team),
+        // new Hunter(generateRandomString(), { x: 0, y: 0 }, team),
+        // new Wizard(generateRandomString(), { x: 0, y: 0 }, team),
+        // new Healer(generateRandomString(), { x: 0, y: 0 }, team),
+        // new Witch(generateRandomString(), { x: 0, y: 0 }, team),
+        // new Fool(generateRandomString(), { x: 0, y: 0 }, team),
+        // new Vanguard(generateRandomString(), { x: 0, y: 0 }, team),
+        // new FistWeaver(generateRandomString(), { x: 0, y: 0 }, team),
+        // new Pikeman(generateRandomString(), { x: 0, y: 0 }, team),
+        // new Rogue(generateRandomString(), { x: 0, y: 0 }, team),
     ];
     shuffleArray(combatantCandidates);
     for(let i = 0; i < 5; i++) {
@@ -226,16 +257,58 @@ function generateRandomString(): string {
 export function refreshTeam(team: Team) {
     team.combatants.forEach((combatant) => {
         combatant.removeAllStatusEffects();
-        combatant.stats.hp = combatant.baseStats.hp;
-        combatant.stats.stamina = combatant.baseStats.stamina;
-        combatant.stats.attackPower = combatant.baseStats.attackPower;
-        combatant.stats.defensePower = combatant.baseStats.defensePower;
-        combatant.stats.agility = combatant.baseStats.agility;
-        combatant.stats.luck = combatant.baseStats.luck;
-        combatant.stats.initiative = combatant.baseStats.initiative;
-        combatant.stats.movementSpeed = combatant.baseStats.movementSpeed;
-        combatant.stats.range = combatant.baseStats.range;
+        const replicaCombatant = getCombatantByType(combatant.getCombatantType(), team);
+        combatant.baseStats.hp = replicaCombatant.baseStats.hp;
+        combatant.baseStats.stamina = replicaCombatant.baseStats.stamina;
+        combatant.baseStats.attackPower = replicaCombatant.baseStats.attackPower;
+        combatant.baseStats.defensePower = replicaCombatant.baseStats.defensePower;
+        combatant.baseStats.agility = replicaCombatant.baseStats.agility;
+        combatant.baseStats.luck = replicaCombatant.baseStats.luck;
+        combatant.baseStats.initiative = replicaCombatant.baseStats.initiative;
+        combatant.baseStats.movementSpeed = replicaCombatant.baseStats.movementSpeed;
+        combatant.baseStats.range = replicaCombatant.baseStats.range;
+        combatant.stats.hp = replicaCombatant.baseStats.hp;
+        combatant.stats.stamina = replicaCombatant.baseStats.stamina;
+        combatant.stats.attackPower = replicaCombatant.baseStats.attackPower;
+        combatant.stats.defensePower = replicaCombatant.baseStats.defensePower;
+        combatant.stats.agility = replicaCombatant.baseStats.agility;
+        combatant.stats.luck = replicaCombatant.baseStats.luck;
+        combatant.stats.initiative = replicaCombatant.baseStats.initiative;
+        combatant.stats.movementSpeed = replicaCombatant.baseStats.movementSpeed;
+        combatant.stats.range = replicaCombatant.baseStats.range;
         combatant.position = { x: 0, y: 0 };
         combatant.hasMoved = false;
     });
+}
+
+function getCombatantByType(type: CombatantType, team: Team): Combatant {
+    const position = { x: 0, y: 0 };
+    const name = generateRandomString();
+
+    switch(type) {
+        case CombatantType.Militia:
+            return new Militia(name, position, team);
+        case CombatantType.Defender:
+            return new Defender(name, position, team);
+        case CombatantType.Hunter:
+            return new Hunter(name, position, team);
+        case CombatantType.Healer:
+            return new Healer(name, position, team);
+        case CombatantType.Wizard:
+            return new Wizard(name, position, team);
+        case CombatantType.Witch:
+            return new Witch(name, position, team);
+        case CombatantType.Fool:
+            return new Fool(name, position, team);
+        case CombatantType.Pikeman:
+            return new Pikeman(name, position, team);
+        case CombatantType.Vanguard:
+            return new Vanguard(name, position, team);
+        case CombatantType.FistWeaver:
+            return new FistWeaver(name, position, team);
+        case CombatantType.StandardBearer:
+            return new StandardBearer(name, position, team);
+        default:
+            return new Militia(name, position, team);
+    }
 }

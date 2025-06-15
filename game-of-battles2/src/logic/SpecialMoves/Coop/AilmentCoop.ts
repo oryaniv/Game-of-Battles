@@ -1,5 +1,5 @@
 import { CombatantType } from "@/logic/Combatants/CombatantType";
-import { CoopMove } from "./CoopMove";
+import { coopCostSlash, CoopMove } from "./CoopMove";
 import { CoopPartnerRequirement } from "./CoopMove";
 import { Damage, DamageReaction, DamageType } from "@/logic/Damage";
 import { Position } from "@/logic/Position";
@@ -23,7 +23,7 @@ export class HellScream extends CoopMove {
         amount: 0,
         type: DamageType.Unstoppable
     };
-    cost: number = 14;
+    cost: number = coopCostSlash ? 10 : 14;
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const combatMaster = CombatMaster.getInstance();
@@ -97,7 +97,7 @@ export class StandUpComedyGoneWrong extends CoopMove {
         areaOfEffect: SpecialMoveAreaOfEffect.Cross,
         range: 6
     };
-    cost: number = 10;
+    cost: number = coopCostSlash ?  8 : 10;
     meterCost: number = 0;  
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const combatMaster = CombatMaster.getInstance();
@@ -117,7 +117,7 @@ export class CircusDiabolique extends CoopMove {
     name: string = "Circus Diabolique";
     description: string = "Entrhall your foes with the most magnificent show of nightmares ever conceived. if struck, they'll be helpess, and slowly rot away as they watch in horror.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
-        { combatantTypeOptions: [CombatantType.Fool, CombatantType.Witch, CombatantType.Rogue] },
+        { combatantTypeOptions: [CombatantType.Fool, CombatantType.Witch, CombatantType.Rogue, CombatantType.Artificer] },
         { combatantTypeOptions: [CombatantType.StandardBearer, CombatantType.Wizard, CombatantType.Defender] }
     ];
     damage: Damage = {
@@ -130,7 +130,7 @@ export class CircusDiabolique extends CoopMove {
         areaOfEffect: SpecialMoveAreaOfEffect.Great_Nova,
         range: 0
     }; 
-    cost: number = 15;
+    cost: number = coopCostSlash ? 10 : 15;
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         invoker.applyStatusEffect({name: StatusEffectType.CIRCUS_DIABOLIQUE, duration: Number.POSITIVE_INFINITY});

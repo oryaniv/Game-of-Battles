@@ -152,8 +152,13 @@ export interface CombatantStats {
       if(effectToRemove) {
         const statusEffect = getStatusEffect(effectToRemove.name);
         const removeStatusHook = statusEffect?.applicationHooks[StatusEffectHook.OnRemove];
-        removeStatusHook && removeStatusHook(this, this, {amount: 0, type: DamageType.Unstoppable});
+
+        // removeStatusHook && removeStatusHook(this, this, {amount: 0, type: DamageType.Unstoppable});
+        // this.statusEffects = this.statusEffects.filter((effect) => effect.name !== effectName);
+
         this.statusEffects = this.statusEffects.filter((effect) => effect.name !== effectName);
+        removeStatusHook && removeStatusHook(this, this, {amount: 0, type: DamageType.Unstoppable});
+        
       }
     }
 
@@ -256,12 +261,19 @@ export interface CombatantStats {
         }
       }
 
+      // can be healed with ReinforceConstruct
       isConstruct(): boolean {
         return this.hasStatusEffect(StatusEffectType.FULL_METAL_JACKET);
       }
 
+      // does not count towards team survival
       isExpendable(): boolean {
         return false;
+      }
+
+      // can be mind controlled, poisoned, etc.
+      isOrganic(): boolean {
+        return true;
       }
 
       addRelatedCombatant(relation:string, combatant: Combatant): void {
