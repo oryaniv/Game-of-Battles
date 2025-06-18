@@ -1,7 +1,7 @@
 import { Combatant } from "../Combatant";
 import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Position } from "../Position";
-import { DanceOfDaggers, KarithrasBoon, RuptureTendons } from "../SpecialMoves/Coop/OffensiveCoop";
+import { DanceOfDaggers, KarithrasBoon, ForbiddenArt } from "../SpecialMoves/Coop/OffensiveCoop";
 import { BloodRite } from "../SpecialMoves/Coop/SupportCoop";
 import { AssassinsMark } from "../SpecialMoves/Singular/Debuffs";
 import { SneakAttack, VipersKiss } from "../SpecialMoves/Singular/Offensive";
@@ -10,7 +10,7 @@ import { ShadowStep } from "../SpecialMoves/Singular/Self";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
 import { SleepingDart } from "../SpecialMoves/Coop/AilmentCoop";
-import { HEALTH_INCREASE_AMOUNT, HEALTH_INCREASE_ENABLED, STAMINA_INCREASE_AMOUNT, STAMINA_INCREASE_ENABLED } from "../LogicFlags";
+import { HEALTH_INCREASE_AMOUNT, HEALTH_INCREASE_ENABLED, STAMINA_INCREASE_AMOUNT, STAMINA_INCREASE_ENABLED, STAT_BUFF_INCREASE_ENABLED } from "../LogicFlags";
 
 
 export class Rogue extends Combatant {
@@ -19,13 +19,13 @@ export class Rogue extends Combatant {
           name,
           {
             hp: HEALTH_INCREASE_ENABLED ? 50 + HEALTH_INCREASE_AMOUNT : 50,
-            attackPower: 25,
-            defensePower: 15,
+            attackPower: STAT_BUFF_INCREASE_ENABLED ? 80 : 25,
+            defensePower: STAT_BUFF_INCREASE_ENABLED ? 50 : 15,
             stamina: STAMINA_INCREASE_ENABLED ? 30 + STAMINA_INCREASE_AMOUNT : 30,
             initiative: 7,
             movementSpeed: 4,
             range: 1,
-            agility: 9,
+            agility: STAT_BUFF_INCREASE_ENABLED ? 12 : 9,
             luck: 5,
           },
           position,
@@ -50,11 +50,12 @@ export class Rogue extends Combatant {
             // supers
             new BloodRite(),
             // new AllayunOverdose(),
-            new RuptureTendons(),
+            new ForbiddenArt(),
             new SleepingDart(),
-            new DanceOfDaggers(),
-            // new ForbiddenArt(),
             new KarithrasBoon(),
+            // new DanceOfDaggers(),
+            // new ForbiddenArt(),
+            
           ], team
         );
       }

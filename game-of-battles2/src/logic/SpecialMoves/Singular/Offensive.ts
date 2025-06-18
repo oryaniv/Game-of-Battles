@@ -752,8 +752,8 @@ export class TitanicFist implements SpecialMove {
                 targetCombatant!.move(getPushResult.moveTo, board);
             }
             if(getPushResult.collisionObject) {
-                targetCombatant?.takeDamage({amount: 10, type: DamageType.Crush});
-                getPushResult.collisionObject?.takeDamage({amount: 10, type: DamageType.Crush});
+                targetCombatant?.takeDamage({amount: 10, type: DamageType.Crush}, board);
+                getPushResult.collisionObject?.takeDamage({amount: 10, type: DamageType.Crush}, board);
             }
         }
         return result;

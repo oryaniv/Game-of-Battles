@@ -12,7 +12,7 @@ import { FullMetalJacket } from "../SpecialMoves/Singular/Buffs";
 import { BuildWalls, BoomBoomJack, ReinforceConstruct } from "../SpecialMoves/Singular/Support";
 import { FlameThrower } from "../SpecialMoves/Coop/OffensiveCoop";
 import { BuildBallistaTurret, BuildBabyBabel, IngeniousUpgrade } from "../SpecialMoves/Coop/BuffCoop";
-import { HEALTH_INCREASE_AMOUNT, HEALTH_INCREASE_ENABLED, STAMINA_INCREASE_AMOUNT, STAMINA_INCREASE_ENABLED } from "../LogicFlags";
+import { HEALTH_INCREASE_AMOUNT, HEALTH_INCREASE_ENABLED, STAMINA_INCREASE_AMOUNT, STAMINA_INCREASE_ENABLED, STAT_BUFF_INCREASE_ENABLED } from "../LogicFlags";
 
 export class Artificer extends Combatant {
     constructor(name: string, position: Position, team: Team) {
@@ -20,8 +20,8 @@ export class Artificer extends Combatant {
         name,
         {
           hp: HEALTH_INCREASE_ENABLED ? 55 + HEALTH_INCREASE_AMOUNT : 55,
-          attackPower: 10,
-          defensePower: 15,
+          attackPower: STAT_BUFF_INCREASE_ENABLED ? 60 : 10,
+          defensePower: STAT_BUFF_INCREASE_ENABLED ? 65 : 15,
           stamina: STAMINA_INCREASE_ENABLED ? 50 + STAMINA_INCREASE_AMOUNT : 50,
           initiative: 4,
           movementSpeed: 2,

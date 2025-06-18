@@ -9,6 +9,7 @@ import { CombatMaster } from "../CombatMaster";
 import { Board } from "../Board";
 import { CharmedAIAgent, PanickedAIAgent, StunLockedAIAgent, TauntedAIAgent } from "../AI/StatusAIAgent";
 import { AIAgentType } from "../AI/AIAgent";
+import {STAT_BUFF_INCREASE_ENABLED, ATTACK_DEFENSE_INCREASE_AMOUNT, AGILITY_LUCK_INCREASE_AMOUNT} from "../LogicFlags";
 
 export class ImmobilizedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.IMMOBILIZED;
@@ -50,10 +51,10 @@ export class StrengthDowngradeStatusEffect implements StatusEffect {
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant) => {
             self.removeStatusEffect(StatusEffectType.STRENGTH_BOOST);
-            self.stats.attackPower -= 20;
+            self.stats.attackPower -= STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 20 : 20;
         },
         [StatusEffectHook.OnRemove]: (self: Combatant) => {
-            self.stats.attackPower += 20;
+            self.stats.attackPower += STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 20 : 20;
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
@@ -64,10 +65,10 @@ export class DefenseDowngradeStatusEffect implements StatusEffect {
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant) => {
             self.removeStatusEffect(StatusEffectType.FORTIFIED);
-            self.stats.defensePower -= 20;
+            self.stats.defensePower -= STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 20 : 20;
         },
         [StatusEffectHook.OnRemove]: (self: Combatant) => {
-            self.stats.defensePower += 20;
+            self.stats.defensePower += STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 20 : 20;
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
@@ -77,10 +78,10 @@ export class LuckDowngradeStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.LUCK_DOWNGRADE;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant) => {
-            self.stats.luck -= 5;
+            self.stats.luck -= STAT_BUFF_INCREASE_ENABLED ? AGILITY_LUCK_INCREASE_AMOUNT + 5 : 5;
         },
         [StatusEffectHook.OnRemove]: (self: Combatant) => {
-            self.stats.luck += 5;
+            self.stats.luck += STAT_BUFF_INCREASE_ENABLED ? AGILITY_LUCK_INCREASE_AMOUNT + 5 : 5;
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
@@ -105,11 +106,11 @@ export class SlowStatusEffect implements StatusEffect {
         [StatusEffectHook.OnApply]: (self: Combatant) => {
             self.removeStatusEffect(StatusEffectType.MOBILITY_BOOST);
             self.stats.movementSpeed -= 2;
-            self.stats.agility -= 3;
+            self.stats.agility -= STAT_BUFF_INCREASE_ENABLED ? AGILITY_LUCK_INCREASE_AMOUNT + 3 : 3;
         },
         [StatusEffectHook.OnRemove]: (self: Combatant) => {
             self.stats.movementSpeed += 2;
-            self.stats.agility += 3;
+            self.stats.agility += STAT_BUFF_INCREASE_ENABLED ? AGILITY_LUCK_INCREASE_AMOUNT + 3 : 3;
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
@@ -124,7 +125,7 @@ export class PoisonedStatusEffect implements StatusEffect {
             }
         },
         [StatusEffectHook.OnTurnEnd]: (self: Combatant, target: Combatant, board: Board) => {
-            self.takeDamage({amount: 10, type: DamageType.Blight});
+            self.takeDamage({amount: 10, type: DamageType.Blight}, board);
             if(self.stats.hp <= 0) {
                 self.stats.hp = 0;
             }
@@ -153,7 +154,7 @@ export class BleedingStatusEffect implements StatusEffect {
         },
         [StatusEffectHook.OnTurnEnd]: (caster: Combatant, target: Combatant, board: Board) => {
             // caster.stats.hp -= 10;
-            caster.takeDamage({amount: 10, type: DamageType.Pierce});
+            caster.takeDamage({amount: 10, type: DamageType.Pierce}, board);
             if(caster.stats.hp <= 0) {
                 caster.stats.hp = 0;
                 // board.removeCombatant(caster);
@@ -455,11 +456,20 @@ export class CharmedStatusEffect implements StatusEffect {
     alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
 }
 
-export class RuptureTendonsStatusEffect implements StatusEffect {
-    name: StatusEffectType = StatusEffectType.RUPTURE_TENDONS;
+export class ForbiddenAfflictionStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.FORBIDDEN_AFFLICTION;
     applicationHooks = {
+        [StatusEffectHook.OnApply]: (self: Combatant) => {
+            if(!self.isOrganic()) {
+                self.removeStatusEffect(StatusEffectType.FORBIDDEN_AFFLICTION);
+                return;
+            }
+        },
         [StatusEffectHook.OnMoving]: (self: Combatant, attacker: Combatant, damage: Damage, amount: number, board: Board) => {
             self.takeDamage({amount: amount * 6, type: DamageType.Dark});
+        },
+        [StatusEffectHook.OnAttacking]: (self: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
+            self.takeDamage({amount: 6, type: DamageType.Dark});
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
@@ -493,8 +503,8 @@ export class PlaguedStatusEffect implements StatusEffect {
                 return;
             }
         },
-        [StatusEffectHook.OnTurnEnd]: (self: Combatant) => {
-            self.takeDamage({amount: 10, type: DamageType.Blight});
+        [StatusEffectHook.OnTurnEnd]: (self: Combatant, target: Combatant, board: Board) => {
+            self.takeDamage({amount: 10, type: DamageType.Blight}, board);
             if(self.stats.hp <= 0) {
                 self.stats.hp = 0;
             }
@@ -533,8 +543,8 @@ export class PlaguedStatusEffect implements StatusEffect {
 export class BurningStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.BURNING;
     applicationHooks = {
-        [StatusEffectHook.OnTurnEnd]: (self: Combatant) => {
-            self.takeDamage({amount: 10, type: DamageType.Fire});
+        [StatusEffectHook.OnTurnEnd]: (self: Combatant, target: Combatant, board: Board) => {
+            self.takeDamage({amount: 10, type: DamageType.Fire}, board);
             if(self.stats.hp <= 0) {
                 self.stats.hp = 0;
             }

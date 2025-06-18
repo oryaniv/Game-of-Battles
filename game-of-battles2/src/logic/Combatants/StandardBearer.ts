@@ -9,16 +9,17 @@ import { InspiringKiller } from "../SpecialMoves/Singular/Passives";
 import { RallyToTheBanner } from "../SpecialMoves/Singular/Support";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
+import { HEALTH_INCREASE_AMOUNT, HEALTH_INCREASE_ENABLED, STAMINA_INCREASE_AMOUNT, STAMINA_INCREASE_ENABLED, STAT_BUFF_INCREASE_ENABLED } from "../LogicFlags";
 
 export class StandardBearer extends Combatant {
     constructor(name: string, position: Position, team: Team) {
       super(
         name,
         {
-          hp: 75,
-          attackPower: 15,
-          defensePower: 25,
-          stamina: 35,
+          hp: HEALTH_INCREASE_ENABLED ? 75 + HEALTH_INCREASE_AMOUNT : 75,
+          attackPower: STAT_BUFF_INCREASE_ENABLED ? 65 : 15,
+          defensePower: STAT_BUFF_INCREASE_ENABLED ? 75 : 25,
+          stamina: STAMINA_INCREASE_ENABLED ? 35 + STAMINA_INCREASE_AMOUNT : 35,
           initiative: 5,
           movementSpeed: 3,
           range: 1,

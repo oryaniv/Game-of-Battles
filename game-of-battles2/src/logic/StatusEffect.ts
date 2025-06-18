@@ -4,7 +4,7 @@ import { Combatant, CombatantStats } from "./Combatant";
 import { DamageType, Damage } from "./Damage";
 import { BlockingStance } from "./SpecialMoves/Singular/Self";
 import { FrozenStatusEffect, ImmobilizedStatusEffect, LuckDowngradeStatusEffect, SlowStatusEffect, StrengthDowngradeStatusEffect, PoisonedStatusEffect, BleedingStatusEffect, TauntedStatusEffect, StupefiedStatusEffect, NauseatedStatusEffect, MesmerizedStatusEffect, StaggeredStatusEffect, DefenseDowngradeStatusEffect, MarkedForPainStatusEffect, 
-  MarkedForOblivionStatusEffect, MarkedForExecutionStatusEffect, PanickedStatusEffect, CharmedStatusEffect, NightmareLockedStatusEffect, RuptureTendonsStatusEffect,
+  MarkedForOblivionStatusEffect, MarkedForExecutionStatusEffect, PanickedStatusEffect, CharmedStatusEffect, NightmareLockedStatusEffect, ForbiddenAfflictionStatusEffect,
    DivineRetributionStatusEffect, PlaguedStatusEffect, BurningStatusEffect, DiamondHookedStatusEffect, SleepingStatusEffect } from "./StatusEffects.ts/NegativeEffects";
 import { EnergyAbsorbStatusEffect, FirstStrikeStatusEffect, FoolsLuckStatusEffect, InspiringKillerStatusEffect, MarchingDefenseStatusEffect, RiposteStatusEffect, SadistStatusEffect, GoingOffStatusEffect, DivineMiracleStatusEffect, LifeDrinkerStatusEffect, LastStandUsedStatusEffect, DecoyStatusEffect, SurpriseBoomStatusEffect, TrollRegenerationStatusEffect, ReloadStatusEffect } from "./StatusEffects.ts/NeutralEffects";
 import { ArcaneBarrierStatusEffect, ArcaneChannelingStatusEffect, ArcaneConduitStatusEffect, ArcaneOverchargeStatusEffect, ArcaneShieldWallProtectedStatusEffect, ArcaneShieldWallStatusEffect, BlockingStanceStatusEffect, CircusDiaboliqueStatusEffect, CloakedStatusEffect, DiamondSupremacyStatusEffect, EncouragedStatusEffect, FocusAimStatusEffect, FortifiedStatusEffect, FrenzyStatusEffect, FullMetalJacketStatusEffect, GuardianProtectedStatusEffect, GuardianStatusEffect, IdaiNoHadouStatusEffect, MesmerizingStatusEffect, MobilityBoostStatusEffect, RalliedStatusEffect, RegeneratingStatusEffect, SanctuaryStatusEffect, ShieldWallProtectedStatusEffect, ShieldWallStatusEffect, StrengthBoostStatusEffect, DiamondHookedHoldingStatusEffect, IngeniousUpgradeStatusEffect } from "./StatusEffects.ts/PositiveEffects";
@@ -119,7 +119,7 @@ StatusEffectType {
     // 52
     FRENZY,
     // 53
-    RUPTURE_TENDONS,
+    FORBIDDEN_AFFLICTION,
     // 54
     SANCTUARY,
     // 55
@@ -263,7 +263,7 @@ StatusEffectType {
     [StatusEffectType.SHIELD_WALL_PROTECTED]: new ShieldWallProtectedStatusEffect(),
     [StatusEffectType.ARCANE_SHIELD_WALL]: new ArcaneShieldWallStatusEffect(),
     [StatusEffectType.ARCANE_SHIELD_WALL_PROTECTED]: new ArcaneShieldWallProtectedStatusEffect(),
-    [StatusEffectType.RUPTURE_TENDONS]: new RuptureTendonsStatusEffect(),
+    [StatusEffectType.FORBIDDEN_AFFLICTION]: new ForbiddenAfflictionStatusEffect(),
     [StatusEffectType.SANCTUARY]: new SanctuaryStatusEffect(),
     [StatusEffectType.DIVINE_RETRIBUTION]: new DivineRetributionStatusEffect(),
     [StatusEffectType.DECOY]: new DecoyStatusEffect(),

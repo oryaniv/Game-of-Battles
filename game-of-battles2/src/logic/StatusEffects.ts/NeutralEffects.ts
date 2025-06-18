@@ -265,7 +265,7 @@ export class SurpriseBoomStatusEffect implements StatusEffect {
                 }
                 const result = combatMaster.executeAttack(caster, targetEnemy.position, board, {amount: 20, type: DamageType.Blight});
                 if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
-                    combatMaster.tryInflictStatusEffect(caster, targetEnemy.position, board, StatusEffectType.POISONED, 3, 0.3);
+                    combatMaster.tryInflictStatusEffect(caster, targetEnemy.position, board, StatusEffectType.POISONED, 3, 0.6);
                 }
                 return result;
             });

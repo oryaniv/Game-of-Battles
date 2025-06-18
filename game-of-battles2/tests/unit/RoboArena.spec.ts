@@ -114,15 +114,15 @@ function exampleMatch(matchCount: number) {
     veteranAIAgentNoCoop.setCollectCoop(false);
     const rookieAIAgent = new RookieAIAgent();
 
-    // const team1 = generateRandomTeam(0, veteranAIAgentWithCoop);
-    // const team2 =  generateCombatantIdenticalTeam(team1, 1, veteranAIAgentNoCoop);
-    // team1.name = 'Team Veteran';
-    // team2.name = 'Team Rookie';
+    const team1 = generateRandomTeam(0, veteranAIAgentWithCoop);
+    const team2 =  generateCombatantIdenticalTeam(team1, 1, veteranAIAgentNoCoop);
+    team1.name = 'Team Veteran';
+    team2.name = 'Team Rookie';
 
-    const team1 = generateRandomTeam(0, veteranAIAgentNoCoop);
-    const team2 =  generateCombatantIdenticalTeam(team1, 1, veteranAIAgentWithCoop);
-    team1.name = 'Team Rookie';
-    team2.name = 'Team Veteran';
+    // const team1 = generateRandomTeam(0, veteranAIAgentNoCoop);
+    // const team2 =  generateCombatantIdenticalTeam(team1, 1, veteranAIAgentWithCoop);
+    // team1.name = 'Team Rookie';
+    // team2.name = 'Team Veteran';
 
     
     let board = new Board(10, 10);

@@ -215,7 +215,7 @@ export class BloodRite extends CoopMove {
             return getStandardActionResult(target, 1);
         }
         const sacrificeAmount = targetCombatant.stats.hp;
-        targetCombatant.takeDamage({amount: sacrificeAmount, type: DamageType.Unstoppable});
+        targetCombatant.takeDamage({amount: sacrificeAmount, type: DamageType.Unstoppable}, board);
         const healingResults = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align).map(AOETarget => {
             const combatantToHeal = board.getCombatantAtPosition(AOETarget);
             if(combatantToHeal && combatantToHeal.name !== targetCombatant.name) {

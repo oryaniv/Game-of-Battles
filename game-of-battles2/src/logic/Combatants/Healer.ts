@@ -13,7 +13,7 @@ import { DivineMircale } from "../SpecialMoves/Singular/Passives";
 import { RainOfGrace, Sanctuary } from "../SpecialMoves/Coop/SupportCoop";
 import { QueensWrathMothersLove } from "../SpecialMoves/Coop/OffensiveCoop";
 import { DivineRetribution } from "../SpecialMoves/Coop/DebuffCoop";
-import { HEALTH_INCREASE_AMOUNT, HEALTH_INCREASE_ENABLED, STAMINA_INCREASE_AMOUNT, STAMINA_INCREASE_ENABLED } from "../LogicFlags";
+import { HEALTH_INCREASE_AMOUNT, HEALTH_INCREASE_ENABLED, STAMINA_INCREASE_AMOUNT, STAMINA_INCREASE_ENABLED, STAT_BUFF_INCREASE_ENABLED } from "../LogicFlags";
 
 export class Healer extends Combatant {
     constructor(name: string, position: Position, team: Team) {
@@ -21,8 +21,8 @@ export class Healer extends Combatant {
         name,
         {
           hp: HEALTH_INCREASE_ENABLED ? 50 + HEALTH_INCREASE_AMOUNT : 50,
-          attackPower: 10,
-          defensePower: 15,
+          attackPower: STAT_BUFF_INCREASE_ENABLED ? 40 : 10 ,
+          defensePower: STAT_BUFF_INCREASE_ENABLED ? 70 : 15,
           stamina: STAMINA_INCREASE_ENABLED ? 50 + STAMINA_INCREASE_AMOUNT : 50,
           initiative: 2,
           movementSpeed: 3,

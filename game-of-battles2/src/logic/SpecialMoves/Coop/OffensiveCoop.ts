@@ -42,8 +42,8 @@ export class ShieldBash extends CoopMove {
                 targetCombatant!.move(getPushResult.moveTo, board);
             }
             if(getPushResult.collisionObject) {
-                targetCombatant?.takeDamage({amount: 10, type: DamageType.Crush});
-                getPushResult.collisionObject?.takeDamage({amount: 10, type: DamageType.Crush});
+                targetCombatant?.takeDamage({amount: 10, type: DamageType.Crush}, board);
+                getPushResult.collisionObject?.takeDamage({amount: 10, type: DamageType.Crush}, board);
             }
         }
         return result;
@@ -405,11 +405,11 @@ export class StrikeAsOne extends CoopMove {
     };
 }
 
-export class RuptureTendons extends CoopMove {
-    name: string = "Rupture Tendons";
-    description: string = "Strike your enemies ankles, making every step of their a pain. they lose health for every step they take.";
+export class ForbiddenArt extends CoopMove {
+    name: string = "Forbidden Art";
+    description: string = "medium dark damage, and inflicts forbidden affliction. target takes damage for every step and attack roll.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
-        { combatantTypeOptions: [CombatantType.Rogue, CombatantType.Vanguard, CombatantType.Pikeman] }
+        { combatantTypeOptions: [CombatantType.Rogue, CombatantType.Vanguard, CombatantType.Pikeman, CombatantType.Witch] }
     ];
     damage: Damage = {
         amount: 20,
@@ -421,7 +421,7 @@ export class RuptureTendons extends CoopMove {
         areaOfEffect: SpecialMoveAreaOfEffect.Single,
         range: 1
     };
-    cost: number = coopCostSlash ? 5 : 8;
+    cost: number = coopCostSlash ? 7 : 10;
     turnCost: number = 1;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const targetCombatant = board.getCombatantAtPosition(target);
@@ -430,7 +430,15 @@ export class RuptureTendons extends CoopMove {
         }
         const combatMaster = CombatMaster.getInstance();
         const result = combatMaster.executeAttack(invoker, target, board, this.damage, true, this.turnCost);
-        combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.RUPTURE_TENDONS, 3, 0.9);
+        if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
+            const targetCombatant = board.getCombatantAtPosition(target);
+            if(targetCombatant) {
+                targetCombatant.applyStatusEffect({
+                    name: StatusEffectType.FORBIDDEN_AFFLICTION,
+                    duration: 3,
+                });
+            }
+        }
         return result;
     };
     checkRequirements = (self: Combatant) => {
@@ -484,8 +492,9 @@ export class KarithrasBoon extends CoopMove {
     name: string = "Karithras Boon";
     description: string = "Attack an enemy. if it dies, get buffs according to target health percent lost. double damage while cloaked";
     coopRequiredPartners: CoopPartnerRequirement[] = [
-        { combatantTypeOptions: [CombatantType.Rogue, CombatantType.Witch, CombatantType.Fool, CombatantType.Wizard] },
-        { combatantTypeOptions: [CombatantType.Healer, CombatantType.FistWeaver, CombatantType.StandardBearer] }
+        // { combatantTypeOptions: [CombatantType.Rogue, CombatantType.Witch, CombatantType.Fool, CombatantType.Wizard] },
+        // { combatantTypeOptions: [CombatantType.Healer, CombatantType.FistWeaver, CombatantType.StandardBearer] }
+        { combatantTypeOptions: [CombatantType.Fool, CombatantType.Witch, CombatantType.StandardBearer, CombatantType.Rogue, CombatantType.Vanguard] }
     ];
     damage: Damage = {
         amount: 20,
@@ -497,7 +506,7 @@ export class KarithrasBoon extends CoopMove {
         areaOfEffect: SpecialMoveAreaOfEffect.Single,
         range: 1
     };
-    turnCost: number = 3;
+    turnCost: number = 2;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const boons = [
             (recipient: Combatant) => { 
@@ -580,18 +589,7 @@ export class KarithrasBoon extends CoopMove {
             return boonsShuffled.slice(0, boonAmount);
         }
 
-
         function getBoonAmount(healthPercentage: number) {
-            // if(healthPercentage === 100) {
-            //     return 4;
-            // } else if(healthPercentage >= 60) {
-            //     return 3;
-            // } else if(healthPercentage >= 30) {
-            //     return 2;
-            // } else {
-            //     return 1;
-            // }
-
             if(healthPercentage >= 60) {
                 return 3;
             } else if(healthPercentage >= 30) {
@@ -677,7 +675,7 @@ export class SoulScythe extends CoopMove {
                             ((invoker.stats.luck - targetCombatant.stats.luck) * 0.02);
         const randomNumber = Math.floor(Math.random() * 100);
         if(randomNumber <= chanceToKill) {
-            targetCombatant.takeDamage({amount: targetCombatant.stats.hp, type: DamageType.Unstoppable});
+            targetCombatant.takeDamage({amount: targetCombatant.stats.hp, type: DamageType.Unstoppable}, board);
             if(targetCombatant.isKnockedOut()) {
                 getResultsForStatusEffectHook(invoker, StatusEffectHook.OnKilling, targetCombatant, undefined, 1, board);
             }
@@ -766,10 +764,10 @@ export class CatastrophicCalamity extends CoopMove {
     description: string = "Unleashes the Wizard's full hidden, Forbidden potential in a terrifying blast that no protection can stop, dealing massive damage.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Wizard, CombatantType.Witch, CombatantType.Fool, CombatantType.Artificer] },
-        { combatantTypeOptions: [CombatantType.Vanguard, CombatantType.Pikeman, CombatantType.FistWeaver, CombatantType.StandardBearer] }
+        { combatantTypeOptions: [CombatantType.Vanguard, CombatantType.Pikeman, CombatantType.FistWeaver, CombatantType.StandardBearer, CombatantType.Defender] }
     ];
     damage: Damage = {
-        amount: 90,
+        amount: 100,
         type: DamageType.Unstoppable
     };
     range: SpecialMoveRange = {

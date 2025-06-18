@@ -1,6 +1,6 @@
 import { Combatant } from "../Combatant";
 import { Damage, DamageReaction, DamageType } from "../Damage";
-import { HEALTH_INCREASE_AMOUNT, HEALTH_INCREASE_ENABLED, STAMINA_INCREASE_AMOUNT, STAMINA_INCREASE_ENABLED } from "../LogicFlags";
+import { HEALTH_INCREASE_AMOUNT, HEALTH_INCREASE_ENABLED, STAMINA_INCREASE_AMOUNT, STAMINA_INCREASE_ENABLED, STAT_BUFF_INCREASE_ENABLED } from "../LogicFlags";
 import { Position } from "../Position";
 import { BlowAKiss, CircusDiabolique, StandUpComedyGoneWrong } from "../SpecialMoves/Coop/AilmentCoop";
 import { NastyNastyDolly } from "../SpecialMoves/Coop/SelfCoop";
@@ -16,14 +16,14 @@ export class Fool extends Combatant {
           name,
           {
             hp: HEALTH_INCREASE_ENABLED ? 50 + HEALTH_INCREASE_AMOUNT : 50,
-            attackPower: 1,
-            defensePower: 10,
+            attackPower: STAT_BUFF_INCREASE_ENABLED ? 1 : 1,
+            defensePower: STAT_BUFF_INCREASE_ENABLED ? 40 : 10,
             stamina: STAMINA_INCREASE_ENABLED ? 40 + STAMINA_INCREASE_AMOUNT : 40,
             initiative: 4,
             movementSpeed: 4,
             range: 2,
             agility: 7,
-            luck: 10,
+            luck: STAT_BUFF_INCREASE_ENABLED ? 13 : 10,
           },
           position,
           [

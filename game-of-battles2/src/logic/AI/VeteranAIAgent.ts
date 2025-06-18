@@ -2619,8 +2619,8 @@ class VeteranAIAgentRoguePlayer extends VeteranAIAgentGenericPlayer {
             return this.evaluateBloodRite(combatant, game, board, movePosition, target);
         }
 
-        if(specialMove === "Rupture Tendons") {
-            return this.evaluateRuptureTendons(combatant, game, board, movePosition, target);
+        if(specialMove === "Forbidden Art") {
+            return this.evaluateForbiddenArt(combatant, game, board, movePosition, target);
         }
 
         if(specialMove === "Dance of Daggers") {
@@ -2681,12 +2681,18 @@ class VeteranAIAgentRoguePlayer extends VeteranAIAgentGenericPlayer {
         return normalizeCoopEvaluation(baseValue + moveValue, 2);
     }
 
-    private evaluateRuptureTendons(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
-        let baseValue = this.evaluateBasicAttack(combatant, game, board, movePosition, target, DamageType.Dark);
+    private evaluateForbiddenArt(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        let baseValue = 4;
+        baseValue = this.evaluateBasicAttack(combatant, game, board, movePosition, target, DamageType.Dark);
         if(target) {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, target!, board);
-            baseValue += isTargetLowLuck(targetCombatant) ? 2 : 0;
-            baseValue += targetCombatant.hasStatusEffect(StatusEffectType.RUPTURE_TENDONS) ? -3 : 3;
+            baseValue += targetCombatant.hasStatusEffect(StatusEffectType.FORBIDDEN_AFFLICTION) ? -5 : 0;
+            baseValue += isTargetFast(targetCombatant) ? 4 : 0;
+            baseValue += isHighAttackPower(targetCombatant) ? 3 : 0;
+            baseValue += isVeryHighAttackPower(targetCombatant) ? 3 : 0;
+            baseValue += isPowerCharged(targetCombatant) ? 3 : 0;
+            baseValue += [CombatantType.Wizard, CombatantType.Hunter, CombatantType.Vanguard, CombatantType.Pikeman].includes(targetCombatant.getCombatantType()) ? 5 : 0;
+            baseValue += [CombatantType.Healer, CombatantType.Fool].includes(targetCombatant.getCombatantType()) ? -5 : 0;
         }
         return normalizeCoopEvaluation(baseValue, 2);
     }
@@ -2734,7 +2740,7 @@ class VeteranAIAgentRoguePlayer extends VeteranAIAgentGenericPlayer {
         baseValue += targetCombatant.hasStatusEffect(StatusEffectType.MARKED_FOR_PAIN) ? 6 : 0;
         baseValue += targetCombatant.hasStatusEffect(StatusEffectType.MARKED_FOR_EXECUTION) ? 9 : 0;
         baseValue += targetCombatant.hasStatusEffect(StatusEffectType.MARKED_FOR_OBLIVION) ? 12 : 0;
-        return normalizeCoopEvaluation(baseValue, 3);
+        return normalizeCoopEvaluation(baseValue, 2);
     }
 
     private evaluateShadowStep(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {

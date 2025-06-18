@@ -56,13 +56,13 @@ export class FocusAimStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.FOCUS_AIM;
     applicationHooks =  {
         [StatusEffectHook.OnAttacking]: (self: Combatant) => {
-            self.stats.attackPower += 25;
-            self.stats.agility += 5;
+            self.stats.attackPower += STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 25 : 25;
+            self.stats.agility += STAT_BUFF_INCREASE_ENABLED ? AGILITY_LUCK_INCREASE_AMOUNT + 5 : 5;
         },
         [StatusEffectHook.OnAfterAttacking]: (self: Combatant) => {
             self.removeStatusEffect(StatusEffectType.FOCUS_AIM);
-            self.stats.attackPower -= 25;
-            self.stats.agility -= 5;
+            self.stats.attackPower -= STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 25 : 25;
+            self.stats.agility -= STAT_BUFF_INCREASE_ENABLED ? AGILITY_LUCK_INCREASE_AMOUNT + 5 : 5;
         },
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
@@ -97,10 +97,10 @@ export class FortifiedStatusEffect implements StatusEffect {
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
             caster.removeStatusEffect(StatusEffectType.DEFENSE_DOWNGRADE);
-            caster.stats.defensePower += 20;
+            caster.stats.defensePower += STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 20 : 20;
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
-            caster.stats.defensePower -= 20;
+            caster.stats.defensePower -= STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 20 : 20;
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
@@ -111,10 +111,10 @@ export class StrengthBoostStatusEffect implements StatusEffect {
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
             caster.removeStatusEffect(StatusEffectType.STRENGTH_DOWNGRADE);
-            caster.stats.attackPower += 20;
+            caster.stats.attackPower += STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 20 : 20;
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
-            caster.stats.attackPower -= 20;
+            caster.stats.attackPower -= STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 20 : 20;
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
@@ -126,11 +126,11 @@ export class MobilityBoostStatusEffect implements StatusEffect {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
             caster.removeStatusEffect(StatusEffectType.SLOW);
             caster.stats.movementSpeed += 2;
-            caster.stats.agility += 3;
+            caster.stats.agility += STAT_BUFF_INCREASE_ENABLED ? AGILITY_LUCK_INCREASE_AMOUNT + 3 : 3;
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
             caster.stats.movementSpeed -= 2;
-            caster.stats.agility -= 3;
+            caster.stats.agility -= STAT_BUFF_INCREASE_ENABLED ? AGILITY_LUCK_INCREASE_AMOUNT + 3 : 3;
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
@@ -139,7 +139,7 @@ export class MobilityBoostStatusEffect implements StatusEffect {
 export class EncouragedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.ENCOURAGED;
     applicationHooks = {
-        [StatusEffectHook.OnTurnEnd]: (caster: Combatant, target: Combatant) => {
+        [StatusEffectHook.OnTurnEnd]: (caster: Combatant, target: Combatant, board: Board) => {
             const roll = Math.random();
             const extraActionChance = 0.2 + (caster.stats.luck * 0.02);
             if (roll <= extraActionChance) {
@@ -161,12 +161,12 @@ export class RalliedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.RALLIED;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
-            caster.stats.defensePower += 10;
-            caster.stats.luck += 5;
+            caster.stats.defensePower += STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 10 : 10;
+            caster.stats.luck += STAT_BUFF_INCREASE_ENABLED ? AGILITY_LUCK_INCREASE_AMOUNT + 5 : 5;
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
-            caster.stats.defensePower -= 10;
-            caster.stats.luck -= 5;
+            caster.stats.defensePower -= STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 10 : 10;
+            caster.stats.luck -= STAT_BUFF_INCREASE_ENABLED ? AGILITY_LUCK_INCREASE_AMOUNT + 5 : 5;
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
@@ -234,8 +234,8 @@ export class CloakedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.CLOAKED;  
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
-            caster.stats.attackPower += 25;
-            caster.stats.agility += 5;
+            caster.stats.attackPower += 30;
+            caster.stats.agility += 10;
         },
         [StatusEffectHook.OnDamageTaken]: (caster: Combatant, target: Combatant, damage: Damage) => {
             caster.removeStatusEffect(StatusEffectType.CLOAKED);
@@ -252,12 +252,11 @@ export class CloakedStatusEffect implements StatusEffect {
             }
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
-            caster.stats.attackPower -= 25;
-            caster.stats.agility -= 5;
+            caster.stats.attackPower -= 30;
+            caster.stats.agility -= 10;
 
             const doll = caster.getRelatedCombatants()["doll"];
             if(doll) {
-                // doll.takeDamage({amount: 100, type: DamageType.Unstoppable});
                 doll.stats.hp = 0;
                 caster.removeRelatedCombatant("doll");
             }
@@ -272,16 +271,16 @@ export class FullMetalJacketStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.FULL_METAL_JACKET;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
-            caster.stats.defensePower += 20;
+            caster.stats.defensePower += STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 15 : 20;
             if([DamageType.Crush, DamageType.Pierce, DamageType.Slash].includes(target.basicAttack().type)) {
-                caster.stats.attackPower += 20;
+                caster.stats.attackPower += STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 15 : 20;
             }
             caster.specialMoves.push(new ReplacementPart());
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
-            caster.stats.defensePower -= 20;
+            caster.stats.defensePower -= STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 15 : 20;
             if([DamageType.Crush, DamageType.Pierce, DamageType.Slash].includes(target.basicAttack().type)) {
-                caster.stats.attackPower -= 20;
+                caster.stats.attackPower -= STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 15 : 20;
             }
             caster.specialMoves = caster.specialMoves.filter(move => move.name !== "Replacement Part");
         },
@@ -403,11 +402,11 @@ export class FrenzyStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.FRENZY;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
-            caster.stats.attackPower += 40;
+            caster.stats.attackPower += STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 40 : 40;
             caster.insertAiAgent(new EnragedAIAgent());
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
-            caster.stats.attackPower -= 40;
+            caster.stats.attackPower -= STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 40 : 40;
             caster.removeAiAgent(AIAgentType.ENRAGED);
         },
         [StatusEffectHook.OnDeath]: (caster: Combatant, target: Combatant) => {
@@ -506,8 +505,6 @@ export class GuardianStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.GUARDIAN;
     applicationHooks = {
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
-            // eslint-disable-next-line
-            // debugger;
             const guardianProtected = target.getRelatedCombatants()['GUARDIAN_PROTECTED'];
             if(guardianProtected && !guardianProtected.isKnockedOut()) {
                 guardianProtected.removeStatusEffect(StatusEffectType.GUARDIAN_PROTECTED);
@@ -592,10 +589,10 @@ export class IngeniousUpgradeStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.INGENIOUS_UPGRADE;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
-            caster.stats.attackPower += 20;
+            caster.stats.attackPower += STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 20 : 20;
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
-            caster.stats.attackPower -= 20;
+            caster.stats.attackPower -= STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 20 : 20;
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;

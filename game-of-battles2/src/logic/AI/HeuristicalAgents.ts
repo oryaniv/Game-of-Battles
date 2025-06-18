@@ -81,8 +81,8 @@ function getHeuristicBestPlay(combatant: Combatant, game: Game,
     
     // eslint-disable-next-line
     // debugger;
-    return allActionsEvaluated[0].play;
-    // return randomizedBestPlay(allActionsEvaluated);
+    // return allActionsEvaluated[0].play;
+    return randomizedBestPlay(allActionsEvaluated);
 }
 
 function randomizedBestPlay(allActionsEvaluated: RankedTurnPlay[]): TurnPlay {

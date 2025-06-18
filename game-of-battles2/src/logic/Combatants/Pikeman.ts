@@ -8,7 +8,7 @@ import { GapingStab, HaftStrike, Skewer } from "../SpecialMoves/Singular/Offensi
 import { FirstStrike } from "../SpecialMoves/Singular/Passives";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
-import { HEALTH_INCREASE_AMOUNT, HEALTH_INCREASE_ENABLED, STAMINA_INCREASE_AMOUNT, STAMINA_INCREASE_ENABLED } from "../LogicFlags";
+import { HEALTH_INCREASE_AMOUNT, HEALTH_INCREASE_ENABLED, STAMINA_INCREASE_AMOUNT, STAMINA_INCREASE_ENABLED, STAT_BUFF_INCREASE_ENABLED } from "../LogicFlags";
 
 export class Pikeman extends Combatant {
     constructor(name: string, position: Position, team: Team) {
@@ -16,8 +16,8 @@ export class Pikeman extends Combatant {
         name,
         {
           hp: HEALTH_INCREASE_ENABLED ? 70 + HEALTH_INCREASE_AMOUNT : 70,
-          attackPower: 20,
-          defensePower: 20,
+          attackPower: STAT_BUFF_INCREASE_ENABLED ? 70 : 20,
+          defensePower: STAT_BUFF_INCREASE_ENABLED ? 70 : 20,
           stamina: STAMINA_INCREASE_ENABLED ? 25 + STAMINA_INCREASE_AMOUNT : 25,
           initiative: 3,
           movementSpeed: 3,

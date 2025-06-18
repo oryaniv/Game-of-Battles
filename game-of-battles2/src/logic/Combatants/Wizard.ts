@@ -12,7 +12,7 @@ import { ArcaneChanneling } from "../SpecialMoves/Singular/Self";
 import { ArcaneBarrier, ArcaneOvercharge, Teleportation } from "../SpecialMoves/Coop/SelfCoop";
 import { CatastrophicCalamity } from "../SpecialMoves/Coop/OffensiveCoop";
 import { ArcaneConduit } from "../SpecialMoves/Coop/SupportCoop";
-import { HEALTH_INCREASE_AMOUNT, HEALTH_INCREASE_ENABLED, STAMINA_INCREASE_AMOUNT, STAMINA_INCREASE_ENABLED } from "../LogicFlags";
+import { HEALTH_INCREASE_AMOUNT, HEALTH_INCREASE_ENABLED, STAMINA_INCREASE_AMOUNT, STAMINA_INCREASE_ENABLED, STAT_BUFF_INCREASE_ENABLED } from "../LogicFlags";
 
 export class Wizard extends Combatant {
     constructor(name: string, position: Position, team: Team) {
@@ -20,8 +20,8 @@ export class Wizard extends Combatant {
         name,
         {
           hp: HEALTH_INCREASE_ENABLED ? 40 + HEALTH_INCREASE_AMOUNT : 40,
-          attackPower: 20,
-          defensePower: 20,
+          attackPower: STAT_BUFF_INCREASE_ENABLED ? 85 : 20,
+          defensePower: STAT_BUFF_INCREASE_ENABLED ? 55 : 20,
           stamina: STAMINA_INCREASE_ENABLED ? 60 + STAMINA_INCREASE_AMOUNT : 60,
           initiative: 2,
           movementSpeed: 3,

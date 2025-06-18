@@ -3,7 +3,7 @@
   <div class="game-container">
     <div class="message">{{ turnMessage }}</div>
     <div class="round-count">Round: {{ roundCount }}</div>
-
+    <div class="board-frame">
     <div class="board">
       <div class="board-background">
       </div>
@@ -100,6 +100,8 @@
         </div>
       </div>
     </div>
+ </div>
+    
 
     <!-- Actions Remaining indicator -->
     <div v-if="actionsRemaining > 0" class="actions">
@@ -349,11 +351,11 @@ export default defineComponent({
     const blackTeam = ref(new Team('Black Team', 1, veternAIAgentWithCoop));
 
     // whiteTeam.value.addCombatant(new Defender('aobo', { x: 3, y: 5}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Rogue('bobo', { x: 6, y: 7}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Fool('cobo', { x: 6, y: 1}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new StandardBearer('dobo', { x: 5, y: 1}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Defender('eobo', { x: 4, y: 0}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Wizard('tnguobo', { x: 3, y: 0}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Wizard('bobo', { x: 7, y: 0}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Wizard('cobo', { x: 6, y: 0}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Wizard('dobo', { x: 5, y: 1}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Wizard('eobo', { x: 4, y: 0}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new StandardBearer('tnguobo', { x: 6, y: 0}, whiteTeam.value));
     // whiteTeam.value.addCombatant(new BabyBabel('Gobo', { x: 5, y: 1}, whiteTeam.value));
     // whiteTeam.value.addCombatant(new BallistaTurret('Gobo', { x: 6, y: 1}, whiteTeam.value));
     // whiteTeam.value.addCombatant(new Wall('Gobo', { x: 5, y: 3}, whiteTeam.value));
@@ -362,11 +364,11 @@ export default defineComponent({
     // whiteTeam.value.addCombatant(new Vanguard('Gobo', { x: 1, y: 8 }, whiteTeam.value));
     // whiteTeam.value.addCombatant(new Witch('eobo', { x: 4, y: 4 }, whiteTeam.value));
 
-    blackTeam.value.addCombatant(new Vanguard('tobo', { x: 7, y: 7 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Hunter('dog', { x: 6, y: 3 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Pikeman('rob', { x: 6, y: 7 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new StandardBearer('nana', { x: 5, y: 7 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Wizard('fefw', { x: 9, y: 9 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Vanguard('tobo', { x: 7, y: 1 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Hunter('dog', { x: 6, y: 3 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Pikeman('rob', { x: 6, y: 7 }, blackTeam.value));
+    blackTeam.value.addCombatant(new FistWeaver('nana', { x: 5, y: 7 }, blackTeam.value));
+    blackTeam.value.addCombatant(new StandardBearer('fefw', { x: 9, y: 9 }, blackTeam.value));
     // blackTeam.value.addCombatant(new Witch('nana', { x: 7, y: 9 }, blackTeam.value));
     // blackTeam.value.addCombatant(new Hunter('reqe', { x: 6, y: 9 }, blackTeam.value));
     // blackTeam.value.addCombatant(new Gorilla('feifne', { x: 5, y: 8 }, blackTeam.value));
@@ -380,15 +382,15 @@ export default defineComponent({
     // whiteTeam.value.combatants[1].stats.stamina = 0;
     // whiteTeam.value.combatants[2].stats.stamina = 0;
     // whiteTeam.value.combatants[3].stats.stamina = 0;
-    blackTeam.value.combatants[0].applyStatusEffect({
-            name: StatusEffectType.SLEEPING,
-            duration: 5,
-    }); 
+    // blackTeam.value.combatants[0].applyStatusEffect({
+    //         name: StatusEffectType.SLEEPING,
+    //         duration: 5,
+    // }); 
 
       // theATeam(whiteTeam.value);
       // theBTeam(blackTeam.value);
 
-   //  placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
+   placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
     
 
     const teams = ref([whiteTeam.value, blackTeam.value]);
@@ -1090,7 +1092,7 @@ export default defineComponent({
       [StatusEffectType.CHARMED]: "CHM",
       [StatusEffectType.CIRCUS_DIABOLIQUE]: "CQ",
       [StatusEffectType.NIGHTMARE_LOCKED]: "NQ",
-      [StatusEffectType.RUPTURE_TENDONS]: "RTN",
+      [StatusEffectType.FORBIDDEN_AFFLICTION]: "FA",
       [StatusEffectType.DIVINE_RETRIBUTION]: "DR",
       [StatusEffectType.SANCTUARY]: "SC",
       [StatusEffectType.IDAI_NO_HADOU]: "INH",
@@ -1524,13 +1526,26 @@ button {
   display: flex;
 }
 
+.board-frame {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding: 20px;
+    z-index: 0;
+    background-image: url('./assets/Frames/testFrame.png');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
 .board-background {
   display: flex;
   width: 100%;
   height: 100%;
   /* background-image: url('./assets/Backgrounds/simpleLand6.png'); */
   /* background-image: url('./assets/Backgrounds/simpleLand5.png'); */
-  background-image: url('./assets/Backgrounds/temple2.png');
+  background-image: url('./assets/Backgrounds/simpleLand5.png');
+  background-size: contain;
   /* background-color: red; */
   position: absolute;
   z-index: -1;

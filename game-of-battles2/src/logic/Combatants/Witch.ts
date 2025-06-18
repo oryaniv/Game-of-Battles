@@ -12,7 +12,7 @@ import { EvilEye, SiphonEnergy, Slow, Weaken } from "../SpecialMoves/Singular/De
 import { LifeDrinker } from "../SpecialMoves/Singular/Passives";
 import { DevourDivinity, UltimateCurse } from "../SpecialMoves/Coop/DebuffCoop";
 import { HungerOfZirash, SoulScythe } from "../SpecialMoves/Coop/OffensiveCoop";
-import { HEALTH_INCREASE_AMOUNT, HEALTH_INCREASE_ENABLED, STAMINA_INCREASE_AMOUNT, STAMINA_INCREASE_ENABLED } from "../LogicFlags";
+import { HEALTH_INCREASE_AMOUNT, HEALTH_INCREASE_ENABLED, STAMINA_INCREASE_AMOUNT, STAMINA_INCREASE_ENABLED, STAT_BUFF_INCREASE_ENABLED } from "../LogicFlags";
 
 export class Witch extends Combatant {
     constructor(name: string, position: Position, team: Team) {
@@ -20,8 +20,8 @@ export class Witch extends Combatant {
         name,
         {
           hp: HEALTH_INCREASE_ENABLED ? 55 + HEALTH_INCREASE_AMOUNT : 55,
-          attackPower: 15,
-          defensePower: 10,
+          attackPower: STAT_BUFF_INCREASE_ENABLED ? 75 : 15,
+          defensePower: STAT_BUFF_INCREASE_ENABLED ? 50  : 10,
           stamina: STAMINA_INCREASE_ENABLED ? 40 + STAMINA_INCREASE_AMOUNT : 40,
           initiative: 3,
           movementSpeed: 3,
