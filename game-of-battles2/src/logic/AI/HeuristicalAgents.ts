@@ -80,7 +80,7 @@ function getHeuristicBestPlay(combatant: Combatant, game: Game,
     allActionsEvaluated.sort((a, b) => b.score - a.score);
     
     // eslint-disable-next-line
-    debugger;
+    // debugger;
     return allActionsEvaluated[0].play;
     // return randomizedBestPlay(allActionsEvaluated);
 }
@@ -453,6 +453,12 @@ export function getAllEnemies(combatant: Combatant, board: Board, game: Game): C
 export function getNearbyEnemies(combatant: Combatant, board: Board, game: Game): Combatant[] {
     return getAllEnemies(combatant, board, game).filter(enemy => 
         board.getDistanceBetweenPositions(combatant.position, enemy.position) <= 5
+    );
+}
+
+export function getAdjacentEnemies(combatant: Combatant, board: Board, game: Game): Combatant[] {
+    return getAllEnemies(combatant, board, game).filter(enemy => 
+        board.getDistanceBetweenPositions(combatant.position, enemy.position) <= 1
     );
 }
 

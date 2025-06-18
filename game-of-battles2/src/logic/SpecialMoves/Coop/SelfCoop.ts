@@ -20,6 +20,7 @@ export class IdaiNoHadou extends CoopMove {
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.FistWeaver, CombatantType.Vanguard, CombatantType.Defender] },
         { combatantTypeOptions: [CombatantType.Healer, CombatantType.StandardBearer, CombatantType.Fool] }
+        // { combatantTypeOptions: [CombatantType.Healer, CombatantType.StandardBearer, CombatantType.Defender, CombatantType.FistWeaver] }
     ];
     cost: number = coopCostSlash ? 8 : 12;
     meterCost: number = 0;
@@ -29,7 +30,7 @@ export class IdaiNoHadou extends CoopMove {
             duration: 3,
         }); 
         invoker.stats.hp = Math.min(invoker.stats.hp + 20, invoker.baseStats.hp);
-        invoker.stats.stamina = Math.min(invoker.stats.stamina + 10, invoker.baseStats.stamina);
+        invoker.stats.stamina = Math.min(invoker.stats.stamina + 18, invoker.baseStats.stamina);
         const negativeStatusEffects: StatusEffect[] = invoker.getStatusEffects().filter(status => status.alignment === StatusEffectAlignment.Negative);
         for(const statusEffect of negativeStatusEffects) {
             invoker?.removeStatusEffect(statusEffect.name);

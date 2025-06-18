@@ -9,6 +9,8 @@ import { Sadist } from "../SpecialMoves/Singular/Passives";
 import { ShadowStep } from "../SpecialMoves/Singular/Self";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
+import { SleepingDart } from "../SpecialMoves/Coop/AilmentCoop";
+import { HEALTH_INCREASE_AMOUNT, HEALTH_INCREASE_ENABLED, STAMINA_INCREASE_AMOUNT, STAMINA_INCREASE_ENABLED } from "../LogicFlags";
 
 
 export class Rogue extends Combatant {
@@ -16,10 +18,10 @@ export class Rogue extends Combatant {
         super(
           name,
           {
-            hp: 50,
+            hp: HEALTH_INCREASE_ENABLED ? 50 + HEALTH_INCREASE_AMOUNT : 50,
             attackPower: 25,
             defensePower: 15,
-            stamina: 30,
+            stamina: STAMINA_INCREASE_ENABLED ? 30 + STAMINA_INCREASE_AMOUNT : 30,
             initiative: 7,
             movementSpeed: 4,
             range: 1,
@@ -47,8 +49,11 @@ export class Rogue extends Combatant {
 
             // supers
             new BloodRite(),
+            // new AllayunOverdose(),
             new RuptureTendons(),
+            new SleepingDart(),
             new DanceOfDaggers(),
+            // new ForbiddenArt(),
             new KarithrasBoon(),
           ], team
         );

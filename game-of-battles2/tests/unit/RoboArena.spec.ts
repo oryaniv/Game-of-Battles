@@ -114,17 +114,15 @@ function exampleMatch(matchCount: number) {
     veteranAIAgentNoCoop.setCollectCoop(false);
     const rookieAIAgent = new RookieAIAgent();
 
-    const team1 = generateRandomTeam(0, veteranAIAgentWithCoop);
-    const team2 =  generateCombatantIdenticalTeam(team1, 1, rookieAIAgent);
-    team1.name = 'Team Veteran';
-    team2.name = 'Team Rookie';
+    // const team1 = generateRandomTeam(0, veteranAIAgentWithCoop);
+    // const team2 =  generateCombatantIdenticalTeam(team1, 1, veteranAIAgentNoCoop);
+    // team1.name = 'Team Veteran';
+    // team2.name = 'Team Rookie';
 
-    // const team1 = generateRandomTeam(0, veteranAIAgentNoCoop);
-    // const team2 =  generateCombatantIdenticalTeam(team1, 1, veteranAIAgentWithCoop);
-    // team1.name = 'Team Rookie';
-    // team2.name = 'Team Veteran';
-
-    
+    const team1 = generateRandomTeam(0, veteranAIAgentNoCoop);
+    const team2 =  generateCombatantIdenticalTeam(team1, 1, veteranAIAgentWithCoop);
+    team1.name = 'Team Rookie';
+    team2.name = 'Team Veteran';
 
     
     let board = new Board(10, 10);
@@ -179,14 +177,15 @@ function combatantBalancingMatch(team1: Team, team2: Team, matchCount: number): 
         while(!game.isGameOver()) {
             const currentCombatant = game.getCurrentCombatant();
             const enemyteamHpStartTurn = game.teams[1 - currentCombatant.team.getIndex()].getAliveCombatants().reduce((acc, combatant) => acc + combatant.stats.hp, 0);
-            
-            
             currentCombatant.getAiAgent()?.playTurn(currentCombatant, game, board);
+
+            if(!currentCombatant.isExpendable()) {
+                const enemyteamHpEndTurn = game.teams[1 - currentCombatant.team.getIndex()].getAliveCombatants().reduce((acc, combatant) => acc + combatant.stats.hp, 0);
+                const damageDone = enemyteamHpStartTurn - enemyteamHpEndTurn;
+                const currentStat = getCombatantStats(currentCombatant.name, allCombatantStats);
+                currentStat.damageDone = damageDone;
+            }
             
-            const enemyteamHpEndTurn = game.teams[1 - currentCombatant.team.getIndex()].getAliveCombatants().reduce((acc, combatant) => acc + combatant.stats.hp, 0);
-            const damageDone = enemyteamHpStartTurn - enemyteamHpEndTurn;
-            const currentStat = getCombatantStats(currentCombatant.name, allCombatantStats);
-            currentStat.damageDone = damageDone;
             game.nextTurn();
 
             if(game.getRoundCount() > 40) {
@@ -196,7 +195,8 @@ function combatantBalancingMatch(team1: Team, team2: Team, matchCount: number): 
             const deadCombatants = board.getAllCombatants().filter((combatant) => combatant.stats.hp <= 0);
             deadCombatants.forEach((combatant) => {
                 // update the dead combatant's stats
-                if(combatant.name.endsWith('_doll')) {
+                if(combatant.isExpendable()) {
+                    board.removeCombatant(combatant);
                     return;
                 }
                 const deadStat = getCombatantStats(combatant.name, allCombatantStats);
@@ -204,8 +204,11 @@ function combatantBalancingMatch(team1: Team, team2: Team, matchCount: number): 
                 deadStat.finalStamina = combatant.stats.stamina;
                 deadStat.survivalRounds = game.getRoundCount();
                 // update the current combatant's kills
-                const currentStat = getCombatantStats(currentCombatant.name, allCombatantStats);
-                currentStat.kills++;
+                if(!currentCombatant.isExpendable()) {
+                    const currentStat = getCombatantStats(currentCombatant.name, allCombatantStats);
+                    currentStat.kills++;
+                }
+
                 board.removeCombatant(combatant);
             });
         }
@@ -222,7 +225,7 @@ function combatantBalancingMatch(team1: Team, team2: Team, matchCount: number): 
     }
     console.log(`match ${matchCount} winning team is ${winner?.getName()}`);
 
-    winner.getAliveCombatants().forEach((combatant) => {
+    winner.getAliveCombatants().filter((combatant) => !combatant.isExpendable()).forEach((combatant) => {
         const stat = getCombatantStats(combatant.name, allCombatantStats);
         stat.survivalRounds = game.getRoundCount();
         stat.finalHp = combatant.stats.hp;

@@ -1,5 +1,6 @@
 import { Combatant } from "../Combatant";
 import { Damage, DamageReaction, DamageType } from "../Damage";
+import { HEALTH_INCREASE_AMOUNT, HEALTH_INCREASE_ENABLED, STAMINA_INCREASE_AMOUNT, STAMINA_INCREASE_ENABLED } from "../LogicFlags";
 import { Position } from "../Position";
 import { BlowAKiss, CircusDiabolique, StandUpComedyGoneWrong } from "../SpecialMoves/Coop/AilmentCoop";
 import { NastyNastyDolly } from "../SpecialMoves/Coop/SelfCoop";
@@ -14,10 +15,10 @@ export class Fool extends Combatant {
         super(
           name,
           {
-            hp: 50,
+            hp: HEALTH_INCREASE_ENABLED ? 50 + HEALTH_INCREASE_AMOUNT : 50,
             attackPower: 1,
             defensePower: 10,
-            stamina: 40,
+            stamina: STAMINA_INCREASE_ENABLED ? 40 + STAMINA_INCREASE_AMOUNT : 40,
             initiative: 4,
             movementSpeed: 4,
             range: 2,
@@ -99,6 +100,18 @@ export class Doll extends Combatant {
 
   getCombatantType(): CombatantType {
     return CombatantType.Doll;
+  }
+
+  isExpendable(): boolean {
+    return true;
+  }
+
+  isConstruct(): boolean {
+    return true;
+  }
+
+  isOrganic(): boolean {
+    return false;
   }
 
   basicAttack(): Damage {

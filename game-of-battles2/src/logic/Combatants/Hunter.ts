@@ -6,17 +6,17 @@ import { PinDown, Ricochet, ToxicArrow } from "../SpecialMoves/Singular/Offensiv
 import { FocusAim } from "../SpecialMoves/Singular/Self";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
-
+import { HEALTH_INCREASE_AMOUNT, HEALTH_INCREASE_ENABLED, STAMINA_INCREASE_AMOUNT, STAMINA_INCREASE_ENABLED } from "../LogicFlags";
 
 export class Hunter extends Combatant {
     constructor(name: string, position: Position, team: Team) {
         super(
           name,
-          {
-            hp: 60,
+          { 
+            hp: HEALTH_INCREASE_ENABLED ? 60 + HEALTH_INCREASE_AMOUNT : 60,
             attackPower: 25,
             defensePower: 10,
-            stamina: 30,
+            stamina: STAMINA_INCREASE_ENABLED ? 30 + STAMINA_INCREASE_AMOUNT : 30,
             initiative: 5,
             movementSpeed: 3,
             range: 8,

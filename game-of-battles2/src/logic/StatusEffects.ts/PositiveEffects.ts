@@ -11,6 +11,7 @@ import { EnragedAIAgent } from "../AI/StatusAIAgent";
 import { AIAgentType } from "../AI/AIAgent";
 import { Doll } from "../Combatants/Fool";
 import { ReplacementPart } from "../SpecialMoves/Singular/Self";
+import {STAT_BUFF_INCREASE_ENABLED, ATTACK_DEFENSE_INCREASE_AMOUNT, AGILITY_LUCK_INCREASE_AMOUNT} from "../LogicFlags";
 
 export class BlockingStanceStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.BLOCKING_STANCE;
@@ -222,7 +223,7 @@ export class CircusDiaboliqueStatusEffect implements StatusEffect {
             getAllTargets.filter(AOETarget => board.getCombatantAtPosition(AOETarget) !== null)
                          .filter(AOETarget => board.getCombatantAtPosition(AOETarget)?.team.getName() !== self.team.getName())
                          .forEach(AOETarget => {
-                combatMaster.tryInflictStatusEffect(self, AOETarget, board, StatusEffectType.PANICKED, 1, 0.6);
+                combatMaster.tryInflictStatusEffect(self, AOETarget, board, StatusEffectType.NIGHTMARE_LOCKED, 2, 0.6);
             });
         } 
     };
@@ -258,6 +259,7 @@ export class CloakedStatusEffect implements StatusEffect {
             if(doll) {
                 // doll.takeDamage({amount: 100, type: DamageType.Unstoppable});
                 doll.stats.hp = 0;
+                caster.removeRelatedCombatant("doll");
             }
         }
         

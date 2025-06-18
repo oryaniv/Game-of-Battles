@@ -141,3 +141,37 @@ export class CircusDiabolique extends CoopMove {
     };
     turnCost: number = 3;
 }
+
+export class SleepingDart extends CoopMove {
+    name: string = "Sleeping Dart";
+    description: string = "High chance to inflict sleep for 2 turns. does not break cloaking";
+    coopRequiredPartners: CoopPartnerRequirement[] = [
+        { combatantTypeOptions: [CombatantType.Fool, CombatantType.Artificer, CombatantType.Rogue] }
+    ];
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Unstoppable
+    };
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Straight,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 3
+    };
+    cost: number = coopCostSlash ? 6 : 10;
+    meterCost: number = 0;
+    effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
+        const combatMaster = CombatMaster.getInstance();
+        const targetCombatant = board.getCombatantAtPosition(target);
+        if(!targetCombatant) {
+            return getStandardActionResult(invoker.position, this.turnCost);
+        }
+        combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.SLEEPING, 2, 0.9);
+        return getStandardActionResult(invoker.position, this.turnCost);
+    };
+    checkRequirements = (self: Combatant) => {
+        return this.checkCoopRequirements(self);
+    };
+    breaksCloaking: boolean = false;
+    turnCost: number = 1;
+}

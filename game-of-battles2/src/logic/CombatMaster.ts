@@ -37,6 +37,11 @@ export class CombatMaster {
             throw new Error("No target found");
           }
         }
+
+        // target is already dead, no need to execute this
+        if(target.stats.hp <= 0) {
+          return getStandardActionResult(position, turnCost);
+        }
       
         getResultsForStatusEffectHook(attacker, StatusEffectHook.OnAttacking);
 
@@ -70,7 +75,7 @@ export class CombatMaster {
           };
         }
 
-        const attackResult = this.calculateAttackRoll(attacker, target);
+        const attackResult = this.calculateAttackRoll(attacker, target, board);
         if(attackResult === AttackResult.Hit || attackResult === AttackResult.CriticalHit){
             const baseDamage = this.calcaulateBaseDamage(attacker, target, damage);
             const actionResult = this.finalizeDamage(target, baseDamage, attackResult, position, turnCost);
@@ -176,7 +181,11 @@ export class CombatMaster {
         };
     }
 
-      calculateAttackRoll(attacker: Combatant, target: Combatant): AttackResult {
+      calculateAttackRoll(attacker: Combatant, target: Combatant, board: Board): AttackResult {
+        if(target.hasStatusEffect(StatusEffectType.SLEEPING) && board.getDistanceBetweenPositions(attacker.position, target.position) <= 1) {
+          return AttackResult.CriticalHit;
+        }
+
         const attackRoll = ((attacker.stats.agility - target.stats.agility) * 2) + Math.floor(Math.random() * 100) + 1;
   
         if(attackRoll < 5) {

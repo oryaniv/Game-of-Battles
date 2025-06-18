@@ -168,9 +168,9 @@ export class GoingOffStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.GOING_OFF;
     applicationHooks = {
         [StatusEffectHook.OnDeath]: (caster: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
-            const combatMaster = CombatMaster.getInstance();
             // eslint-disable-next-line
-            debugger;
+            // debugger;
+            const combatMaster = CombatMaster.getInstance();
             const getAllTargets = board.getAreaOfEffectPositions(caster, caster.position, SpecialMoveAreaOfEffect.Nova, SpecialMoveAlignment.All);
             getAllTargets.forEach((targetPosition) => {
                 const targetEnemy = board.getCombatantAtPosition(targetPosition);
@@ -243,7 +243,6 @@ export class DecoyStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.DECOY;
     applicationHooks = {
         [StatusEffectHook.OnDeath]: (caster: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
-            const team = caster.team;
             const realTarget = caster.getRelatedCombatants()["doll_owner"];
             if(realTarget) {
                 realTarget.removeStatusEffect(StatusEffectType.CLOAKED);

@@ -13,16 +13,17 @@ import { DivineMircale } from "../SpecialMoves/Singular/Passives";
 import { RainOfGrace, Sanctuary } from "../SpecialMoves/Coop/SupportCoop";
 import { QueensWrathMothersLove } from "../SpecialMoves/Coop/OffensiveCoop";
 import { DivineRetribution } from "../SpecialMoves/Coop/DebuffCoop";
+import { HEALTH_INCREASE_AMOUNT, HEALTH_INCREASE_ENABLED, STAMINA_INCREASE_AMOUNT, STAMINA_INCREASE_ENABLED } from "../LogicFlags";
 
 export class Healer extends Combatant {
     constructor(name: string, position: Position, team: Team) {
       super(
         name,
         {
-          hp: 50,
+          hp: HEALTH_INCREASE_ENABLED ? 50 + HEALTH_INCREASE_AMOUNT : 50,
           attackPower: 10,
           defensePower: 15,
-          stamina: 50,
+          stamina: STAMINA_INCREASE_ENABLED ? 50 + STAMINA_INCREASE_AMOUNT : 50,
           initiative: 2,
           movementSpeed: 3,
           range: 1,

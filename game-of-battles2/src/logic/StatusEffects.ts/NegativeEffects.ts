@@ -304,7 +304,7 @@ export class NightmareLockedStatusEffect implements StatusEffect {
             caster.removeAiAgent(AIAgentType.STUNLOCKED);
         },
         [StatusEffectHook.OnTurnStart]: (caster: Combatant) => {
-            caster.takeDamage({amount: 10, type: DamageType.Blight});
+            caster.takeDamage({amount: 10, type: DamageType.Dark});
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
@@ -569,6 +569,32 @@ export class DiamondHookedStatusEffect implements StatusEffect {
             if(holder) {
                 holder.removeStatusEffect(StatusEffectType.DIAMOND_HOOKED_HOLDING);
                 holder.removeRelatedCombatant('DIAMOND_HOOKED_HOLDING');
+            }
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Negative;
+}
+
+export class SleepingStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.SLEEPING;
+    applicationHooks = {
+        [StatusEffectHook.OnApply]: (self: Combatant) => {
+            if(!self.isOrganic()) {
+                self.removeStatusEffect(StatusEffectType.PANICKED);
+                return;
+            }
+            self.insertAiAgent(new StunLockedAIAgent('Sleeping'));
+        },
+        [StatusEffectHook.OnRemove]: (self: Combatant) => {
+            if(!self.isOrganic()) {
+                return;
+            }
+            self.removeAiAgent(AIAgentType.STUNLOCKED);
+        },
+        [StatusEffectHook.OnDamageTaken]: (self: Combatant, target: Combatant, damage: Damage) => {
+
+            if(damage.amount > 0) {
+                self.removeStatusEffect(StatusEffectType.SLEEPING);
             }
         }
     };

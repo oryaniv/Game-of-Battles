@@ -1,5 +1,6 @@
 import { Combatant } from "../Combatant";
 import { Damage, DamageReaction, DamageType } from "../Damage";
+import { HEALTH_INCREASE_AMOUNT, HEALTH_INCREASE_ENABLED } from "../LogicFlags";
 import { Position } from "../Position";
 import { FlameCannon, IceCannon, ThunderDome, ArcBolt, SharpenalShell, ScorpionBolt, TeleportBlast } from "../SpecialMoves/Singular/Offensive";
 import { GoOff } from "../SpecialMoves/Singular/Passives";
@@ -12,7 +13,7 @@ export class Wall extends Combatant {
       super(
         name,
         {
-          hp: 50,
+          hp: HEALTH_INCREASE_ENABLED ? 50 + (HEALTH_INCREASE_AMOUNT / 2) : 50,
           attackPower: 0,
           defensePower: 20,
           stamina: 1,
@@ -123,7 +124,7 @@ export class BabyBabel extends Combatant {
     super(
       name,
       {
-        hp: 100,
+        hp: HEALTH_INCREASE_ENABLED ? 100 + HEALTH_INCREASE_AMOUNT : 100,
         attackPower: 20,
         defensePower: 20,
         stamina: 100,
@@ -180,7 +181,7 @@ export class BallistaTurret extends Combatant {
     super(
       name,
       {
-        hp: 65,
+        hp: HEALTH_INCREASE_ENABLED ? 65 + (HEALTH_INCREASE_AMOUNT / 2) : 65,
         attackPower: 30,
         defensePower: 15,
         stamina: 30,

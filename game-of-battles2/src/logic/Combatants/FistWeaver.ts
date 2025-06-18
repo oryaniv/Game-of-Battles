@@ -1,5 +1,6 @@
 import { Combatant } from "../Combatant";
 import { Damage, DamageReaction, DamageType } from "../Damage";
+import { HEALTH_INCREASE_AMOUNT, HEALTH_INCREASE_ENABLED, STAMINA_INCREASE_AMOUNT, STAMINA_INCREASE_ENABLED } from "../LogicFlags";
 import { Position } from "../Position";
 import { LightningKicks, MoonBeam } from "../SpecialMoves/Coop/OffensiveCoop";
 import { IdaiNoHadou } from "../SpecialMoves/Coop/SelfCoop";
@@ -15,10 +16,10 @@ export class FistWeaver extends Combatant {
       super(
         name,
         {
-          hp: 75,
+          hp: HEALTH_INCREASE_ENABLED ? 75 + HEALTH_INCREASE_AMOUNT : 75,
           attackPower: 25,
           defensePower: 15,
-          stamina: 35,
+          stamina: STAMINA_INCREASE_ENABLED ? 35 + STAMINA_INCREASE_AMOUNT : 35,
           initiative: 5,
           movementSpeed: 4,
           range: 1,

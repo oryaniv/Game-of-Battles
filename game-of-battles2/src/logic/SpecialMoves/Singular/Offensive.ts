@@ -239,7 +239,7 @@ export class FireBall implements SpecialMove {
         const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
         const fireBallResults = getAllTargets.map(AOETarget => {
             const result = combatMaster.executeAttack(invoker, AOETarget, board, damage, true);
-            if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
+            if(hasOvercharge && (result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit)) {
                 CombatMaster.getInstance().tryInflictStatusEffect(invoker, AOETarget, board, StatusEffectType.BURNING, 1, 0.6);
             }
             return result;
@@ -286,6 +286,8 @@ export class ChainLightning implements SpecialMove {
             chainLightningResults.push(result);
             if(result.attackResult === AttackResult.Miss || result.attackResult === AttackResult.Fumble || result.attackResult === AttackResult.Blocked) {
                 break;
+            } else if(hasOvercharge && (result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit)) {
+                CombatMaster.getInstance().tryInflictStatusEffect(invoker, currentTarget, board, StatusEffectType.STAGGERED, 1, 0.6);
             }
         }
         return chainLightningResults;

@@ -325,6 +325,7 @@ export class Game {
       return this.skillRecords;
     }
 
+
     private getSkillNameForRecord(skill: SpecialMove): string {
       if(skill instanceof CoopMove) { 
         const coopMove = skill as CoopMove;

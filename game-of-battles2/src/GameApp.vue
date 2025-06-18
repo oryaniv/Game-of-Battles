@@ -3,8 +3,10 @@
   <div class="game-container">
     <div class="message">{{ turnMessage }}</div>
     <div class="round-count">Round: {{ roundCount }}</div>
-    
+
     <div class="board">
+      <div class="board-background">
+      </div>
       <div
         v-for="y in 10"
         :key="y"
@@ -29,6 +31,7 @@
           <!-- <div class="coordinates" style="font-size: 24px;">{{x -1}},{{y - 1}}</div> -->
           <div
             v-if="getCombatant({ x , y})"
+            :class="{ dead: getCombatant({ x, y })?.stats.hp <= 0 }"
             class="combatant"
             :style="{ 
               color: teamColors[getCombatant({ x, y }).team.getIndex() === 0 ? 0 : 1],
@@ -342,30 +345,29 @@ export default defineComponent({
     const veternAIAgentNoCoop = new VeteranAIAgent();
     veternAIAgentNoCoop.setCollectCoop(false);
     const rookieAIAgent = new RookieAIAgent();
-    const whiteTeam = ref(new Team('White Team', 0, veternAIAgentWithCoop));
+    const whiteTeam = ref(new Team('White Team', 0));
     const blackTeam = ref(new Team('Black Team', 1, veternAIAgentWithCoop));
 
     // whiteTeam.value.addCombatant(new Defender('aobo', { x: 3, y: 5}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Artificer('bobo', { x: 7, y: 0}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Wizard('cobo', { x: 6, y: 0}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Hunter('dobo', { x: 5, y: 0}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new FistWeaver('eobo', { x: 4, y: 0}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Pikeman('tnguobo', { x: 3, y: 0}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Rogue('bobo', { x: 6, y: 7}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Fool('cobo', { x: 6, y: 1}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new StandardBearer('dobo', { x: 5, y: 1}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Defender('eobo', { x: 4, y: 0}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Wizard('tnguobo', { x: 3, y: 0}, whiteTeam.value));
     // whiteTeam.value.addCombatant(new BabyBabel('Gobo', { x: 5, y: 1}, whiteTeam.value));
     // whiteTeam.value.addCombatant(new BallistaTurret('Gobo', { x: 6, y: 1}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Wall('Gobo', { x: 4, y: 3}, whiteTeam.value));
     // whiteTeam.value.addCombatant(new Wall('Gobo', { x: 5, y: 3}, whiteTeam.value));
     // whiteTeam.value.addCombatant(new Wall('Gobo', { x: 6, y: 3}, whiteTeam.value));
 
     // whiteTeam.value.addCombatant(new Vanguard('Gobo', { x: 1, y: 8 }, whiteTeam.value));
     // whiteTeam.value.addCombatant(new Witch('eobo', { x: 4, y: 4 }, whiteTeam.value));
 
-    blackTeam.value.addCombatant(new Artificer('tobo', { x: 5, y: 5 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Wizard('dog', { x: 6, y: 8 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Hunter('rob', { x: 5, y: 8 }, blackTeam.value));
-    blackTeam.value.addCombatant(new FistWeaver('nana', { x: 5, y: 7 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Pikeman('fefw', { x: 9, y: 9 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Vanguard('nana', { x: 7, y: 9 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Vanguard('tobo', { x: 7, y: 7 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Hunter('dog', { x: 6, y: 3 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Pikeman('rob', { x: 6, y: 7 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new StandardBearer('nana', { x: 5, y: 7 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Wizard('fefw', { x: 9, y: 9 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Witch('nana', { x: 7, y: 9 }, blackTeam.value));
     // blackTeam.value.addCombatant(new Hunter('reqe', { x: 6, y: 9 }, blackTeam.value));
     // blackTeam.value.addCombatant(new Gorilla('feifne', { x: 5, y: 8 }, blackTeam.value));
 
@@ -378,15 +380,15 @@ export default defineComponent({
     // whiteTeam.value.combatants[1].stats.stamina = 0;
     // whiteTeam.value.combatants[2].stats.stamina = 0;
     // whiteTeam.value.combatants[3].stats.stamina = 0;
-    // whiteTeam.value.combatants[1].applyStatusEffect({
-    //         name: StatusEffectType.CLOAKED,
-    //         duration: 5,
-    // }); 
+    blackTeam.value.combatants[0].applyStatusEffect({
+            name: StatusEffectType.SLEEPING,
+            duration: 5,
+    }); 
 
       // theATeam(whiteTeam.value);
       // theBTeam(blackTeam.value);
 
-    placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
+   //  placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
     
 
     const teams = ref([whiteTeam.value, blackTeam.value]);
@@ -684,14 +686,18 @@ export default defineComponent({
       setTimeout(() => {
         const deadCombatants = board.value.getAllCombatants().filter((combatant) => combatant.stats.hp <= 0);
         deadCombatants.forEach((combatant) => {
-          board.value.removeCombatant(combatant);
+          // board.value.removeCombatant(combatant);
+          removeCombatantEffect(combatant);
           const combatantIndex = combatant.team.combatants.indexOf(combatant);
           if(combatant.isExpendable() && combatantIndex > -1) {
-            debugger;
             combatant.team.combatants.splice(combatantIndex, 1);
           }
         });
       }, 500);
+
+      function removeCombatantEffect(combatant: Combatant) {
+        board.value.removeCombatant(combatant);
+      }
     }
 
     const playAiTurn = (currentCombatant: Combatant) => {
@@ -1103,6 +1109,7 @@ export default defineComponent({
       [StatusEffectType.DIAMOND_HOOKED]: "DH",
       [StatusEffectType.DIAMOND_HOOKED_HOLDING]: "DHH",
       [StatusEffectType.INGENIOUS_UPGRADE]: "IU",
+      [StatusEffectType.SLEEPING]: "SL",
       // ... add mappings for other status effect types
     };
 
@@ -1509,17 +1516,30 @@ button {
 .board {
   display: flex;
   flex-direction: column;
-  background-color: black;
+  /* background-color: black; */
+  position: relative;
 }
 
 .row {
   display: flex;
 }
 
+.board-background {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  /* background-image: url('./assets/Backgrounds/simpleLand6.png'); */
+  /* background-image: url('./assets/Backgrounds/simpleLand5.png'); */
+  background-image: url('./assets/Backgrounds/temple2.png');
+  /* background-color: red; */
+  position: absolute;
+  z-index: -1;
+}
+
 .panel {
   width: 70px;
   height: 70px;
-  background-color: gray;
+  /*background-color: gray; */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1557,8 +1577,13 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  transition: box-shadow 0.3s ease-in-out;
+  transition: box-shadow 0.3s ease-in-out, opacity 1s ease-out;
 }
+
+.combatant.dead {
+  opacity: 0;
+}
+
 .health-bar{
     width: 100%;
     height: 3px;

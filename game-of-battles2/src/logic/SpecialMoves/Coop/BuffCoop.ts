@@ -13,6 +13,7 @@ import { SpecialMoveRange } from "@/logic/SpecialMove";
 import { CombatMaster } from "@/logic/CombatMaster";
 import { StatusEffect, StatusEffectAlignment, StatusEffectType } from "@/logic/StatusEffect";
 import { BallistaTurret, BabyBabel } from "@/logic/Combatants/ArtificerConstructs";
+import { IdGenerator } from "@/logic/IdGenerator";
 
 export class UnitedWeStand extends CoopMove {
     name: string = "United We Stand";
@@ -102,7 +103,7 @@ export class BuildBallistaTurret extends CoopMove {
                 invokverTeam.combatants.splice(invokverTeam.combatants.indexOf(turret), 1);
             }
         }
-        const ballista = new BallistaTurret('Ballista', target, invokverTeam);
+        const ballista = new BallistaTurret(`Ballista_${IdGenerator.generateId()}`, target, invokverTeam);
         invokverTeam.addCombatant(ballista);
         board.placeCombatant(ballista, target);
         return getStandardActionResult(invoker.position, this.turnCost);
@@ -137,7 +138,7 @@ export class BuildBabyBabel extends CoopMove {
                 invokverTeam.combatants.splice(invokverTeam.combatants.indexOf(babyBabel), 1);
             }
         }
-        const babyBabel = new BabyBabel('Tower', target, invokverTeam);
+        const babyBabel = new BabyBabel(`Tower_${IdGenerator.generateId()}`, target, invokverTeam);
         invokverTeam.addCombatant(babyBabel);
         board.placeCombatant(babyBabel, target);
         return getStandardActionResult(invoker.position, this.turnCost);

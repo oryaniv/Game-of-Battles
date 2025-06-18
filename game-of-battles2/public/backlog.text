@@ -82,15 +82,15 @@ bug fixes + new balancing matches + balancing changes <------------ you are here
 big bug hunt - bug list:
 -------------------------------------------
 
-- why is veteran + co ops not significantly better than no coop?
-      
-      * Vanguard doing mis-Frenzy?  
-      * Wizard no arcane conduit
-      * Idai no hadou never used (also no angelic touch)
-      * shield wall overshadowed by arcane shield wall
-      * rogue co ops almost never used
+- veteran weird behviours:
+
+* shield wall overshadowed by arcane shield wall
+* arcane/shield wall used far from enemies
 
 - why is the rogue underpowererd now?
+      * rogue co ops almost never used
+
+----------- balance change A/B tests -------------
 
 - should we decrease the amount of synergies between classes?
 
@@ -146,7 +146,7 @@ go into reddit
 
 potential testers:
 
-Elad, Nadav, Kauffman, Emanuel, Zach, Lich, Tendler, Yotam, Anat
+Elad, Nadav, Kauffman, Emanuel, Zach, Lich, Tendler, Yotam, Anat, Nati, Gavi, Elia Peretz, Hezki,
 
 start early access
 

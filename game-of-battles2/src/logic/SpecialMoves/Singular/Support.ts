@@ -8,6 +8,7 @@ import { CombatantType } from "@/logic/Combatants/CombatantType";
 import { CombatMaster } from "@/logic/CombatMaster";
 import { DamageReaction, DamageType } from "@/logic/Damage";
 import { Damage } from "@/logic/Damage";
+import { IdGenerator } from "@/logic/IdGenerator";
 import { Position } from "@/logic/Position";
 import { SpecialMoveAreaOfEffect } from "@/logic/SpecialMove";
 import { SpecialMoveAlignment, SpecialMoveRange, SpecialMoveRangeType, SpecialMoveTriggerType } from "@/logic/SpecialMove";
@@ -252,7 +253,7 @@ export class BuildWalls implements SpecialMove {
         const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
 
         for(const currentTarget of getAllTargets) {
-            const wall = new Wall('Wall', currentTarget, invoker.team);
+            const wall = new Wall(`Wall_${IdGenerator.generateId()}`, currentTarget, invoker.team);
             board.placeCombatant(wall, currentTarget);
         }
 
@@ -286,7 +287,7 @@ export class BoomBoomJack implements SpecialMove {
                 invokverTeam.combatants.splice(invokverTeam.combatants.indexOf(bomb), 1);
             }
         }
-        const bomb = new Bomb('bomb', target, invokverTeam);
+        const bomb = new Bomb(`Bomb_${IdGenerator.generateId()}`, target, invokverTeam);
         invokverTeam.addCombatant(bomb);
         board.placeCombatant(bomb, target);
         return getStandardActionResult();

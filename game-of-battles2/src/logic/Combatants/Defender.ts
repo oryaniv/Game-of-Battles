@@ -12,15 +12,16 @@ import { DefensiveStrike } from "../SpecialMoves/Singular/Offensive";
 import { Fortify } from "../SpecialMoves/Singular/Buffs";
 import { ShieldBash } from "../SpecialMoves/Coop/OffensiveCoop";
 import { ArcaneShieldWall, Guardian, ShieldWall } from "../SpecialMoves/Coop/SupportCoop";
+import { HEALTH_INCREASE_AMOUNT, HEALTH_INCREASE_ENABLED, STAMINA_INCREASE_AMOUNT, STAMINA_INCREASE_ENABLED } from "../LogicFlags";
 export class Defender extends Combatant {
     constructor(name: string, position: Position, team: Team) {
       super(
         name,
         {
-          hp: 100,
+          hp: HEALTH_INCREASE_ENABLED ? 100 + HEALTH_INCREASE_AMOUNT : 100,
           attackPower: 20,
           defensePower: 30,
-          stamina: 20,
+          stamina: STAMINA_INCREASE_ENABLED ? 25 + STAMINA_INCREASE_AMOUNT : 25,
           initiative: 4,
           movementSpeed: 3,
           range: 1,

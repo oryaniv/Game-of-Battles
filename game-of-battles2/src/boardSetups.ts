@@ -147,6 +147,7 @@ export function generateRandomTeam(teamIndex: number, agent?:AIAgent) {
         new FistWeaver(generateRandomString(), { x: 0, y: 0 }, team),
         new Pikeman(generateRandomString(), { x: 0, y: 0 }, team),
         new Rogue(generateRandomString(), { x: 0, y: 0 }, team),
+        new Artificer(generateRandomString(), { x: 0, y: 0 }, team),
 
         // 2nd wave
         // new StandardBearer(generateRandomString(), { x: 0, y: 0 }, team),
@@ -182,6 +183,7 @@ export function generateCombatantIdenticalTeam(team: Team, teamIndex: number, ag
         new FistWeaver(generateRandomString(), { x: 0, y: 0 }, newTeam),
         new Pikeman(generateRandomString(), { x: 0, y: 0 }, newTeam),
         new Rogue(generateRandomString(), { x: 0, y: 0 }, newTeam),
+        new Artificer(generateRandomString(), { x: 0, y: 0 }, newTeam),
     ];
     team.combatants.forEach((combatant) => {
         const type: CombatantType = combatant.getCombatantType();
@@ -196,7 +198,7 @@ export function generateCombatantIdenticalTeam(team: Team, teamIndex: number, ag
 
 export function placeAllCombatants(team1: Team, team2: Team, board: Board) {
     const frontLineTypes = [CombatantType.Defender, CombatantType.StandardBearer, CombatantType.Vanguard, CombatantType.Pikeman, CombatantType.FistWeaver];
-    const backLineTypes = [CombatantType.Rogue, CombatantType.Hunter, CombatantType.Wizard, CombatantType.Healer, CombatantType.Witch, CombatantType.Fool];
+    const backLineTypes = [CombatantType.Rogue, CombatantType.Hunter, CombatantType.Wizard, CombatantType.Healer, CombatantType.Witch, CombatantType.Fool,CombatantType.Artificer];
     const whiteTeamFrontY = 1;
     const whiteTeamBackY = 0;
     let whiteTeamBackXStart = 2;
@@ -255,6 +257,7 @@ function generateRandomString(): string {
 }
 
 export function refreshTeam(team: Team) {
+    team.combatants = team.combatants.filter((combatant) => !combatant.isExpendable());
     team.combatants.forEach((combatant) => {
         combatant.removeAllStatusEffects();
         const replicaCombatant = getCombatantByType(combatant.getCombatantType(), team);

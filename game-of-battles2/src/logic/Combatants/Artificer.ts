@@ -12,16 +12,17 @@ import { FullMetalJacket } from "../SpecialMoves/Singular/Buffs";
 import { BuildWalls, BoomBoomJack, ReinforceConstruct } from "../SpecialMoves/Singular/Support";
 import { FlameThrower } from "../SpecialMoves/Coop/OffensiveCoop";
 import { BuildBallistaTurret, BuildBabyBabel, IngeniousUpgrade } from "../SpecialMoves/Coop/BuffCoop";
+import { HEALTH_INCREASE_AMOUNT, HEALTH_INCREASE_ENABLED, STAMINA_INCREASE_AMOUNT, STAMINA_INCREASE_ENABLED } from "../LogicFlags";
 
 export class Artificer extends Combatant {
     constructor(name: string, position: Position, team: Team) {
       super(
         name,
         {
-          hp: 55,
+          hp: HEALTH_INCREASE_ENABLED ? 55 + HEALTH_INCREASE_AMOUNT : 55,
           attackPower: 10,
           defensePower: 15,
-          stamina: 40,
+          stamina: STAMINA_INCREASE_ENABLED ? 50 + STAMINA_INCREASE_AMOUNT : 50,
           initiative: 4,
           movementSpeed: 2,
           range: 1,

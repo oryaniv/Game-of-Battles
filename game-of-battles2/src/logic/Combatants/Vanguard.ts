@@ -7,16 +7,17 @@ import { Frenzy } from "../SpecialMoves/Coop/SelfCoop";
 import { FeralSwing, ShieldBreaker as ShieldBreaker, Rampage, UnstoppableCharge } from "../SpecialMoves/Singular/Offensive";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
+import { HEALTH_INCREASE_AMOUNT, HEALTH_INCREASE_ENABLED, STAMINA_INCREASE_AMOUNT, STAMINA_INCREASE_ENABLED } from "../LogicFlags";
 
 export class Vanguard extends Combatant {
     constructor(name: string, position: Position, team: Team) {
       super(
         name,
         {
-          hp: 90,
+          hp: HEALTH_INCREASE_ENABLED ? 90 + HEALTH_INCREASE_AMOUNT : 90,
           attackPower: 35,
           defensePower: 10,
-          stamina: 25,
+          stamina: STAMINA_INCREASE_ENABLED ? 25 + STAMINA_INCREASE_AMOUNT : 25,
           initiative: 6,
           movementSpeed: 5,
           range: 1,

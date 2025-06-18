@@ -336,7 +336,7 @@ export class HungerOfZirash extends CoopMove {
         type: SpecialMoveRangeType.Curve,
         align: SpecialMoveAlignment.Enemy,
         areaOfEffect: SpecialMoveAreaOfEffect.Nova,
-        range: 6
+        range: 5
     };
     cost: number = coopCostSlash ? 9 : 15;
     meterCost: number = 0;
@@ -482,7 +482,7 @@ export class DanceOfDaggers extends CoopMove {
 
 export class KarithrasBoon extends CoopMove {
     name: string = "Karithras Boon";
-    description: string = "Sneak attack an enemy as an offering to the goddess of death, if the target dies, you gain boons according to the percentage of health the target had before you attacked.";
+    description: string = "Attack an enemy. if it dies, get buffs according to target health percent lost. double damage while cloaked";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Rogue, CombatantType.Witch, CombatantType.Fool, CombatantType.Wizard] },
         { combatantTypeOptions: [CombatantType.Healer, CombatantType.FistWeaver, CombatantType.StandardBearer] }
@@ -532,10 +532,16 @@ export class KarithrasBoon extends CoopMove {
             },
             (recipient: Combatant) => {
                 recipient.applyStatusEffect({
-                    name: StatusEffectType.CLOAKED,
+                    name: StatusEffectType.FORTIFIED,
                     duration: 5,
                 });
             },
+            // (recipient: Combatant) => {
+            //     recipient.applyStatusEffect({
+            //         name: StatusEffectType.CLOAKED,
+            //         duration: 5,
+            //     });
+            // },
         ];
 
         const combatMaster = CombatMaster.getInstance();
@@ -545,8 +551,8 @@ export class KarithrasBoon extends CoopMove {
         }
         const initialHp = targetCombatant.stats.hp;
         let skillDamage = this.damage.amount;
-        if(invoker.hasStatusEffect(StatusEffectType.CLOAKED) || board.isFlanked(targetCombatant!)) {
-            skillDamage = this.damage.amount * 1.5;
+        if(invoker.hasStatusEffect(StatusEffectType.CLOAKED)) {
+            skillDamage = this.damage.amount * 2;
         }
         const result = combatMaster.executeAttack(invoker, target, board, {type: this.damage.type, amount: skillDamage}, true, this.turnCost);
         if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
@@ -557,6 +563,12 @@ export class KarithrasBoon extends CoopMove {
                 boons.forEach(boon => {
                     boon(invoker);
                 });
+                if(healthPercentage >= 1000) {
+                    invoker.applyStatusEffect({
+                        name: StatusEffectType.CLOAKED,
+                        duration: 5,
+                    });
+                }
             }
         }
             
@@ -570,9 +582,17 @@ export class KarithrasBoon extends CoopMove {
 
 
         function getBoonAmount(healthPercentage: number) {
-            if(healthPercentage === 100) {
-                return 4;
-            } else if(healthPercentage >= 60) {
+            // if(healthPercentage === 100) {
+            //     return 4;
+            // } else if(healthPercentage >= 60) {
+            //     return 3;
+            // } else if(healthPercentage >= 30) {
+            //     return 2;
+            // } else {
+            //     return 1;
+            // }
+
+            if(healthPercentage >= 60) {
                 return 3;
             } else if(healthPercentage >= 30) {
                 return 2;
