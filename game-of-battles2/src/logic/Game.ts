@@ -11,6 +11,7 @@ import { Team } from "./Team";
 import { emitter } from '../eventBus';
 import { EventLogger } from '../eventLogger';
 import { CoopMove } from "./SpecialMoves/Coop/CoopMove";
+import { PlayActionType } from "./AI/HeuristicalAgents";
 
 export class Game {
     private currentTeamIndex: number = 0;
@@ -87,7 +88,11 @@ export class Game {
 
     executeBasicAttack(attacker: Combatant, position: Position, board: Board): ActionResult {
       const eventLogger = EventLogger.getInstance();
-      eventLogger.logEvent(`${attacker.name} uses basic attack`);
+      eventLogger.logEvent({
+        messageBody: `${attacker.name} `,
+        actionPart: 'Attacks',
+        actionType: PlayActionType.BASIC_ATTACK
+      });
       const damage = attacker.basicAttack();
       const actionResult = this.executeAttack(attacker, position, board, damage);
       this.spendActionPoints(actionResult.cost);
@@ -102,7 +107,11 @@ export class Game {
       this.addSkillUsage(skill);
 
       const eventLogger = EventLogger.getInstance();
-      eventLogger.logEvent(`${invoker.name} uses ${skill.name}`);
+      eventLogger.logEvent({
+        messageBody: `${invoker.name} uses `,
+        actionPart: `${skill.name}`,
+        actionType: PlayActionType.USE_SPECIAL_MOVE
+      });
       invoker.stats.stamina -= skill.cost;
       getResultsForStatusEffectHook(invoker, StatusEffectHook.OnSkillUsed, undefined, undefined, 1, board, skill);
       const actionResult: ActionResult | ActionResult[] = skill.effect(invoker, target, board); 
@@ -125,7 +134,11 @@ export class Game {
       }
       this.addSkillUsage(coopMove);
       const eventLogger = EventLogger.getInstance();
-      eventLogger.logEvent(`${invoker.name} uses ${coopMove.name}`);
+      eventLogger.logEvent({
+        messageBody: `${invoker.name} uses `,
+        actionPart: `${coopMove.name}`,
+        actionType: PlayActionType.USE_COOP_SPECIAL_MOVE
+      });
 
       [invoker, ...supportingCombatants].forEach((combatant) => {
         combatant.stats.stamina -= coopMove.cost;
@@ -147,14 +160,22 @@ export class Game {
       const currentCombatant = this.getCurrentCombatant();
       this.combatMaster.defend(currentCombatant);
       const eventLogger = EventLogger.getInstance();
-      eventLogger.logEvent(`${currentCombatant.name} defends`);
+      eventLogger.logEvent({
+        messageBody: `${currentCombatant.name} `,
+        actionPart: 'Defends',
+        actionType: PlayActionType.DEFEND
+      });
       this.spendActionPoints(1);
     }
 
     executeSkipTurn(): void {
       const eventLogger = EventLogger.getInstance();
       const currentCombatant = this.getCurrentCombatant();
-      eventLogger.logEvent(`${currentCombatant.name}  skips their turn`);
+      eventLogger.logEvent({
+        messageBody: `${currentCombatant.name} `,
+        actionPart: 'Skips',
+        actionType: PlayActionType.SKIP
+      });
       this.spendActionPoints(currentCombatant.hasMoved || 
         currentCombatant.isExpendable() ||
         this.getCurrentTeam().getAliveCombatants().length === 1 ? 
@@ -222,8 +243,8 @@ export class Game {
       this.currentTeamIndex = 1 - this.currentTeamIndex;
       this.actionsRemaining = this.teams[this.currentTeamIndex].getAliveCombatants().length;
       const eventLogger = EventLogger.getInstance();
-      eventLogger.addBreak();
-      eventLogger.logEvent(`${this.getCurrentTeam().name}'s Turn`);
+      // eventLogger.addBreak();
+      // eventLogger.logEvent(`${this.getCurrentTeam().name}'s Turn`);
     }
 
     private teamNextCombatant(): void {
@@ -238,9 +259,9 @@ export class Game {
     nextRound(): void {
       this.roundCount++;
       const eventLogger = EventLogger.getInstance();
-      eventLogger.addBreak();
+      
       // eventLogger.logEvent(`Round ${this.roundCount} begins`);
-      eventLogger.addBreak();
+     
       // this.updateStatusEffects();
     }
 

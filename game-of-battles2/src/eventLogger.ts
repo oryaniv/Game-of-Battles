@@ -1,6 +1,15 @@
+import { PlayActionType } from "./logic/AI/HeuristicalAgents";
+
+export interface GameEventMessage {
+    messageBody: string;
+    actionPart?: string;
+    actionType: PlayActionType;
+}
+
+
 export class EventLogger {
     private static instance: EventLogger;
-    private events: string[] = [];
+    private events: GameEventMessage[] = [];
 
     private constructor() {
     }
@@ -12,15 +21,19 @@ export class EventLogger {
         return EventLogger.instance;
     }
 
-    public logEvent(message: string): void {
+    public logEvent(message: GameEventMessage): void {
         this.events.push(message);
     }
 
     public addBreak(): void {
-        this.events.push('--------------------------------');
+        this.events.push({
+            messageBody: '--------------------------------',
+            actionPart: undefined,
+            actionType: PlayActionType.SKIP
+        });
     }
 
-    public getEvents(): string[] {
+    public getEvents(): GameEventMessage[] {
         return this.events;
     }
 }

@@ -204,6 +204,8 @@ StatusEffectType {
   
   export interface StatusEffect {
     name: StatusEffectType;
+    isVisible?: boolean;
+    description: string;
     applicationHooks: {
       [key in StatusEffectHook]?: (combatant: Combatant, ...args: any[]) => any;
     };

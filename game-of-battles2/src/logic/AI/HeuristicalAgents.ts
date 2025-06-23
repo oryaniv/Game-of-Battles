@@ -37,7 +37,9 @@ export enum PlayActionType {
     DEFEND, // 1
     BASIC_ATTACK, // 2
     USE_SPECIAL_MOVE, // 3
-    USE_COOP_SPECIAL_MOVE // 4
+    USE_COOP_SPECIAL_MOVE, // 4
+    // this is for when the combatant is stunned, panicked, etc.
+    INACTION // 5
 }
 
 export abstract class HeuristicalAIAgent implements AIAgent {

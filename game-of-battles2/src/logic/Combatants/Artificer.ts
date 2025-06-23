@@ -20,9 +20,10 @@ export class Artificer extends Combatant {
         name,
         {
           hp: HEALTH_INCREASE_ENABLED ? 55 + HEALTH_INCREASE_AMOUNT : 55,
+          stamina: STAMINA_INCREASE_ENABLED ? 50 + STAMINA_INCREASE_AMOUNT : 50,
           attackPower: STAT_BUFF_INCREASE_ENABLED ? 60 : 10,
           defensePower: STAT_BUFF_INCREASE_ENABLED ? 65 : 15,
-          stamina: STAMINA_INCREASE_ENABLED ? 50 + STAMINA_INCREASE_AMOUNT : 50,
+          
           initiative: 4,
           movementSpeed: 2,
           range: 1,

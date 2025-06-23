@@ -14,9 +14,9 @@ export class Hunter extends Combatant {
           name,
           { 
             hp: HEALTH_INCREASE_ENABLED ? 60 + HEALTH_INCREASE_AMOUNT : 60,
+            stamina: STAMINA_INCREASE_ENABLED ? 30 + STAMINA_INCREASE_AMOUNT : 30,
             attackPower: STAT_BUFF_INCREASE_ENABLED ? 75 : 25,
             defensePower: STAT_BUFF_INCREASE_ENABLED ? 50 : 10,
-            stamina: STAMINA_INCREASE_ENABLED ? 30 + STAMINA_INCREASE_AMOUNT : 30,
             initiative: 5,
             movementSpeed: 3,
             range: 8,

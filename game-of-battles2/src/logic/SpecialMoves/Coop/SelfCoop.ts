@@ -20,7 +20,6 @@ export class IdaiNoHadou extends CoopMove {
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.FistWeaver, CombatantType.Vanguard, CombatantType.Defender] },
         { combatantTypeOptions: [CombatantType.Healer, CombatantType.StandardBearer, CombatantType.Fool] }
-        // { combatantTypeOptions: [CombatantType.Healer, CombatantType.StandardBearer, CombatantType.Defender, CombatantType.FistWeaver] }
     ];
     cost: number = coopCostSlash ? 8 : 12;
     meterCost: number = 0;

@@ -9,6 +9,7 @@ import { Position } from "../Position";
 import { Team } from "../Team";
 import { off } from "process";
 import { StatusEffectType } from "../StatusEffect";
+import { PlayActionType } from "./HeuristicalAgents";
 
 
 export class StunLockedAIAgent implements AIAgent {
@@ -20,7 +21,11 @@ export class StunLockedAIAgent implements AIAgent {
 
     playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
         const eventLogger = EventLogger.getInstance();
-        eventLogger.logEvent(`${combatant.name} is ${this.stunLockCauseMessage} and cannot act!`);
+        eventLogger.logEvent({
+            messageBody: `${combatant.name} is `,
+            actionPart: `${this.stunLockCauseMessage}!`,
+            actionType: PlayActionType.INACTION
+        });
         game.executePassTurn();
         return getStandardActionResult();
     }
@@ -89,7 +94,11 @@ export class TauntedAIAgent implements AIAgent {
 export class PanickedAIAgent implements AIAgent {
     playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
         const eventLogger = EventLogger.getInstance();
-        eventLogger.logEvent(`${combatant.name} is panicked and flees the enemy!`);
+        eventLogger.logEvent({
+            messageBody: `${combatant.name} is`,
+            actionPart: 'Panicked!',
+            actionType: PlayActionType.INACTION
+        });
         const actionResult = this.runAway(combatant, game, board);
         return actionResult;
     }
@@ -136,7 +145,11 @@ export class PanickedAIAgent implements AIAgent {
 export class EnragedAIAgent implements AIAgent {
     playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
         const eventLogger = EventLogger.getInstance();
-        eventLogger.logEvent(`${combatant.name} is enraged and goes berserk!`);
+        eventLogger.logEvent({
+            messageBody: `${combatant.name} is`,
+            actionPart: 'Enraged!',
+            actionType: PlayActionType.INACTION
+        });
         const actionResult = this.goBerserk(combatant, game, board);
         return actionResult;
     }
@@ -220,7 +233,11 @@ export class EnragedAIAgent implements AIAgent {
 export class CharmedAIAgent implements AIAgent {
     playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
         const eventLogger = EventLogger.getInstance();
-        eventLogger.logEvent(`${combatant.name} turns against their allies!`);
+        eventLogger.logEvent({
+            messageBody: `${combatant.name} is`,
+            actionPart: 'Charmed!',
+            actionType: PlayActionType.INACTION
+        });
         const actionResult = this.doBetrayal(combatant, game, board);
         return actionResult;
     }

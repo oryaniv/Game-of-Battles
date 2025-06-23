@@ -16,9 +16,9 @@ export class Fool extends Combatant {
           name,
           {
             hp: HEALTH_INCREASE_ENABLED ? 50 + HEALTH_INCREASE_AMOUNT : 50,
+            stamina: STAMINA_INCREASE_ENABLED ? 40 + STAMINA_INCREASE_AMOUNT : 40,
             attackPower: STAT_BUFF_INCREASE_ENABLED ? 1 : 1,
             defensePower: STAT_BUFF_INCREASE_ENABLED ? 40 : 10,
-            stamina: STAMINA_INCREASE_ENABLED ? 40 + STAMINA_INCREASE_AMOUNT : 40,
             initiative: 4,
             movementSpeed: 4,
             range: 2,
@@ -69,9 +69,10 @@ export class Doll extends Combatant {
       name,
       {
         hp: 10,
+        stamina: 0,
         attackPower: 15,
         defensePower: 0,
-        stamina: 0,
+        
         initiative: 1,
         movementSpeed: Number.NEGATIVE_INFINITY,
         range: 1,

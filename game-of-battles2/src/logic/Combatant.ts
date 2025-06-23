@@ -14,9 +14,9 @@ import { BoardPiece } from "./BoardObject";
 
 export interface CombatantStats {
     hp: number;
+    stamina: number;
     attackPower: number;
     defensePower: number;
-    stamina: number;
     initiative: number;
     movementSpeed: number;
     range: number;

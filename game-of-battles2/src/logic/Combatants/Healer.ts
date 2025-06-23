@@ -21,9 +21,9 @@ export class Healer extends Combatant {
         name,
         {
           hp: HEALTH_INCREASE_ENABLED ? 50 + HEALTH_INCREASE_AMOUNT : 50,
+          stamina: STAMINA_INCREASE_ENABLED ? 50 + STAMINA_INCREASE_AMOUNT : 50,
           attackPower: STAT_BUFF_INCREASE_ENABLED ? 40 : 10 ,
           defensePower: STAT_BUFF_INCREASE_ENABLED ? 70 : 15,
-          stamina: STAMINA_INCREASE_ENABLED ? 50 + STAMINA_INCREASE_AMOUNT : 50,
           initiative: 2,
           movementSpeed: 3,
           range: 1,

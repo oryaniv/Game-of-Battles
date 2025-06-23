@@ -15,6 +15,7 @@ import {STAT_BUFF_INCREASE_ENABLED, ATTACK_DEFENSE_INCREASE_AMOUNT, AGILITY_LUCK
 
 export class BlockingStanceStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.BLOCKING_STANCE;
+    description: string = "Incoming physical attacks have a 70% chance to be blocked. removed upon any action but skip";
     applicationHooks =  {
         [StatusEffectHook.OnBeingAttacked]: (attacker: Combatant, defender: Combatant, damage: Damage, attackCost: number) => {
             if(damage.type !== DamageType.Crush && damage.type !== DamageType.Pierce && damage.type !== DamageType.Slash) {
@@ -45,6 +46,7 @@ export class BlockingStanceStatusEffect implements StatusEffect {
 
 
 export class ArcaneChannelingStatusEffect implements StatusEffect {
+    description: string = "Allows the use of higher Tier spells, and augments others. Removed after casting a spell that requires it.";
     name: StatusEffectType = StatusEffectType.ARCANE_CHANNELING;
     applicationHooks =  {
     };
@@ -54,6 +56,7 @@ export class ArcaneChannelingStatusEffect implements StatusEffect {
 
 export class FocusAimStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.FOCUS_AIM;
+    description: string = "Increases attack power and accuracy for the next attack.";
     applicationHooks =  {
         [StatusEffectHook.OnAttacking]: (self: Combatant) => {
             self.stats.attackPower += STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 25 : 25;
@@ -71,6 +74,7 @@ export class FocusAimStatusEffect implements StatusEffect {
 
 export class RegeneratingStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.REGENERATING;
+    description: string = "Regenerates a small amount of health at the start of each turn.";
     applicationHooks = {
         [StatusEffectHook.OnTurnStart]: (self: Combatant) => {
             if(!self.isOrganic()) {
@@ -94,6 +98,7 @@ export class RegeneratingStatusEffect implements StatusEffect {
 
 export class FortifiedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.FORTIFIED;
+    description: string = "Increases defense considerably";
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
             caster.removeStatusEffect(StatusEffectType.DEFENSE_DOWNGRADE);
@@ -108,6 +113,7 @@ export class FortifiedStatusEffect implements StatusEffect {
 
 export class StrengthBoostStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.STRENGTH_BOOST;
+    description: string = "Increases attack power considerably";
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
             caster.removeStatusEffect(StatusEffectType.STRENGTH_DOWNGRADE);
@@ -122,6 +128,7 @@ export class StrengthBoostStatusEffect implements StatusEffect {
 
 export class MobilityBoostStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.MOBILITY_BOOST;
+    description: string = "Increases movement speed and agility";
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
             caster.removeStatusEffect(StatusEffectType.SLOW);
@@ -138,6 +145,7 @@ export class MobilityBoostStatusEffect implements StatusEffect {
 
 export class EncouragedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.ENCOURAGED;
+    description: string = "Gives a 20% chance to gain an extra action point at the end of each turn. chance increases by the luck stat";
     applicationHooks = {
         [StatusEffectHook.OnTurnEnd]: (caster: Combatant, target: Combatant, board: Board) => {
             const roll = Math.random();
@@ -159,6 +167,7 @@ export class EncouragedStatusEffect implements StatusEffect {
 
 export class RalliedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.RALLIED;
+    description: string = "Increases both defense and luck";
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
             caster.stats.defensePower += STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 10 : 10;
@@ -174,6 +183,7 @@ export class RalliedStatusEffect implements StatusEffect {
 
 export class MesmerizingStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.MESMERIZING;
+    description: string = "enemies in a 2-tile radius have a medium chance to become mesmerized and unable to act for 1 turn. removed upon any action but skip";
     applicationHooks = {
         [StatusEffectHook.OnAttacking]: (self: Combatant) => {
             self.removeStatusEffect(StatusEffectType.MESMERIZING);
@@ -203,6 +213,7 @@ export class MesmerizingStatusEffect implements StatusEffect {
 
 export class CircusDiaboliqueStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.CIRCUS_DIABOLIQUE;
+    description: string = "enemies in a 2-tile radius have a medium chance to become trapped in a nightmare for 2 turns, unable to act and slowly decay. removed upon any action but skip";
     applicationHooks = {
         [StatusEffectHook.OnAttacking]: (self: Combatant) => {
             self.removeStatusEffect(StatusEffectType.CIRCUS_DIABOLIQUE);
@@ -232,6 +243,7 @@ export class CircusDiaboliqueStatusEffect implements StatusEffect {
 
 export class CloakedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.CLOAKED;  
+    description: string = "Invisible to enemies, cannot be targeted, but can still be hit by AOE, or found if an enemy tries to move to your position. attacking and most skills break cloaking.";
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
             caster.stats.attackPower += 30;
@@ -269,6 +281,7 @@ export class CloakedStatusEffect implements StatusEffect {
 
 export class FullMetalJacketStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.FULL_METAL_JACKET;
+    description: string = "Increases defense, and also attack power for any physical combatant. allows you to be repaired like a machine, and gives you the replacement part skill. Also adds weakness to lightning";
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
             caster.stats.defensePower += STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 15 : 20;
@@ -290,6 +303,7 @@ export class FullMetalJacketStatusEffect implements StatusEffect {
 
 export class IdaiNoHadouStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.IDAI_NO_HADOU;
+    description: string = "Increases agility, luck, and movement speed. Also allows the use of the Angelic touch skill";
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
             caster.stats.agility += 10;
@@ -307,6 +321,7 @@ export class IdaiNoHadouStatusEffect implements StatusEffect {
 
 export class ShieldWallStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.SHIELD_WALL;
+    description = `All physical damage for this combatant is halved, and cannot be hit in weakness or suffer critical by physical attacks. this and any statuses born of it will be removed by any action except skip`;
     applicationHooks = {
         [StatusEffectHook.OnAttacking]: (self: Combatant) => {
             self.removeStatusEffect(StatusEffectType.SHIELD_WALL);
@@ -342,6 +357,8 @@ function removeShieldWallRelatedCombatants(self: Combatant) {
 
 export class ShieldWallProtectedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.SHIELD_WALL_PROTECTED;
+    description = `This combatant is protected by a shield wall. all physical damage to it is halved, and cannot be hit in weakness or suffer critical by physical attacks. 
+    removed by moving or if the shield wall invoker loses shield wall status`;
     applicationHooks = {
         [StatusEffectHook.OnMoving]: (caster: Combatant, target: Combatant) => { 
             caster.removeStatusEffect(StatusEffectType.SHIELD_WALL_PROTECTED);
@@ -353,6 +370,7 @@ export class ShieldWallProtectedStatusEffect implements StatusEffect {
 
 export class ArcaneShieldWallStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.ARCANE_SHIELD_WALL;
+    description = `All damage except unstoppable for this combatant is halved, and cannot be hit in weakness or suffer critical hits. this and any statuses born of it will be removed by any action except skip`;
     applicationHooks = {
         [StatusEffectHook.OnAttacking]: (self: Combatant) => {
             self.removeStatusEffect(StatusEffectType.ARCANE_SHIELD_WALL);
@@ -388,6 +406,8 @@ function removeArcaneShieldWallRelatedCombatants(self: Combatant) {
 
 export class ArcaneShieldWallProtectedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.ARCANE_SHIELD_WALL_PROTECTED;
+    description = `This combatant is protected by an arcane shield wall. all damage to it except unstoppable is halved, and it cannot be hit in weakness or suffer critical hits. 
+    Removed by moving or if the Arcane shield wall invoker loses Arcane shield wall status`;
     applicationHooks = {
         [StatusEffectHook.OnMoving]: (caster: Combatant, target: Combatant) => { 
             caster.removeStatusEffect(StatusEffectType.ARCANE_SHIELD_WALL_PROTECTED);
@@ -400,6 +420,7 @@ export class ArcaneShieldWallProtectedStatusEffect implements StatusEffect {
 
 export class FrenzyStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.FRENZY;
+    description = `Combatant gains dramatic attack power increase, and cannot die, but loses control and will attack the closest target, including allies.`;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
             caster.stats.attackPower += STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 40 : 40;
@@ -418,6 +439,7 @@ export class FrenzyStatusEffect implements StatusEffect {
 
 export class SanctuaryStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.DIVINE_RETRIBUTION;
+    description = `All attacks against this combatant are blocked, except unstoppable. removed upon moving or attacking, including attack-based skills`;
     applicationHooks = {
         [StatusEffectHook.OnBeingAttacked]: (self: Combatant, defender: Combatant, damage: Damage, attackCost: number) => {
             return {attackResult: AttackResult.Blocked, damage: {amount: 0, type: DamageType.Unstoppable}, cost: attackCost * 2, reaction: DamageReaction.IMMUNITY, position: self.position};
@@ -434,6 +456,7 @@ export class SanctuaryStatusEffect implements StatusEffect {
 
 export class ArcaneOverchargeStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.ARCANE_OVERCHARGE;
+    description = `This combatant is charged with immense power. Next spell will be considerably stronger and may have additional effects.`;
     applicationHooks = {
         
     };
@@ -442,12 +465,17 @@ export class ArcaneOverchargeStatusEffect implements StatusEffect {
 
 export class ArcaneBarrierStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.ARCANE_BARRIER;
+    description = `Protected by a magical barrier. All damage will be soaked by the barrier until it breaks.
+    Does not soak unstoppable damage.`;
     applicationHooks = {
         [StatusEffectHook.OnDamageTaken]: (self: Combatant, target: Combatant, damage: Damage) => {
 
             const ArcaneBarrierStatusEffect = self.statusEffects.find(statusEffect => statusEffect.name === StatusEffectType.ARCANE_BARRIER);
             if(!ArcaneBarrierStatusEffect) {
-                throw new Error("Arcane Overcharge Status Effect not found");
+                throw new Error("Arcane Barrier Status Effect not found");
+            }
+            if(damage.type === DamageType.Unstoppable) {
+                return getStandardActionResult();
             }
             let damageToRestore = damage.amount;
             const newDuration = ArcaneBarrierStatusEffect.duration - damage.amount;
@@ -471,6 +499,7 @@ export class ArcaneBarrierStatusEffect implements StatusEffect {
 
 export class ArcaneConduitStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.ARCANE_CONDUIT;
+    description = `This combatant is granted arcane power from an ally, and will gain Arcane channeling status effect every turn until this status ends.`;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
             caster.applyStatusEffect({
@@ -490,6 +519,7 @@ export class ArcaneConduitStatusEffect implements StatusEffect {
 
 export class DiamondSupremacyStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.DIAMOND_SUPREMACY;
+    description = ``;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
             caster.stats.range = 3;
@@ -503,6 +533,7 @@ export class DiamondSupremacyStatusEffect implements StatusEffect {
 
 export class GuardianStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.GUARDIAN;
+    description = `This combatant is a guardian of an ally. Any damage taken by the ally is instead inflicted on the guardian, but halved.`;
     applicationHooks = {
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
             const guardianProtected = target.getRelatedCombatants()['GUARDIAN_PROTECTED'];
@@ -522,10 +553,9 @@ export class GuardianStatusEffect implements StatusEffect {
 
 export class GuardianProtectedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.GUARDIAN_PROTECTED;
+    description = `This combatant is protected by a guardian. Any damage taken to it is instead inflicted on the guardian, but halved.`;
     applicationHooks = {
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
-            // eslint-disable-next-line
-            //debugger;
             const guardian = target.getRelatedCombatants()['GUARDIAN'];
             if(guardian && !guardian.isKnockedOut()) {
                 guardian.removeStatusEffect(StatusEffectType.GUARDIAN);
@@ -554,6 +584,7 @@ export class GuardianProtectedStatusEffect implements StatusEffect {
 
 export class DiamondHookedHoldingStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.DIAMOND_HOOKED_HOLDING;
+    description = `This combatant holds an enemy captive with a diamnd hook, and will attack it if it tries to move or resist.`;
     applicationHooks = {
         [StatusEffectHook.OnMoving]: (self: Combatant) => {
             const heldEnemy = self.getRelatedCombatants()['DIAMOND_HOOKED'];
@@ -587,6 +618,7 @@ export class DiamondHookedHoldingStatusEffect implements StatusEffect {
 
 export class IngeniousUpgradeStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.INGENIOUS_UPGRADE;
+    description = `This construct has gone through an upgrade, has a unique skill unlocked, and a considerable boost to attack power.`;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
             caster.stats.attackPower += STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 20 : 20;

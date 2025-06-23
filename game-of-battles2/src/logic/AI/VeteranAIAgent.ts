@@ -1804,6 +1804,8 @@ class VeteranAIAgentFoolPlayer extends VeteranAIAgentGenericPlayer {
 
     private evaluateCircusDiabolique(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
         let baseValue = 0;
+        baseValue += combatant.hasStatusEffect(StatusEffectType.CIRCUS_DIABOLIQUE) ? -20 : 0;
+        baseValue += combatant.hasStatusEffect(StatusEffectType.MESMERIZING) ? -15 : 0;
         const getAllTargets = board.getAreaOfEffectPositions(combatant, target!, SpecialMoveAreaOfEffect.Great_Nova, SpecialMoveAlignment.Enemy);
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
@@ -1892,6 +1894,9 @@ class VeteranAIAgentFoolPlayer extends VeteranAIAgentGenericPlayer {
     
     private evaluateLookeyHere(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
         let baseValue = 0;
+        baseValue += combatant.hasStatusEffect(StatusEffectType.CIRCUS_DIABOLIQUE) ? -20 : 0;
+        baseValue += combatant.hasStatusEffect(StatusEffectType.MESMERIZING) ? -15 : 0;
+
         const getAllTargets = board.getAreaOfEffectPositions(combatant, target!, SpecialMoveAreaOfEffect.Great_Nova, SpecialMoveAlignment.Enemy);
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);

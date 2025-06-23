@@ -11,9 +11,9 @@ export class Dragon extends Combatant {
         name,
         {
           hp: 400,
+          stamina: 2000,
           attackPower: 40,
           defensePower: 40,
-          stamina: 2000,
           initiative: 1,
           movementSpeed: 5,
           range: 1,

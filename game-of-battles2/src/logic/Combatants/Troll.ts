@@ -12,9 +12,9 @@ export class Troll extends Combatant {
         name,
         {
           hp: 400,
+          stamina: 100,
           attackPower: 40,
           defensePower: 40,
-          stamina: 100,
           initiative: 2,
           movementSpeed: 4,
           range: 1,

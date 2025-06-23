@@ -14,6 +14,7 @@ import { emitter } from "@/eventBus";
 
 export class InspiringKillerStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.INSPIRING_KILLER;
+    description = `Any time this combatant kills an ally, adjacent allies will gain a random buff.`;
     applicationHooks = {
         [StatusEffectHook.OnKilling]: (caster: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
             const getAllTargets = board.getAreaOfEffectPositions(caster, target.position, SpecialMoveAreaOfEffect.Cross, SpecialMoveAlignment.Ally);
@@ -39,6 +40,7 @@ export class InspiringKillerStatusEffect implements StatusEffect {
 
 export class EnergyAbsorbStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.ENERGY_ABSORB;
+    description = ``;
     applicationHooks =  {
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Neutral;
@@ -46,6 +48,7 @@ export class EnergyAbsorbStatusEffect implements StatusEffect {
 
 export class FoolsLuckStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.FOOLS_LUCK;
+    description = `Any attack against the fool has a small chance to miss, and half this chance to fumble. Chance grows with the fool's luck stat.`;
     applicationHooks = {
         [StatusEffectHook.OnBeingAttacked]: (attacked: Combatant, attacker: Combatant, damage: Damage, attackCost: number) => {
             const chanceToMiss = attacked.stats.luck * 0.02;
@@ -78,6 +81,7 @@ export class FoolsLuckStatusEffect implements StatusEffect {
 
 export class FirstStrikeStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.FIRST_STRIKE;
+    description = `Once every turn, this combatant will strike at its melee attackers before they get to attack.`;
     applicationHooks = {
         [StatusEffectHook.OnBeingAttacked]: (self: Combatant, attacker: Combatant, damage: Damage, amount: number, board: Board) => {
             let isAttackerHookedToSelf = false;
@@ -121,6 +125,8 @@ export class FirstStrikeStatusEffect implements StatusEffect {
 
 export class StruckFirstStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.STRUCK_FIRST;
+    description = '';
+    isVisible?: boolean = false;
     applicationHooks =  {
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Neutral;
@@ -128,6 +134,7 @@ export class StruckFirstStatusEffect implements StatusEffect {
 
 export class RiposteStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.RIPOSTE;
+    description = `Every time an enemy misses this combatant in melee, this combatant will retaliate against the attacker with a basic attack.`;
     applicationHooks = {
         [StatusEffectHook.OnBeingMissed]: (self: Combatant, attacker: Combatant, damage: Damage, amount: number, board: Board) => {
             const rangeCalculator = new RangeCalculator();
@@ -141,6 +148,7 @@ export class RiposteStatusEffect implements StatusEffect {
 }
 
 export class MarchingDefenseStatusEffect implements StatusEffect {
+    description = `This combatant can use the Defend action even after moving`;
     name: StatusEffectType = StatusEffectType.MARCHING_DEFENSE;
     applicationHooks = {
     };
@@ -149,6 +157,7 @@ export class MarchingDefenseStatusEffect implements StatusEffect {
 
 export class SadistStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.SADIST;
+    description = `This combatant will gain an attack power boost if it inflicts 50 or more damage with an attack.`;
     applicationHooks = {
         [StatusEffectHook.OnInflictingDamage]: (self: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
             if(damage.amount >= 50) {
@@ -166,6 +175,7 @@ export class SadistStatusEffect implements StatusEffect {
 
 export class GoingOffStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.GOING_OFF;
+    description = `This combatant will explode on death, inflicting fire damage to all enemies in 1-tile radius nova.`;
     applicationHooks = {
         [StatusEffectHook.OnDeath]: (caster: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
             // eslint-disable-next-line
@@ -191,6 +201,7 @@ export class GoingOffStatusEffect implements StatusEffect {
 
 export class DivineMiracleStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.DIVINE_MIRACLE;
+    description = `Once per Battle, upon their health dropping to 0, this combatant will heal and have all negative statuses removed`;
     applicationHooks = {
         [StatusEffectHook.OnDeath]: (caster: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
             caster.stats.hp = Math.min(40, caster.baseStats.hp);
@@ -216,6 +227,7 @@ export class DivineMiracleStatusEffect implements StatusEffect {
 
 export class LifeDrinkerStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.LIFE_DRINKER;
+    description = `Every time this combatant kills a non construct enemy, it will gain 30% of the target's max health, and 10% of the target's max health for each negative status it has.`;
     applicationHooks = {
         [StatusEffectHook.OnKilling]: (caster: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
             if(!caster.isOrganic()) {
@@ -234,6 +246,8 @@ export class LifeDrinkerStatusEffect implements StatusEffect {
 
 export class LastStandUsedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.LAST_STAND_USED;
+    description = ``;
+    isVisible?: boolean = false;
     applicationHooks = {
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Neutral;
@@ -241,6 +255,7 @@ export class LastStandUsedStatusEffect implements StatusEffect {
 
 export class DecoyStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.DECOY;
+    description = `This combatant is a decoy, and will be destroyed if its creator is revealed. Destroying the decoy will reveal the creator.`;
     applicationHooks = {
         [StatusEffectHook.OnDeath]: (caster: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
             const realTarget = caster.getRelatedCombatants()["doll_owner"];
@@ -254,6 +269,7 @@ export class DecoyStatusEffect implements StatusEffect {
 
 export class SurpriseBoomStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.SURPRISE_BOOM;
+    description = `This combatant will explode on death, inflicting blight damage to everyone around in 1-tile radius nova.`;
     applicationHooks = {
         [StatusEffectHook.OnDeath]: (caster: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
             const combatMaster = CombatMaster.getInstance();
@@ -278,6 +294,7 @@ export class SurpriseBoomStatusEffect implements StatusEffect {
 
 export class TrollRegenerationStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.TROLL_REGENERATION;
+    description = `This combatant will regenerate some health at the start of each turn. Suffering fire or blight damage will remove this status.`;
     applicationHooks = {
         [StatusEffectHook.OnTurnStart]: (self: Combatant) => {
             const newHp = Math.min(self.stats.hp + 12, self.baseStats.hp);
@@ -302,6 +319,7 @@ export class TrollRegenerationStatusEffect implements StatusEffect {
 
 export class ReloadStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.RELOAD;
+    description = `The tower is reloading its cannon, and can't use a certain skill until it's done reloading.`;
     applicationHooks = {
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Neutral;

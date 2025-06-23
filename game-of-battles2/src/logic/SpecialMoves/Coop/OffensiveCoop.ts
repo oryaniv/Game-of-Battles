@@ -801,7 +801,7 @@ export class SkySovereignsWrath extends CoopMove {
     name: string = "Sky Sovereign's Wrath";
     description: string = "Fall on your enemies with a mighty blow powered with the wrath of the skies, striking the target and whoever behind with the power of lightning";
     coopRequiredPartners: CoopPartnerRequirement[] = [
-        { combatantTypeOptions: [CombatantType.Wizard, CombatantType.Artificer, CombatantType.FistWeaver] },
+        { combatantTypeOptions: [CombatantType.Wizard, CombatantType.Artificer] },
     ];
     damage: Damage = {
         amount: 25,

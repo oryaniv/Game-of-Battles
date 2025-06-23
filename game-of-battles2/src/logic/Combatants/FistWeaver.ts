@@ -17,9 +17,9 @@ export class FistWeaver extends Combatant {
         name,
         {
           hp: HEALTH_INCREASE_ENABLED ? 75 + HEALTH_INCREASE_AMOUNT : 75,
+          stamina: STAMINA_INCREASE_ENABLED ? 35 + STAMINA_INCREASE_AMOUNT : 35,
           attackPower: STAT_BUFF_INCREASE_ENABLED ? 80 : 25,
           defensePower: STAT_BUFF_INCREASE_ENABLED ? 60 : 15,
-          stamina: STAMINA_INCREASE_ENABLED ? 35 + STAMINA_INCREASE_AMOUNT : 35,
           initiative: 5,
           movementSpeed: 4,
           range: 1,

@@ -17,9 +17,9 @@ export class StandardBearer extends Combatant {
         name,
         {
           hp: HEALTH_INCREASE_ENABLED ? 75 + HEALTH_INCREASE_AMOUNT : 75,
+          stamina: STAMINA_INCREASE_ENABLED ? 35 + STAMINA_INCREASE_AMOUNT : 35,
           attackPower: STAT_BUFF_INCREASE_ENABLED ? 65 : 15,
           defensePower: STAT_BUFF_INCREASE_ENABLED ? 75 : 25,
-          stamina: STAMINA_INCREASE_ENABLED ? 35 + STAMINA_INCREASE_AMOUNT : 35,
           initiative: 5,
           movementSpeed: 3,
           range: 1,

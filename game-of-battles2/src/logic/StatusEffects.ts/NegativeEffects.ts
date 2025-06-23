@@ -13,6 +13,7 @@ import {STAT_BUFF_INCREASE_ENABLED, ATTACK_DEFENSE_INCREASE_AMOUNT, AGILITY_LUCK
 
 export class ImmobilizedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.IMMOBILIZED;
+    description = `Unable to move`;
     applicationHooks =  {
         [StatusEffectHook.OnApply]: (self: Combatant) => {
             self.stats.movementSpeed = Number.NEGATIVE_INFINITY;
@@ -26,6 +27,7 @@ export class ImmobilizedStatusEffect implements StatusEffect {
 
 export class FrozenStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.FROZEN;
+    description = `This combatant cannot act, and is weak to crush damage. Removed by being attacked.`;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant) => {
             self.stats.agility = 0;
@@ -48,6 +50,7 @@ export class FrozenStatusEffect implements StatusEffect {
 
 export class StrengthDowngradeStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.STRENGTH_DOWNGRADE;
+    description = `Attack power is reduced.`;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant) => {
             self.removeStatusEffect(StatusEffectType.STRENGTH_BOOST);
@@ -62,6 +65,7 @@ export class StrengthDowngradeStatusEffect implements StatusEffect {
 
 export class DefenseDowngradeStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.DEFENSE_DOWNGRADE;
+    description = `Defense is reduced.`;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant) => {
             self.removeStatusEffect(StatusEffectType.FORTIFIED);
@@ -76,6 +80,7 @@ export class DefenseDowngradeStatusEffect implements StatusEffect {
 
 export class LuckDowngradeStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.LUCK_DOWNGRADE;
+    description = `Luck is reduced.`;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant) => {
             self.stats.luck -= STAT_BUFF_INCREASE_ENABLED ? AGILITY_LUCK_INCREASE_AMOUNT + 5 : 5;
@@ -89,6 +94,7 @@ export class LuckDowngradeStatusEffect implements StatusEffect {
 
 export class StaggeredStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.STAGGERED;
+    description = `Agility is slightly reduced.`;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant) => {
             self.stats.agility -= 5;
@@ -102,6 +108,7 @@ export class StaggeredStatusEffect implements StatusEffect {
 
 export class SlowStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.SLOW;
+    description = `Movement speed and agility are both reduced.`;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant) => {
             self.removeStatusEffect(StatusEffectType.MOBILITY_BOOST);
@@ -118,6 +125,7 @@ export class SlowStatusEffect implements StatusEffect {
 
 export class PoisonedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.POISONED;
+    description = `Suffer 10 blight damage at the end of each turn.`;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant) => {
             if(!self.isOrganic()) {
@@ -146,6 +154,7 @@ export class PoisonedStatusEffect implements StatusEffect {
 
 export class BleedingStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.BLEEDING;
+    description = `Suffer 10 pierce damage at the end of each turn.`;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant) => {
             if(!self.isOrganic()) {
@@ -176,6 +185,7 @@ export class BleedingStatusEffect implements StatusEffect {
 
 export class TauntedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.TAUNTED;
+    description = `This combatant is taunted by an enemy, and is dead set to chase and attack it. Also has a it's defense and agility slightly reduced.`;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
             if(!caster.isOrganic()) {
@@ -200,6 +210,7 @@ export class TauntedStatusEffect implements StatusEffect {
 
 export class StupefiedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.STUPEFIED;
+    description = `Cannot use skills`;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
             if(!caster.isOrganic()) {
@@ -215,6 +226,7 @@ export class StupefiedStatusEffect implements StatusEffect {
 
 export class NauseatedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.NAUSEATED;
+    description = `Unable to act. May be removed at the start of each turn.`;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant, target: Combatant) => {
             if(!self.isOrganic()) {
@@ -247,6 +259,7 @@ export class NauseatedStatusEffect implements StatusEffect {
 
 export class MesmerizedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.MESMERIZED;
+    description = `Unable to act. Removed by taking damage.`;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
             if(!caster.isOrganic()) {
@@ -280,6 +293,7 @@ export class MesmerizedStatusEffect implements StatusEffect {
 
 export class NightmareLockedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.NIGHTMARE_LOCKED;
+    description = `Unable to act, and takes 10 blight damage at the end of each turn. will not be removed by taking damage.`;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
             if(!caster.isOrganic()) {
@@ -313,6 +327,7 @@ export class NightmareLockedStatusEffect implements StatusEffect {
 
 export class MarkedForPainStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.MARKED_FOR_PAIN;
+    description = `This combatant was marked by an assassin, and will take 25% more damage from their next attack.`;
     applicationHooks = {
         [StatusEffectHook.OnBeingAttacked]: (self: Combatant, attacker: Combatant) => {
             if(attacker.specialMoves.map(m => m.name).includes("Assassin's Mark" )) {
@@ -344,6 +359,7 @@ export class MarkedForPainStatusEffect implements StatusEffect {
 
 export class MarkedForExecutionStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.MARKED_FOR_EXECUTION;
+    description = `This combatant was marked twiceby an assassin, and will take 50% more damage from their next attack.`;
     applicationHooks = {
         [StatusEffectHook.OnBeingAttacked]: (self: Combatant, attacker: Combatant) => {
             if(attacker.specialMoves.map(m => m.name).includes("Assassin's Mark" )) {
@@ -376,6 +392,7 @@ export class MarkedForExecutionStatusEffect implements StatusEffect {
 
 export class MarkedForOblivionStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.MARKED_FOR_OBLIVION;
+    description = `This combatant was marked thrice by an assassin, and will take 100% more damage from their next attack.`;
     applicationHooks = {
         [StatusEffectHook.OnBeingAttacked]: (self: Combatant, attacker: Combatant) => {
             if(!self.isDefending() && attacker.specialMoves.map(m => m.name).includes("Assassin's Mark" )) {
@@ -408,6 +425,8 @@ export class MarkedForOblivionStatusEffect implements StatusEffect {
 
 export class MarkedDetonatedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.MARKED_DETONATED;
+    description = ``;
+    isVisible: boolean = false;
     applicationHooks = {
         [StatusEffectHook.OnBeingMissed]: (self: Combatant, attacker: Combatant) => {
             self.removeStatusEffect(StatusEffectType.MARKED_DETONATED);
@@ -418,6 +437,7 @@ export class MarkedDetonatedStatusEffect implements StatusEffect {
 
 export class PanickedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.PANICKED;
+    description = `This combatant is panicked, and will flee from the closest enemy.`;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant) => {
             if(!self.isOrganic()) {
@@ -438,6 +458,7 @@ export class PanickedStatusEffect implements StatusEffect {
 
 export class CharmedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.CHARMED;
+    description = `This combatant is charmed by an enemy, will attack its allies, and aid its enemies.`;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant) => {
             if(!self.isOrganic()) {
@@ -458,6 +479,7 @@ export class CharmedStatusEffect implements StatusEffect {
 
 export class ForbiddenAfflictionStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.FORBIDDEN_AFFLICTION;
+    description = `This combatant is afflicted by a forbidden affliction. Any step of movement or attack will inclict dark damage on it.`;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant) => {
             if(!self.isOrganic()) {
@@ -477,6 +499,7 @@ export class ForbiddenAfflictionStatusEffect implements StatusEffect {
 
 export class DivineRetributionStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.DIVINE_RETRIBUTION;
+    description = `This combatant is afflicted by divine retribution, and will suffer half of any direct damage it inflicts.`;
     applicationHooks = {
         [StatusEffectHook.OnInflictingDamage]: (self: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
 
@@ -496,6 +519,7 @@ export class DivineRetributionStatusEffect implements StatusEffect {
 
 export class PlaguedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.PLAGUED;
+    description = `This combatant is afflicted by plague, will suffer 10 blight damage at the end of each turn, and spread the plague to adjacent allies.`;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant) => {
             if(!self.isOrganic()) {
@@ -542,6 +566,7 @@ export class PlaguedStatusEffect implements StatusEffect {
 
 export class BurningStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.BURNING;
+    description = `Suffer 10 fire damage at the end of each turn.`;
     applicationHooks = {
         [StatusEffectHook.OnTurnEnd]: (self: Combatant, target: Combatant, board: Board) => {
             self.takeDamage({amount: 10, type: DamageType.Fire}, board);
@@ -565,6 +590,7 @@ export class BurningStatusEffect implements StatusEffect {
 
 export class DiamondHookedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.DIAMOND_HOOKED;
+    description = `This combatant is held captive by a diamond hook. Will be attacked by the captor if it moves, or if it tries to attack the captor.`;
     applicationHooks = {
         [StatusEffectHook.OnMoving]: (self: Combatant, attacker: Combatant, damage: Damage, amount: number, board: Board) => {
             const holder = self.getRelatedCombatants()['DIAMOND_HOOKED'];
@@ -587,6 +613,7 @@ export class DiamondHookedStatusEffect implements StatusEffect {
 
 export class SleepingStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.SLEEPING;
+    description = `Combatant cannot act. Next melee attack on it will be a critical hit. Removed by taking damage.`;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant) => {
             if(!self.isOrganic()) {

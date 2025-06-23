@@ -15,9 +15,9 @@ export class Vanguard extends Combatant {
         name,
         {
           hp: HEALTH_INCREASE_ENABLED ? 90 + HEALTH_INCREASE_AMOUNT : 90,
+          stamina: STAMINA_INCREASE_ENABLED ? 25 + STAMINA_INCREASE_AMOUNT : 25,
           attackPower: STAT_BUFF_INCREASE_ENABLED ? 90 : 35,
           defensePower: STAT_BUFF_INCREASE_ENABLED ? 45 : 10,
-          stamina: STAMINA_INCREASE_ENABLED ? 25 + STAMINA_INCREASE_AMOUNT : 25,
           initiative: 6,
           movementSpeed: 5,
           range: 1,

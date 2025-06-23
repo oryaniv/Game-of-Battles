@@ -16,9 +16,9 @@ export class Pikeman extends Combatant {
         name,
         {
           hp: HEALTH_INCREASE_ENABLED ? 70 + HEALTH_INCREASE_AMOUNT : 70,
+          stamina: STAMINA_INCREASE_ENABLED ? 25 + STAMINA_INCREASE_AMOUNT : 25,
           attackPower: STAT_BUFF_INCREASE_ENABLED ? 70 : 20,
           defensePower: STAT_BUFF_INCREASE_ENABLED ? 70 : 20,
-          stamina: STAMINA_INCREASE_ENABLED ? 25 + STAMINA_INCREASE_AMOUNT : 25,
           initiative: 3,
           movementSpeed: 3,
           range: 2,
