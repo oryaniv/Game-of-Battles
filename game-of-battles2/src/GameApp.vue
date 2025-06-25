@@ -113,7 +113,7 @@
       </div>
     </div>
 
-<div class="action-menu" v-if="!isGameOver()">
+<div class="action-menu" v-if="showActionMenu() && !showHoveringMessage()">
   <div class="action-menu-button-container">
     <!-- Main central button (e.g., Attack or Use Skill) -->
     <button class="action-menu-main-button" @mouseover="actionButtonHover('examine')" @mouseleave="actionButtonHover('')" v-show="!actionSelected()" @click="showCombatantsForStatus">e<span class="action-menu-button-highlight">X</span>amine</button>
@@ -135,6 +135,8 @@
     </div>
   </div>
 </div>
+
+<button v-if="!isGameOver()" @click="playAiTurn(currentCombatant)">AI Play</button>
 
 <div class="action-description-container" v-if="actionDescription">
   <div class="action-description-text">
@@ -248,18 +250,10 @@
          :actionType="getEvents()[getEvents().length - 1].actionType" />
     </div>
   </div>
-
-
-  <!-- <div class="event-log">
-    <div class="event-log-header">
-      Event Log
-    </div>
-    <div id="event-log-body" class="event-log-body">
-      <div class="event-log-item" v-for="event in getEvents()" :key="event.id">
-        {{ event }}
-      </div>
-    </div>
-  </div> -->
+  
+  <div class="commentator-messages-container">
+    <CommentatorMessages :messages="commentatorMessages" />
+  </div>
 
       <!-- Status Popup -->
     <div v-if="showStatusPopup" class="status-popup-frame">
@@ -324,9 +318,14 @@
      </div>
     </div>
 
-    <div class="hovering-message-container">
-      <div class="hovering-message-text">
-        YOU DIED
+    <div class="hovering-message-container" :class="{ 'hovering-message-container-show': showHoveringMessage() }">
+      <div class="hovering-message-text"
+      :class="{
+        'hovering-message-you-died': hoveringMessage === 'YOU DIED',
+        'hovering-message-enemy-died': hoveringMessage === 'Enemy Died'
+      }"
+      >
+        {{ hoveringMessage }}
       </div>
     </div>
   </div>
@@ -371,16 +370,19 @@ import { Howl } from 'howler';
 import { EventLogger } from './eventLogger';
 import { AllOfThem, standardVsSetup, theATeam, theBTeam, allMilitiaSetup, theGorillaTeam,
  generateRandomTeam, generateCombatantIdenticalTeam, placeAllCombatants, debugSetupWhiteTeam, debugSetupBlackTeam} from './boardSetups';
- import { getGameOverMessage } from './GameOverMessageProvider';
+ import { getGameResultMessage, getGameOverMessage } from './GameOverMessageProvider';
+ import { getCommentatorMessage, CommentatorMessage } from './CommentatorMessageProvider';
  import { getActionDescription } from './UIUtils';
  import { getStatusEffectDescription } from './UIUtils';
  import StatusDescriptionBox from './components/StatusDescriptionBox.vue';
  import ActionEventMessage from './components/ActionEventMessage.vue';
+ import CommentatorMessages from './components/CommentatorMessages.vue';
 
 export default defineComponent({
   components: {
     StatusDescriptionBox,
-    ActionEventMessage
+    ActionEventMessage,
+    CommentatorMessages
   },
   setup() {
     
@@ -390,14 +392,14 @@ export default defineComponent({
     const veternAIAgentNoCoop = new VeteranAIAgent();
     veternAIAgentNoCoop.setCollectCoop(false);
     const rookieAIAgent = new RookieAIAgent();
-    const whiteTeam = ref(new Team('White Team', 0, ));
-    const blackTeam = ref(new Team('Black Team', 1, ));
+    const whiteTeam = ref(new Team('White Team', 0));
+    const blackTeam = ref(new Team('Black Team', 1, veternAIAgentWithCoop));
 
     // whiteTeam.value.addCombatant(new Defender('aobo', { x: 3, y: 5}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new FistWeaver('Naari', { x: 7, y: 0}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Hunter('Lucia', { x: 6, y: 0}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Witch('Jezebel', { x: 5, y: 1}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Fool('Harley', { x: 4, y: 0}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Wizard('Saruman', { x: 4, y: 4}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Hunter('Lucia', { x: 5, y: 6}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new StandardBearer('Jezebel', { x: 2, y: 4}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new FistWeaver('Harley', { x: 4, y: 0}, whiteTeam.value));
     whiteTeam.value.addCombatant(new Healer('Mia', { x: 6, y: 0}, whiteTeam.value));
     // whiteTeam.value.addCombatant(new BabyBabel('Gobo', { x: 5, y: 1}, whiteTeam.value));
     // whiteTeam.value.addCombatant(new BallistaTurret('Gobo', { x: 6, y: 1}, whiteTeam.value));
@@ -407,41 +409,59 @@ export default defineComponent({
     // whiteTeam.value.addCombatant(new Vanguard('Gobo', { x: 1, y: 8 }, whiteTeam.value));
     // whiteTeam.value.addCombatant(new Witch('eobo', { x: 4, y: 4 }, whiteTeam.value));
 
-    blackTeam.value.addCombatant(new Vanguard('Ragnar', { x: 7, y: 1 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Defender('Richard', { x: 6, y: 3 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Pikeman('Garret', { x: 6, y: 7 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Wizard('Gandalf', { x: 5, y: 7 }, blackTeam.value));
-    blackTeam.value.addCombatant(new StandardBearer('Maximus', { x: 9, y: 9 }, blackTeam.value));
-    blackTeam.value.addCombatant(new BabyBabel('Maximus', { x: 3, y: 3 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Vanguard('Ragnar', { x: 4, y: 7 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Defender('Richard', { x: 6, y: 5 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Pikeman('Garret', { x: 6, y: 6 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Rogue('Gandalf', { x: 6, y: 7 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Witch('Maximus', { x: 9, y: 8 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Militia('Non', { x: 9, y: 7 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Militia('Skf', { x: 9, y: 6 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new Militia('efe', { x: 8, y: 8 }, blackTeam.value));
+    // blackTeam.value.addCombatant(new BabyBabel('Maximus', { x: 3, y: 3 }, blackTeam.value));
     // blackTeam.value.addCombatant(new Witch('nana', { x: 7, y: 9 }, blackTeam.value));
     // blackTeam.value.addCombatant(new Hunter('reqe', { x: 6, y: 9 }, blackTeam.value));
     // blackTeam.value.addCombatant(new Gorilla('feifne', { x: 5, y: 8 }, blackTeam.value));
 
   //blackTeam.value.addCombatant(new Artificer('Gobo', { x: 9, y: 6 }, blackTeam.value));
 
-    blackTeam.value.combatants[0].applyStatusEffect({
-            name: StatusEffectType.IMMOBILIZED,
+    whiteTeam.value.combatants[0].applyStatusEffect({
+            name: StatusEffectType.ARCANE_CHANNELING,
             duration: 5,
     }); 
 
-    blackTeam.value.combatants[0].applyStatusEffect({
-            name: StatusEffectType.STRENGTH_BOOST,
+    whiteTeam.value.combatants[0].applyStatusEffect({
+            name: StatusEffectType.ARCANE_OVERCHARGE,
             duration: 5,
     }); 
 
-    blackTeam.value.combatants[0].applyStatusEffect({
-            name: StatusEffectType.MOBILITY_BOOST,
+    whiteTeam.value.combatants[0].applyStatusEffect({
+            name: StatusEffectType.BURNING,
             duration: 5,
     }); 
 
-    whiteTeam.value.combatants[1].applyStatusEffect({
-            name: StatusEffectType.FROZEN,
+    blackTeam.value.combatants[1].applyStatusEffect({
+            name: StatusEffectType.STRENGTH_DOWNGRADE,
             duration: 5,
     }); 
+
+    blackTeam.value.combatants[1].applyStatusEffect({
+            name: StatusEffectType.POISONED,
+            duration: 5,
+    }); 
+
+    // blackTeam.value.combatants[0].applyStatusEffect({
+    //         name: StatusEffectType.SANCTUARY,
+    //         duration: 5,
+    // }); 
+
+    // whiteTeam.value.combatants[1].applyStatusEffect({
+    //         name: StatusEffectType.FROZEN,
+    //         duration: 5,
+    // }); 
 
     
 
-   placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
+    placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
     
 
     const teams = ref([whiteTeam.value, blackTeam.value]);
@@ -486,6 +506,9 @@ export default defineComponent({
     const eventLogger = EventLogger.getInstance();
     let eventLogBody: HTMLElement | null = null;
     const actionDescription = ref<string | null>(null);
+    const commentatorMessages = ref<CommentatorMessage[]>([]);
+
+    const hoveringMessage = ref<string>('');
 
     const getCombatantEffects = (position: Position) => {
       const key = `${position.x},${position.y}`;
@@ -494,6 +517,7 @@ export default defineComponent({
 
     onMounted(() => {
       updateTurnMessage();
+      
 
       actionsRemaining.value = currentTeam.value.combatants.length;
       emitter.on('trigger-method', (actionResultData:any) => {
@@ -504,9 +528,15 @@ export default defineComponent({
         playMoveSound();
       });
 
-      eventLogBody = document.getElementById('event-log-body');
+      emitter.on('change-team', () => {
+        updateTurnMessage();
+      });
 
       document.addEventListener('keydown', (event) => {
+        if(!showActionMenu() || showHoveringMessage()) {
+          return;
+        }
+
         if(actionSelected()) {
           if(event.key.toLowerCase() === 'c') {
             cancel();
@@ -555,10 +585,10 @@ export default defineComponent({
 
     const updateTurnMessage = () => {
       if(game.value.isGameOver()) {
-        // turnMessage.value = `Game Over`;
-        turnMessage.value = getGameOverMessage(whiteTeam.value, blackTeam.value);
+        updateHoveringMessage(getGameOverMessage(whiteTeam.value, blackTeam.value), false);
       } else {
-        turnMessage.value = `${game.value.teams[(game.value as Game).getCurrentTeamIndex()].name}'s Turn`;
+        debugger;
+        updateHoveringMessage(`${game.value.teams[(game.value as Game).getCurrentTeamIndex()].name}'s Turn`, true);
       }
     };
 
@@ -605,6 +635,22 @@ export default defineComponent({
       }
     }
 
+    const showActionMenu = () => {
+       if(game.value.isGameOver()) {
+         return false;
+       }
+       const currentTeam = game.value.getCurrentTeam();
+       if(!currentTeam.isHumanPlayerTeam()) {
+         return false;
+       }
+
+       const currentCombatant = game.value.getCurrentCombatant();
+       if(currentCombatant.getAiAgent() !== undefined) {
+         return false;
+       }
+       return true;
+    }
+
     const defend = () => {
       game.value.executeDefend();
       game.value.nextTurn();
@@ -645,6 +691,13 @@ export default defineComponent({
       if (currentCombatant.value) {
         validMoves.value = board.value.getValidMoves(currentCombatant.value);
         moveMode.value = true;
+      }
+
+      if(validMoves.value.length === 0) {
+        alert("No valid moves");
+        validMoves.value = [];
+        moveMode.value = false;
+        return;
       }
     };
 
@@ -687,9 +740,17 @@ export default defineComponent({
 
 
     const showAttackOptions = () => {
-      if (currentCombatant.value) {
-        validAttacks.value = board.value.getValidAttacks(currentCombatant.value);
-        attackMode.value = true;
+      if(!currentCombatant.value) {
+        return;
+      }
+      validAttacks.value = board.value.getValidAttacks(currentCombatant.value);
+      attackMode.value = true;
+
+      if(validAttacks.value.length === 0) {
+        alert("No valid attacks");
+        validAttacks.value = [];
+        attackMode.value = false;
+        return;
       }
     };
 
@@ -706,6 +767,7 @@ export default defineComponent({
         validAttacks.value = [];
         attackMode.value = false;
         applyAttackEffects(result, position);
+        applyCommentatorMessages([result], currentCombatant.value.team);
         prepareNextTurn();
       }
     };
@@ -746,6 +808,12 @@ export default defineComponent({
           playSound(actionResult.damage.type);
     };
 
+    const applyCommentatorMessages = (actionResults: ActionResult[], team: Team) => {
+      const messages = getCommentatorMessage(actionResults, team, board.value as Board);
+      debugger;
+      commentatorMessages.value = messages;
+    }
+
     const playSound = (type: DamageType) => {
       const sound = actionSounds[type];
       if(sound) {
@@ -769,7 +837,7 @@ export default defineComponent({
 
     const canMove = (): boolean => {  
       const currentCombatant = game.value.getCurrentCombatant();
-      return currentCombatant?.stats.movementSpeed > 0;
+      return currentCombatant?.stats.movementSpeed > 0 && !currentCombatant.hasMoved;
     }
 
     const canDefend = (): boolean => {
@@ -793,20 +861,22 @@ export default defineComponent({
       hasMoved.value = false;
       previousPosition.value = null;
       removeTheDead();
-      updateTurnMessage();
+      // updateTurnMessage();
       if(eventLogBody) {
         eventLogBody.scrollTop = eventLogBody.scrollHeight;
       }
       if(game.value.isGameOver()) {
+        updateTurnMessage();
         return;
       }
 
       // if the current combatant has an AI agent, let it play the turn
       const currentCombatant = game.value.getCurrentCombatant();
       if(currentCombatant && currentCombatant.getAiAgent() !== undefined) {
+        const turnDelay = showHoveringMessage() ? 1500 : 1000;  
         setTimeout(() => {
           playAiTurn(currentCombatant);
-        }, 1000);
+        }, turnDelay);
       }
     };
 
@@ -835,8 +905,10 @@ export default defineComponent({
         aiActionResult.forEach((actionResult) => {
           actionResult.position && applyAttackEffects(actionResult, actionResult.position);
         });
+        applyCommentatorMessages(aiActionResult, currentCombatant.team);
       } else {
         aiActionResult.position && applyAttackEffects(aiActionResult, aiActionResult.position);
+        applyCommentatorMessages([aiActionResult], currentCombatant.team);
       }
       setTimeout(() => {
         game.value.nextTurn();
@@ -1112,6 +1184,12 @@ export default defineComponent({
       currentSkill.value = skill;
       const range = skill.range;
       validTargetsForSkill.value = board.value.getValidTargetsForSkill(currentCombatant.value, range);
+      if(validTargetsForSkill.value.length === 0) {
+        alert("No valid targets");
+        validTargetsForSkill.value = [];
+        coopSkillMode.value = false;
+        return;
+      }
     }
 
     const showSkillTargets = (skillName: string) => {
@@ -1130,6 +1208,12 @@ export default defineComponent({
       currentSkill.value = skill;
       const range = skill.range;
       validTargetsForSkill.value = board.value.getValidTargetsForSkill(currentCombatant.value, range);      
+      if(validTargetsForSkill.value.length === 0) {
+        alert("No valid targets");
+        validTargetsForSkill.value = [];
+        skillMode.value = false;
+        return;
+      }
     };
 
     const isSkillTargetValid = (position: Position): boolean => {
@@ -1163,6 +1247,7 @@ export default defineComponent({
             applyAttackEffects(actionResult, applyPosition);
           }
         });
+        applyCommentatorMessages(actionResults, currentCombatant.value.team);
         skillMode.value = false;
         validTargetsForSkill.value = [];
         aoePositions.value = [];
@@ -1182,6 +1267,7 @@ export default defineComponent({
             applyAttackEffects(actionResult, applyPosition);
           }
         });
+        applyCommentatorMessages(actionResults, currentCombatant.value.team);
         coopSkillMode.value = false;
         validTargetsForSkill.value = [];
         aoePositions.value = [];
@@ -1596,6 +1682,22 @@ export default defineComponent({
       statusDescriptionBoxIndex.value = null;
     }
 
+    const updateHoveringMessage = (message: string, shouldFadeOut: boolean = true) => {
+      hoveringMessage.value = message;
+      if(shouldFadeOut) {
+        setTimeout(() => {
+          hoveringMessage.value = '';
+        }, 1000);
+      }
+      else {
+        hoveringMessage.value = message;
+      }
+    }
+
+    const showHoveringMessage = () => {
+      return hoveringMessage.value !== '';
+    }
+
     
 
     return {
@@ -1606,6 +1708,7 @@ export default defineComponent({
       isCurrentCombatant,
       actionsRemaining,
       turnMessage,
+      showActionMenu,
       defend,
       skip,
       currentCombatant,
@@ -1688,7 +1791,10 @@ export default defineComponent({
       showStatusEffectDescription,
       hideStatusEffectDescription,
       statusDescriptionBox,
-      statusDescriptionBoxIndex
+      statusDescriptionBoxIndex,
+      commentatorMessages,
+      showHoveringMessage,
+      hoveringMessage
     };
   },
 });
@@ -1817,6 +1923,7 @@ button {
 }
 
 .board-frame {
+    margin-top: 40px;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -2623,7 +2730,7 @@ button {
 
 .event-indicator-container {
   position: absolute;
-  top: 30%;
+  top: 20%;
   right: 3.5%;
   width: 240px;
   height: 30px;
@@ -2651,39 +2758,12 @@ button {
   text-align: center;
 }
 
-.event-indicator-skill-name {
-  color: red;
-}
-
-.event-log {
+.commentator-messages-container {
   position: absolute;
-  top: 30%;
+  top: 35%;
   right: 3.5%;
-  width: 280px;
-  height: 300px;
-  /* color: white; */
-  z-index: 10;
-}
-
-.event-log-header {
-  background-color: #333;
-  color: white;
-  padding: 10px;
-  font-size: 24px;
-  border: 1px solid white;
-}
-
-.event-log-body {
-  padding: 10px;
-  background-color: #333;
-  border: 1px solid white;
-  min-height: 300px;
-  max-height: 300px;
-  overflow-y: scroll;
-}
-
-.event-log-item {
-  font-size: 20px;
+  width: 250px;
+  height: 30px;
 }
 
 .hovering-message-container {
@@ -2692,20 +2772,38 @@ button {
   background-color: #00000082;
   width: 100vw;
   height: 100px;
-  z-index: 20;
+  z-index: -1;
   border: 1px solid white;
-  /* display: flex; */
-  display: none;
+  display: flex;
+  /* display: none; */
   align-items: center;
   justify-content: center; 
+  transition: all 1s ease;
+  opacity: 0;
+}
+
+.hovering-message-container-show {
+  opacity: 1;
+  z-index: 20;
 }
 
 .hovering-message-text {
-  font-size: 68px;
+  font-size: 32px;
   text-align: center;
-  /*font-family: "CinzelDecorative-Regular"; */
+  font-family: "CinzelDecorative-Regular";
+  color: white;
+}
+
+.hovering-message-text.hovering-message-you-died {
+  font-size: 68px;
   font-family: "MetalMania-Regular";
   color: darkred;
+}
+
+.hovering-message-text.hovering-message-enemy-died {
+  font-size: 48px;
+  font-family: "CinzelDecorative-Regular";
+  color: gold;
 }
 
 </style>

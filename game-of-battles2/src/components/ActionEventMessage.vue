@@ -1,23 +1,25 @@
 <template>
-    <span class="action-event-message-part">{{ message }}</span>
-    <span 
-      class="action-event-action-part"
-      :class= "{
-        skip: actionType === 0,
-        defend: actionType === 1,
-        attack: actionType === 2,
-        skill: actionType === 3,
-        coop: actionType === 4,
-        inaction: actionType === 5
-      }"
-      >
-     {{ actionPart }}
-    </span>
+    <div :class="{'long-text': actionPart.length > 12, 'longer-text': actionPart.length > 18}" 
+       class="action-event-message-container">
+      <span class="action-event-message-part">{{ message }}</span>
+      <span 
+        class="action-event-action-part"
+        :class= "{
+          skip: actionType === 0,
+          defend: actionType === 1,
+          attack: actionType === 2,
+          skill: actionType === 3,
+          coop: actionType === 4,
+          inaction: actionType === 5,
+        }"
+        >
+      {{ actionPart }}
+      </span>
+    </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { PlayActionType } from '../logic/AI/HeuristicalAgents';
 
 export default defineComponent({
   props: {
@@ -27,17 +29,32 @@ export default defineComponent({
     },
     actionPart: {
       type: String,
-      required: true
+      required: false
     },
     actionType: {       
-      type: PlayActionType,
-      required: true
+      type: Number,
+      required: false
     }
   }
 });
 </script>
 
 <style scoped>
+
+.action-event-message-container {
+  margin-top: 2px;
+}
+
+.action-event-message-container.long-text {
+   font-size: 15px;
+   margin-top: 5px;
+}
+
+.action-event-message-container.long-text.longer-text {
+   font-size: 14px;
+   margin-top: 5px;
+}
+
 .action-event-message-part {
   color: white;
 }
@@ -65,5 +82,6 @@ export default defineComponent({
 .action-event-action-part.inaction {
   color: #cf5252;
 }
+
 
 </style>

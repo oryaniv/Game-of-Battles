@@ -40,7 +40,7 @@ export class Weaken implements SpecialMove {
         return getStandardActionResult();
     };
     checkRequirements = undefined;
-    description = `Instill weakness in an enemy, reducing their attack power for 3 turns`
+    description = `Reduce Enemy's attack power for 3 rounds.`
 }
 
 export class Slow implements SpecialMove {
@@ -70,7 +70,7 @@ export class Slow implements SpecialMove {
         return getStandardActionResult();
     };
     checkRequirements = undefined;
-    description = `curse an enemy's body with a crushing burden, reducing their movement speed and agility for 3 turns`
+    description = `Reduce Enemy's movement speed and agility for 3 rounds.`
 }
 
 export class EvilEye implements SpecialMove {
@@ -105,7 +105,7 @@ export class EvilEye implements SpecialMove {
         return getStandardActionResult();
     };
     checkRequirements = undefined;
-    description = `Cast a malevolent gaze upon the enemy, cursing them and reducing their luck for 3 turns`
+    description = `Reduce luck of all enemies in a 1-tile cross-shaped area.`
 }
 
 export class SiphonEnergy implements SpecialMove {
@@ -140,7 +140,7 @@ export class SiphonEnergy implements SpecialMove {
     checkRequirements = (self: Combatant) => {
         return !self.hasStatusEffect(StatusEffectType.ENERGY_ABSORB);
     };
-    description = `Leech upon an enemy's stamina, draining a small amount of theirs to replenish your own`
+    description = `Steal 10 stamina points from the target. 2 rounds cooldown.`
 }
 
 export class AssassinsMark implements SpecialMove {
@@ -195,8 +195,8 @@ export class AssassinsMark implements SpecialMove {
         };
     };
     checkRequirements = undefined;
-    description = `cast the mark of the assassin on an enemy. the mark can get stronger with every cast.
-    the mark will be detonated when the marked target is struck by a rogue. the stornger the mark is upon detonation,
-    the more damage the target will suffer from the detonating attack.`;
+    description = `Apply mark on the target. Can be applied up to 3 times, each mark results in a bigger damage
+    multiplier when the mark is detonated by a rogue's attack. Can be used without breaking cloaking, and costs
+    only half an action point.`;
     breaksCloaking = false;
 }

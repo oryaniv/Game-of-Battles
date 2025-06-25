@@ -1,12 +1,16 @@
 
 !------------------------- FINAL UI REQUIREMENT LIST ------------------------!
 
+* logic BUGS
+  * is it possible that the healer's divine miracle did not replenish between balancing fights?
+  * veteran casters are almost helpless when out of stamina, not trying to attack 
+
 * Battle screen UI
+
+   * BUGS
+     
+
    * the board
-      * unique background for each difficulty level V
-      * add frame for each background V
-      * alter the panel lines for each background V
-      * change the font V
       * add green glow on edges for co op partnets upon skill selection
       * status effects list must not go below the panel
       * status effects will be icons instead of letters
@@ -15,26 +19,18 @@
       * yellow bar for arcane barrier
 
    * right side 
-      * larger, more readable character action message
+      * make sure the event messages disappear after a short while
       * good/bad move for player AI announcment message
       * multi kill announcement (double, multi, ultra, monster, HOLY SH!T)
 
    * left side
-     * change design for buttons V
-     * gun barrel menu V
-     * upon selection, only cancel is visible V
-     * can be pressed using keys V
-     * must not be able to hotkey actions when only cancel is visible or popup is up V
-     * hot key is highlighted and is bigger V
-     * the status action will now allow to select who to watch V
-     * fix status pop up to be aligned with the skill menus V
+     * make sure the UI doesn't break on larger screens
     
 
    * menus on board
-     * new background for the menus V
-     * no more close button, all popups are closed with cancel (except messages) V
-     * status menu will show weaknesses V
-     * status menu will show all statuses with their icons, and hovering above will show description of status VX
+     * weakness/resist messages should be shorter
+     * add status icons in the examine pop up
+     * add 'error' messages when trying to do illegal moves (move after moving, attack with no targets available, etc.)
 
 
    * music and sound

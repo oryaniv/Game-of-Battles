@@ -27,6 +27,22 @@ export enum Difficulty {
 }
 
 export function getGameOverMessage(team1: Team, team2: Team) {
+    if(!isPvP(team1, team2)) {
+        if(determineIsHumanWinner(team1, team2)) {
+            return 'Enemy Died';
+        } else {
+            return 'YOU DIED';
+        }
+    } 
+    const winner = determineWinner(team1, team2);
+    if(winner.getName() === team1.getName()) {
+        return team2.getName() + ' Died';
+    } else {
+        return team1.getName() + ' Died';
+    }
+}
+
+export function getGameResultMessage(team1: Team, team2: Team) {
     if(isPvP(team1, team2)) {
         return getPvPMessages(team1, team2);
     } 

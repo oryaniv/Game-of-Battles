@@ -31,7 +31,7 @@ export class MarchingDefense implements SpecialMove {
         return getStandardActionResult();
     };
     requirements = undefined;
-    description = 'allows you to use the defend action after moving.'
+    description = 'allows to use the defend action after moving.'
 }
 
 export class InspiringKiller implements SpecialMove {

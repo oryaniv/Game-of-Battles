@@ -52,7 +52,7 @@ export class Heal implements SpecialMove {
         };
     };
     checkRequirements = undefined
-    description = `engulf an ally in a wave of divine energy, healing them for a medium amount of health`   
+    description = `Restore Medium amount of health to an organic ally.`   
 }
 
 export class Regenerate implements SpecialMove {
@@ -82,8 +82,7 @@ export class Regenerate implements SpecialMove {
         return getStandardActionResult();
     };
     checkRequirements = undefined
-    description = `Greatly empower an ally's natural healing abilities, 
-    allowing them to heal for a small amount of health each turn`   
+    description = `Ally gains the Regenerating status for 5 rounds. Each turn, they restore a small amount of health. only works on organic allies.`   
 }
 
 export class Purify implements SpecialMove {
@@ -113,7 +112,7 @@ export class Purify implements SpecialMove {
         return getStandardActionResult();
     };
     checkRequirements = undefined
-    description = `Cure an ally of all Negative status effects`   
+    description = `Remove all negative status effects from an ally.`   
 }
 
 export class RallyToTheBanner implements SpecialMove {
@@ -149,8 +148,8 @@ export class RallyToTheBanner implements SpecialMove {
     checkRequirements = (self: Combatant) => {
         return !self.hasMoved
     };
-    description = `Rally close allies to the banner, granting them all a small bonus to both defense and luck. this move
-    cannot be user after moving` 
+    description = `You and all allies in a 1-tile cross-shaped area gain the Rallied status for 3 rounds.
+    Rallied combatants gain a boost to both defense and luck. Can not be used after moving.` 
 }
 
 export class Meditate implements SpecialMove {
@@ -185,7 +184,7 @@ export class Meditate implements SpecialMove {
         };
     };
     checkRequirements = undefined
-    description = `Meditate, cleasing yourself of all negative effects tainting your body and soul`   
+    description = `Resotre a small amount of health, and remove all negative status effects.`   
 }
 
 export class ReinforceConstruct implements SpecialMove {
@@ -200,7 +199,7 @@ export class ReinforceConstruct implements SpecialMove {
         range: 3
     };
     damage: Damage = {
-        amount: 30,
+        amount: 40,
         type: DamageType.Healing
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
@@ -231,7 +230,7 @@ export class ReinforceConstruct implements SpecialMove {
         return results
     };
     checkRequirements = undefined
-    description = `Fix and Reinforce a construct, or a Metal covered ally, healing them for a medium amount of health`
+    description = `Resotre Medium amount of health to all constructs in a 1-tile cross-shaped area.`
 }
 
 export class BuildWalls implements SpecialMove {
@@ -260,7 +259,7 @@ export class BuildWalls implements SpecialMove {
         return getStandardActionResult();
     };
     checkRequirements = undefined
-    description = `Build a wall, blocking all movement and attacks to and from the target position`
+    description = `Build walls in a 1-tile arc-shaped area. Walls block movement and may stand in the way of attacks.`
 }
 
 export class BoomBoomJack implements SpecialMove {
@@ -293,5 +292,6 @@ export class BoomBoomJack implements SpecialMove {
         return getStandardActionResult();
     };
     checkRequirements = undefined
-    description = `Build a wall, blocking all movement and attacks to and from the target position`
+    description = `Deploy a walking bomb, which can blow itself up. If it dies, it will explode on the spot
+    can have up to 7 bombs at the same time.`
 }

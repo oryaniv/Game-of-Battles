@@ -23,7 +23,7 @@ export class Wizard extends Combatant {
           attackPower: STAT_BUFF_INCREASE_ENABLED ? 85 : 20,
           defensePower: STAT_BUFF_INCREASE_ENABLED ? 55 : 20,
           stamina: STAMINA_INCREASE_ENABLED ? 60 + STAMINA_INCREASE_AMOUNT : 60,
-          initiative: 2,
+          initiative: 12,
           movementSpeed: 3,
           range: 1,
           agility: 6,

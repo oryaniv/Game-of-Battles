@@ -33,8 +33,7 @@ export class YoMama implements SpecialMove {
         return getStandardActionResult();
     };
      checkRequirements = undefined;
-    description = `Barrage an enemy with a torrent of insults regarding their dear mama, leading to a medium probability of them
-    losing their composure and becoming enraged, doomed to chase you for 3 rounds`
+    description = `Target enemy may become taunted by you for 3 rounds.`
 }
 
 export class StupidestCrapEver implements SpecialMove {
@@ -62,8 +61,7 @@ export class StupidestCrapEver implements SpecialMove {
         return getStandardActionResult();
     };
      checkRequirements = undefined;
-    description = `The stupidest thing you've ever seen? this does something even stupider. those who see
-    this may suffer from brain damage and cannot use skills for 2 rounds`
+    description = `Enemies in 1-tile arc may become Stupefied for 2 rounds, making them unable to use skills.`
 }
 
 export class SmellIt implements SpecialMove {
@@ -94,8 +92,7 @@ export class SmellIt implements SpecialMove {
         return getStandardActionResult(target);
     };
      checkRequirements = undefined;
-    description = `Throw a little vial containing a vile concoction of the most disgusting substances known to man.
-    those who smell it may suffer from horrible nausea and may lose their turns for the next 2 rounds`
+    description = `Enemies in 1-tile radius nova become Nauseated and unable to act for 3 rounds. Every turn they have chance to recover`
 }
 
 export class LookeyHere implements SpecialMove {
@@ -120,6 +117,6 @@ export class LookeyHere implements SpecialMove {
     checkRequirements = (self: Combatant) => {
         return !self.hasMoved;
     };
-    description = `Begin one hell of a peculiar dance, making close enememies look at you in bewilderment as long as
-    you keep dancing, and as long as they fail to break off of it`;
+    description = `Enemies in a 2-tile radius nova nova around you may become mesmerized and unable to act for 1 round.
+    This will keep on as long as you skip your turn.`;
 }

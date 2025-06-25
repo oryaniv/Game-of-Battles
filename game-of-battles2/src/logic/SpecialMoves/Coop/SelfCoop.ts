@@ -16,7 +16,7 @@ import { Doll } from "@/logic/Combatants/Fool";
 
 export class IdaiNoHadou extends CoopMove {
     name: string = "Idai no Hadou";
-    description: string = "Idai no Hadou";
+    description: string = "Resotre a small amount of health and stamina, and remove all negative status effects. Then gain the Idai no Hadou status for 3 rounds, which increases luck and agility and unlocks the angelic touch skill.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.FistWeaver, CombatantType.Vanguard, CombatantType.Defender] },
         { combatantTypeOptions: [CombatantType.Healer, CombatantType.StandardBearer, CombatantType.Fool] }
@@ -85,7 +85,7 @@ export class DiamondSupremacy extends CoopMove {
 
 export class Frenzy extends CoopMove {
     name: string = "Frenzy";
-    description: string = "Enter a state of screaming blood frenzy, in which your power increase significantly and you cannot die, however, you have no control over your actions.";
+    description: string = "Gain the Frenzy status for 3 rounds. While in frenzy, your attack power is increased, and you cannot die, but lose control over your actions.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Witch, CombatantType.Vanguard, CombatantType.Fool, CombatantType.StandardBearer] },
     ];
@@ -112,7 +112,9 @@ export class Frenzy extends CoopMove {
 
 export class NastyNastyDolly extends CoopMove {
     name: string = "Nasty Nasty Dolly";
-    description: string = "Slip away unnoticed, while putting a doll as a decoy in your place. Should anyone be foolish enough to attack it, they'll suffer a noxious explosion to their face.";
+    description: string = `Move to target position, cloak yourself, and place a doll as a decoy. If anyone attacks the doll, 
+    it will explod and everyone in 1-tile radius cross shaped area will be dealt blight damage with a chance to be poisoned.
+    The doll is removed if the user is exposed.`;
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Rogue, CombatantType.Fool, CombatantType.Artificer] },
     ];
@@ -146,7 +148,7 @@ export class NastyNastyDolly extends CoopMove {
 
 export class Teleportation extends CoopMove {
     name: string = "Teleportation";
-    description: string = "Teleport to a chosen location on the battelfield. Having Arcane Channeling or Arcane Overcharge statuses may entail additional effects.";
+    description: string = "Teleport to a target location. Having Arcane Channeling or Arcane Overcharge statuses may entail additional effects.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Wizard, CombatantType.FistWeaver, CombatantType.Rogue] },
     ];
@@ -191,7 +193,7 @@ export class Teleportation extends CoopMove {
 
 export class ArcaneOvercharge extends CoopMove {
     name: string = "Arcane Overcharge";
-    description: string = "Arcane Overcharge";
+    description: string = "Next spell will deal significantly more damage, and may have additional effects.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Wizard, CombatantType.Witch, CombatantType.Vanguard, CombatantType.Hunter] },
     ];
@@ -218,7 +220,7 @@ export class ArcaneOvercharge extends CoopMove {
 
 export class ArcaneBarrier extends CoopMove {
     name: string = "Arcane Barrier";
-    description: string = "Arcane Barrier";
+    description: string = "Gain the Arcane Barrier status for 50 rounds. Any non-unstoppable damage taken may be reduced down to 0, and the duration is cut by the amount of damage taken.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Defender, CombatantType.Healer, CombatantType.StandardBearer] },
     ];

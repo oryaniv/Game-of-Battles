@@ -32,7 +32,7 @@ export class DefensiveStrike implements SpecialMove {
         return result;
     };
     checkRequirements = undefined
-    description = `Attack Quickly for low Slash damage, and immediately go into Defend mode.`   
+    description = `Low Slash damage to target, Then go into Defend mode.`   
 }
 
 function hasArcaneOvercharge(invoker: Combatant) {
@@ -70,7 +70,7 @@ export class Flame implements SpecialMove {
         return result;
     };
     checkRequirements = undefined
-    description = `Ignite an enemy with Malicious fire and deal medium Fire damage.`   
+    description = `Medium Fire damage to target.`   
 }
 
 export class FlameCannon implements SpecialMove {   
@@ -82,7 +82,7 @@ export class FlameCannon implements SpecialMove {
         type: SpecialMoveRangeType.Curve,
         align: SpecialMoveAlignment.Enemy,
         areaOfEffect: SpecialMoveAreaOfEffect.Single,
-        range: 6
+        range: 8
     };
     damage: Damage = {
         amount: 30,
@@ -93,7 +93,7 @@ export class FlameCannon implements SpecialMove {
         return result;
     };
     checkRequirements = undefined
-    description = `medium fire damage at a long range` 
+    description = `Medium Fire damage to target at a long range.` 
 }
 
 export class IceCannon implements SpecialMove {   
@@ -105,7 +105,7 @@ export class IceCannon implements SpecialMove {
         type: SpecialMoveRangeType.Curve,
         align: SpecialMoveAlignment.Enemy,
         areaOfEffect: SpecialMoveAreaOfEffect.Single,
-        range: 6
+        range: 8
     };
     damage: Damage = {
         amount: 30,
@@ -116,7 +116,7 @@ export class IceCannon implements SpecialMove {
         return result;
     };
     checkRequirements = undefined
-    description = `medium Ice damage at a long range` 
+    description = `medium Ice damage to target at a long range` 
 }
 
 export class ThunderDome implements SpecialMove {
@@ -131,7 +131,7 @@ export class ThunderDome implements SpecialMove {
         range: 8
     };
     damage: Damage = {
-        amount: 30,
+        amount: 40,
         type: DamageType.Lightning
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
@@ -173,7 +173,7 @@ export class LightningBolt implements SpecialMove {
         return result;
     };
     checkRequirements = undefined
-    description = `Strike a foe with a bolt of lightning and deal medium Lightning damage.`   
+    description = `Medium Lightning damage to target.`   
 }
 
 export class Icicle implements SpecialMove {
@@ -207,7 +207,7 @@ export class Icicle implements SpecialMove {
         return result;
     };
     checkRequirements = undefined
-    description = `Conjure a sharp icicle to impale an enemy and deal medium Ice damage.`   
+    description = `Medium Ice damage to target.`   
 }
 
 export class FireBall implements SpecialMove {
@@ -250,7 +250,7 @@ export class FireBall implements SpecialMove {
     checkRequirements = (self: Combatant) => {
         return self.statusEffects.some((effect) => effect.name === StatusEffectType.ARCANE_CHANNELING);
     };
-    description = `Hurl a ball of fire that explodes on impact, dealing medium Fire damage to all in the area. Removes Arcane Channeling.`   
+    description = `Medium Fire damage to all targets in 1-tile radius nova. Requires and Removes Arcane Channeling.`   
 }
 
 export class ChainLightning implements SpecialMove {
@@ -295,8 +295,7 @@ export class ChainLightning implements SpecialMove {
     checkRequirements = (self: Combatant) => {
         return self.statusEffects.some((effect) => effect.name === StatusEffectType.ARCANE_CHANNELING);
     };
-    description = `Shoot a bolt of lightning at an enemy, the bolt will then jump to up to 3 other 
-    enemies, dealing half damage of the previous hit. Removes Arcane Channeling.`   
+    description = `Medium Lightning damage to target, jumps to up to 3 other enemies. Requires and Removes Arcane Channeling.`   
 }
 
 
@@ -336,8 +335,7 @@ export class FrozenBurst implements SpecialMove {
     checkRequirements = (self: Combatant) => {
         return self.statusEffects.some((effect) => effect.name === StatusEffectType.ARCANE_CHANNELING);
     };
-    description = `Blast an enemy with a surge of freezing cold, dealing medium ice damage and having a hight chance
-    of freezing the target for 2 turns. Removes Arcane Channeling.`   
+    description = `Medium Ice damage to target, high chance to inflict Frozen for 2 rounds. Requires and Removes Arcane Channeling.`   
 }
 
 
@@ -361,7 +359,7 @@ export class SacredFlame implements SpecialMove {
         return result;
     };
     checkRequirements = undefined
-    description = `Strike an enemy with a beam of holy retribution, dealing low Holy damage.`   
+    description = `Low Holy damage to target.`   
 }
 
 export class GraspOfZirash implements SpecialMove {
@@ -389,7 +387,7 @@ export class GraspOfZirash implements SpecialMove {
         return result;
     };
     checkRequirements = undefined
-    description = `Raise a thorn coated with Dark energies from the ground, dealing low Darl damage to the target.`   
+    description = `Low Dark damage to target. Damage increases by 25% of base damage for each negative status effect on target.`   
 }
 
 export class PinDown implements SpecialMove {
@@ -416,7 +414,7 @@ export class PinDown implements SpecialMove {
         return result;
     };
     checkRequirements = undefined
-    description = `Shoot an enemy's legs, with amedium chance to immobilize them for 2 turns.`   
+    description = `Medium Pierce damage to target, chance to Immobilize them for 2 rounds.`   
 }
 
 export class Ricochet implements SpecialMove {
@@ -449,7 +447,7 @@ export class Ricochet implements SpecialMove {
         return ricochetResults;
     };
     checkRequirements = undefined
-    description = `Shoot an enemy with a special arrow the splinters on impact, ricocheting and hitting another enemy.`   
+    description = `Medium Pierce damage to target, can jump to 1 other adjacent enemy.`   
 }
 
 export class ToxicArrow implements SpecialMove {
@@ -476,7 +474,8 @@ export class ToxicArrow implements SpecialMove {
         return result;
     };
     checkRequirements = undefined
-    description = `Launch an arrow coated in a deadly poison, dealing medium Blight damage and having a medium chance to inflict Poisoned for 3 turns.`   
+    description = `Medium Blight damage to target, chance to inflict Poisoned for 3 rounds.`   
+    // TODO: add a description for the arrow
 }
 
 export class Skewer implements SpecialMove {
@@ -504,7 +503,7 @@ export class Skewer implements SpecialMove {
         return skewerResults;
     };
     checkRequirements = undefined
-    description = `Stab the enemy where it hurts, dealing medium Pierce damage.`
+    description = `Medium Pierce damage to all targets in a 3-tile line.`
 }
 
 export class GapingStab implements SpecialMove {
@@ -531,7 +530,7 @@ export class GapingStab implements SpecialMove {
         return result;
     };
     checkRequirements = undefined
-    description = `Stab the enemy where it hurts, dealing medium Pierce damage and having a medium chance to inflict Bleeding for 3 turns.`   
+    description = `Medium Pierce damage to target, chance to inflict Bleeding for 3 rounds.`   
 }
 
 export class HaftStrike implements SpecialMove {
@@ -558,7 +557,7 @@ export class HaftStrike implements SpecialMove {
         return result;
     };
     checkRequirements = undefined
-    description = `Strike an enemy with a powerful haft, dealing medium Crush damage.`   
+    description = `Medium Crush damage to target, chance to inflict Staggered for 3 rounds.`   
 }
 
 export class Rampage implements SpecialMove {
@@ -596,7 +595,7 @@ export class Rampage implements SpecialMove {
         return rampageResults;
     };
     checkRequirements = undefined
-    description = `Strike at the enemy in a wild frenzy, Swinging 3 times but at the cost of a small chance to miss every time regardless.`   
+    description = `3 basic attacks against target, with a small chance to automatically miss each time.`   
 }
 
 export class ShieldBreaker implements SpecialMove {
@@ -631,7 +630,7 @@ export class ShieldBreaker implements SpecialMove {
         return result;
     };
     checkRequirements = undefined
-    description = `Swing at an enemy's armor and shields, ripping them away and opening them up to attack.`   
+    description = `Low Slash damage to target, decrease enemy's defense by for 3 rounds, breaks defense mode and removes most defensive statuses (i.e shield wall)`   
 }
 
 
@@ -661,7 +660,7 @@ export class FeralSwing implements SpecialMove {
         return feralSwingResults;
     };
     checkRequirements = undefined
-    description = `Swing your blade in a wide arc, dealing massive Slash damage to all in the area.`   
+    description = `Basic attack against all targets in a 3-tiles arc.`   
 }
 
 export class UnstoppableCharge implements SpecialMove {
@@ -692,7 +691,8 @@ export class UnstoppableCharge implements SpecialMove {
     checkRequirements = (self: Combatant) => {
         return !self.hasMoved && !self.hasStatusEffect(StatusEffectType.IMMOBILIZED)
     };
-    description = `Charge at an enemy with a blade held high, damage increasees the more panels you move in the process`   
+    description = `Move forward up to 5 tiles, then basic attack against the target. The More tiles moved, the higher the damage.
+    Can not be used after moving.`   
 }
 
 
@@ -721,7 +721,7 @@ export class WindRunAssault implements SpecialMove {
     checkRequirements = (self: Combatant) => {
         return !self.hasMoved
     };
-    description = `Let your feet run on the wind itself, then drop by an enemy and strike them by surprise.`   
+    description = `Teleport by the the target, then perform a basic attack. Can not be used after moving`   
 }
 
 export class TitanicFist implements SpecialMove {
@@ -759,8 +759,8 @@ export class TitanicFist implements SpecialMove {
         return result;
     };
     checkRequirements = undefined
-    description = `Strike an enemy with a powerful fist, dealing medium Crush damage and pushing them up to 3 panels back.
-    if they hit something on the way, they'll stop, and both them and the obstacle will suffer a small amount of damage.`   
+    description = `Medium Crush damage to target. Attempts to push the target up to 3 tiles back if possible. If any other
+    target is in the way, both pushed enemy and the target suffer low crush damage.`   
 }
 
 export class AngelicTouch implements SpecialMove {
@@ -793,7 +793,7 @@ export class AngelicTouch implements SpecialMove {
     checkRequirements = (self: Combatant) => {
         return self.hasStatusEffect(StatusEffectType.IDAI_NO_HADOU);
     };
-    description = `Imbue your fist with the gift of the heavens, deal massive holy damage to an enemy, and may kill it outright.`   
+    description = `High Holy damage to target, small chance to instant kill. Requires the Idai no Hadou status.`   
 }   
 
 export class VipersKiss implements SpecialMove {
@@ -820,7 +820,7 @@ export class VipersKiss implements SpecialMove {
         return result;
     };
     checkRequirements = undefined
-    description = `Strike the target with a dagger coated with deadly poison, dealing medium Blight damage and having a medium chance to inflict Poisoned for 3 turns.`   
+    description = `Medium Blight damage to target, chance to inflict Poisoned for 3 rounds.`   
 }
 
 export class SneakAttack implements SpecialMove {
@@ -850,7 +850,7 @@ export class SneakAttack implements SpecialMove {
         return result;
     };
     checkRequirements = undefined
-    description = `Strike an unsuspecting enemy, either from invisibility or from from the flank, for considerable pierce damage`   
+    description = `Medium Pierce damage to target, damage increased by 50% if the user is cloaked or the target is flanked by another ally.`   
 }
 
 export class ShockingGauntlet implements SpecialMove {
@@ -877,7 +877,7 @@ export class ShockingGauntlet implements SpecialMove {
         return result;
     };
     checkRequirements = undefined
-    description = `Use your handy electrified gauntlet to shock an enemy from up close, dealing medium Lightning damage and having a small chance to inflict Staggered for 3 turns.`   
+    description = `Medium Lightning damage to target, chance to inflict Staggered for 3 rounds.`   
 }   
 
 export class Horns implements SpecialMove {
@@ -901,7 +901,7 @@ export class Horns implements SpecialMove {
         return result;
     };
     checkRequirements = undefined
-    description = `Strike an enemy with your horns, dealing medium Pierce damage.`   
+    description = `High Pierce damage to target.`   
 }
 
 export class Claws implements SpecialMove {
@@ -925,7 +925,7 @@ export class Claws implements SpecialMove {
         return result;
     };
     checkRequirements = undefined
-    description = `Strike an enemy with your claws, dealing medium Slash damage.`   
+    description = `High Slash damage to target.`   
 }
 
 export class TrollKick implements SpecialMove {
@@ -949,7 +949,7 @@ export class TrollKick implements SpecialMove {
         return result;
     };
     checkRequirements = undefined
-    description = `Strike an enemy with your mighty foot, dealing medium Crush damage.`   
+    description = `High Crush damage to target.`   
 }
 
 export class VenomousSpit implements SpecialMove {
@@ -976,7 +976,7 @@ export class VenomousSpit implements SpecialMove {
         return result;
     };
     checkRequirements = undefined
-    description = `Strike an enemy with your venomous spit, dealing medium Blight damage, may also poison them for 3 turns.`   
+    description = `Medium Blight damage to target, chance to inflict Poisoned for 3 rounds.`   
 }
 
 export class DragonBreath implements SpecialMove {
@@ -1003,7 +1003,7 @@ export class DragonBreath implements SpecialMove {
         return result;
     };
     checkRequirements = undefined
-    description = `Breathe fire on an enemy, dealing medium Fire damage and may inflict Burning for 3 turns.`   
+    description = `Medium Fire damage to target, chance to inflict Burning for 3 rounds.`   
 }
 
 export class DragonFireBall implements SpecialMove {
@@ -1033,7 +1033,7 @@ export class DragonFireBall implements SpecialMove {
         return fireBallResults;
     };  
     checkRequirements = undefined
-    description = `Cast a ball of fire, dealing medium Fire damage.`   
+    description = `Medium Fire damage to all targets in a 1-tile radius nova.`   
 }
 
 export class DieMortal implements SpecialMove {
@@ -1081,7 +1081,7 @@ export class ArcBolt implements SpecialMove {
         return result;
     };
     checkRequirements = undefined
-    description = `Shoot a bolt in an arc, dealing medium Pierce damage.`   
+    description = `Medium Pierce damage to target.`   
 }
 
 export class SharpenalShell implements SpecialMove {
@@ -1117,7 +1117,7 @@ export class SharpenalShell implements SpecialMove {
     checkRequirements = (self: Combatant) => {
         return self.hasStatusEffect(StatusEffectType.INGENIOUS_UPGRADE) && !self.hasStatusEffect(StatusEffectType.RELOAD);
     }
-    description = 'medium crush damage to targtet, medium pierce damage to everyone around it. 2 rounds cooldown to reload.'
+    description = 'Medium crush damage to targtet, Medium pierce damage in 1-tile radius nova. 2 rounds cooldown to reload.'
 }
     
 
@@ -1148,7 +1148,7 @@ export class ScorpionBolt implements SpecialMove {
     checkRequirements = (self: Combatant) => {
         return self.hasStatusEffect(StatusEffectType.INGENIOUS_UPGRADE);
     }
-    description = `Shoot a bolt in an arc, dealing medium Pierce damage.`   
+    description = `Medium Pierce damage to all targets in a 3-tile line.`   
 }
 
 export class TeleportBlast implements SpecialMove {
@@ -1182,5 +1182,5 @@ export class TeleportBlast implements SpecialMove {
     checkRequirements = (self: Combatant) => {
         return self.hasStatusEffect(StatusEffectType.INGENIOUS_UPGRADE);
     }
-    description = `Shoot a bolt in an arc, dealing medium Pierce damage.`
+    description = `Teleport to target tile, then explode and damage everyone in a 1-tile nova radius.`
 }

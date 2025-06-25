@@ -38,9 +38,7 @@ export class BlockingStance implements SpecialMove {
     checkRequirements = (self: Combatant) => {
         return !self.hasStatusEffect(StatusEffectType.BLOCKING_STANCE);
     };
-    description = `Go into Blocking stance. 
-    Every attack against you of slash, pierce or crush damage types has a 50 percent chance of being blocked.
-    Stance will end upon moving or attacking.`
+    description = `Gain Blocking stance status. As long as it lasts, any physical attack against you has 70% chance to be blocked.`
 }
 
 export class ArcaneChanneling implements SpecialMove {
@@ -72,7 +70,7 @@ export class ArcaneChanneling implements SpecialMove {
     checkRequirements = (self: Combatant) => {
         return !self.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING);
     };
-    description = `Gather the power of the arcane in your body, and get ready to unleash a devastating spell.`
+    description = `Gain the Arcane Channeling status. Required for various spells.`
 }
 
 export class FocusAim implements SpecialMove {
@@ -104,7 +102,7 @@ export class FocusAim implements SpecialMove {
     checkRequirements = (self: Combatant) => {
         return !self.hasStatusEffect(StatusEffectType.FOCUS_AIM);
     };
-    description = `Gather the power of the arcane in your body, and get ready to unleash a devastating spell.`
+    description = `Gain the Focus Aim status, which increases attack power and agility for the next attack.`
 }
 
 export class ShadowStep implements SpecialMove {
@@ -133,8 +131,7 @@ export class ShadowStep implements SpecialMove {
     checkRequirements = (self: Combatant) => {
         return !self.hasStatusEffect(StatusEffectType.CLOAKED) && !self.hasMoved;
     };
-    description = `Step into the shadows, move to target position, and become cloaked for 5 round.
-    cloaking breaks upon taking damage, losing focus or attacking.`
+    description = `Move to target position, and become cloaked for 5 rounds. Cloaking breaks upon taking damage, attackin and performing most skills.`
 }
 
 export class TrollRegeneration implements SpecialMove {
@@ -165,7 +162,7 @@ export class TrollRegeneration implements SpecialMove {
 
 export class DragonRage implements SpecialMove {
     name: string = "Dragon Rage";
-    description = `Rage like a dragon, and gain an additional action point.`
+    description = `Gain 2 additional action points.`
     triggerType = SpecialMoveTriggerType.Active;
     cost: number = 10;
     turnCost: number = 1;
@@ -187,7 +184,7 @@ export class DragonRage implements SpecialMove {
 
 export class SelfDestruct implements SpecialMove {
     name: string = "Self Destruct";
-    description = `Self destruct, deal 100 damage to all enemies in range.`
+    description = `Self destruct and deal medium fire damage in a 1-tile radius nova.`
     triggerType = SpecialMoveTriggerType.Active;
     cost: number = 0;
     turnCost: number = 1;
@@ -210,7 +207,7 @@ export class SelfDestruct implements SpecialMove {
 
 export class ReplacementPart implements SpecialMove {
     name: string = "Replacement Part";
-    description = `resotre some health and stamina. requires ingenius upgraded status.`
+    description = `Restore some health and stamina. Requires Ingenius Upgrade status.`
     triggerType = SpecialMoveTriggerType.Active;
     cost: number = 0;
     turnCost: number = 1;

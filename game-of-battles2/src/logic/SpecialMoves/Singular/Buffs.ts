@@ -35,7 +35,7 @@ export class Fortify implements SpecialMove {
         return getStandardActionResult();
     };
     checkRequirements = undefined;
-    description = `Use your expertise in martial defense to fortify an ally, increasing their defense power for 3 turns`
+    description = `Increase ally's defense power for 3 rounds.`
 }
 
 export class CallOfStrength implements SpecialMove {
@@ -65,7 +65,7 @@ export class CallOfStrength implements SpecialMove {
         return getStandardActionResult();
     };
     checkRequirements = undefined;
-    description = `Inspire an ally's heart with words of strength, increasing their attack power for 3 turns`
+    description = `Increase ally's attack power for 3 rounds.`
 }
 
 export class CallOfVigor implements SpecialMove {
@@ -95,7 +95,7 @@ export class CallOfVigor implements SpecialMove {
         return getStandardActionResult();
     };
     checkRequirements = undefined;
-    description = `Remove the burden of fear from an ally's body , increasing their Movement speed for 3 turns`
+    description = `Increase ally's agility and movement speed for 3 rounds.`
 }
 
 export class Encourage implements SpecialMove {
@@ -125,7 +125,7 @@ export class Encourage implements SpecialMove {
         return getStandardActionResult();
     };
     checkRequirements = undefined;
-    description = `Raise the morale of an ally, giving them a small chance to gain extra action points after their turn for 5 rounds`
+    description = `Ally gains the Encouraged status for 5 rounds. Upon ending their turn, they have a small chance to gain an additional action point.`
 }
 
 export class FullMetalJacket implements SpecialMove {
@@ -155,9 +155,7 @@ export class FullMetalJacket implements SpecialMove {
         return getStandardActionResult();
     };
     checkRequirements = undefined;
-    description = `Cover an ally with a thick layer of reinforced metal, increasing their defense power for 3 turns, and 
-    and potentially their attack power as well if they carry a physical weapon. However, they also become weak to
-    lightning damage.`
-        
+    description = `For 3 rounds, ally becomes a construct, gains defense boost, attack boost if their attacks are physical based,
+    becomes weak to lightning damage, and may unlock an additional skill.`       
 }
 

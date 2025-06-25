@@ -18,7 +18,7 @@ import { FistWeaver } from "@/logic/Combatants/FistWeaver";
 
 export class ShieldBash extends CoopMove {
     name: string = "Shield Bash";
-    description: string = "Strike an adjacent enemy with your shield, pushing them back and potentially knocking them staggered.";
+    description: string = "Medium Crush damage to target, chance to Stagger them for 3 rounds, and push them up to 2 tiles back. If they hit something on the way, they'll stop, and both them and the obstacle will suffer a small amount of damage.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Vanguard, CombatantType.FistWeaver] }
     ];
@@ -62,7 +62,7 @@ export class ShieldBash extends CoopMove {
 
 export class RainOfArrows extends CoopMove {
     name: string = "Rain of Arrows";
-    description: string = "Fire a barrage of arrows to the sky, raining down on all enemies in a cross-shaped area.";
+    description: string = "Medium Pierce damage to all targets in a 1-tile cross-shaped area.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Hunter, CombatantType.StandardBearer, CombatantType.Pikeman, CombatantType.Rogue] }
     ];
@@ -95,7 +95,7 @@ export class RainOfArrows extends CoopMove {
 
 export class BrimstoneRain extends CoopMove {
     name: string = "Brimstone Rain";
-    description: string = "Ignite your arrows with fire and brimstone, and launch them in a massive crosse shaped volley";
+    description: string = "Medium Fire damage to all targets in a 1-tile cross-shaped area, chance to inflict Burning for 3 rounds.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Hunter, CombatantType.StandardBearer, CombatantType.Pikeman, CombatantType.Rogue] },
         { combatantTypeOptions: [CombatantType.Wizard, CombatantType.Artificer] }
@@ -133,7 +133,7 @@ export class BrimstoneRain extends CoopMove {
 
 export class QueensWrathMothersLove extends CoopMove {
     name: string = "Queen's Wrath, Mother's Love";
-    description: string = "Through most pure prayer, call for the heavens to smite your enemies with holy fire, and bath your allies with healing energy.";
+    description: string = "All targets in a 1-tile radius nova, allies are healed for medium amount of health, enemies are dealt medium Holy damage.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Healer, CombatantType.StandardBearer, CombatantType.FistWeaver] },
         { combatantTypeOptions: [CombatantType.Wizard, CombatantType.Witch] }
@@ -185,7 +185,7 @@ export class QueensWrathMothersLove extends CoopMove {
 
 export class MoonBeam extends CoopMove {
     name: string = "Moon Beam";
-    description: string = "Call down a beam of moonlight to strike your enemies, causing them to bleed out.";
+    description: string = "All targets in a 3-tile line are dealt medium Holy damage.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Wizard, CombatantType.Healer] }
     ];
@@ -218,7 +218,7 @@ export class MoonBeam extends CoopMove {
         
 export class WhirlwindAttack extends CoopMove {
     name: string = "Whirlwind Attack";
-    description: string = "Perform a deadly spin, cleaving at everyone around you.";
+    description: string = "All targets in a 1-tile nova around you are dealt medium Slash damage.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Vanguard, CombatantType.Pikeman] }
     ];
@@ -285,12 +285,12 @@ export class ColdEdge extends CoopMove {
     };
     
     meterCost: number = 0;
-    description = `Charge your weapon with the gift of electricity, and strike through a line of targets, dealing medium Lightning damage.`
+    description = `Medium Ice damage to all targets in a 1-tile line.`
 }
 
 export class SkeweringHarppon extends CoopMove {
     name: string = "Skewering Harppon";
-    description: string = "Charge your weapon with the gift of electricity, and strike through a line of targets, dealing medium Lightning damage.";
+    description: string = "Medium Pierce damage to all targets in a 3-tile line in a 4-tile range.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Hunter, CombatantType.Pikeman] }
     ];
@@ -323,7 +323,7 @@ export class SkeweringHarppon extends CoopMove {
 
 export class HungerOfZirash extends CoopMove {
     name: string = "Hunger of Zirash";
-    description: string = "Call upon the hunger of Zirash to strike your enemies, causing them to bleed out.";
+    description: string = "Medium Dark damage to all targets in a 1-tile radius nova, and removes all of their negative status effects. For each negative status effect removed, the damage is repeated.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Wizard, CombatantType.Witch, CombatantType.Rogue] },
         { combatantTypeOptions: [CombatantType.Healer, CombatantType.FistWeaver, CombatantType.Fool] }
@@ -370,7 +370,7 @@ export class HungerOfZirash extends CoopMove {
 
 export class StrikeAsOne extends CoopMove {
     name: string = "Strike as One";
-    description: string = "Strike your enemy, damage increases with every ally standing by the target.";
+    description: string = "Medium Crush damage to target, damage increases by 25% of base damage for each ally adjacent to the target.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Vanguard, CombatantType.FistWeaver, 
             CombatantType.Pikeman] }
@@ -407,7 +407,7 @@ export class StrikeAsOne extends CoopMove {
 
 export class ForbiddenArt extends CoopMove {
     name: string = "Forbidden Art";
-    description: string = "medium dark damage, and inflicts forbidden affliction. target takes damage for every step and attack roll.";
+    description: string = "medium dark damage, and inflicts forbidden affliction for 3 rounds. target takes damage for every step and attack roll.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Rogue, CombatantType.Vanguard, CombatantType.Pikeman, CombatantType.Witch] }
     ];
@@ -490,7 +490,7 @@ export class DanceOfDaggers extends CoopMove {
 
 export class KarithrasBoon extends CoopMove {
     name: string = "Karithras Boon";
-    description: string = "Attack an enemy. if it dies, get buffs according to target health percent lost. double damage while cloaked";
+    description: string = "Attack an enemy. if it dies, get buffs according to target health percent lost. Double damage while cloaked";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         // { combatantTypeOptions: [CombatantType.Rogue, CombatantType.Witch, CombatantType.Fool, CombatantType.Wizard] },
         // { combatantTypeOptions: [CombatantType.Healer, CombatantType.FistWeaver, CombatantType.StandardBearer] }
@@ -608,7 +608,7 @@ export class KarithrasBoon extends CoopMove {
 
 export class LightningKicks extends CoopMove {
     name: string = "Lightning Kicks";
-    description: string = "Kick your enemy thrice with wonderful alacrity. If all kicks land, a lightning bolt will strike them as well.";
+    description: string = "Low Crush damage to target, 3 times. If all attacks land, they are dealt medium Lightning damage as well.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Vanguard, CombatantType.Pikeman, CombatantType.FistWeaver] }
     ];
@@ -645,7 +645,7 @@ export class LightningKicks extends CoopMove {
 
 export class SoulScythe extends CoopMove {
     name: string = "Soul Scythe";
-    description: string = "Strike your enemy with a scythe of souls, causing them to bleed out.";
+    description: string = "Low chance to drop target to 0 health. Chance increases for each negative status effect on the target, as well as for every % of missing health.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Vanguard, CombatantType.Pikeman, CombatantType.Rogue] }
     ];
@@ -696,7 +696,7 @@ export class SoulScythe extends CoopMove {
 
 export class SnipeShot extends CoopMove {
     name: string = "Snipe Shot";
-    description: string = "Take careful aim and launch a hyper accurate shot at your enemy. goes beyond obstacles, high chance for critical hit.";
+    description: string = "Medium Pierce damage to target with increased attack power and agility. Curved trajectory.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Hunter, CombatantType.Vanguard, CombatantType.FistWeaver] }
     ];
@@ -729,7 +729,7 @@ export class SnipeShot extends CoopMove {
 
 export class PlagueArrow extends CoopMove {
     name: string = "Plague Arrow";
-    description: string = "Launch a poisoned arrow at your enemy, causing them to bleed out.";
+    description: string = "Medium Blight damage to target, chance to inflict Plagued for 3 rounds. Plagued enemies may inflict plageud on their friends";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Artificer, CombatantType.Witch, CombatantType.Fool] }
     ];
@@ -761,7 +761,7 @@ export class PlagueArrow extends CoopMove {
 
 export class CatastrophicCalamity extends CoopMove {
     name: string = "Catastrophic Calamity";
-    description: string = "Unleashes the Wizard's full hidden, Forbidden potential in a terrifying blast that no protection can stop, dealing massive damage.";
+    description: string = "Massive Unstoppable damage to all targets in a 2-tile radius nova. Requires both Arcane Channeling and Arcane Overcharge.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Wizard, CombatantType.Witch, CombatantType.Fool, CombatantType.Artificer] },
         { combatantTypeOptions: [CombatantType.Vanguard, CombatantType.Pikeman, CombatantType.FistWeaver, CombatantType.StandardBearer, CombatantType.Defender] }
@@ -799,7 +799,7 @@ export class CatastrophicCalamity extends CoopMove {
 
 export class SkySovereignsWrath extends CoopMove {
     name: string = "Sky Sovereign's Wrath";
-    description: string = "Fall on your enemies with a mighty blow powered with the wrath of the skies, striking the target and whoever behind with the power of lightning";
+    description: string = "Medium Lightning damage to all targets in a 3-tile line.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Wizard, CombatantType.Artificer] },
     ];
@@ -832,7 +832,7 @@ export class SkySovereignsWrath extends CoopMove {
 
 export class DiamondHook extends CoopMove {
     name: string = "Diamond Hook";
-    description: string = "Grab an enemy, pull him to you, then strike him. He can not move or attack you without being struck again.";
+    description: string = "Target is grabbed and pulled, dealt low pierce damage, and then attacked again for Medium Pierce damage. If the attack hits, the target is hooked to the attacker.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Artificer, CombatantType.Vanguard, CombatantType.Defender, CombatantType.StandardBearer] }
     ];
@@ -895,7 +895,7 @@ export class DiamondHook extends CoopMove {
 
 export class FlameThrower extends CoopMove {
     name: string = "Flame Thrower";
-    description: string = "Medium fire damage in a line, chance to inflinct burn";
+    description: string = "Medium fire damage in a 3-tile line, chance to inflinct burn";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Wizard, CombatantType.Artificer, CombatantType.Vanguard] }
     ];
