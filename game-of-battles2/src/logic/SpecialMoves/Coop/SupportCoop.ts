@@ -311,7 +311,7 @@ export class Sanctuary extends CoopMove {
 
 export class ArcaneConduit extends CoopMove {
     name: string = "Arcane Conduit";
-    description: string = "Arcane Conduit";
+    description: string = "Gain the Arcane Conduit status for 2 rounds. While it lasts, gain the Arcane Channeling status at the beginning of your turns.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Wizard, CombatantType.Artificer] },
     ];
@@ -338,7 +338,7 @@ export class ArcaneConduit extends CoopMove {
 
 export class Guardian extends CoopMove {
     name: string = "Guardian";
-    description: string = "Guardian";
+    description: string = "Any damage taken by target ally is halved and transferred to you";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Healer, CombatantType.StandardBearer, CombatantType.Pikeman] },
     ];
@@ -361,7 +361,7 @@ export class Guardian extends CoopMove {
         targetCombatant.addRelatedCombatant('GUARDIAN', invoker);
         return getStandardActionResult(invoker.position, this.turnCost);
     };
-    cost: number = 10;
+    cost: number = 8;
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Curve,
         align: SpecialMoveAlignment.Ally,

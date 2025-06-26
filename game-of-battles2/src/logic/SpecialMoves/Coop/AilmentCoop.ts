@@ -15,7 +15,7 @@ import { StatusEffect, StatusEffectAlignment, StatusEffectType } from "@/logic/S
 
 export class HellScream extends CoopMove {
     name: string = "Hell Scream";
-    description: string = "Let out a terrifying scream from the depths of your burning soul, high chance to inflict fear on enemies.";
+    description: string = "All enemies in a 1-tile radius cross-shaped have a chance to be inflicted with panic for 3 turns";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Fool, CombatantType.Witch] }
     ];
@@ -50,7 +50,7 @@ export class HellScream extends CoopMove {
 
 export class BlowAKiss extends CoopMove {
     name: string = "Blow a Kiss";
-    description: string = "Sends an enemy your hearty token of love, with a medium chance of charming them.";
+    description: string = "Chance to charm target enemy for 2 turns";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Fool, CombatantType.Witch, CombatantType.Healer] }
     ];
@@ -83,7 +83,7 @@ export class BlowAKiss extends CoopMove {
 
 export class StandUpComedyGoneWrong extends CoopMove {
     name: string = "Stand Up Comedy Gone Wrong";
-    description: string = "You always wanted to be a comedian, but no one is laughing. instead, there's a medium chance they'll want to kill you.";
+    description: string = "All enemies in a 1-tile cross-shaped area of effect have a chance to be inflicted with taunted for 3 rounds.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Fool, CombatantType.Vanguard, CombatantType.Defender] }
     ];
@@ -103,7 +103,7 @@ export class StandUpComedyGoneWrong extends CoopMove {
         const combatMaster = CombatMaster.getInstance();
         const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
         getAllTargets.map(AOETarget => {
-            combatMaster.tryInflictStatusEffect(invoker, AOETarget, board, StatusEffectType.TAUNTED, 1, 0.6);
+            combatMaster.tryInflictStatusEffect(invoker, AOETarget, board, StatusEffectType.TAUNTED, 3, 0.6);
         });
         return getStandardActionResult(invoker.position, this.turnCost);
     };
@@ -115,7 +115,9 @@ export class StandUpComedyGoneWrong extends CoopMove {
 
 export class CircusDiabolique extends CoopMove {
     name: string = "Circus Diabolique";
-    description: string = "Entrhall your foes with the most magnificent show of nightmares ever conceived. if struck, they'll be helpess, and slowly rot away as they watch in horror.";
+    description: string = `Gain the Circus Diabolique status effect.
+    Enemies in a 2-tile radius nova around you may become Nightmare locked for 2 rounds.
+    They are unable to act, and suffer 10 blight damage every turn. Circus Diabolique will keep on as long as you skip your turn.`;
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Fool, CombatantType.Witch, CombatantType.Rogue, CombatantType.Artificer] },
         { combatantTypeOptions: [CombatantType.StandardBearer, CombatantType.Wizard, CombatantType.Defender] }
@@ -144,7 +146,7 @@ export class CircusDiabolique extends CoopMove {
 
 export class SleepingDart extends CoopMove {
     name: string = "Sleeping Dart";
-    description: string = "High chance to inflict sleep for 2 turns. does not break cloaking";
+    description: string = "High chance to inflict sleep for 2 rounds. does not break cloaking";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Fool, CombatantType.Artificer, CombatantType.Rogue] }
     ];

@@ -17,7 +17,7 @@ import { StatusEffect, StatusEffectAlignment, StatusEffectType } from "@/logic/S
 
 export class DevourDivinity extends CoopMove {
     name: string = "Devour Divinity";
-    description: string = "Devour the divinity of your enemies, high chance to inflict fear on enemies.";
+    description: string = "All enemies in a 1-tile radius nova lose their positive status effects, For each positive status effect removed, restore 10 health. In addition, you gain Attack power boost that lasts for the amount of statuses removed.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Healer, CombatantType.StandardBearer] }
     ];
@@ -63,7 +63,7 @@ export class DevourDivinity extends CoopMove {
 
 export class UltimateCurse extends CoopMove {
     name: string = "Ultimate Curse";
-    description: string = "Bane your enemy with a crippling curse, weakening them in every way possible";
+    description: string = "Target enemy is applied attack power, defense, agility, movement and luck decrease for 3 turns";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Witch, CombatantType.Fool, CombatantType.Hunter] }
     ];
@@ -112,7 +112,7 @@ export class UltimateCurse extends CoopMove {
 
 export class DivineRetribution extends CoopMove {
     name: string = "Divine Retribution";
-    description: string = "Mark an enemy with the mark of vengeance. They will suffer half of any direct damage they inflict.";
+    description: string = "Half of Any direct damage dealt by target enemy is dealt to them as well";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Vanguard, CombatantType.Hunter, CombatantType.Pikeman] }
     ];
@@ -147,7 +147,7 @@ export class DivineRetribution extends CoopMove {
 
 export class ShatterSteel extends CoopMove {
     name: string = "Shatter Steel";
-    description: string = "Use your unbreakable edge to break your enemy's arms and armor. decreaseing their defense and attack power.";
+    description: string = "Low pierce damage to target, also applies attack power and defense decrease for 3 turns. May remove some positive buffs";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Vanguard, CombatantType.Witch, CombatantType.Fool, CombatantType.Rogue] }
     ];

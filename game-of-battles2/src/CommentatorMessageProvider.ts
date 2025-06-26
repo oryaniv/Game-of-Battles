@@ -122,7 +122,7 @@ const criticalAndWeaknessOpponentMessages = [
     "Ouch!",
     "Gotta be more careful!",
     "Try not to scream...",
-    "Need some Senzu Beans?",
+    "Senzu Bean!",
     "Why so serious?"
 ]
 
@@ -140,7 +140,7 @@ const bigDamageOpponentMessages = [
     "OOF!",
     "It was nice knowing you",
     "Are you not entertained!?",
-    "How's your health plan going?"
+    "How's your health plan?"
 ]
 
 const failedAttackMessages = [

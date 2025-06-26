@@ -17,7 +17,7 @@ import { IdGenerator } from "@/logic/IdGenerator";
 
 export class UnitedWeStand extends CoopMove {
     name: string = "United We Stand";
-    description: string = "Stand together with your allies, increasing their defense by 10% and their attack by 10%.";
+    description: string = "Caster and all adjacent allies in a 1-tile cross-shaped area are granted strength and mobility boost for 3 turns. Cannot be used after moving.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Defender, CombatantType.StandardBearer, CombatantType.Pikeman, CombatantType.Artificer] }
     ];
@@ -59,7 +59,7 @@ export class UnitedWeStand extends CoopMove {
 
 export class IngeniousUpgrade extends CoopMove {
     name: string = "Ingenious Upgrade";
-    description: string = "boosts construct's attack. Artificer creations get extra abilities";
+    description: string = "Target ally gains attack power boost for 5 turns. In addition, constructs unlock a new skill while this is active.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Fool, CombatantType.Wizard, CombatantType.Healer] }
     ];
@@ -123,7 +123,7 @@ export class BuildBallistaTurret extends CoopMove {
 
 export class BuildBabyBabel extends CoopMove {
     name: string = "Build Death Tower";
-    description: string = "Build a baby babel, which can heal allies and deal damage to enemies.";
+    description: string = "Build a magical guard tower, which can attack enemies with many types of elemental skills";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Artificer, CombatantType.Wizard, CombatantType.Witch] },
         { combatantTypeOptions: [CombatantType.Hunter, CombatantType.Pikeman, CombatantType.Vanguard, CombatantType.StandardBearer] }

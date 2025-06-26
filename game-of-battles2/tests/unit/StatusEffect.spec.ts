@@ -64,6 +64,7 @@ describe('StatusEffect basic tests', () => {
   it('should get results for status effect hook', () => {
     const mockEffect: StatusEffect = {
       name: StatusEffectType.BLOCKING_STANCE,
+      description: 'Blocking Stance',
       applicationHooks: {
         [StatusEffectHook.OnBeingAttacked]: jest.fn().mockReturnValue(getStandardActionResult())
       },

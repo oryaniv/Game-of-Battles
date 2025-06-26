@@ -3,7 +3,7 @@
   <div class="game-container">
     <!-- <div class="team-turn-message">{{ turnMessage }}</div>
     <div class="round-count">Round: {{ roundCount }}</div> -->
-    <div class="board-frame cave">
+    <div class="board-frame temple">
     <div class="board">
       <div class="board-background">
       </div>
@@ -32,7 +32,7 @@
           <!-- <div class="coordinates" style="font-size: 24px;">{{x -1}},{{y - 1}}</div> -->
           <div
             v-if="getCombatant({ x , y})"
-            :class="{ dead: getCombatant({ x, y })?.stats.hp <= 0 }"
+            :class="{ dead: getCombatant({ x, y })?.stats.hp <= 0, 'active-combatant': isCurrentCombatant({ x, y }) }"
             class="combatant"
             :style="{ 
               color: teamColors[getCombatant({ x, y }).team.getIndex() === 0 ? 0 : 1],
@@ -42,16 +42,16 @@
               }"
             
           >
+           <div class="health-stamina-bars">
             <div class="health-bar">
               <div class="health-fill" :style="calcHealthFill(getCombatant({ x, y }))"></div>
             </div>
             <div class="stamina-bar">
               <div class="stamina-fill" :style="calcStaminaFill(getCombatant({ x, y }))"></div>
             </div>
-            <div :class="{'sprite-container': true, 'white': getCombatant({ x, y })?.team.getIndex() === 0}">
-              <img class="combatant-sprite" :src="getCombatantSprite(getCombatant({ x, y }))" alt="Combatant" />
-             
-            </div>
+           </div>
+            
+            <CombatantSprite :combatant="getCombatant({ x, y })" />
              <img v-if="isDefending(getCombatant({ x, y }))" class="defend-icon" src="./assets/defend.svg" alt="Defend" />
             <transition-group name="damage-text" tag="div">
               <div
@@ -214,31 +214,15 @@
 
   <!-- Turn Order: white team-->
   <div v-if="getWhiteTeamCombatants().length > 0" class="white-team-turn-order-container">
-    <div v-for="combatant in getWhiteTeamCombatants()" :key="combatant.name" class="turn-order-item" :style="{ filter: getCurrentTeamIndex() === 1 ? 'blur(4px)' : '' }">
-      <div class="turn-order-combatant-icon" :style="{ boxShadow: getCurrentCombatant()?.name === combatant.name ? '0 0 10px 5px rgba(0, 255, 0, 0.7)' : '' }">
-        <div class="sprite-container white">
-              <img class="combatant-sprite" :src="getCombatantSprite(combatant)" alt="Combatant" />  
-        </div>
-        <div class="turn-order-combatant-name">{{ combatant.name }}</div>
-      </div>
-      <div class="dead-x" v-if="combatant.stats.hp <= 0">
-        <img  src="./assets/X.svg" alt="Dead" />
-      </div>
+    <div v-for="combatant in getWhiteTeamCombatants()" :key="combatant.name" class="turn-order-item" :style="{ filter: getCurrentTeamIndex() === 3 ? 'blur(4px)' : '' }">
+      <TurnOrderWidget :combatant="combatant" :currentCombatant="getCurrentCombatant()" />
     </div>
   </div>
 
   <!-- Turn Order: black team -->
   <div v-if="getBlackTeamCombatants().length > 0" class="black-team-turn-order-container" >
     <div v-for="combatant in getBlackTeamCombatants()" :key="combatant.name" class="turn-order-item" :style="{ filter: getCurrentTeamIndex() === 0 ? 'blur(4px)' : '' }">
-      <div class="turn-order-combatant-icon" :style="{ boxShadow: getCurrentCombatant()?.name === combatant.name ? '0 0 10px 5px rgba(0, 255, 0, 0.7)' : '' }">
-        <div class="sprite-container black" >
-            <img class="combatant-sprite" :src="getCombatantSprite(combatant)" alt="Combatant" />  
-        </div>
-        <div class="turn-order-combatant-name">{{ combatant.name }}</div>
-      </div>
-      <div class="dead-x" v-if="combatant.stats.hp <= 0">
-        <img  src="./assets/X.svg" alt="Dead" />
-      </div>
+      <TurnOrderWidget :combatant="combatant" :currentCombatant="getCurrentCombatant()" />
     </div>
   </div>
 
@@ -377,12 +361,16 @@ import { AllOfThem, standardVsSetup, theATeam, theBTeam, allMilitiaSetup, theGor
  import StatusDescriptionBox from './components/StatusDescriptionBox.vue';
  import ActionEventMessage from './components/ActionEventMessage.vue';
  import CommentatorMessages from './components/CommentatorMessages.vue';
+ import CombatantSprite from './components/CombatantSprite.vue';
+ import TurnOrderWidget from './components/TurnOrderWidget.vue';
 
 export default defineComponent({
   components: {
     StatusDescriptionBox,
     ActionEventMessage,
-    CommentatorMessages
+    CommentatorMessages,
+    CombatantSprite,
+    TurnOrderWidget
   },
   setup() {
     
@@ -392,16 +380,23 @@ export default defineComponent({
     const veternAIAgentNoCoop = new VeteranAIAgent();
     veternAIAgentNoCoop.setCollectCoop(false);
     const rookieAIAgent = new RookieAIAgent();
-    const whiteTeam = ref(new Team('White Team', 0));
+    const whiteTeam = ref(new Team('White Team', 0, veternAIAgentWithCoop));
     const blackTeam = ref(new Team('Black Team', 1, veternAIAgentWithCoop));
 
     // whiteTeam.value.addCombatant(new Defender('aobo', { x: 3, y: 5}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Wizard('Saruman', { x: 4, y: 4}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Hunter('Lucia', { x: 5, y: 6}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new StandardBearer('Jezebel', { x: 2, y: 4}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new FistWeaver('Harley', { x: 4, y: 0}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Healer('Mia', { x: 6, y: 0}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new BabyBabel('Gobo', { x: 5, y: 1}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Gorilla('Gorrila', { x: 4, y: 4}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Vanguard('V1', { x: 5, y: 4}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new FistWeaver('F1', { x: 3, y: 4}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Hunter('H1', { x: 5, y: 6}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new StandardBearer('S1', { x: 4, y: 6}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Fool('F1', { x: 5, y: 7}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Rogue('R1', { x: 3, y: 5}, whiteTeam.value));
+    // whiteTeam.value.addCombatant(new Wizard('Z1', { x: 3, y: 5}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Artificer('A1', { x: 3, y: 5}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Healer('L1', { x: 3, y: 5}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Pikeman('P1', { x: 3, y: 5}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Defender('D1', { x: 3, y: 5}, whiteTeam.value));
+    whiteTeam.value.addCombatant(new Witch('W1', { x: 3, y: 5}, whiteTeam.value));
     // whiteTeam.value.addCombatant(new BallistaTurret('Gobo', { x: 6, y: 1}, whiteTeam.value));
     // whiteTeam.value.addCombatant(new Wall('Gobo', { x: 5, y: 3}, whiteTeam.value));
     // whiteTeam.value.addCombatant(new Wall('Gobo', { x: 6, y: 3}, whiteTeam.value));
@@ -409,45 +404,50 @@ export default defineComponent({
     // whiteTeam.value.addCombatant(new Vanguard('Gobo', { x: 1, y: 8 }, whiteTeam.value));
     // whiteTeam.value.addCombatant(new Witch('eobo', { x: 4, y: 4 }, whiteTeam.value));
 
-    blackTeam.value.addCombatant(new Vanguard('Ragnar', { x: 4, y: 7 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Defender('Richard', { x: 6, y: 5 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Pikeman('Garret', { x: 6, y: 6 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Rogue('Gandalf', { x: 6, y: 7 }, blackTeam.value));
-    blackTeam.value.addCombatant(new Witch('Maximus', { x: 9, y: 8 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Militia('Non', { x: 9, y: 7 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Militia('Skf', { x: 9, y: 6 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Militia('efe', { x: 8, y: 8 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new BabyBabel('Maximus', { x: 3, y: 3 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Witch('nana', { x: 7, y: 9 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Hunter('reqe', { x: 6, y: 9 }, blackTeam.value));
-    // blackTeam.value.addCombatant(new Gorilla('feifne', { x: 5, y: 8 }, blackTeam.value));
+    blackTeam.value.addCombatant(new Vanguard('V2', { x: 5, y: 6}, blackTeam.value));
+    blackTeam.value.addCombatant(new FistWeaver('F2', { x: 2, y: 4}, blackTeam.value));
+    blackTeam.value.addCombatant(new Hunter('H2', { x: 5, y: 6}, blackTeam.value));
+    blackTeam.value.addCombatant(new StandardBearer('S2', { x: 4, y: 6}, blackTeam.value));
+    blackTeam.value.addCombatant(new Fool('F2', { x: 5, y: 7}, blackTeam.value));
+    // blackTeam.value.addCombatant(new Rogue('R2', { x: 3, y: 5}, blackTeam.value));
+    // blackTeam.value.addCombatant(new Wizard('Z2', { x: 3, y: 7}, blackTeam.value));
+    // blackTeam.value.addCombatant(new Artificer('A2', { x: 3, y: 5}, blackTeam.value));
+    // blackTeam.value.addCombatant(new Healer('L2', { x: 3, y: 9}, blackTeam.value));
+    // blackTeam.value.addCombatant(new Pikeman('P2', { x: 3, y: 5}, blackTeam.value));
+    // blackTeam.value.addCombatant(new Defender('D2', { x: 3, y: 5}, blackTeam.value));
+    // blackTeam.value.addCombatant(new Witch('W2', { x: 2, y: 1}, blackTeam.value));
 
   //blackTeam.value.addCombatant(new Artificer('Gobo', { x: 9, y: 6 }, blackTeam.value));
 
-    whiteTeam.value.combatants[0].applyStatusEffect({
-            name: StatusEffectType.ARCANE_CHANNELING,
-            duration: 5,
-    }); 
+    // whiteTeam.value.combatants[0].applyStatusEffect({
+    //         name: StatusEffectType.STRENGTH_BOOST,
+    //         duration: 5,
+    // }); 
 
-    whiteTeam.value.combatants[0].applyStatusEffect({
-            name: StatusEffectType.ARCANE_OVERCHARGE,
-            duration: 5,
-    }); 
+    // whiteTeam.value.combatants[0].applyStatusEffect({
+    //         name: StatusEffectType.LUCK_DOWNGRADE,
+    //         duration: 5,
+    // }); 
 
-    whiteTeam.value.combatants[0].applyStatusEffect({
-            name: StatusEffectType.BURNING,
-            duration: 5,
-    }); 
+    // whiteTeam.value.combatants[0].applyStatusEffect({
+    //         name: StatusEffectType.ARCANE_OVERCHARGE,
+    //         duration: 5,
+    // }); 
 
-    blackTeam.value.combatants[1].applyStatusEffect({
-            name: StatusEffectType.STRENGTH_DOWNGRADE,
-            duration: 5,
-    }); 
+    // whiteTeam.value.combatants[0].applyStatusEffect({
+    //         name: StatusEffectType.BURNING,
+    //         duration: 5,
+    // }); 
 
-    blackTeam.value.combatants[1].applyStatusEffect({
-            name: StatusEffectType.POISONED,
-            duration: 5,
-    }); 
+    // blackTeam.value.combatants[1].applyStatusEffect({
+    //         name: StatusEffectType.STRENGTH_DOWNGRADE,
+    //         duration: 5,
+    // }); 
+
+    // blackTeam.value.combatants[1].applyStatusEffect({
+    //         name: StatusEffectType.POISONED,
+    //         duration: 5,
+    // }); 
 
     // blackTeam.value.combatants[0].applyStatusEffect({
     //         name: StatusEffectType.SANCTUARY,
@@ -461,7 +461,7 @@ export default defineComponent({
 
     
 
-    placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
+   placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
     
 
     const teams = ref([whiteTeam.value, blackTeam.value]);
@@ -587,7 +587,6 @@ export default defineComponent({
       if(game.value.isGameOver()) {
         updateHoveringMessage(getGameOverMessage(whiteTeam.value, blackTeam.value), false);
       } else {
-        debugger;
         updateHoveringMessage(`${game.value.teams[(game.value as Game).getCurrentTeamIndex()].name}'s Turn`, true);
       }
     };
@@ -810,7 +809,6 @@ export default defineComponent({
 
     const applyCommentatorMessages = (actionResults: ActionResult[], team: Team) => {
       const messages = getCommentatorMessage(actionResults, team, board.value as Board);
-      debugger;
       commentatorMessages.value = messages;
     }
 
@@ -891,7 +889,7 @@ export default defineComponent({
             combatant.team.combatants.splice(combatantIndex, 1);
           }
         });
-      }, 500);
+      }, 1000);
 
       function removeCombatantEffect(combatant: Combatant) {
         board.value.removeCombatant(combatant);
@@ -1885,7 +1883,7 @@ button {
 }
 
 .sprite-container.white {
-  filter: invert(1);
+  /*filter: invert(1);*/
 }
 
 .turn-icon {
@@ -2024,28 +2022,49 @@ button {
 
 
 .combatant {
-  transform: scale(2);
+  /*transform: scale(2); */
   display: flex;
   flex-direction: column;
   align-items: center;
-  transition: box-shadow 0.3s ease-in-out, opacity 1s ease-out;
+  transition: box-shadow 0.3s ease-in-out, opacity 1.5s ease-out;
+  position: relative;
 }
 
 .combatant.dead {
   opacity: 0;
 }
 
-.health-bar{
+.health-stamina-bars{
     width: 100%;
-    height: 3px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    z-index: 3;
+    top: -5px;
+}
+
+.combatant:hover .health-bar, 
+.combatant:hover .stamina-bar, 
+.combatant.active-combatant .health-bar, 
+.combatant.active-combatant .stamina-bar{
+  height: 5px;
+}
+
+.health-bar{
+    width: 65%;
+    height: 2px;
     background-color: darkred;
+    transition: all 0.3s ease-in-out;
 }
 
 .stamina-bar{
-    width: 100%;
-    height: 3px;
+    width: 65%;
+    height: 2px;
     background-color: darkblue;
     margin-bottom: 2px;
+    transition: all 0.3s ease-in-out;
 }
 
 .health-fill{
@@ -2060,7 +2079,8 @@ button {
 
 .defend-icon{
   position: absolute;
-  top: 6px;
+  top: 20px;
+  transform: scale(2.5);
 }
 
 .actions {
@@ -2301,7 +2321,7 @@ button {
   top: -20px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 14px;
+  font-size: 20px;
   font-weight: bold;
   animation: floatUp 1s forwards;
 }
@@ -2467,8 +2487,8 @@ button {
 
 .status-effect-indicator-positive, .status-effect-indicator-negative {
   position: absolute;
-  top: -15%;
-  font-size: 8px;
+  top: -2%;
+  font-size: 16px;
   font-weight: bold;
   display: flex;
   flex-direction: column;
@@ -2477,11 +2497,11 @@ button {
 }
 
 .status-effect-indicator-positive {
-  left: -50%;
+  left: -13%;
 }
 
 .status-effect-indicator-negative {
-  right: -50%;
+  right: -13%;
 }
 
 .aoe-highlight {
@@ -2510,11 +2530,13 @@ button {
   width: 20px;
   height: 20px;
   color: red;
+  transform: scale(2) translate(-5px, 10px);
 }
 
 .white-team-turn-order-container, .black-team-turn-order-container {
     display: flex;
     max-width: 335px;
+    gap: 5px;
 }
 
 .white-team-turn-order-container {
@@ -2526,8 +2548,27 @@ button {
 }
 
 .turn-order-item {
-  border-radius: 5px;
+  /*border-radius: 5px;*/
+  /*min-width: 35px;
+  max-width: 35px;*/
   position: relative;
+  margin: 5px;
+  text-align: center;
+  border: none;
+  transition: all 0.3s ease;
+
+   background-image: radial-gradient(circle at center,
+                       rgba(30, 0, 40, 0.9) 0%,
+                       rgba(30, 0, 40, 0.7) 60%,
+                       rgba(30, 0, 40, 0) 100%
+                     );
+   background-color: transparent;
+
+   border-radius: 0px;
+
+   box-shadow: 
+     0 0 15px 5px rgba(245, 232, 210, 0.6),
+     0 0 25px 8px rgba(245, 232, 210, 0.4) inset;
 }
 
 .dead-x {
@@ -2537,52 +2578,52 @@ button {
 }
 
 .white-team-turn-order-container .turn-order-item {
-  background-color: black;
-  color: white;
+  background-image: radial-gradient(circle at center,
+                       rgba(0, 0, 139, 0.9) 0%,
+                       rgba(0, 0, 139, 0.7) 60%,
+                       rgba(0, 0, 139, 0) 100%
+                     );
 }
 
 .black-team-turn-order-container .turn-order-item {
-  background-color: white;
-  color: black;
+   background-image: radial-gradient(circle at center,
+                       rgba(139, 0, 0, 0.9) 0%,
+                       rgba(139, 0, 0, 0.7) 60%,
+                       rgba(139, 0, 0, 0) 100%
+                     );
 }
 
-.black-team-turn-order-container .turn-order-combatant-icon {
+/*.black-team-turn-order-container .turn-order-combatant-icon {
   color: black;
-}
+}*/
 
 .turn-order-combatant-name {
   font-size: 10px;
 }
 
 .white-team-turn-order-container .turn-order-combatant-name {
-  color: white;
+  /*color: white;*/
 }
 
 .black-team-turn-order-container .turn-order-combatant-name {
-  color: black;
+  /*color: black;*/
 }
 
 .black-team-turn-order-container {
   position: absolute;
   bottom: 0;
   right: 2%;
+  
 }
 
 .white-team-turn-order-container {
   position: absolute;
   top: 0;
   right: 2%;
+  
 }
 
-.turn-order-item {
-  background-color: #333;
-  border: 1px solid white;
-  padding: 10px;
-  margin: 5px;
-  min-width: 35px;
-  max-width: 35px;
-  text-align: center;
-}
+
 
 .turn-order-combatant-icon .sprite-container {
   text-align: center;
