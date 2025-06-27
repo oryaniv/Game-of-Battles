@@ -11,22 +11,19 @@
      
 
    * the board
-      * add green glow on edges for co op partnets upon skill selection
+      * new icons/images for all combatants V
       * status effects list must not go below the panel
       * status effects will be icons instead of letters
       * new action results effects for buffs, debuffs, ailments, etc.
-      * new icons/images for all combatants
+      * add green glow on edges for co op partnets upon skill selection  
       * yellow bar for arcane barrier
 
    * right side 
       * make sure the event messages disappear after a short while
-      * good/bad move for player AI announcment message
-      * multi kill announcement (double, multi, ultra, monster, HOLY SH!T)
 
    * left side
      * make sure the UI doesn't break on larger screens
     
-
    * menus on board
      * weakness/resist messages should be shorter
      * add status icons in the examine pop up
@@ -39,13 +36,11 @@
      * sounds for moving, for pressing buttons.
 
    * game flow
-     * screen wide message for every team transition
-     * game over message for "YOU DIED" and "Enemy Died!" with the correct font
+     
 
    * custom messages (for tutorials or bosses)
      
-     
-
+    
 * Result screen
     * summary line according to game results
     * next match in case of victory

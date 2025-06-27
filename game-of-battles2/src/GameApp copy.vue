@@ -1543,8 +1543,8 @@ button {
   width: 100%;
   height: 100%;
   /* background-image: url('./assets/Backgrounds/simpleLand6.png'); */
-  /* background-image: url('./assets/Backgrounds/simpleLand5.png'); */
-  background-image: url('./assets/Backgrounds/cave3.png');
+  background-image: url('./assets/Backgrounds/simpleLand5.png');
+  /* background-image: url('./assets/Backgrounds/cave3.png'); */
   background-size: contain;
   /* background-color: red; */
   position: absolute;

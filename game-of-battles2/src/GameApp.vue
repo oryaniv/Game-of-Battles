@@ -3,7 +3,7 @@
   <div class="game-container">
     <!-- <div class="team-turn-message">{{ turnMessage }}</div>
     <div class="round-count">Round: {{ roundCount }}</div> -->
-    <div class="board-frame temple">
+    <div class="board-frame forest">
     <div class="board">
       <div class="board-background">
       </div>
@@ -356,8 +356,7 @@ import { AllOfThem, standardVsSetup, theATeam, theBTeam, allMilitiaSetup, theGor
  generateRandomTeam, generateCombatantIdenticalTeam, placeAllCombatants, debugSetupWhiteTeam, debugSetupBlackTeam} from './boardSetups';
  import { getGameResultMessage, getGameOverMessage } from './GameOverMessageProvider';
  import { getCommentatorMessage, CommentatorMessage } from './CommentatorMessageProvider';
- import { getActionDescription } from './UIUtils';
- import { getStatusEffectDescription } from './UIUtils';
+ import { getActionDescription, getStatusEffectDescription, getLetterForStatusEffect } from './UIUtils';
  import StatusDescriptionBox from './components/StatusDescriptionBox.vue';
  import ActionEventMessage from './components/ActionEventMessage.vue';
  import CommentatorMessages from './components/CommentatorMessages.vue';
@@ -380,8 +379,8 @@ export default defineComponent({
     const veternAIAgentNoCoop = new VeteranAIAgent();
     veternAIAgentNoCoop.setCollectCoop(false);
     const rookieAIAgent = new RookieAIAgent();
-    const whiteTeam = ref(new Team('White Team', 0, veternAIAgentWithCoop));
-    const blackTeam = ref(new Team('Black Team', 1, veternAIAgentWithCoop));
+    const whiteTeam = ref(new Team('White Team', 0));
+    const blackTeam = ref(new Team('Black Team', 1));
 
     // whiteTeam.value.addCombatant(new Defender('aobo', { x: 3, y: 5}, whiteTeam.value));
     // whiteTeam.value.addCombatant(new Gorilla('Gorrila', { x: 4, y: 4}, whiteTeam.value));
@@ -419,45 +418,45 @@ export default defineComponent({
 
   //blackTeam.value.addCombatant(new Artificer('Gobo', { x: 9, y: 6 }, blackTeam.value));
 
-    // whiteTeam.value.combatants[0].applyStatusEffect({
-    //         name: StatusEffectType.STRENGTH_BOOST,
-    //         duration: 5,
-    // }); 
+    whiteTeam.value.combatants[0].applyStatusEffect({
+            name: StatusEffectType.STRENGTH_BOOST,
+            duration: 5,
+    }); 
 
-    // whiteTeam.value.combatants[0].applyStatusEffect({
-    //         name: StatusEffectType.LUCK_DOWNGRADE,
-    //         duration: 5,
-    // }); 
+    whiteTeam.value.combatants[0].applyStatusEffect({
+            name: StatusEffectType.LUCK_DOWNGRADE,
+            duration: 5,
+    }); 
 
-    // whiteTeam.value.combatants[0].applyStatusEffect({
-    //         name: StatusEffectType.ARCANE_OVERCHARGE,
-    //         duration: 5,
-    // }); 
+    whiteTeam.value.combatants[0].applyStatusEffect({
+            name: StatusEffectType.ARCANE_OVERCHARGE,
+            duration: 5,
+    }); 
 
-    // whiteTeam.value.combatants[0].applyStatusEffect({
-    //         name: StatusEffectType.BURNING,
-    //         duration: 5,
-    // }); 
+    whiteTeam.value.combatants[0].applyStatusEffect({
+            name: StatusEffectType.BURNING,
+            duration: 5,
+    }); 
 
-    // blackTeam.value.combatants[1].applyStatusEffect({
-    //         name: StatusEffectType.STRENGTH_DOWNGRADE,
-    //         duration: 5,
-    // }); 
+    blackTeam.value.combatants[1].applyStatusEffect({
+            name: StatusEffectType.STRENGTH_DOWNGRADE,
+            duration: 5,
+    }); 
 
-    // blackTeam.value.combatants[1].applyStatusEffect({
-    //         name: StatusEffectType.POISONED,
-    //         duration: 5,
-    // }); 
+    blackTeam.value.combatants[1].applyStatusEffect({
+            name: StatusEffectType.POISONED,
+            duration: 5,
+    }); 
 
-    // blackTeam.value.combatants[0].applyStatusEffect({
-    //         name: StatusEffectType.SANCTUARY,
-    //         duration: 5,
-    // }); 
+    blackTeam.value.combatants[0].applyStatusEffect({
+            name: StatusEffectType.SANCTUARY,
+            duration: 5,
+    }); 
 
-    // whiteTeam.value.combatants[1].applyStatusEffect({
-    //         name: StatusEffectType.FROZEN,
-    //         duration: 5,
-    // }); 
+    whiteTeam.value.combatants[1].applyStatusEffect({
+            name: StatusEffectType.FROZEN,
+            duration: 5,
+    }); 
 
     
 
@@ -1274,64 +1273,8 @@ export default defineComponent({
       }
     }
 
-    const statusEffectLetters: { [key in StatusEffectType]?: string } = {
-      [StatusEffectType.BLOCKING_STANCE]: "B",
-      [StatusEffectType.ARCANE_CHANNELING]: "H",
-      [StatusEffectType.FOCUS_AIM]: "A",
-      [StatusEffectType.IMMOBILIZED]: "Z",
-      [StatusEffectType.FORTIFIED]: "O",
-      [StatusEffectType.FROZEN]: "F",
-      [StatusEffectType.REGENERATING]: "R",
-      [StatusEffectType.STRENGTH_BOOST]: "S",
-      [StatusEffectType.MOBILITY_BOOST]: "M",
-      [StatusEffectType.ENCOURAGED]: "E",
-      [StatusEffectType.RALLIED]: "L",
-      [StatusEffectType.STRENGTH_DOWNGRADE]: "SD",
-      [StatusEffectType.LUCK_DOWNGRADE]: "LD",
-      [StatusEffectType.SLOW]: "SW",
-      [StatusEffectType.POISONED]: "P",
-      [StatusEffectType.BLEEDING]: "BL",
-      [StatusEffectType.TAUNTED]: "TA",
-      [StatusEffectType.STUPEFIED]: "ST",
-      [StatusEffectType.NAUSEATED]: "NA",
-      [StatusEffectType.MESMERIZED]: "ME",
-      [StatusEffectType.MESMERIZING]: "ME",
-      [StatusEffectType.STAGGERED]: "SG",
-      [StatusEffectType.DEFENSE_DOWNGRADE]: "DD",
-      [StatusEffectType.CLOAKED]: "CL",
-      [StatusEffectType.MARKED_FOR_PAIN]: "MR1",
-      [StatusEffectType.MARKED_FOR_EXECUTION]: "MR2",
-      [StatusEffectType.MARKED_FOR_OBLIVION]: "MR3",
-      [StatusEffectType.FULL_METAL_JACKET]: "FMJ",
-      [StatusEffectType.PANICKED]: "PN",
-      [StatusEffectType.CHARMED]: "CHM",
-      [StatusEffectType.CIRCUS_DIABOLIQUE]: "CQ",
-      [StatusEffectType.NIGHTMARE_LOCKED]: "NQ",
-      [StatusEffectType.FORBIDDEN_AFFLICTION]: "FA",
-      [StatusEffectType.DIVINE_RETRIBUTION]: "DR",
-      [StatusEffectType.SANCTUARY]: "SC",
-      [StatusEffectType.IDAI_NO_HADOU]: "INH",
-      [StatusEffectType.PLAGUED]: "PLG",
-      [StatusEffectType.BURNING]: "BRN",
-      [StatusEffectType.FRENZY]: "FZ",
-      [StatusEffectType.ARCANE_OVERCHARGE]: "AO",
-      [StatusEffectType.ARCANE_BARRIER]: "AB",
-      [StatusEffectType.ARCANE_CONDUIT]: "ACO",
-      [StatusEffectType.GUARDIAN_PROTECTED]: "GP",
-      [StatusEffectType.GUARDIAN]: "G",
-      [StatusEffectType.SHIELD_WALL_PROTECTED]: "SWP",
-      [StatusEffectType.SHIELD_WALL]: "SW",
-      [StatusEffectType.ARCANE_SHIELD_WALL_PROTECTED]: "ASP",
-      [StatusEffectType.ARCANE_SHIELD_WALL]: "ASW",
-      [StatusEffectType.DIAMOND_HOOKED]: "DH",
-      [StatusEffectType.DIAMOND_HOOKED_HOLDING]: "DHH",
-      [StatusEffectType.INGENIOUS_UPGRADE]: "IU",
-      [StatusEffectType.SLEEPING]: "SL",
-      // ... add mappings for other status effect types
-    };
-
     const getStatusEffectLetter = (effectType: StatusEffectType): string => {
-      return statusEffectLetters[effectType] || "?"; // Default to "?" if not found
+      return getLetterForStatusEffect(effectType); // Default to "?" if not found
     };
 
      const getStatusEffectColor = (alignment: StatusEffectAlignment): string => {
