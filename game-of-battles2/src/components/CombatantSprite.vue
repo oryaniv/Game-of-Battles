@@ -14,7 +14,7 @@
   'fool': combatant.getCombatantType() === 'Fool',
   'artificer': combatant.getCombatantType() === 'Artificer',
   'healer': combatant.getCombatantType() === 'Healer',
-  'standard-bearer': combatant.getCombatantType() === 'Standard Bearer',
+  'standard-bearer': combatant.getCombatantType() === 'Champion',
   'pikeman': combatant.getCombatantType() === 'Pikeman',
   }">
 

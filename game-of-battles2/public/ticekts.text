@@ -48,25 +48,25 @@
     * rematch in case of PVP
 
 * Intro screens
-  * enable sound yes/no
+  * enable sound yes/no v
   * loading screen if needed
   
 * tutorial
 
 * main menu
-    * game logo
-      * new game, options, credits, about the developer
-      * new game - player vs AI, player vs player, tutorial
+    * game logo V
+      * new game, options, credits, about the developer V
+      * new game - player vs AI, player vs player, tutorial V
       * player vs AI - ask if want the tutorial - only once
-      * lead to difficulty select screen
+      * lead to difficulty select screen 
         * difficulties: easy, normal, hard
 
     * options menu
-       * sound on/off (default as chosen)
+       * sound on/off (default as chosen) V
        * allow advanced moves(co op) (default on)
-       * turn off game taunts (default off)
-       * turn off battle messages (defaul off)
-       * show game grid (default off)
+       * turn off game taunts (default off) V
+       * turn off battle messages (defaul off) V
+       * show game grid (default off) V
 
     * credits
        * any artists who own sounds/svg's/ images
@@ -78,6 +78,9 @@
 
 
 * Team select screen
+  * fix all the combatant info, role, pros, const
+  * bring in the stats section
+  * stats/description only visible after clicking a combatant
 
 
 useful fonts for the future:
@@ -87,6 +90,8 @@ Creepster (holy shit?)
 Nosifer (you died!)
 
 Metal Mania(insutls?)
+
+https://www.youtube.com/watch?v=pVeX4C9B1Lk - evil laugh sound - need 1.5X speed
 
 
 
@@ -102,3 +107,7 @@ A seamless, abstract background texture. It must have NO visible horizontal line
     const prompt = `A seamless, abstract background texture for a game menu. The dominant color is a deep, muted plum (#5E3B68) with a luxurious marble texture. The marble veins should be extremely subtle, very dark, and faded gold/bronze (#4A3C2E, a much darker version of #8B7355), blending almost imperceptibly into the plum surface. They should appear as faint, barely-there whispers of texture, ensuring they do not interfere with white text readability.
     There is no frame or any horizontal/vertical lines across the interior of this background.
     The overall style should be elegant, functional, and visually appealing for an in-game menu overlay, providing a rich background that allows crisp white text to stand out clearly.`;
+
+
+    v-for="[statName, statValue] in (selectedCombatantForChoice || hoveredCombatant).combatantReference.baseStats"
+          :key="statName"

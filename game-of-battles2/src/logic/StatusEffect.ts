@@ -154,6 +154,10 @@ StatusEffectType {
     RELOAD,
     // 70
     SLEEPING,
+    // 71
+    PHYS_DUPLICATE,
+    // 72
+    ELEM_DUPLICATE,
 }
 
   export enum StatusEffectHook {

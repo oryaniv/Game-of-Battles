@@ -32,8 +32,8 @@ let errorCount = 0;
 describe('RoboArenta', () => {
 
     it.skip('Ai Agent match 1', () => {
-        let roundCounts = [];
-        let winnerCounts = [];
+        const roundCounts = [];
+        const winnerCounts = [];
         for(let i = 0; i < 1000; i++) {
             try {
                 const matchResult = exampleMatch(i);
@@ -58,7 +58,7 @@ describe('RoboArenta', () => {
 
 
     it.only('Balancing battles', () => {
-        let matchDataCollection: MatchData[] = [];
+        const matchDataCollection: MatchData[] = [];
         const teamRecords: TeamRecord[] = [];
 
         const veteranAIAgentWithCoop = new VeteranAIAgent();
@@ -125,7 +125,7 @@ function exampleMatch(matchCount: number) {
     // team2.name = 'Team Veteran';
 
     
-    let board = new Board(10, 10);
+    const board = new Board(10, 10);
     
     // theATeam(team1);
     // theBTeam(team2);
@@ -164,7 +164,7 @@ function exampleMatch(matchCount: number) {
 }   
 
 function combatantBalancingMatch(team1: Team, team2: Team, matchCount: number): MatchData {
-    let board = new Board(10, 10);
+    const board = new Board(10, 10);
     placeAllCombatants(team1, team2, board);
     
     const game = new Game([team1, team2], board);

@@ -3368,6 +3368,25 @@ class VeteranAIAgentBabyBabelPlayer extends VeteranAIAgentGenericPlayer {
 
 }
 
+class VeteranAIAgentOozeGolemPlayer implements VeteranAIAgentPlayer {
+    evaluate(combatant: Combatant, game: Game, board: Board, turnPlay: TurnPlay): number {
+        return 0;
+    }
+}
+
+class VeteranAIAgentWeaveEaterPlayer implements VeteranAIAgentPlayer {
+    evaluate(combatant: Combatant, game: Game, board: Board, turnPlay: TurnPlay): number {
+        return 0;
+    }
+}
+
+class VeteranAIAgentTwinBladesPlayer implements VeteranAIAgentPlayer {
+    evaluate(combatant: Combatant, game: Game, board: Board, turnPlay: TurnPlay): number {
+        return 0;
+    }
+}
+
+
 const agentByCombatantType = {
     [CombatantType.Defender]: new VeteranAIAgentDefenderPlayer(),
     [CombatantType.Militia]: new VeteranAIAgentMilitiaPlayer(),
@@ -3398,6 +3417,10 @@ const agentByCombatantType = {
     [CombatantType.Doll]: new VeteranAIAgentDollPlayer(),
     [CombatantType.BallistaTurret]: new VeteranAIAgentBallistaTurretPlayer(),
     [CombatantType.BabyBabel]: new VeteranAIAgentBabyBabelPlayer(),
+
+    [CombatantType.OozeGolem]: new VeteranAIAgentOozeGolemPlayer(),
+    [CombatantType.WeaveEater]: new VeteranAIAgentWeaveEaterPlayer(),
+    [CombatantType.TwinBlades]: new VeteranAIAgentTwinBladesPlayer(),
 }
 
 function addCoverValue(combatant: Combatant, game: Game, board: Board, movePosition: Position): number {

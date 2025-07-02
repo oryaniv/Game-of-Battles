@@ -3,8 +3,14 @@ import { test, expect } from '@playwright/test';
 test.describe('Game Actions', () => {
   test.beforeEach(async ({ page }) => {
     // Assuming your Vue app is running on localhost:3000
-    await page.goto('http://localhost:8080');
+    await page.goto('http://localhost:8081/Journey');
   });
+
+  test.only('sound on/off', async ({ page }) => {
+    await page.waitForTimeout(3000);
+    // await page.click('button:has-text("Hell yes!")');
+  });
+
 
   test('skip action with multiple combatants', async ({ page }) => {
     // Test case: 2 combatants per team, skip action

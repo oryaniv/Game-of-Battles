@@ -1,3 +1,4 @@
+import { DamageType } from "./logic/Damage";
 import { getStatusEffect, StatusEffect, StatusEffectApplication, StatusEffectType } from "./logic/StatusEffect";
 
 export const getActionDescription = (action: string) => {
@@ -110,3 +111,79 @@ const statusEffectLetters: { [key in StatusEffectType]?: string } = {
     // [StatusEffectType.STRENGTH_DOWNGRADE]: require("./assets/statusIcons/STRENGTH_DOWNGRADE.svg"),
     // [StatusEffectType.LUCK_DOWNGRADE]: require("./assets/statusIcons/LUCK_DOWNGRADE.svg"),
   }
+
+  export const getStatUiName = (statName: string) => {
+    switch (statName) {
+      case 'hp':
+        return 'HP';
+      case 'attackPower':
+        return 'Attack';
+      case 'defensePower':
+        return 'Defense';
+      case 'agility':
+        return 'Agility';
+      case 'stamina':
+        return 'Stamina';
+      case 'movementSpeed':
+        return 'Movement';
+      case 'initiative':
+        return 'Initiative';
+      case 'range':
+        return 'Range';
+      case 'luck':
+        return 'Luck';
+    }
+  }
+
+  export const getStatusScale = (statName: string) => {
+    switch (statName) {
+      case 'hp':
+        return 150;
+      case 'attackPower':
+        return 120;
+      case 'defensePower':
+        return 120;
+      case 'agility':
+        return 20;
+      case 'stamina':
+        return 80;
+      case 'movementSpeed':
+        return 8;
+      case 'initiative':
+        return 10;
+      case 'range':
+        return 10;
+      case 'luck':
+        return 20;
+    }
+  }
+
+  export const getDamageSvg = (type: DamageType): string => {
+    switch (type) {
+      case DamageType.Slash:
+        return require('./assets/Slash.svg');
+      case DamageType.Crush:
+        return require('./assets/Crush.svg');
+      case DamageType.Pierce:
+        return require('./assets/Pierce.svg');
+      case DamageType.Fire:
+        return require('./assets/Flame.svg');
+      case DamageType.Ice:
+        return require('./assets/Ice.svg');
+      case DamageType.Lightning:
+        return require('./assets/Thunder.svg');
+      case DamageType.Blight:
+        return require('./assets/Skull.svg');
+      case DamageType.Holy:
+        return require('./assets/Sun.svg');
+      case DamageType.Dark:
+        return require('./assets/Pentagram.svg');
+      case DamageType.Healing:
+        return require('./assets/Healing.svg');
+      case DamageType.Unstoppable:
+        return require('./assets/Unstoppable.svg');
+      // ... other cases
+      default:
+        return require('./assets/Empty.svg'); // Or a default SVG path
+    }
+};

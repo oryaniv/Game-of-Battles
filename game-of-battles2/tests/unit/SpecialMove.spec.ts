@@ -160,13 +160,13 @@ describe('Blocking stance tests', () => {
 describe('Defensive strike tests', () => {
 
     it('should defend after using defensive strike', () => {
-        let team1 = new Team('Team 1', 1);
-        let team2 = new Team('Team 2', 2);
-        let board = new Board(10, 10);
-        let combatant = new Defender('Fighter', { x: 0, y: 0 }, team1);
+        const team1 = new Team('Team 1', 1);
+        const team2 = new Team('Team 2', 2);
+        const board = new Board(10, 10);
+        const combatant = new Defender('Fighter', { x: 0, y: 0 }, team1);
         team1.addCombatant(combatant);
         team2.addCombatant(new Militia('Enemy', { x: 1, y: 0 }, team2));
-        let game = new Game([team1, team2], board);
+        const game = new Game([team1, team2], board);
 
         game.executeSkill(new DefensiveStrike(), combatant, {x:1,y:0}, board);
         expect(combatant.hasStatusEffect(StatusEffectType.DEFENDING)).toBe(true);
@@ -175,14 +175,14 @@ describe('Defensive strike tests', () => {
 
   describe('Heal tests', () => {
     it('ally should be healed after using heal', () => {
-        let team1 = new Team('Team 1', 1);
-        let team2 = new Team('Team 2', 2);
-        let board = new Board(10, 10);
-        let healer = new Militia('Healer', { x: 0, y: 0 }, team1);
-        let ally = new Militia('Ally', { x: 1, y: 0 }, team1);
+        const team1 = new Team('Team 1', 1);
+        const team2 = new Team('Team 2', 2);
+        const board = new Board(10, 10);
+        const healer = new Militia('Healer', { x: 0, y: 0 }, team1);
+        const ally = new Militia('Ally', { x: 1, y: 0 }, team1);
         team1.addCombatant(healer);
         team1.addCombatant(ally);
-        let game = new Game([team1, team2], board);
+        const game = new Game([team1, team2], board);
 
         // Damage the ally first
         ally.stats.hp -= 20;
@@ -195,14 +195,14 @@ describe('Defensive strike tests', () => {
 
   describe('Purify tests', () => {
     it('ally should lose all negative status effects after being targeted by purify', () => {
-        let team1 = new Team('Team 1', 1);
-        let team2 = new Team('Team 2', 2);
-        let board = new Board(10, 10);
-        let healer = new Militia('Healer', { x: 0, y: 0 }, team1);
-        let ally = new Militia('Ally', { x: 1, y: 0 }, team1);
+        const team1 = new Team('Team 1', 1);
+        const team2 = new Team('Team 2', 2);
+        const board = new Board(10, 10);
+        const healer = new Militia('Healer', { x: 0, y: 0 }, team1);
+        const ally = new Militia('Ally', { x: 1, y: 0 }, team1);
         team1.addCombatant(healer);
         team1.addCombatant(ally);
-        let game = new Game([team1, team2], board);
+        const game = new Game([team1, team2], board);
 
         // Apply some negative status effects to ally
         ally.applyStatusEffect({
@@ -227,16 +227,16 @@ describe('Defensive strike tests', () => {
 
   describe('Regenerate tests', () => {
     it('should heal a little every turn', () => {
-        let team1 = new Team('Team 1', 1);
-        let team2 = new Team('Team 2', 2);
-        let board = new Board(10, 10);
-        let healer = new Militia('Healer', { x: 0, y: 0 }, team1);
-        let ally = new Militia('Ally', { x: 1, y: 0 }, team1);
-        let enemy = new Militia('Enemy', { x: 2, y: 0 }, team2);
+        const team1 = new Team('Team 1', 1);
+        const team2 = new Team('Team 2', 2);
+        const board = new Board(10, 10);
+        const healer = new Militia('Healer', { x: 0, y: 0 }, team1);
+        const ally = new Militia('Ally', { x: 1, y: 0 }, team1);
+        const enemy = new Militia('Enemy', { x: 2, y: 0 }, team2);
         team1.addCombatant(healer);
         team1.addCombatant(ally);
         team2.addCombatant(enemy);
-        let game = new Game([team1, team2], board);
+        const game = new Game([team1, team2], board);
 
         // Damage the ally first
         ally.stats.hp -= 20;
@@ -270,14 +270,14 @@ describe('Defensive strike tests', () => {
   describe('Focus Aim tests', () => {
     
     it('should have focus aim status effect after using focus aim', () => {
-        let team1 = new Team('Team 1', 1);
-        let team2 = new Team('Team 2', 2);
-        let board = new Board(10, 10);
-        let archer = new Militia('Archer', { x: 0, y: 0 }, team1);
-        let enemy = new Militia('Enemy', { x: 3, y: 0 }, team2);
+        const team1 = new Team('Team 1', 1);
+        const team2 = new Team('Team 2', 2);
+        const board = new Board(10, 10);
+        const archer = new Militia('Archer', { x: 0, y: 0 }, team1);
+        const enemy = new Militia('Enemy', { x: 3, y: 0 }, team2);
         team1.addCombatant(archer);
         team2.addCombatant(enemy);
-        let game = new Game([team1, team2], board);
+        const game = new Game([team1, team2], board);
 
         const initialAttack = archer.stats.attackPower;
         const initialAgility = archer.stats.agility;
@@ -288,14 +288,14 @@ describe('Defensive strike tests', () => {
     });
 
     it('should remove focus aim status effect after attacking', () => {
-        let team1 = new Team('Team 1', 1);
-        let team2 = new Team('Team 2', 2);
-        let board = new Board(10, 10);
-        let archer = new Militia('Archer', { x: 0, y: 0 }, team1);
-        let enemy = new Militia('Enemy', { x: 1, y: 0 }, team2);
+        const team1 = new Team('Team 1', 1);
+        const team2 = new Team('Team 2', 2);
+        const board = new Board(10, 10);
+        const archer = new Militia('Archer', { x: 0, y: 0 }, team1);
+        const enemy = new Militia('Enemy', { x: 1, y: 0 }, team2);
         team1.addCombatant(archer);
         team2.addCombatant(enemy);
-        let game = new Game([team1, team2], board);
+        const game = new Game([team1, team2], board);
 
         game.executeSkill(new FocusAim(), archer, {x:0,y:0}, board);
         expect(archer.hasStatusEffect(StatusEffectType.FOCUS_AIM)).toBe(true);
@@ -313,16 +313,16 @@ describe('Defensive strike tests', () => {
 
   describe('Ricochet tests', () => {
     it('should hit 2 targets after using ricochet', () => {
-        let team1 = new Team('Team 1', 1);
-        let team2 = new Team('Team 2', 2);
-        let board = new Board(10, 10);
-        let archer = new Hunter('Archer', { x: 0, y: 0 }, team1);
-        let enemy1 = new Militia('Enemy1', { x: 2, y: 0 }, team2);
-        let enemy2 = new Militia('Enemy2', { x: 3, y: 0 }, team2);
+        const team1 = new Team('Team 1', 1);
+        const team2 = new Team('Team 2', 2);
+        const board = new Board(10, 10);
+        const archer = new Hunter('Archer', { x: 0, y: 0 }, team1);
+        const enemy1 = new Militia('Enemy1', { x: 2, y: 0 }, team2);
+        const enemy2 = new Militia('Enemy2', { x: 3, y: 0 }, team2);
         team1.addCombatant(archer);
         team2.addCombatant(enemy1);
         team2.addCombatant(enemy2);
-        let game = new Game([team1, team2], board);
+        const game = new Game([team1, team2], board);
 
 
         // Mock CombatMaster to always return successful hits
@@ -348,12 +348,12 @@ describe('Defensive strike tests', () => {
 
   describe('Arcane channeling tests', () => {
     it('should have arcane channeling status effect after using arcane channeling', () => {
-        let team1 = new Team('Team 1', 1);
-        let team2 = new Team('Team 2', 2);
-        let board = new Board(10, 10);
-        let mage = new Militia('Mage', { x: 0, y: 0 }, team1);
+        const team1 = new Team('Team 1', 1);
+        const team2 = new Team('Team 2', 2);
+        const board = new Board(10, 10);
+        const mage = new Militia('Mage', { x: 0, y: 0 }, team1);
         team1.addCombatant(mage);
-        let game = new Game([team1, team2], board);
+        const game = new Game([team1, team2], board);
 
         game.executeSkill(new ArcaneChanneling(), mage, {x:0,y:0}, board);
         
@@ -363,18 +363,18 @@ describe('Defensive strike tests', () => {
 
   describe('Fireball tests', () => {
     it('should hit all enemies after using fireball', () => {
-        let team1 = new Team('Team 1', 1);
-        let team2 = new Team('Team 2', 2);
-        let board = new Board(10, 10);
-        let wizard = new Wizard('Wizard', { x: 0, y: 0 }, team1);
-        let enemy1 = new Militia('Enemy1', { x: 6, y: 0 }, team2);
-        let enemy2 = new Militia('Enemy2', { x: 5, y: 0 }, team2);
-        let enemy3 = new Militia('Enemy3', { x: 4, y: 0 }, team2);
+        const team1 = new Team('Team 1', 1);
+        const team2 = new Team('Team 2', 2);
+        const board = new Board(10, 10);
+        const wizard = new Wizard('Wizard', { x: 0, y: 0 }, team1);
+        const enemy1 = new Militia('Enemy1', { x: 6, y: 0 }, team2);
+        const enemy2 = new Militia('Enemy2', { x: 5, y: 0 }, team2);
+        const enemy3 = new Militia('Enemy3', { x: 4, y: 0 }, team2);
         team1.addCombatant(wizard);
         team2.addCombatant(enemy1);
         team2.addCombatant(enemy2);
         team2.addCombatant(enemy3);
-        let game = new Game([team1, team2], board);
+        const game = new Game([team1, team2], board);
 
         // Mock CombatMaster to always return successful hits
         jest.spyOn(CombatMaster.getInstance(), 'executeAttack').mockImplementation(() => {
@@ -401,20 +401,20 @@ describe('Defensive strike tests', () => {
 
   describe('Chain lightning tests', () => {
     it('should hit 4 enemies after using chain lightning', () => {
-        let team1 = new Team('Team 1', 1);
-        let team2 = new Team('Team 2', 2);
-        let board = new Board(10, 10);
-        let wizard = new Wizard('Wizard', { x: 0, y: 0 }, team1);
-        let enemy1 = new Militia('Enemy1', { x: 2, y: 0 }, team2);
-        let enemy2 = new Militia('Enemy2', { x: 2, y: 1 }, team2);
-        let enemy3 = new Militia('Enemy3', { x: 3, y: 0 }, team2);
-        let enemy4 = new Militia('Enemy4', { x: 3, y: 1 }, team2);
+        const team1 = new Team('Team 1', 1);
+        const team2 = new Team('Team 2', 2);
+        const board = new Board(10, 10);
+        const wizard = new Wizard('Wizard', { x: 0, y: 0 }, team1);
+        const enemy1 = new Militia('Enemy1', { x: 2, y: 0 }, team2);
+        const enemy2 = new Militia('Enemy2', { x: 2, y: 1 }, team2);
+        const enemy3 = new Militia('Enemy3', { x: 3, y: 0 }, team2);
+        const enemy4 = new Militia('Enemy4', { x: 3, y: 1 }, team2);
         team1.addCombatant(wizard);
         team2.addCombatant(enemy1);
         team2.addCombatant(enemy2);
         team2.addCombatant(enemy3);
         team2.addCombatant(enemy4);
-        let game = new Game([team1, team2], board);
+        const game = new Game([team1, team2], board);
 
         // Mock CombatMaster to always return successful hits
         jest.spyOn(CombatMaster.getInstance(), 'executeAttack').mockImplementation(() => {
@@ -442,14 +442,14 @@ describe('Defensive strike tests', () => {
 
   describe('Frozen burst tests', () => {
     it('enemy should be frozen after using frozen burst', () => {
-        let team1 = new Team('Team 1', 1);
-        let team2 = new Team('Team 2', 2);
-        let board = new Board(10, 10);
-        let wizard = new Wizard('Wizard', { x: 0, y: 0 }, team1);
-        let enemy = new Militia('Enemy', { x: 1, y: 0 }, team2);
+        const team1 = new Team('Team 1', 1);
+        const team2 = new Team('Team 2', 2);
+        const board = new Board(10, 10);
+        const wizard = new Wizard('Wizard', { x: 0, y: 0 }, team1);
+        const enemy = new Militia('Enemy', { x: 1, y: 0 }, team2);
         team1.addCombatant(wizard);
         team2.addCombatant(enemy);
-        let game = new Game([team1, team2], board);
+        const game = new Game([team1, team2], board);
 
         // Mock CombatMaster to return successful hit and status effect application
         jest.spyOn(CombatMaster.getInstance(), 'executeAttack').mockImplementation(() => {

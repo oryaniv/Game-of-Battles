@@ -284,7 +284,7 @@ export function refreshTeam(team: Team) {
     });
 }
 
-function getCombatantByType(type: CombatantType, team: Team): Combatant {
+export function getCombatantByType(type: CombatantType, team: Team): Combatant {
     const position = { x: 0, y: 0 };
     const name = generateRandomString();
 
@@ -311,6 +311,10 @@ function getCombatantByType(type: CombatantType, team: Team): Combatant {
             return new FistWeaver(name, position, team);
         case CombatantType.StandardBearer:
             return new StandardBearer(name, position, team);
+        case CombatantType.Rogue:
+            return new Rogue(name, position, team);
+        case CombatantType.Artificer:
+            return new Artificer(name, position, team);
         default:
             return new Militia(name, position, team);
     }

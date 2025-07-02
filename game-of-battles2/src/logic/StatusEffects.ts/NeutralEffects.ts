@@ -324,3 +324,16 @@ export class ReloadStatusEffect implements StatusEffect {
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Neutral;
 }
+
+export class PhysDuplicateStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.PHYS_DUPLICATE;
+    description = `This combatant duplicates itself to both side tiles if possible.`;
+    applicationHooks = {
+        [StatusEffectHook.OnDamageTaken]: (self: Combatant, target: Combatant, damage: Damage) => {
+            if(damage.amount >= 1 && (damage.type  === DamageType.Crush || damage.type === DamageType.Slash)) {
+                // self.removeStatusEffect(StatusEffectType.PHYS_DUPLICATE);
+            }
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
+}

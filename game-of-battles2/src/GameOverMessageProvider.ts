@@ -21,9 +21,9 @@ export enum GameResult {
 }
 
 export enum Difficulty {
-    EASY,
-    MEDIUM,
-    HARD,
+    EASY = 'Easy',
+    MEDIUM = 'Normal',
+    HARD = 'Hard',
 }
 
 export function getGameOverMessage(team1: Team, team2: Team) {

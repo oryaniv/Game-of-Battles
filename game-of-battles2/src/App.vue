@@ -1,27 +1,46 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+  <router-view/>
 </template>
 
-<script lang="ts">
-import { Options, Vue } from 'vue-class-component';
-import HelloWorld from './components/HelloWorld.vue';
-
-@Options({
-  components: {
-    HelloWorld,
-  },
-})
-export default class App extends Vue {}
-</script>
-
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+
+@font-face {
+  font-family: "Exo2-Regular";
+  src: url("@/assets/fonts/Exo2-Regular.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
 }
+
+@font-face {
+  font-family: "MetalMania-Regular";
+  src: url("@/assets/fonts/MetalMania-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Creepster-Regular";
+  src: url("@/assets/fonts/Creepster-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Nosifer-Regular";
+  src: url("@/assets/fonts/Nosifer-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+#app {
+  height: 100vh;
+}
+
+@supports (height: 100dvh) {
+  #app {
+    height: 100dvh;
+  }
+}
+
+
 </style>

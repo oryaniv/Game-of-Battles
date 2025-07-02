@@ -9,6 +9,7 @@ import { Combatant } from "@/logic/Combatant";
 import { CombatMaster } from "@/logic/CombatMaster";
 import { ActionResult } from "@/logic/attackResult";
 import { RangeCalculator } from "@/logic/RangeCalculator";
+import { CombatantType } from "@/logic/Combatants/CombatantType";
 
 export class DefensiveStrike implements SpecialMove {
     name: string = "Defensive Strike";
@@ -979,6 +980,116 @@ export class VenomousSpit implements SpecialMove {
     description = `Medium Blight damage to target, chance to inflict Poisoned for 3 rounds.`   
 }
 
+export class GooSpit implements SpecialMove {
+    name: string = "Goo Spit";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 3;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Straight,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 3
+    };
+    damage: Damage = {
+        amount: 25,
+        type: DamageType.Blight
+    };  
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage);
+        if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
+            combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.POISONED, 3, 0.6);
+        }
+        return result;
+    };
+    checkRequirements = undefined
+    description = `Medium Blight damage to target, chance to inflict Poisoned for 3 rounds.`   
+}
+
+export class Crush implements SpecialMove {
+    name: string = "Crush";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 2;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Melee,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 1
+    };
+    damage: Damage = {
+        amount: 20,
+        type: DamageType.Crush
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage);
+        if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
+            combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.SLOW, 3, 0.5);
+        }
+        return result;
+    };
+    checkRequirements = undefined
+    description = `Medium Crush damage to target, may inflict Slow for 3 rounds.`   
+}
+
+export class WeaveBurst implements SpecialMove {
+    name: string = "Weave Burst";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 3;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Curve,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 3
+    };
+    damage: Damage = {
+        amount: 30,
+        type: DamageType.Dark
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const randomDamage = [DamageType.Fire, DamageType.Ice, DamageType.Lightning][Math.floor(Math.random() * 3)];
+        const attackDamage = {
+            amount: this.damage.amount,
+            type: randomDamage
+        };
+        const result = combatMaster.executeAttack(invoker, target, board, attackDamage);
+        return result;
+    };
+    checkRequirements = undefined
+    description = `Medium Random elemental damage to the target.`   
+}
+
+export class MindLash implements SpecialMove {
+    name: string = "Tentacle Lash";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 2;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Melee,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 1
+    };
+    damage: Damage = {
+        amount: 20,
+        type: DamageType.Crush
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage);
+        if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
+            combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.STUPEFIED, 3, 0.5);
+        }
+        return result;
+    };
+    checkRequirements = undefined
+    description = `Medium Crush damage to target. May inflict Stupefied for 3 rounds.`   
+}
+
 export class DragonBreath implements SpecialMove {
     name: string = "Dragon's Breath";
     triggerType = SpecialMoveTriggerType.Active;
@@ -1183,4 +1294,44 @@ export class TeleportBlast implements SpecialMove {
         return self.hasStatusEffect(StatusEffectType.INGENIOUS_UPGRADE);
     }
     description = `Teleport to target tile, then explode and damage everyone in a 1-tile nova radius.`
+}
+
+export class TwinSpin implements SpecialMove {
+    name: string = "Twin Spin";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 5;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Melee,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 1
+    };
+    damage: Damage = {
+        amount: 25,
+        type: DamageType.Slash
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const targetCombatant = board.getCombatantAtPosition(target);
+        if(!targetCombatant) {
+            return getStandardActionResult();
+        }
+        let skillDamage = this.damage.amount;
+        if(invoker.hasStatusEffect(StatusEffectType.CLOAKED) || board.isFlanked(targetCombatant!)) {
+            skillDamage = this.damage.amount * 1.5;
+        }
+        const adjacentCombatants = board.getAdjacentCombatants(targetCombatant,1);
+        const isTwinAdjacent = adjacentCombatants
+        .some(adjacentCombatant => adjacentCombatant.getCombatantType() === CombatantType.TwinBlades);
+        const result = combatMaster.executeAttack(invoker, target, board, {amount: skillDamage, type: DamageType.Slash});
+        adjacentCombatants.forEach(adjacentCombatant => {
+            combatMaster.executeAttack(invoker, adjacentCombatant.position, board, {amount: skillDamage, type: DamageType.Slash});
+        });
+        return result;
+    };
+    checkRequirements = (self: Combatant) => {
+        return self.hasStatusEffect(StatusEffectType.INGENIOUS_UPGRADE);
+    }
+    description = `Medium Crush damage to target.`   
 }

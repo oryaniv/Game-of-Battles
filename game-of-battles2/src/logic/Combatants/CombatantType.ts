@@ -7,7 +7,7 @@ export enum CombatantType {
     Hunter = "Hunter",
     Healer = "Healer",
     Wizard = "Wizard",
-    StandardBearer = "Standard Bearer",
+    StandardBearer = "Champion",
     Witch = "Witch",
     Fool = "Fool",
     Pikeman = "Pikeman",
@@ -20,6 +20,11 @@ export enum CombatantType {
     Gorilla = "Gorilla",
     Troll = "Troll",
     Dragon = "Dragon",
+
+    // web version sub bosses
+    OozeGolem = "Ooze Golem",
+    WeaveEater = "Weave Eater",
+    TwinBlades = "Twin Blade",
     
     // real version bosses
     Myrmidon = "Myrmidon",

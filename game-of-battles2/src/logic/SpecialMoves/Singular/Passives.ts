@@ -297,6 +297,50 @@ export class Decoy implements SpecialMove {
     description = `this combatant is a decoy for another. when it is destroyed, the original combatant is revealed, and vice versa.`
 }
 
+export class ElemDuplicate implements SpecialMove {
+    name: string = "Elem Duplicate";
+    triggerType = SpecialMoveTriggerType.Passive;
+    cost: number = 0;
+    turnCost: number = 0;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.None,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Unstoppable
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        return getStandardActionResult();
+    };
+    requirements = undefined;
+    description = `Upon being hit with elemental damage, this combatant duplicates itself to both side tiles if possible.`
+}
+
+export class PhysDuplicate implements SpecialMove {
+    name: string = "Phys Duplicate";
+    triggerType = SpecialMoveTriggerType.Passive;
+    cost: number = 0;
+    turnCost: number = 0;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.None,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Unstoppable
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        return getStandardActionResult();
+    };
+    requirements = undefined;
+    description = `Upon being hit with elemental damage, this combatant duplicates itself to both side tiles if possible.`
+}
+
 
 
     

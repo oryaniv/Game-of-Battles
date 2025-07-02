@@ -1,6 +1,6 @@
 <template>
   <div class="description-cloud-container">
-    {{ text }}
+    <div class="description-cloud-text">{{ text }}</div>
   </div>
 </template>
 
@@ -11,7 +11,7 @@ export default defineComponent({
   props: {
     text: {
       type: String,
-      required: true
+      required: false
     }
   }
 });
@@ -19,8 +19,8 @@ export default defineComponent({
 
 <style scoped>
 .description-cloud-container {
-  height: 30px;
-  width:  150px;
+  height: 20px;
+  width:  100%;
   z-index: 10;
   border: none;
   transition: all 0.3s ease;
@@ -33,10 +33,17 @@ export default defineComponent({
    background-color: transparent;
 
    padding: 15px 20px;
-   border-radius: 0px;
+   border-radius: 20px;
 
    box-shadow: 
      0 0 15px 5px rgba(245, 232, 210, 0.6),
      0 0 25px 8px rgba(245, 232, 210, 0.4) inset;
+}
+
+.description-cloud-container .description-cloud-text {
+  color: white;
+  font-size: 1em;
+  text-align: center;
+  font-family: 'Exo 2', sans-serif;
 }
 </style>

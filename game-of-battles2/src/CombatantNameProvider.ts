@@ -13,63 +13,63 @@ const trollNames = [
 ];
 
 const defenderNames = [
-    "Hector", "Achilles", "Galahad", "Beowulf", "Sigurd",
-    "Roland", "Thor", "Ajax", "Aragorn", "Ares"
+    "Hector", "Yoav", "Lancelot", "Beowulf", "Richard",
+    "Roland", "Mandor", "C.Rogers", "Boromir", "Stannis"
 ];
 
 const hunterNames = [
-    "Artemis", "Orion", "Diana", "Nimrod", "Skadi",
-    "Legolas", "Robin", "Atalanta", "Actaeon", "Mielikki"
+    "Haldir", "Orion", "Tannis", "Nimrod", "Oliver",
+    "Legolas", "Robin", "Meldinon", "Artemis", "Zevran"
 ];
 
 const healerNames = [
-    "Raphael", "Hygeia", "Eir", "Brigid", "Iaso",
-    "Airmed", "Ix Chel", "Panacea", "Asclepius", "Imhotep"
+    "Christabel", "Beatrice", "Galadriel", "Brigid", "Io",
+    "Abigail", "Alina", "Panacea", "Phoenix", "Marriane"
 ];
 
 const wizardNames = [
-    "Merlin", "Gandalf", "Circe", "Medea", "Prospero",
-    "Ged", "Pug", "Elminster", "Raistlin", "Rincewind"
+    "Merlin", "Gandalf", "Saruman", "Gale", "Irenicus",
+    "Ged", "Feloron", "Elminster", "Raistlin", "Rincewind"
 ];
 
 const standardBearerNames = [
-    "Joan", "Wallace", "Jeanne", "Arminius", "Boudica",
-    "Saladin", "Jan Žižka", "Skanderbeg", "Leonidas", "Vercingetorix"
+    "Joan", "Wallace", "Ned", "Arminius", "Maxiums",
+    "Saladin", "Aradas", "David", "Hannibal", "Caesar"
 ];
 
 const witchNames = [
-    "Baba Yaga", "Morgana", "Circe", "Hecate", "Elphaba",
-    "Jadis", "Morrigan", "Serafina", "Granny", "Maleficent"
+    "Ethel", "Lohse", "Circe", "Hecate", "Elphaba",
+    "Jadis", "Morrigan", "Serafina", "Flemeth", "Jezebel"
 ];
 
 const foolNames = [
-    "Puck", "Till", "Nasreddin", "Yorick", "Feste",
-    "Cicero", "Rigoletto", "Touchstone", "Arlecchino", "Triboulet"
+    "Carmen", "Harley", "Joker", "Crow", "Zifnab",
+    "Mystique", "Simkin", "Hisoka", "Pippin", "Arkana"
 ];
 
 const pikemanNames = [
-    "William", "Vlad", "Hector", "Lu Bu", "Zhang Fei",
-    "Guan Yu", "Zhao Yun", "Ma Chao", "Leonidas", "Tell"
+    "William", "Vlad", "Alexander", "Lu Bu", "Zhang Fei",
+    "Chulainn", "Zhao", "Ma Chao", "Leonidas", "Setanta"
 ];
 
 const vanguardNames = [
-    "Conan", "Hannibal", "Drogo", "Genghis", "Attila",
-    "Ragnar", "Rollo", "Scipio", "Boromir", "Bruenor"
+    "Conan", "Cloud", "Robert", "Genghis", "Attila",
+    "Ragnar", "Aragorn", "Ajax", "Samson", "Bruenor"
 ];
 
 const rogueNames = [
-    "Robin", "Lupin", "Carmen", "Garrett", "Altaïr",
-    "Ezio", "Corvo", "Bilbo", "Locke", "Gray"
+    "Sebille", "Taki", "Katarina", "Mileena", "Antalis",
+    "Orchid", "Sadira", "Natasha", "Aria", "Nina"
 ];
 
 const artificerNames = [
-    "Daedalus", "Leonardo", "Imhotep", "Tesla", "Edison",
-    "Ada", "Brunel", "Zhuge", "Archimedes", "Hephaestus"
+    "Daedalus", "LD.Vinci", "Sokka", "Tesla", "Isaac",
+    "Tony", "Q", "Midas", "Archimedes", "MacGyver"
 ];
 
 const fistWeaverNames = [
-    "Bruce", "Ip Man", "Paul.P", "Jin", "Liu.K",
-    "Oyama", "Rama", "Chuck.N", "Jigoro", "Ryu"
+    "Christie", "Elena", "Kira", "Ororo", "Kali",
+    "Niraty", "Ambessa", "T'kari", "Yang", "Maya"
 ];
 
 export function getRandomNameForCombatantType(type: CombatantType): string {
@@ -126,10 +126,12 @@ export function getRandomNameForCombatantType(type: CombatantType): string {
     return names[randomIndex];
 }
 
-export function getNewCombatant(type: CombatantType, existingCombatantNames: string[]): string {
+export function getNewCombatantName(type: CombatantType, existingCombatantNames: string[]): string {
+    // eslint-disable-next-line 
+    // debugger;
     const name = getRandomNameForCombatantType(type);
     if(existingCombatantNames.includes(name)) {
-        return getNewCombatant(type, existingCombatantNames);
+        return getNewCombatantName(type, existingCombatantNames);
     }
     return name;
 }
