@@ -1968,7 +1968,7 @@ class VeteranAIAgentPikemanPlayer extends VeteranAIAgentGenericPlayer {
             return this.evaluateColdEdge(combatant, game, board, movePosition, target);
         }
 
-        if(specialMove === "Skewering Harppon") {
+        if(specialMove === "Skewering Harpoon") {
             return this.evaluateSkeweringHarppon(combatant, game, board, movePosition, target);
         }
 
@@ -2632,7 +2632,7 @@ class VeteranAIAgentRoguePlayer extends VeteranAIAgentGenericPlayer {
             return this.evaluateDanceOfDaggers(combatant, game, board, movePosition, target);
         }
 
-        if(specialMove === "Karithras Boon") {
+        if(specialMove === "Karithra's Boon") {
             return this.evaluateKarithrasBoon(combatant, game, board, movePosition, target);
         }
 
@@ -2809,7 +2809,7 @@ class VeteranAIAgentArtificerPlayer extends VeteranAIAgentGenericPlayer {
     }
 
     protected getBaseDefendValue(): number {
-        return super.getBaseDefendValue();
+        return -1000;
     }
 
     protected getBaseBasicAttackValue(): number {
@@ -3077,6 +3077,7 @@ class VeteranAIAgentArtificerPlayer extends VeteranAIAgentGenericPlayer {
 
     private evaluateBuildDeathTower(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
         let baseValue = 24;
+        
         baseValue += this.evaluateMovement(combatant, game, board, movePosition);
         const towerExists = combatant.team.getAliveCombatants().some(c => c.getCombatantType() === CombatantType.BabyBabel);
         if(towerExists) {
@@ -3084,7 +3085,9 @@ class VeteranAIAgentArtificerPlayer extends VeteranAIAgentGenericPlayer {
         }
         const closestEnemy = getClosestEnemy(combatant, board, game);
         const hasLineOfSight = closestEnemy && board.hasLineOfSight(movePosition, closestEnemy.position, combatant);
-        if(hasLineOfSight || board.getDistanceBetweenPositions(target!, closestEnemy.position) <= 4) {
+        // eslint-disable-next-line
+        debugger;
+        if(closestEnemy && (hasLineOfSight || board.getDistanceBetweenPositions(target!, closestEnemy.position) <= 4)) {
             baseValue += 30;
         }
         return normalizeCoopEvaluation(baseValue, 3);
@@ -3368,21 +3371,260 @@ class VeteranAIAgentBabyBabelPlayer extends VeteranAIAgentGenericPlayer {
 
 }
 
-class VeteranAIAgentOozeGolemPlayer implements VeteranAIAgentPlayer {
-    evaluate(combatant: Combatant, game: Game, board: Board, turnPlay: TurnPlay): number {
+class VeteranAIAgentOozeGolemPlayer extends VeteranAIAgentGenericPlayer {
+    protected getBaseMovementValue(): number {
+        return super.getBaseMovementValue();
+    }
+
+    protected getBaseSkipValue(): number {
         return 0;
+    }
+
+    protected getBaseDefendValue(): number {
+        return -3;
+    }
+
+    protected getBaseBasicAttackValue(): number {
+        return 3;
+    }
+
+    protected getAggressivenessLevel(): number {
+        return AggressivenessLevel.FrontLine;
+    }
+
+    protected evaluateBasicAttack(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined, damageType?: DamageType, range?: number): number {
+        const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, target!, board);
+        let baseValue = super.evaluateBasicAttack(combatant, game, board, movePosition, target, damageType, range);
+        baseValue += isCombatantCaster(targetCombatant) ? 5 : 0;
+        return baseValue;
+    }
+
+    evaluate(combatant: Combatant, game: Game, board: Board, turnPlay: TurnPlay): number {
+        const evaluation = super.evaluate(combatant, game, board, turnPlay);
+        if(evaluation > -1000) {
+            return evaluation;
+        }
+
+        const movePosition = turnPlay.position;
+        const target = turnPlay.playAction.target;
+        const specialMove = turnPlay.playAction.skillName;
+
+        if(specialMove === "Goo Spit") {
+            return this.evaluateGooSpit(combatant, game, board, movePosition, target);
+        }
+
+        if(specialMove === "Crush") {
+            return this.evaluateCrush(combatant, game, board, movePosition, target);
+        }
+
+        return 0;
+    }
+
+    evaluateGooSpit(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        return this.evaluateBasicAttack(combatant, game, board, movePosition, target, DamageType.Blight) + 10;
+    }
+
+    evaluateCrush(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        return this.evaluateBasicAttack(combatant, game, board, movePosition, target, DamageType.Crush) + 10;
+    }
+
+    
+}
+
+class VeteranAIAgentWeaveEaterPlayer extends VeteranAIAgentGenericPlayer  {
+    protected getBaseMovementValue(): number {
+        return super.getBaseMovementValue();
+    }
+
+    protected getBaseSkipValue(): number {
+        return 0;
+    }
+
+    protected getBaseDefendValue(): number {
+        return 0;
+    }
+
+    protected getBaseBasicAttackValue(): number {
+        return 3;
+    }
+
+    protected getAggressivenessLevel(): number {
+        return AggressivenessLevel.FrontLine;
+    }
+
+    protected evaluateBasicAttack(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined, damageType?: DamageType, range?: number): number {
+        const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, target!, board);
+        let baseValue = super.evaluateBasicAttack(combatant, game, board, movePosition, target, damageType, range);
+        baseValue += isCombatantMartial(targetCombatant) ? 5 : 0;
+        return baseValue;
+    }
+
+    evaluate(combatant: Combatant, game: Game, board: Board, turnPlay: TurnPlay): number {
+        const evaluation = super.evaluate(combatant, game, board, turnPlay);
+        if(evaluation > -1000) {
+            return evaluation;
+        }
+
+        const movePosition = turnPlay.position;
+        const target = turnPlay.playAction.target;
+        const specialMove = turnPlay.playAction.skillName;
+
+        if(specialMove === "Weave Burst") {
+            return this.evaluateWeaveBurst(combatant, game, board, movePosition, target);
+        }
+
+        if(specialMove === "Mind Lash") {
+            return this.evaluateMindLash(combatant, game, board, movePosition, target);
+        }
+
+        if(specialMove === "Chain Weave Burst") {
+            return this.evaluateChainWeaveBurst(combatant, game, board, movePosition, target);
+        }
+
+        return 0;
+    }
+
+    evaluateWeaveBurst(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        let baseValue = 0;
+        baseValue += combatant.hasStatusEffect(StatusEffectType.ARCANE_OVERCHARGE) ? 5 : 0;
+        baseValue += this.evaluateBasicAttack(combatant, game, board, movePosition, target, DamageType.Ice) + 3;
+        return baseValue;
+    }
+
+    evaluateMindLash(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        return this.evaluateBasicAttack(combatant, game, board, movePosition, target, DamageType.Dark) + 5;
+    }
+
+    evaluateChainWeaveBurst(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        let baseValue = 0;
+        if(target) {
+            const chainTargets = board.getChainTargets(combatant, target, 3, 3);
+            chainTargets.forEach(chainTarget => {
+                baseValue += this.evaluateBasicAttack(combatant, game, board, movePosition, chainTarget, DamageType.Ice);
+                baseValue += 10;
+                if(combatant.hasStatusEffect(StatusEffectType.ARCANE_OVERCHARGE)) {
+                    baseValue += 6;
+                }
+            });
+        }
+        return baseValue;
     }
 }
 
-class VeteranAIAgentWeaveEaterPlayer implements VeteranAIAgentPlayer {
-    evaluate(combatant: Combatant, game: Game, board: Board, turnPlay: TurnPlay): number {
+class VeteranAIAgentTwinBladesPlayer extends VeteranAIAgentGenericPlayer  {
+    protected getBaseMovementValue(): number {
+        return super.getBaseMovementValue();
+    }
+
+    protected getBaseSkipValue(): number {
         return 0;
     }
-}
 
-class VeteranAIAgentTwinBladesPlayer implements VeteranAIAgentPlayer {
+    protected getBaseDefendValue(): number {
+        return -1000;
+    }
+
+    protected getBaseBasicAttackValue(): number {
+        return 3;
+    }
+
+    protected getAggressivenessLevel(): number {
+        return AggressivenessLevel.BackLine;
+    }
+
     evaluate(combatant: Combatant, game: Game, board: Board, turnPlay: TurnPlay): number {
+        const evaluation = super.evaluate(combatant, game, board, turnPlay);
+        if(evaluation > -1000) {
+            return evaluation;
+        }
+
+        const movePosition = turnPlay.position;
+        const target = turnPlay.playAction.target;
+        const specialMove = turnPlay.playAction.skillName;
+
+        if(specialMove === "Shadow Step") {
+            return this.evaluateShadowStep(combatant, game, board, movePosition, target);
+        }
+
+        if(specialMove === "Viper's Kiss") {
+            return this.evaluateVipersKiss(combatant, game, board, movePosition, target);
+        }
+
+        if(specialMove === "Twin Spin") {
+            return this.evaluateTwinSpin(combatant, game, board, movePosition, target);
+        }
+
+        if(specialMove === "Arakan's Bane") {
+            return this.evaluateArakanBane(combatant, game, board, movePosition, target);
+        }
+
+        if(specialMove === "Revive Twin") {
+            return this.evaluateReviveTwin(combatant, game, board, movePosition, target);
+        }
+
         return 0;
+    }
+
+    private evaluateShadowStep(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        let baseValue = 12;
+        baseValue += combatant.isCloaked() ? -25 : 0;
+        baseValue += isInjured(combatant) ? 3 : 0;
+        baseValue += isBadlyInjured(combatant) ? 5 : 0;
+        baseValue += isNearDeath(combatant) ? 7 : 0;
+        baseValue += isFatigued(combatant) ? -2 : 0;
+        baseValue += isLowStamina(combatant) ? -5 : 0;
+        baseValue += this.evaluateMovement(combatant, game, board, movePosition);
+        return baseValue;
+    }
+
+    private evaluateVipersKiss(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        let baseValue = this.evaluateBasicAttack(combatant, game, board, movePosition, target, DamageType.Blight);
+        if(target) {
+            const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, target!, board);
+            baseValue += isTargetLowLuck(targetCombatant) ? 2 : 0;
+            baseValue += targetCombatant.hasStatusEffect(StatusEffectType.POISONED) ? -3 : 0;
+            baseValue += 2;
+        }
+        return baseValue;
+    }
+
+    evaluateTwinSpin(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        let baseValue = 0;
+        baseValue += this.evaluateBasicAttack(combatant, game, board, movePosition, target);
+        
+        const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, target!, board);
+        if(board.isFlanked(targetCombatant) || combatant.isCloaked()) {
+            baseValue *= 1.5;
+        }
+
+        const adjacentCombatants = board.getAdjacentCombatants(targetCombatant,1);
+        const isTwinAdjacent = adjacentCombatants.filter(c => !c.isKnockedOut())
+        .filter(c => c.name !== combatant.name)
+        .some(adjacentCombatant => adjacentCombatant.getCombatantType() === CombatantType.TwinBlades);
+
+        if(isTwinAdjacent) {
+            baseValue = baseValue * 2;
+        }
+
+        return baseValue;
+    }
+
+    evaluateArakanBane(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        let baseValue = 4;
+        baseValue += this.evaluateBasicAttack(combatant, game, board, movePosition, target);
+        const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, target!, board);
+        baseValue += targetCombatant.hasStatusEffect(StatusEffectType.SLOW) ? -5 : 0;
+        baseValue += targetCombatant.hasStatusEffect(StatusEffectType.MOBILITY_BOOST) ? 3 : 0;
+        baseValue += targetCombatant.hasStatusEffect(StatusEffectType.DEFENSE_DOWNGRADE) ? -5 : 0;
+        baseValue += targetCombatant.hasStatusEffect(StatusEffectType.FORTIFIED) ? 3 : 0;
+        baseValue += combatant.hasStatusEffect(StatusEffectType.CLOAKED) ? 4 : 0;
+        return baseValue;
+    }
+
+    evaluateReviveTwin(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        const isTwinAlive = combatant.team.getAliveCombatants()
+        .some(c => c.getCombatantType() === CombatantType.TwinBlades && combatant.name !== c.name);
+        return isTwinAlive ? -1000 : 1000;
     }
 }
 

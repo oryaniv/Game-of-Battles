@@ -18,12 +18,12 @@ const defenderNames = [
 ];
 
 const hunterNames = [
-    "Haldir", "Orion", "Tannis", "Nimrod", "Oliver",
+    "Haldir", "Orion", "Tanis", "Drizzt", "Oliver",
     "Legolas", "Robin", "Meldinon", "Artemis", "Zevran"
 ];
 
 const healerNames = [
-    "Christabel", "Beatrice", "Galadriel", "Brigid", "Io",
+    "Goldmoon", "Beatrice", "Galadriel", "Brigid", "Io",
     "Abigail", "Alina", "Panacea", "Phoenix", "Marriane"
 ];
 
@@ -43,7 +43,7 @@ const witchNames = [
 ];
 
 const foolNames = [
-    "Carmen", "Harley", "Joker", "Crow", "Zifnab",
+    "Carmen", "Harley", "Joker", "Saul.G", "Zifnab",
     "Mystique", "Simkin", "Hisoka", "Pippin", "Arkana"
 ];
 
@@ -54,7 +54,7 @@ const pikemanNames = [
 
 const vanguardNames = [
     "Conan", "Cloud", "Robert", "Genghis", "Attila",
-    "Ragnar", "Aragorn", "Ajax", "Samson", "Bruenor"
+    "Ragnar", "Aragorn", "Ajax", "Samson", "Caramon"
 ];
 
 const rogueNames = [
@@ -64,13 +64,37 @@ const rogueNames = [
 
 const artificerNames = [
     "Daedalus", "LD.Vinci", "Sokka", "Tesla", "Isaac",
-    "Tony", "Q", "Midas", "Archimedes", "MacGyver"
+    "Tony", "Q", "Midas", "W.white", "MacGyver"
 ];
 
 const fistWeaverNames = [
     "Christie", "Elena", "Kira", "Ororo", "Kali",
     "Niraty", "Ambessa", "T'kari", "Yang", "Maya"
 ];
+
+const twinBladesNames = [
+    "Henzel", "Gretel"
+];
+
+const gorillaNames = [
+    "Goro"
+];
+
+const militiaNames = [
+    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O",
+     "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
+];
+
+const oozeGolemNames = [
+    "Goo", "Slime", "Blasto", "Gloop", "Gooey", "Brrb", "Blort", "Zorg", "Zbabab", "Nrrugh",
+    "aooey", "booey", "cooey", "dooey", "eooey", "fooey", "gooey", "hooey", "iooey", "jooey"
+];
+
+const weaveEaterNames = [
+    "??", "!?", 
+];
+
+
 
 export function getRandomNameForCombatantType(type: CombatantType): string {
     let names: string[];
@@ -117,6 +141,21 @@ export function getRandomNameForCombatantType(type: CombatantType): string {
             break;
         case CombatantType.FistWeaver:
             names = fistWeaverNames;
+            break;
+        case CombatantType.TwinBlades:
+            names = twinBladesNames;
+            break;
+        case CombatantType.Gorilla:
+            names = gorillaNames;
+            break;
+        case CombatantType.Militia:
+            names = militiaNames;
+            break;
+        case CombatantType.OozeGolem:
+            names = oozeGolemNames;
+            break;
+        case CombatantType.WeaveEater:
+            names = weaveEaterNames;
             break;
         default:
             return "Unknown";

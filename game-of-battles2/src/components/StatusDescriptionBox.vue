@@ -35,5 +35,6 @@ export default defineComponent({
 
     /* Outer shadow for depth (from original) */
     3px 3px 6px rgba(0, 0, 0, 0.4);
+    z-index: 10;
 }
 </style>

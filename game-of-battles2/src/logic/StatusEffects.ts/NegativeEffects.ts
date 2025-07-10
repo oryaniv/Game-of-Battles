@@ -185,7 +185,7 @@ export class BleedingStatusEffect implements StatusEffect {
 
 export class TauntedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.TAUNTED;
-    description = `This combatant is taunted by an enemy, and is dead set to chase and attack it. Also has a it's defense and agility slightly reduced.`;
+    description = `This combatant is taunted by an enemy, and is dead set to chase and attack it.`;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
             if(!caster.isOrganic()) {
@@ -359,7 +359,7 @@ export class MarkedForPainStatusEffect implements StatusEffect {
 
 export class MarkedForExecutionStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.MARKED_FOR_EXECUTION;
-    description = `This combatant was marked twiceby an assassin, and will take 50% more damage from their next attack.`;
+    description = `This combatant was marked twice by an assassin, and will take 50% more damage from their next attack.`;
     applicationHooks = {
         [StatusEffectHook.OnBeingAttacked]: (self: Combatant, attacker: Combatant) => {
             if(attacker.specialMoves.map(m => m.name).includes("Assassin's Mark" )) {

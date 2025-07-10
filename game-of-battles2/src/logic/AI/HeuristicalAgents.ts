@@ -61,7 +61,7 @@ export abstract class HeuristicalAIAgent implements AIAgent {
 
     abstract evaluationFunction(combatant: Combatant, game: Game, board: Board, turnPlay: TurnPlay): any;
 
-    private collectCoop: boolean = false;
+    private collectCoop: boolean = true;
     setCollectCoop(collectCoop: boolean) {
         this.collectCoop = collectCoop;
     }

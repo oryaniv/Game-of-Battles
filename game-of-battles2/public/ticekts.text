@@ -8,14 +8,13 @@
 * Battle screen UI
 
    * BUGS
+    * shouldn't be able to examine a cloaked enemy
+    * AI should not know to AOE target cloaked foes
      
-
    * the board
-      * new icons/images for all combatants V
-      * status effects list must not go below the panel
-      * status effects will be icons instead of letters
+      * status effects will be icons instead of letters <-- 
+      * add green glow on edges for co op partnets upon skill selection 
       * new action results effects for buffs, debuffs, ailments, etc.
-      * add green glow on edges for co op partnets upon skill selection  
       * yellow bar for arcane barrier
 
    * right side 
@@ -26,7 +25,6 @@
     
    * menus on board
      * weakness/resist messages should be shorter
-     * add status icons in the examine pop up
      * add 'error' messages when trying to do illegal moves (move after moving, attack with no targets available, etc.)
 
 
@@ -42,13 +40,13 @@
      
     
 * Result screen
-    * summary line according to game results
-    * next match in case of victory
-    * back to main menu in case of loss or end of run
+    * summary line according to game results V
+    * next match in case of victory V
+    * back to main menu in case of loss or end of run V
     * rematch in case of PVP
 
 * Intro screens
-  * enable sound yes/no v
+  * enable sound yes/no V
   * loading screen if needed
   
 * tutorial
@@ -58,15 +56,11 @@
       * new game, options, credits, about the developer V
       * new game - player vs AI, player vs player, tutorial V
       * player vs AI - ask if want the tutorial - only once
-      * lead to difficulty select screen 
-        * difficulties: easy, normal, hard
+      * lead to difficulty select screen V
+        * difficulties: easy, normal, hard V
 
     * options menu
-       * sound on/off (default as chosen) V
-       * allow advanced moves(co op) (default on)
-       * turn off game taunts (default off) V
-       * turn off battle messages (defaul off) V
-       * show game grid (default off) V
+       * see if there's anything more to add
 
     * credits
        * any artists who own sounds/svg's/ images
@@ -78,9 +72,7 @@
 
 
 * Team select screen
-  * fix all the combatant info, role, pros, const
-  * bring in the stats section
-  * stats/description only visible after clicking a combatant
+  * remove the stat/description as long as no click
 
 
 useful fonts for the future:

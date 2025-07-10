@@ -1,9 +1,9 @@
 
 <template>
-  <div class="game-container">
+  <div class="game-container" :class="{ 'game-over': startGameOverAnimation }">
     <!-- <div class="team-turn-message">{{ turnMessage }}</div>
     <div class="round-count">Round: {{ roundCount }}</div> -->
-    <div class="board-frame forest">
+    <div class="board-frame" :class="getFrameClass()">
     <div class="board">
       <div class="board-background">
       </div>
@@ -36,7 +36,7 @@
             class="combatant"
             :style="{ 
               color: teamColors[getCombatant({ x, y }).team.getIndex() === 0 ? 0 : 1],
-              boxShadow: isCurrentCombatant({ x, y }) ? '0 0 10px 5px rgba(0, 255, 0, 0.7)' : '',
+              boxShadow: isCurrentCombatant({ x, y }) ? '0 0 10px 5px #CDAD00' : '',
               
               animation: isCurrentCombatant({ x, y }) ? 'glow 2s infinite alternate' :  ''
               }"
@@ -84,7 +84,8 @@
                   
                   :style="{ color: getStatusEffectColor(statusEffect.alignment) }"
                 >
-                  {{ getStatusEffectLetter(statusEffect.name) }}
+                  <!-- {{ getStatusEffectLetter(statusEffect.name) }} -->
+                  <img class="status-effect-indicator-icon" :src="requireStatusEffectSvg(statusEffect.name)" alt="Status Effect" />
                 </div>
             </div>
             <div class="status-effect-indicator-positive">
@@ -94,7 +95,8 @@
                   
                   :style="{ color: getStatusEffectColor(statusEffect.alignment) }"
                 >
-                  {{ getStatusEffectLetter(statusEffect.name) }}
+                  <!-- {{ getStatusEffectLetter(statusEffect.name) }} -->
+                  <img class="status-effect-indicator-icon" :src="requireStatusEffectSvg(statusEffect.name)" alt="Status Effect" />
                 </div>
             </div>
           </div>
@@ -165,6 +167,11 @@
               @mouseover="showSkillDescription(skill.name)"
               @mouseleave="hideSkillDescription"
             >
+              <span class="skill-icon">
+                <div class="skill-icon-inner">
+                 <img :src="getSkillEffectIcon(skill.name)" alt="Skill" /> 
+                </div>
+              </span>
               <span class="skill-name">{{ skill.name }}</span>
               <span class="skill-cost">{{ skill.cost }} SP</span>
             </div>
@@ -194,8 +201,12 @@
             @mouseover="showCoopSkillDescription(skill.move.name, skill.partners)"
             @mouseleave="hideCoopSkillDescription"
           >
+            <span class="skill-icon">
+                <div class="skill-icon-inner">
+                 <img :src="getSkillEffectIcon(skill.move.name)" alt="Skill" /> 
+                </div>
+            </span>
             <span class="skill-name">{{ skill.move.name }}</span>
-            <!-- <span class="skill-meter-cost">Meter: {{ skill.move.meterCost }}</span> -->
             <span class="skill-turn-cost">Turns: {{ skill.move.turnCost }}</span>
             <span class="skill-cost">{{ skill.move.cost }} SP</span>
           </div>
@@ -221,7 +232,7 @@
 
   <!-- Turn Order: black team -->
   <div v-if="getBlackTeamCombatants().length > 0" class="black-team-turn-order-container" >
-    <div v-for="combatant in getBlackTeamCombatants()" :key="combatant.name" class="turn-order-item" :style="{ filter: getCurrentTeamIndex() === 0 ? 'blur(4px)' : '' }">
+    <div v-for="combatant in getBlackTeamCombatants()" :key="combatant.name" class="turn-order-item" :style="{ filter: getCurrentTeamIndex() === 3 ? 'blur(4px)' : '' }">
       <TurnOrderWidget :combatant="combatant" :currentCombatant="getCurrentCombatant()" />
     </div>
   </div>
@@ -277,11 +288,12 @@
           <div class="damage-reaction-header">Damage Reactions:</div>
           <div class="damage-reaction-item" v-for="(reaction, index) in examinedCombatant?.resistances" :key="index">
             <img class="damage-reaction-icon" :src="getDamageSvg(reaction.type)" alt="Damage Reaction" />
-            <span class="damage-reaction-text">{{ reaction.reaction }}</span>
+            <span class="damage-reaction-text">{{ getShortDamageReactionText(reaction.reaction) }}</span>
           </div>
         </div>
+        <div class="status-effects-header">Status Effects:</div>
         <div class="status-effects-list">
-          <div class="status-effects-header">Status Effects:</div>
+          
           <div
             v-for="(effect, index) in examinedCombatant?.statusEffects"
             :key="effect.name"
@@ -291,7 +303,8 @@
             @mouseleave="hideStatusEffectDescription"
           >
             <StatusDescriptionBox v-if="statusDescriptionBox && statusDescriptionBoxIndex === index" :text="statusDescriptionBox" />
-            {{ statusNameToText(effect.name) }}
+            <img class="status-effect-examine-icon" :src="requireStatusEffectSvg(effect.name)" alt="Status Effect" />
+            <!-- <span class="status-effect-name">{{ statusNameToText(effect.name) }}</span> -->
           </div>
           <!-- <StatusDescriptionBox v-if="statusDescriptionBox" :text="statusDescriptionBox" /> -->
           <div v-if="examinedCombatant?.statusEffects.length === 0">
@@ -318,7 +331,7 @@
 
 <script lang="ts">
 /* eslint-disable */
-import { defineComponent, ref, onMounted, computed } from 'vue';
+import { defineComponent, ref, onMounted, onUnmounted, computed } from 'vue';
 import { emitter } from './eventBus';
 import { Combatant } from './logic/Combatant';
 import { Board } from './logic/Board';
@@ -353,15 +366,21 @@ import { VeteranAIAgent } from './logic/AI/VeteranAIAgent';
 import { Howl } from 'howler';
 import { EventLogger } from './eventLogger';
 import { AllOfThem, standardVsSetup, theATeam, theBTeam, allMilitiaSetup, theGorillaTeam,
- generateRandomTeam, generateCombatantIdenticalTeam, placeAllCombatants, debugSetupWhiteTeam, debugSetupBlackTeam} from './boardSetups';
+ generateRandomTeam, generateCombatantIdenticalTeam, placeAllCombatants, debugSetupWhiteTeam,
+  debugSetupBlackTeam, playGroundTeams} from './boardSetups';
  import { getGameResultMessage, getGameOverMessage } from './GameOverMessageProvider';
  import { getCommentatorMessage, CommentatorMessage } from './CommentatorMessageProvider';
- import { getActionDescription, getStatusEffectDescription, getLetterForStatusEffect } from './UIUtils';
+ import { getSkillEffectIcon, getShortDamageReactionText, getActionDescription, getStatusEffectDescription, 
+ getLetterForStatusEffect, requireStatusEffectSvg, delay, statusNameToText } from './UIUtils';
+ import { Difficulty } from './GameOverMessageProvider';
+ import { useRouter } from 'vue-router';
+ import { RunManager } from './GameData/RunManager';
  import StatusDescriptionBox from './components/StatusDescriptionBox.vue';
  import ActionEventMessage from './components/ActionEventMessage.vue';
  import CommentatorMessages from './components/CommentatorMessages.vue';
  import CombatantSprite from './components/CombatantSprite.vue';
  import TurnOrderWidget from './components/TurnOrderWidget.vue';
+ import { getEmptyAsType } from './logic/LogicFlags';
 
 export default defineComponent({
   components: {
@@ -372,99 +391,25 @@ export default defineComponent({
     TurnOrderWidget
   },
   setup() {
-    
+    const router = useRouter();
+ 
+    const runManager = RunManager.getInstance();
+
     const board = ref(new Board(10, 10));
-    const veternAIAgentWithCoop = new VeteranAIAgent();
-    veternAIAgentWithCoop.setCollectCoop(true);
-    const veternAIAgentNoCoop = new VeteranAIAgent();
-    veternAIAgentNoCoop.setCollectCoop(false);
-    const rookieAIAgent = new RookieAIAgent();
-    const whiteTeam = ref(new Team('White Team', 0));
-    const blackTeam = ref(new Team('Black Team', 1));
+    
+    const matchTeams = playGroundTeams();
 
-    // whiteTeam.value.addCombatant(new Defender('aobo', { x: 3, y: 5}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Gorilla('Gorrila', { x: 4, y: 4}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Vanguard('V1', { x: 5, y: 4}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new FistWeaver('F1', { x: 3, y: 4}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Hunter('H1', { x: 5, y: 6}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new StandardBearer('S1', { x: 4, y: 6}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Fool('F1', { x: 5, y: 7}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Rogue('R1', { x: 3, y: 5}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Wizard('Z1', { x: 3, y: 5}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Artificer('A1', { x: 3, y: 5}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Healer('L1', { x: 3, y: 5}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Pikeman('P1', { x: 3, y: 5}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Defender('D1', { x: 3, y: 5}, whiteTeam.value));
-    whiteTeam.value.addCombatant(new Witch('W1', { x: 3, y: 5}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new BallistaTurret('Gobo', { x: 6, y: 1}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Wall('Gobo', { x: 5, y: 3}, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Wall('Gobo', { x: 6, y: 3}, whiteTeam.value));
+    // const matchTeams = runManager.getMatchTeams();
 
-    // whiteTeam.value.addCombatant(new Vanguard('Gobo', { x: 1, y: 8 }, whiteTeam.value));
-    // whiteTeam.value.addCombatant(new Witch('eobo', { x: 4, y: 4 }, whiteTeam.value));
+    const whiteTeam = ref(matchTeams[0]);
+    const blackTeam = ref(matchTeams[1]);
 
-    blackTeam.value.addCombatant(new Vanguard('V2', { x: 5, y: 6}, blackTeam.value));
-    blackTeam.value.addCombatant(new FistWeaver('F2', { x: 2, y: 4}, blackTeam.value));
-    blackTeam.value.addCombatant(new Hunter('H2', { x: 5, y: 6}, blackTeam.value));
-    blackTeam.value.addCombatant(new StandardBearer('S2', { x: 4, y: 6}, blackTeam.value));
-    blackTeam.value.addCombatant(new Fool('F2', { x: 5, y: 7}, blackTeam.value));
-    // blackTeam.value.addCombatant(new Rogue('R2', { x: 3, y: 5}, blackTeam.value));
-    // blackTeam.value.addCombatant(new Wizard('Z2', { x: 3, y: 7}, blackTeam.value));
-    // blackTeam.value.addCombatant(new Artificer('A2', { x: 3, y: 5}, blackTeam.value));
-    // blackTeam.value.addCombatant(new Healer('L2', { x: 3, y: 9}, blackTeam.value));
-    // blackTeam.value.addCombatant(new Pikeman('P2', { x: 3, y: 5}, blackTeam.value));
-    // blackTeam.value.addCombatant(new Defender('D2', { x: 3, y: 5}, blackTeam.value));
-    // blackTeam.value.addCombatant(new Witch('W2', { x: 2, y: 1}, blackTeam.value));
-
-  //blackTeam.value.addCombatant(new Artificer('Gobo', { x: 9, y: 6 }, blackTeam.value));
-
-    whiteTeam.value.combatants[0].applyStatusEffect({
-            name: StatusEffectType.STRENGTH_BOOST,
-            duration: 5,
-    }); 
-
-    whiteTeam.value.combatants[0].applyStatusEffect({
-            name: StatusEffectType.LUCK_DOWNGRADE,
-            duration: 5,
-    }); 
-
-    whiteTeam.value.combatants[0].applyStatusEffect({
-            name: StatusEffectType.ARCANE_OVERCHARGE,
-            duration: 5,
-    }); 
-
-    whiteTeam.value.combatants[0].applyStatusEffect({
-            name: StatusEffectType.BURNING,
-            duration: 5,
-    }); 
-
-    blackTeam.value.combatants[1].applyStatusEffect({
-            name: StatusEffectType.STRENGTH_DOWNGRADE,
-            duration: 5,
-    }); 
-
-    blackTeam.value.combatants[1].applyStatusEffect({
-            name: StatusEffectType.POISONED,
-            duration: 5,
-    }); 
-
-    blackTeam.value.combatants[0].applyStatusEffect({
-            name: StatusEffectType.SANCTUARY,
-            duration: 5,
-    }); 
-
-    whiteTeam.value.combatants[1].applyStatusEffect({
-            name: StatusEffectType.FROZEN,
-            duration: 5,
-    }); 
+    placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
 
     
-
-   placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
-    
-
     const teams = ref([whiteTeam.value, blackTeam.value]);
     const game = ref(new Game(teams.value, board.value as Board));
+
     const teamColors = ref(['white', 'black']);
     const actionsRemaining = ref(5);
     const turnMessage = ref('');
@@ -508,6 +453,8 @@ export default defineComponent({
     const commentatorMessages = ref<CommentatorMessage[]>([]);
 
     const hoveringMessage = ref<string>('');
+
+    const startGameOverAnimation = ref(false);
 
     const getCombatantEffects = (position: Position) => {
       const key = `${position.x},${position.y}`;
@@ -582,9 +529,19 @@ export default defineComponent({
       });
     });
 
+    onUnmounted(() => {
+      game.value.clear();
+      game.value = getEmptyAsType<Game>();
+    });
+
     const updateTurnMessage = () => {
+      if(!game.value) {
+        return;
+      }
+
       if(game.value.isGameOver()) {
         updateHoveringMessage(getGameOverMessage(whiteTeam.value, blackTeam.value), false);
+        endGame();
       } else {
         updateHoveringMessage(`${game.value.teams[(game.value as Game).getCurrentTeamIndex()].name}'s Turn`, true);
       }
@@ -634,6 +591,10 @@ export default defineComponent({
     }
 
     const showActionMenu = () => {
+      if(!game.value) {
+        return false;
+      }
+
        if(game.value.isGameOver()) {
          return false;
        }
@@ -1009,7 +970,7 @@ export default defineComponent({
           case DamageType.Slash:
             return require('./assets/Slash.svg');
           case DamageType.Crush:
-            return require('./assets/Crush.svg');
+            return require('./assets/Crush2.png');
           case DamageType.Pierce:
             return require('./assets/Pierce.svg');
           case DamageType.Fire:
@@ -1273,6 +1234,10 @@ export default defineComponent({
       }
     }
 
+    // const getStatusEffectSvg = (effectType: StatusEffectType): string => {
+    //   return requireStatusEffectSvg(effectType);
+    // }
+
     const getStatusEffectLetter = (effectType: StatusEffectType): string => {
       return getLetterForStatusEffect(effectType); // Default to "?" if not found
     };
@@ -1463,158 +1428,14 @@ export default defineComponent({
       }
     }
 
-    const statusNameToText = (statusName: StatusEffectType) => {
-      switch (statusName) {
-        case 0:
-          return "Blocking Stance";
-        case 1:
-          return "Arcane Channeling";
-        case 2:
-          return "Focus Aim";
-        case 3:
-          return "Fortified";
-        case 4:
-          return "Immobilized";
-        case 5:
-          return "Regenerating";
-        case 6:
-          return "Frozen";
-        case 7:
-          return "Poisoned";
-        case 8:
-          return "Strength Boost";
-        case 9:
-          return "Mobility Boost";
-        case 10:
-          return "Encouraged";
-        case 11:
-          return "Rallied";
-        case 12:
-          return "Strength Downgrade";
-        case 13:
-          return "Inspiring Killer";
-        case 14:
-          return "Luck Downgrade";
-        case 15:
-          return "Slow";
-        case 16:
-          return "Energy Absorb";
-        case 17:
-          return "Bleeding";
-        case 18:
-          return "Taunted";
-        case 19:
-          return "Fool's Luck";
-        case 20:
-          return "Mesmerizing";
-        case 21:
-          return "Mesmerized";
-        case 22:
-          return "Nauseated";
-        case 23:
-          return "Stupefied";
-        case 24:
-          return "Staggered";
-        case 25:
-          return "First Strike";
-        case 26:
-          return "Defense Downgrade";
-        case 27:
-          return "Idai No Hadou";
-        case 28:
-          return "Riposte";
-        case 29:
-          return "Struck First";
-        case 30:
-          return "Marching Defense";
-        case 31:
-          return "Cloaked";
-        case 32:
-          return "Sadist";
-        case 33:
-          return "Marked for Pain";
-        case 34:
-          return "Marked for Execution";
-        case 35:
-          return "Marked for Oblivion";
-        case 36:
-          return "Mark detonate";
-        case 37:
-          return "Full Metal Jacket";
-        case 38:
-          return "Going Off";
-        case 39:
-          return "Defending";
-        case 40:
-          return "Divine Miracle";
-        case 41:  
-          return "Life Drinker";
-        case 42:
-          return "Panicked";
-        case 43:
-          return "Diamond Supremacy";
-        case 44:  
-          return "Charmed";
-        case 45:
-          return "Circus Diabolique";
-        case 46:
-          return "Nightmare Locked";
-        case 47:  
-          return "Last Stand Used";
-        case 48:
-          return "Shield Wall";
-        case 49:
-          return "Shield Wall Protected";
-        case 50:  
-          return "Arcane Shield Wall";
-        case 51:
-          return "Arcane Shield Wall Protected";
-        case 52:
-          return "Frenzy";
-        case 53:
-          return "Forbidden Affliction";
-        case 54:  
-          return "Sanctuary";
-        case 55:
-          return "Divine Retribution";
-        case 56:
-          return "Decoy";
-        case 57:
-          return "Surprise Boom";
-        case 58:
-          return "Plagued";
-        case 59:
-          return "Burning";
-        case 60:
-          return "Arcane Overcharge";
-        case 61:
-          return "Arcane Barrier";
-        case 62:
-          return "Arcane Conduit";
-        case 63:
-          return "Guardian";
-        case 64:
-          return "Guardian Protected";
-        case 65:
-          return "Diamond Hooked";
-        case 66:
-          return "Diamond Hooked Holding";
-        case 67:
-          return "Troll Regeneration";
-        case 68:
-          return "Ingenious Upgrade";
-        case 69:
-          return "Reload";
-        case 70:
-          return "Sleeping";
-        }
-    }
     const getEvents = () => {
       return eventLogger.getEvents();
     }
 
     const showStatusEffectDescription = (effect: StatusEffectApplication, index: number) => {
-      statusDescriptionBox.value = getStatusEffectDescription(effect);
+      const statusEffectName = statusNameToText(effect.name);
+      const statusEffectDescription = getStatusEffectDescription(effect);
+      statusDescriptionBox.value = `${statusEffectName}: ${statusEffectDescription}`;
       statusDescriptionBoxIndex.value = index;
     }
 
@@ -1639,7 +1460,42 @@ export default defineComponent({
       return hoveringMessage.value !== '';
     }
 
-    
+
+    const getFrameClass = () => {
+      const difficulty = runManager.getDifficulty();
+      if(difficulty === Difficulty.EASY) {
+        return 'forest';
+      }
+      else if(difficulty === Difficulty.MEDIUM) {
+        return 'cave';
+      }
+      return 'temple';
+    }
+
+    const endGame = async () => {
+      const playerSurvived = !game.value.teams.find((team) => team.isHumanPlayerTeam())?.isDefeated();
+      const gameOverMessage = getGameResultMessage(whiteTeam.value, blackTeam.value);
+      await delay(1500);
+      startGameOverAnimation.value = true;
+      await delay(2500);
+      clearGame();
+      router.push({
+        name: 'PostMatch',
+        state: {
+          postMatchMessage: gameOverMessage,
+          playerSurvived: playerSurvived
+        }
+      });
+    }
+
+    const clearGame = () => {
+      // game.value = null;
+      // board.value = null;
+      // whiteTeam.value = null;
+      // blackTeam.value = null;
+      // teams.value = [];
+      // teamColors.value = [];
+    }
 
     return {
       board,
@@ -1735,7 +1591,12 @@ export default defineComponent({
       statusDescriptionBoxIndex,
       commentatorMessages,
       showHoveringMessage,
-      hoveringMessage
+      hoveringMessage,
+      getFrameClass,
+      startGameOverAnimation,
+      requireStatusEffectSvg,
+      getShortDamageReactionText,
+      getSkillEffectIcon
     };
   },
 });
@@ -1806,6 +1667,11 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
+  transition: opacity 2s ease-in-out;
+}
+
+.game-container.game-over {
+  opacity: 0;
 }
 
 .team-turn-message {
@@ -2360,13 +2226,56 @@ button {
   overflow-y: auto;
 }
 
+.skill-icon {
+  width: 20px; /* Increased size slightly for better icon visibility and glow */
+  height: 20px; /* Keep it square */
+  
+  /* Change background to very dark, near-black */
+  background-color: rgba(0, 0, 0, 0.8); /* Very dark, 80% opaque black */
+  /* You could also use a very dark solid color like #1A1A1A if you prefer no transparency */
+
+  border-radius: 8px; /* Slightly more rounded corners for the plaque */
+  
+  /* Keep the existing gold border */
+  border: 2px solid #A17A50; /* Gold/bronze accent border */
+  
+  padding: 5px; /* Padding inside the box around the icon */
+  display: flex;
+  justify-content: center; /* Center the icon horizontally */
+  align-items: center; /* Center the icon vertically */
+  align-self: center; /* Center the box itself if flex-direction: column on parent */
+
+  /* Add the dynamic inner glow */
+  /* The --icon-glow-color will be set via Vue's :style binding */
+  box-shadow: 
+    inset 0 0 10px 3px var(--icon-glow-color, rgba(255, 255, 255, 0.3)), /* Icon-colored inner glow */
+    0 0 5px rgba(0, 0, 0, 0.3); /* Subtle outer shadow for depth */
+  
+  transition: box-shadow 0.2s ease-out, background-color 0.2s ease-out; /* Smooth transitions */
+}
+
+.skill-icon-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.skill-icon-inner img {
+  width: 100%;
+  height: 100%;
+}
+
 .skill-item {
   font-size: 16px;
   padding: 10px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   border-bottom: 1px solid #555;
   cursor: pointer;
+  gap: 1em;
 }
 
 .skill-item:last-child {
@@ -2382,7 +2291,7 @@ button {
 }
 
 .coop-skill-menu .skill-name {
-  flex: 0.7;
+  
 }
 
 .skill-cost {
@@ -2436,15 +2345,24 @@ button {
   display: flex;
   flex-direction: column;
   gap: 0px;
+  max-height: 70px;
+  overflow-y: hidden;
   /* Add more styling as needed */
 }
 
+.status-effect-indicator-positive .status-effect-indicator-icon,
+.status-effect-indicator-negative .status-effect-indicator-icon {
+  transform: scale(1);
+  width: 20px;
+  height: 20px;
+}
+
 .status-effect-indicator-positive {
-  left: -13%;
+  left: -20%;
 }
 
 .status-effect-indicator-negative {
-  right: -13%;
+  right: -20%;
 }
 
 .aoe-highlight {
@@ -2535,10 +2453,6 @@ button {
                        rgba(139, 0, 0, 0) 100%
                      );
 }
-
-/*.black-team-turn-order-container .turn-order-combatant-icon {
-  color: black;
-}*/
 
 .turn-order-combatant-name {
   font-size: 10px;
@@ -2665,17 +2579,70 @@ button {
 }
 
 
-.status-effects-list {
-  margin-top: 15px;
-}
+
 
 .status-effects-header {
   font-weight: bold;
-  margin-bottom: 5px;
+  margin: 20px 0 10px 0;
+}
+
+.status-effects-list {
+  margin: 15px 0 0 0px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 
 .status-effect-item {
   margin-bottom: 5px;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1.3em;
+}
+
+/* .status-effect-examine-icon {
+  width: 30px;
+  background-color: #2f4f4f;
+  border-radius: 5px;
+  border: 2px solid #A17A50;
+  padding: 5px;
+  display: flex;
+  align-self: center;
+} */
+
+.status-effect-examine-icon {
+  width: 40px; /* Increased size slightly for better icon visibility and glow */
+  height: 40px; /* Keep it square */
+  
+  /* Change background to very dark, near-black */
+  background-color: rgba(0, 0, 0, 0.8); /* Very dark, 80% opaque black */
+  /* You could also use a very dark solid color like #1A1A1A if you prefer no transparency */
+
+  border-radius: 8px; /* Slightly more rounded corners for the plaque */
+  
+  /* Keep the existing gold border */
+  border: 2px solid #A17A50; /* Gold/bronze accent border */
+  
+  padding: 5px; /* Padding inside the box around the icon */
+  display: flex;
+  justify-content: center; /* Center the icon horizontally */
+  align-items: center; /* Center the icon vertically */
+  align-self: center; /* Center the box itself if flex-direction: column on parent */
+
+  /* Add the dynamic inner glow */
+  /* The --icon-glow-color will be set via Vue's :style binding */
+  box-shadow: 
+    inset 0 0 10px 3px var(--icon-glow-color, rgba(255, 255, 255, 0.3)), /* Icon-colored inner glow */
+    0 0 5px rgba(0, 0, 0, 0.3); /* Subtle outer shadow for depth */
+  
+  transition: box-shadow 0.2s ease-out, background-color 0.2s ease-out; /* Smooth transitions */
+}
+
+.status-effect-examine-icon:hover {
+  background-color: rgba(26, 26, 26, 0.9); /* Slightly lighter on hover */
+  box-shadow: 
+    inset 0 0 15px 5px var(--icon-glow-color, rgba(255, 255, 255, 0.5)), /* Stronger glow on hover */
+    0 0 8px rgba(0, 0, 0, 0.5); /* Stronger outer shadow on hover */
 }
 
 .status-popup-close {
@@ -2706,6 +2673,7 @@ button {
   width: 20px;
   height: 20px;
   margin-bottom: 5px;
+  transform: scale(1.5);
 }
 
 .damage-reaction-text {
@@ -2714,7 +2682,7 @@ button {
 
 .event-indicator-container {
   position: absolute;
-  top: 20%;
+  top: 22%;
   right: 3.5%;
   width: 240px;
   height: 30px;
@@ -2779,13 +2747,13 @@ button {
 }
 
 .hovering-message-text.hovering-message-you-died {
-  font-size: 68px;
+  font-size: 6em;
   font-family: "MetalMania-Regular";
   color: darkred;
 }
 
 .hovering-message-text.hovering-message-enemy-died {
-  font-size: 48px;
+  font-size: 4em;
   font-family: "CinzelDecorative-Regular";
   color: gold;
 }

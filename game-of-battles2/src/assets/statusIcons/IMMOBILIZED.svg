@@ -1,0 +1,20 @@
+<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="20.969px" height="20.969px" viewBox="0 0 60.969 60.969" style="enable-background:new 0 0 60.969 60.969;"
+	 xml:space="preserve">
+<g>
+	<g>
+		<!-- Original icon path -->
+		<path d="M16.014,46.963c-0.742,4.453-2.12,9.117-0.53,9.365c1.591,0.247,3.817,0.706,6.36,0c2.545-0.707,3.18-1.944,6.254,2.614
+			s20.99,0,20.99,0s0-2.333,0-4.664c0-2.333-4.771-2.757-8.162-4.134c-3.393-1.38-7.846-4.028-7.846-9.86c0-5.83,0-40.285,0-40.285
+			L11.88,1.909c0,0,1.59,21.202,2.332,29.577C14.954,39.86,16.757,42.511,16.014,46.963z" fill="white"/>
+	</g>
+
+	<!-- Prohibited sign overlay - Modified to be more akin to the provided image -->
+	<g id="Prohibited_Sign">
+		<!-- Red circle outline -->
+		<circle cx="30.4845" cy="30.4845" r="25" fill="none" stroke="red" stroke-width="6"/>
+		<!-- Red diagonal line -->
+		<rect x="7.9845" y="26.4845" width="45" height="8" transform="rotate(-45 30.4845 30.4845)" fill="red"/>
+	</g>
+</g>
+</svg>

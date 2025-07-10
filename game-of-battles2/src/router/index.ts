@@ -1,7 +1,6 @@
 import { createRouter, createWebHashHistory, createWebHistory, RouteRecordRaw } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import SoundOnOff from '../views/SoundOnOff.vue'
-import MainMenu from '../views/MainMenu.vue'
 import MainMenu2 from '../views/MainMenu2.vue'
 import BuildTeam from '../views/BuildTeam.vue'
 import TeamBuilder from '../views/BuildTeam2.vue'
@@ -11,6 +10,8 @@ import Credits from '../views/Credits.vue'
 import Movie from '../views/Movie.vue'
 import IntroSequence from '../views/IntroSequence.vue'
 import GameApp from '../GameApp.vue'
+import PostMatch from '../views/PostMatch.vue'
+import { Route } from '@playwright/test'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -52,6 +53,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/Match',
     name: 'Match',
     component: GameApp,
+  },
+  {
+    path: '/PostMatch',
+    name: 'PostMatch',
+    component: PostMatch
   }
 
 

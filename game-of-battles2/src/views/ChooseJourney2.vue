@@ -73,12 +73,12 @@
       </div> 
     </div>
 
-    <!-- <div @click="ascend" class="bobobob">BOBOMBMFRE</div> -->
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, computed, onBeforeUnmount, onMounted, nextTick } from 'vue';
+import { useRouter } from 'vue-router';
 import { RunManager, RunsStatus } from '../GameData/RunManager';
 import { Difficulty } from "../GameOverMessageProvider";
 import { Team } from '@/logic/Team';
@@ -93,14 +93,13 @@ export default defineComponent({
     CombatantSprite
   },
   setup() {
+
+    const router = useRouter();
+
     const runManager = RunManager.getInstance();
     const currentRun = runManager.getRun();
     const iconCombatant = currentRun.team.combatants[0];
-    // let bobo = ref(0);
-
-    const boboPlay = () => {
-      startPlayerPlaqueDescent();
-    }
+   
 
     const selectedDifficulty = ref<Difficulty | undefined>(currentRun.difficulty || undefined);
     const animationPhase = ref<'idle' | 'zooming' | 'descending' | 'ascending' | 'complete'>
@@ -175,7 +174,7 @@ export default defineComponent({
       }
     };
 
-    const getEnemyIconClass = (enemy) => {
+    const getEnemyIconClass = (enemy:any) => {
       console.log(enemy);
  
       if(!selectedDifficulty.value || animationPhase.value === 'idle') {
@@ -197,6 +196,10 @@ export default defineComponent({
     // --- Animation Sequence ---
     const startPyramidAnimation = async (difficulty: Difficulty) => { // Made async
       if (animationPhase.value !== 'idle') return; // Prevent re-triggering
+
+      runManager.setDifficulty(difficulty);
+      runManager.setStatus(RunsStatus.IN_PROGRESS);
+      runManager.setCurrentLevel(1);
 
       selectedDifficulty.value = difficulty;
       animationPhase.value = 'zooming';
@@ -283,7 +286,7 @@ export default defineComponent({
           playerPlaqueY.value = targetY - 50; // Update reactive Y position
 
           // Scroll to keep the player plaque in view as it descends
-          const scrollContainer = document.querySelector('.journey-screen-container');
+          const scrollContainer = document.querySelector('.journey-screen-container') as HTMLElement;
           if (scrollContainer) {
             // Calculate target scroll position to keep plaque roughly centered in its scrollable area
             const plaqueTopRelativeToScrollContainer = playerPlaqueY.value;
@@ -316,6 +319,9 @@ export default defineComponent({
 
     const straightDescend = () => {
       animationPhase.value = 'descending';
+      if(!allBlocksElements.value || !selectedDifficulty.value) {
+        return;
+      }
       const block = allBlocksElements.value[selectedDifficulty.value][0];
       const blockRects = block.getBoundingClientRect();
       console.log(blockRects);
@@ -325,7 +331,7 @@ export default defineComponent({
       playerPlaqueY.value = (blockRects.top + blockRects.height / 2) - 95;
 
       // Scroll to keep the player plaque in view as it descends
-      const scrollContainer = document.querySelector('.journey-screen-container');
+      const scrollContainer = document.querySelector('.journey-screen-container') as HTMLElement;
       if (scrollContainer) {
         // Calculate target scroll position to keep plaque roughly centered in its scrollable area
         const plaqueTopRelativeToScrollContainer = playerPlaqueY.value;
@@ -341,9 +347,10 @@ export default defineComponent({
         }
       }
 
-      // setTimeout(() => {
-      //   revealNextEnemy(1);
-      // }, 1500);
+      setTimeout(() => {
+        // revealNextEnemy(1);
+        nextFight();
+      }, 2500);
     }
 
     const ascend = () => {
@@ -354,20 +361,21 @@ export default defineComponent({
 
     const revealNextEnemy = (level: number) => {
       console.log('revealing next enemy');
+      if(!selectedDifficulty.value) {
+        return;
+      }
       // eslint-disable-next-line
       debugger;
-      const combatantType = getEnemyTeamCombatantTypes(selectedDifficulty.value, level)[0];
+      const combatantType = getEnemyTeamCombatantTypes(selectedDifficulty.value!, level)[0];
       const combatant = getCombatantByType(combatantType, enemyTeam.value);
       const currentEnemy = enemyData.value[selectedDifficulty.value][level - 1];
       console.log(combatant, currentEnemy);
      //  currentEnemy.combatant = null;
     }
 
-    // const getEnemyPlaqueCombatant = (enemy) => {
-    //   // eslint-disable-next-line
-    //   debugger;
-    //   return enemy.combatant;
-    // }
+    const nextFight = () => {
+      router.push('/Match');
+    }
 
     const assignAllBlocksElements = () => {
       allBlocksElements.value = {
@@ -390,10 +398,10 @@ export default defineComponent({
     }
 
     const placePlayerPlaque = () => {
-      if(!selectedDifficulty.value || animationPhase.value === 'idle') {
+      if(!selectedDifficulty.value || animationPhase.value === 'idle' || !allBlocksElements.value) {
         return;
       }
-      const block = allBlocksElements.value[selectedDifficulty.value as keyof typeof allBlocksElements][playerPlaqueCurrentLevel.value];
+      const block = allBlocksElements.value[selectedDifficulty.value][playerPlaqueCurrentLevel.value];
       const blockRects = block.getBoundingClientRect();
       const containerRect = document.querySelector('.journey-screen-container')?.getBoundingClientRect() || { top: 0, left: 0 };
       let targetY = 0;
@@ -402,7 +410,7 @@ export default defineComponent({
       playerPlaqueY.value = targetY;
     }
 
-    const getDifficultyLetter = (enemy) => {
+    const getDifficultyLetter = (enemy:any) => {
 
       if(enemy.isBoss) {
         return 'B';
@@ -443,14 +451,14 @@ export default defineComponent({
       playerPlaqueStyle,
       enemyPlaqueStyle,
       selectDifficulty: startPyramidAnimation, // Bind click to start animation
-      boboPlay,
       ascend,
       straightDescend,
       iconCombatant,
       getEnemyIconClass,
       getDifficultyLetter,
       revealNextEnemy,
-      enemyTeam
+      enemyTeam,
+      nextFight
     };
   },
 });

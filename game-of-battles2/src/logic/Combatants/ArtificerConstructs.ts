@@ -70,8 +70,8 @@ export class Bomb extends Combatant {
         {
           hp: 25,
           stamina: 1,
-          attackPower: 20,
-          defensePower: 0,
+          attackPower: 70,
+          defensePower: 20,
           initiative: 1,
           movementSpeed: 3,
           range: 0,
@@ -126,8 +126,8 @@ export class BabyBabel extends Combatant {
       {
         hp: HEALTH_INCREASE_ENABLED ? 100 + HEALTH_INCREASE_AMOUNT : 100,
         stamina: 100,
-        attackPower: 20,
-        defensePower: 20, 
+        attackPower: 70,
+        defensePower: 90, 
         initiative: 1,
         movementSpeed: Number.NEGATIVE_INFINITY,
         range: 3,
@@ -183,8 +183,8 @@ export class BallistaTurret extends Combatant {
       {
         hp: HEALTH_INCREASE_ENABLED ? 65 + (HEALTH_INCREASE_AMOUNT / 2) : 65,
         stamina: 30,
-        attackPower: 30,
-        defensePower: 15,
+        attackPower: 80,
+        defensePower: 50,
         initiative: 1,
         movementSpeed: Number.NEGATIVE_INFINITY,
         range: 6,

@@ -145,7 +145,7 @@ export class MobilityBoostStatusEffect implements StatusEffect {
 
 export class EncouragedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.ENCOURAGED;
-    description: string = "Gives a 20% chance to gain an extra action point at the end of each turn. chance increases by the luck stat";
+    description: string = "Gives a 20% chance to gain an extra action point at the end of each turn. chance further increases by the luck stat";
     applicationHooks = {
         [StatusEffectHook.OnTurnEnd]: (caster: Combatant, target: Combatant, board: Board) => {
             const roll = Math.random();

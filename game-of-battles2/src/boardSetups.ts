@@ -5,7 +5,7 @@ import { Hunter } from './logic/Combatants/Hunter';
 import { Healer } from './logic/Combatants/Healer';
 import { Wizard } from './logic/Combatants/Wizard'; 
 import { Witch } from './logic/Combatants/Witch';
-import { Fool } from './logic/Combatants/Fool';
+import { Doll, Fool } from './logic/Combatants/Fool';
 import { Pikeman } from './logic/Combatants/Pikeman';
 import { Vanguard } from './logic/Combatants/Vanguard';
 import { FistWeaver } from './logic/Combatants/FistWeaver';
@@ -22,6 +22,79 @@ import { Rogue } from "./logic/Combatants/Rogue";
 import { Artificer } from "./logic/Combatants/Artificer";
 import { Iskariot } from "./logic/Combatants/Iskariot";
 import { Myrmidon } from "./logic/Combatants/Myrmidon";
+import { RookieAIAgent } from "./logic/AI/DeterministicAgents";
+import { VeteranAIAgent } from "./logic/AI/VeteranAIAgent";
+import { Troll } from "./logic/Combatants/Troll";
+import { Dragon } from "./logic/Combatants/Dragon";
+import { WeaveEater } from "./logic/Combatants/WeaveEater";
+import { OozeGolem } from "./logic/Combatants/OozeGolem";
+import { TwinBlade } from "./logic/Combatants/TwinBlade";
+import { BabyBabel, Wall, BallistaTurret, Bomb } from "./logic/Combatants/ArtificerConstructs";
+import { StatusEffectType } from "./logic/StatusEffect";
+
+export function playGroundTeams(): Team[] {
+    const veternAIAgentWithCoop = new VeteranAIAgent();
+    veternAIAgentWithCoop.setCollectCoop(true);
+    const veternAIAgentNoCoop = new VeteranAIAgent();
+    veternAIAgentNoCoop.setCollectCoop(false);
+    const rookieAIAgent = new RookieAIAgent();
+    const whiteTeam = new Team('White Team', 0);
+    const blackTeam = new Team('Black Team', 1);
+
+    whiteTeam.addCombatant(new Wizard('P1', { x: 3, y: 3}, whiteTeam));
+    whiteTeam.addCombatant(new Artificer('A1', { x: 3, y: 5}, whiteTeam));
+    whiteTeam.addCombatant(new Healer('L1', { x: 3, y: 5}, whiteTeam));
+    whiteTeam.addCombatant(new Vanguard('P2', { x: 3, y: 4}, whiteTeam));
+    whiteTeam.addCombatant(new Hunter('P3', { x: 3, y: 6}, whiteTeam));
+    whiteTeam.addCombatant(new Fool('P4', { x: 3, y: 7}, whiteTeam));
+    whiteTeam.addCombatant(new Witch('P5', { x: 3, y: 8}, whiteTeam));
+    whiteTeam.addCombatant(new FistWeaver('P6', { x: 3, y: 9}, whiteTeam));
+    whiteTeam.addCombatant(new Pikeman('P7', { x: 3, y: 10}, whiteTeam));
+    whiteTeam.addCombatant(new Rogue('P8', { x: 3, y: 11}, whiteTeam));
+    whiteTeam.addCombatant(new Defender('P9', { x: 3, y: 12}, whiteTeam));
+    whiteTeam.addCombatant(new StandardBearer('P10', { x: 3, y: 13}, whiteTeam));
+   
+    
+    // whiteTeam.addCombatant(new Vanguard('P2', { x: 3, y: 4}, whiteTeam));
+    
+    blackTeam.addCombatant(new Wizard('W1', { x: 3, y: 5}, blackTeam));
+
+
+    // blackTeam.addCombatant(new TwinBlade('V3', { x: 5, y: 6}, blackTeam));
+    // blackTeam.addCombatant(new TwinBlade('V4', { x: 5, y: 7}, blackTeam));
+
+
+    // blackTeam.addCombatant(new OozeGolem('V3', { x: 5, y: 6}, blackTeam));
+    // blackTeam.addCombatant(new OozeGolem('V4', { x: 5, y: 7}, blackTeam));
+    // blackTeam.addCombatant(new WeaveEater('V5', { x: 5, y: 8}, blackTeam));
+    // blackTeam.addCombatant(new WeaveEater('V6', { x: 5, y: 9}, blackTeam));
+
+    blackTeam.combatants[0].applyStatusEffect({
+        name: StatusEffectType.SLOW,
+        duration: 1,
+    });
+
+    // blackTeam.combatants[0].applyStatusEffect({
+    //     name: StatusEffectType.NIGHTMARE_LOCKED,
+    //     duration: 1,
+    // });
+
+    // blackTeam.combatants[0].applyStatusEffect({
+    //     name: StatusEffectType.MESMERIZING,
+    //     duration: 1,
+    // });
+
+    // blackTeam.combatants[0].applyStatusEffect({
+    //     name: StatusEffectType.STUPEFIED,
+    //     duration: 1,
+    // });
+    
+
+
+    return [whiteTeam, blackTeam];
+}
+
+
 
 export function allMilitiaSetup(team1: Team, team2: Team) {
     team1.addCombatant(new Hunter('A', { x: 3, y: 0 }, team1));
@@ -258,30 +331,32 @@ function generateRandomString(): string {
 
 export function refreshTeam(team: Team) {
     team.combatants = team.combatants.filter((combatant) => !combatant.isExpendable());
-    team.combatants.forEach((combatant) => {
-        combatant.removeAllStatusEffects();
-        const replicaCombatant = getCombatantByType(combatant.getCombatantType(), team);
-        combatant.baseStats.hp = replicaCombatant.baseStats.hp;
-        combatant.baseStats.stamina = replicaCombatant.baseStats.stamina;
-        combatant.baseStats.attackPower = replicaCombatant.baseStats.attackPower;
-        combatant.baseStats.defensePower = replicaCombatant.baseStats.defensePower;
-        combatant.baseStats.agility = replicaCombatant.baseStats.agility;
-        combatant.baseStats.luck = replicaCombatant.baseStats.luck;
-        combatant.baseStats.initiative = replicaCombatant.baseStats.initiative;
-        combatant.baseStats.movementSpeed = replicaCombatant.baseStats.movementSpeed;
-        combatant.baseStats.range = replicaCombatant.baseStats.range;
-        combatant.stats.hp = replicaCombatant.baseStats.hp;
-        combatant.stats.stamina = replicaCombatant.baseStats.stamina;
-        combatant.stats.attackPower = replicaCombatant.baseStats.attackPower;
-        combatant.stats.defensePower = replicaCombatant.baseStats.defensePower;
-        combatant.stats.agility = replicaCombatant.baseStats.agility;
-        combatant.stats.luck = replicaCombatant.baseStats.luck;
-        combatant.stats.initiative = replicaCombatant.baseStats.initiative;
-        combatant.stats.movementSpeed = replicaCombatant.baseStats.movementSpeed;
-        combatant.stats.range = replicaCombatant.baseStats.range;
-        combatant.position = { x: 0, y: 0 };
-        combatant.hasMoved = false;
-    });
+    team.combatants.forEach((combatant) => refreshCombatant(combatant, team));
+}
+
+export function refreshCombatant(combatant: Combatant, team: Team) {
+    combatant.removeAllStatusEffects();
+    const replicaCombatant = getCombatantByType(combatant.getCombatantType(), team);
+    combatant.baseStats.hp = replicaCombatant.baseStats.hp;
+    combatant.baseStats.stamina = replicaCombatant.baseStats.stamina;
+    combatant.baseStats.attackPower = replicaCombatant.baseStats.attackPower;
+    combatant.baseStats.defensePower = replicaCombatant.baseStats.defensePower;
+    combatant.baseStats.agility = replicaCombatant.baseStats.agility;
+    combatant.baseStats.luck = replicaCombatant.baseStats.luck;
+    combatant.baseStats.initiative = replicaCombatant.baseStats.initiative;
+    combatant.baseStats.movementSpeed = replicaCombatant.baseStats.movementSpeed;
+    combatant.baseStats.range = replicaCombatant.baseStats.range;
+    combatant.stats.hp = replicaCombatant.baseStats.hp;
+    combatant.stats.stamina = replicaCombatant.baseStats.stamina;
+    combatant.stats.attackPower = replicaCombatant.baseStats.attackPower;
+    combatant.stats.defensePower = replicaCombatant.baseStats.defensePower;
+    combatant.stats.agility = replicaCombatant.baseStats.agility;
+    combatant.stats.luck = replicaCombatant.baseStats.luck;
+    combatant.stats.initiative = replicaCombatant.baseStats.initiative;
+    combatant.stats.movementSpeed = replicaCombatant.baseStats.movementSpeed;
+    combatant.stats.range = replicaCombatant.baseStats.range;
+    combatant.position = { x: 0, y: 0 };
+    combatant.hasMoved = false;
 }
 
 export function getCombatantByType(type: CombatantType, team: Team): Combatant {
@@ -315,6 +390,18 @@ export function getCombatantByType(type: CombatantType, team: Team): Combatant {
             return new Rogue(name, position, team);
         case CombatantType.Artificer:
             return new Artificer(name, position, team);
+        case CombatantType.Gorilla:
+            return new Gorilla(name, position, team);
+        case CombatantType.Troll:
+            return new Troll(name, position, team);
+        case CombatantType.Dragon:
+            return new Dragon(name, position, team);
+        case CombatantType.WeaveEater:
+            return new WeaveEater(name, position, team);
+        case CombatantType.OozeGolem:
+            return new OozeGolem(name, position, team);
+        case CombatantType.TwinBlades:
+            return new TwinBlade(name, position, team);
         default:
             return new Militia(name, position, team);
     }

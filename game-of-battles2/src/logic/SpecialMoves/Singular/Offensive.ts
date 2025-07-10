@@ -596,7 +596,7 @@ export class Rampage implements SpecialMove {
         return rampageResults;
     };
     checkRequirements = undefined
-    description = `3 basic attacks against target, with a small chance to automatically miss each time.`   
+    description = `3 basic attacks against the target, with a small chance to automatically miss each time.`   
 }
 
 export class ShieldBreaker implements SpecialMove {
@@ -1051,20 +1051,80 @@ export class WeaveBurst implements SpecialMove {
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
         const combatMaster = CombatMaster.getInstance();
-        const randomDamage = [DamageType.Fire, DamageType.Ice, DamageType.Lightning][Math.floor(Math.random() * 3)];
+        const randomDamageType = [DamageType.Fire, DamageType.Ice, DamageType.Lightning][Math.floor(Math.random() * 3)];
+        const hasOvercharge = invoker.hasStatusEffect(StatusEffectType.ARCANE_OVERCHARGE);
+        const damage = hasOvercharge ? this.damage.amount * 1.5 : this.damage.amount;
         const attackDamage = {
-            amount: this.damage.amount,
-            type: randomDamage
+            amount: damage,
+            type: randomDamageType
         };
         const result = combatMaster.executeAttack(invoker, target, board, attackDamage);
+        if((result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit ) && hasOvercharge) {
+            const afflictionType = randomDamageType === DamageType.Fire ? 
+            StatusEffectType.BURNING : randomDamageType === DamageType.Ice ? 
+            StatusEffectType.FROZEN : StatusEffectType.STAGGERED;
+
+            CombatMaster.getInstance().tryInflictStatusEffect(invoker, target, board, afflictionType, 1, 0.6);
+        }
+        hasOvercharge && invoker.removeStatusEffect(StatusEffectType.ARCANE_OVERCHARGE);
         return result;
     };
     checkRequirements = undefined
     description = `Medium Random elemental damage to the target.`   
 }
 
+export class ChainWeaveBurst implements SpecialMove {
+    name: string = "Chain Weave Burst";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 6;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Straight,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 4
+    };
+    damage: Damage = {
+        amount: 30,
+        type: DamageType.Dark
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        invoker.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
+        const combatMaster = CombatMaster.getInstance();
+        const hasOvercharge = hasArcaneOvercharge(invoker);
+        const randomDamageType = [DamageType.Fire, DamageType.Ice, DamageType.Lightning][Math.floor(Math.random() * 3)];
+        const damage = {
+            amount: hasOvercharge ? this.damage.amount * 1.5 : this.damage.amount,
+            type: randomDamageType
+        };
+        if(hasOvercharge) {
+            invoker.removeStatusEffect(StatusEffectType.ARCANE_OVERCHARGE);
+        }
+        const chainTargets = board.getChainTargets(invoker, target, 3, 3);
+        const chainWeaveBurstResults: ActionResult[] = [];
+        for(const currentTarget of chainTargets) {
+            const result = combatMaster.executeAttack(invoker, currentTarget, board, damage);
+            chainWeaveBurstResults.push(result);
+            if(result.attackResult === AttackResult.Miss || result.attackResult === AttackResult.Fumble || result.attackResult === AttackResult.Blocked) {
+                break;
+            } else if(hasOvercharge && (result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit)) {
+                const afflictionType = randomDamageType === DamageType.Fire ? 
+                StatusEffectType.BURNING : randomDamageType === DamageType.Ice ? 
+                StatusEffectType.FROZEN : StatusEffectType.STAGGERED;
+
+                CombatMaster.getInstance().tryInflictStatusEffect(invoker, currentTarget, board, afflictionType, 1, 0.6);
+            }
+        }
+        return chainWeaveBurstResults;
+    };
+    checkRequirements = (self: Combatant) => {
+        return self.statusEffects.some((effect) => effect.name === StatusEffectType.ARCANE_CHANNELING);
+    };
+    description = `Random elemental damage to target, jumps up 3 times.`   
+}
+
 export class MindLash implements SpecialMove {
-    name: string = "Tentacle Lash";
+    name: string = "Mind Lash";
     triggerType = SpecialMoveTriggerType.Active;
     cost: number = 2;
     turnCost: number = 1;
@@ -1321,17 +1381,19 @@ export class TwinSpin implements SpecialMove {
         if(invoker.hasStatusEffect(StatusEffectType.CLOAKED) || board.isFlanked(targetCombatant!)) {
             skillDamage = this.damage.amount * 1.5;
         }
+        
         const adjacentCombatants = board.getAdjacentCombatants(targetCombatant,1);
-        const isTwinAdjacent = adjacentCombatants
+        const isTwinAdjacent = adjacentCombatants.filter(c => !c.isKnockedOut())
+        .filter(c => c.name !== invoker.name)
         .some(adjacentCombatant => adjacentCombatant.getCombatantType() === CombatantType.TwinBlades);
+
+        if(isTwinAdjacent) {
+            skillDamage = skillDamage * 2;
+        }
         const result = combatMaster.executeAttack(invoker, target, board, {amount: skillDamage, type: DamageType.Slash});
-        adjacentCombatants.forEach(adjacentCombatant => {
-            combatMaster.executeAttack(invoker, adjacentCombatant.position, board, {amount: skillDamage, type: DamageType.Slash});
-        });
         return result;
     };
-    checkRequirements = (self: Combatant) => {
-        return self.hasStatusEffect(StatusEffectType.INGENIOUS_UPGRADE);
-    }
-    description = `Medium Crush damage to target.`   
+    checkRequirements = undefined;
+    description = `Medium Slashe damage to target. 50% more damage if target is flanked or attacker is cloaked. Double damage if
+    another allied Twin Blade is adjacent to the target.`   
 }

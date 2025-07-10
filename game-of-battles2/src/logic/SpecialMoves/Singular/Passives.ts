@@ -335,10 +335,40 @@ export class PhysDuplicate implements SpecialMove {
         type: DamageType.Unstoppable
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
+        invoker.applyStatusEffect({
+            name: StatusEffectType.PHYS_DUPLICATE,
+            duration: Number.POSITIVE_INFINITY,
+        });
         return getStandardActionResult();
     };
     requirements = undefined;
     description = `Upon being hit with elemental damage, this combatant duplicates itself to both side tiles if possible.`
+}
+
+export class WeaveEating implements SpecialMove {
+    name: string = "Weave Eating";
+    triggerType = SpecialMoveTriggerType.Passive;
+    cost: number = 0;
+    turnCost: number = 0;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.None,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Unstoppable
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        invoker.applyStatusEffect({
+            name: StatusEffectType.WEAVE_EATING,
+            duration: Number.POSITIVE_INFINITY,
+        });
+        return getStandardActionResult();
+    };
+    requirements = undefined;
+    description = `When this combatant is hit with any type of magic damage (but not unstoppable), it is charged with eldritch energy.`
 }
 
 

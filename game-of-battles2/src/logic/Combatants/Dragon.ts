@@ -10,15 +10,15 @@ export class Dragon extends Combatant {
       super(
         name,
         {
-          hp: 400,
+          hp: 500,
           stamina: 2000,
-          attackPower: 40,
-          defensePower: 40,
+          attackPower: 100,
+          defensePower: 100,
           initiative: 1,
           movementSpeed: 5,
           range: 1,
           agility: 8,
-          luck: 15,
+          luck: 18,
         },
         position,
         [

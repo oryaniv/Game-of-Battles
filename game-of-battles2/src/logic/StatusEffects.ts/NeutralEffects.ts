@@ -5,16 +5,32 @@ import { StatusEffect } from "../StatusEffect";
 import { Board } from "../Board";
 import { SpecialMoveAlignment, SpecialMoveAreaOfEffect } from "../SpecialMove";
 import { ActionResult, AttackResult, getStandardActionResult } from "../attackResult";
+import { Position } from "../Position";
 import { Damage, DamageType } from "../Damage";
 import { DamageReaction } from "../Damage";
 import { RangeCalculator } from "../RangeCalculator";
 import { CombatMaster } from "../CombatMaster";
 import { emitter } from "@/eventBus";
+// import { OozeGolem } from "../Combatants/OozeGolem";
+import { Team } from "../Team";
+import { IdGenerator } from "../IdGenerator";
+// import { getNewCombatantName } from "@/CombatantNameProvider";
+import { CombatantType } from "@/logic/Combatants/CombatantType";
+import { getCombatantByType } from "@/boardSetups";
+import { getNewCombatantName } from "@/CombatantNameProvider";
 
+export class DefendingStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.DEFENDING;
+    description = `All incoming damage is halved. incoming attacks cannot miss, fumble, crit or hit weakness.`;
+    applicationHooks = {
+
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Neutral;
+}
 
 export class InspiringKillerStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.INSPIRING_KILLER;
-    description = `Any time this combatant kills an ally, adjacent allies will gain a random buff.`;
+    description = `Any time this combatant kills an enemy, allies adjacent to said enemy will gain a random buff.`;
     applicationHooks = {
         [StatusEffectHook.OnKilling]: (caster: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
             const getAllTargets = board.getAreaOfEffectPositions(caster, target.position, SpecialMoveAreaOfEffect.Cross, SpecialMoveAlignment.Ally);
@@ -157,7 +173,7 @@ export class MarchingDefenseStatusEffect implements StatusEffect {
 
 export class SadistStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.SADIST;
-    description = `This combatant will gain an attack power boost if it inflicts 50 or more damage with an attack.`;
+    description = `This combatant will restore some health and stamina and gain an attack power boost if it inflicts 50 or more damage with a direct attack.`;
     applicationHooks = {
         [StatusEffectHook.OnInflictingDamage]: (self: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
             if(damage.amount >= 50) {
@@ -327,11 +343,86 @@ export class ReloadStatusEffect implements StatusEffect {
 
 export class PhysDuplicateStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.PHYS_DUPLICATE;
-    description = `This combatant duplicates itself to both side tiles if possible.`;
+    description = `Upon taking physical damage, this combatant duplicates itself to both left and right of itself, if possible.`;
     applicationHooks = {
-        [StatusEffectHook.OnDamageTaken]: (self: Combatant, target: Combatant, damage: Damage) => {
-            if(damage.amount >= 1 && (damage.type  === DamageType.Crush || damage.type === DamageType.Slash)) {
-                // self.removeStatusEffect(StatusEffectType.PHYS_DUPLICATE);
+        [StatusEffectHook.OnDamageTaken]: (self: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
+            // eslint-disable-next-line
+            debugger;
+
+            if(damage.amount <= 0 || 
+                (damage.type !== DamageType.Crush &&
+                damage.type !== DamageType.Pierce && 
+                damage.type !== DamageType.Slash)) {
+                return;
+            }
+
+            const leftPosition = board.isValidPosition({x: self.position.x - 1, y: self.position.y}) &&
+             board.isPositionEmpty({x: self.position.x - 1, y: self.position.y}) ? {x: self.position.x - 1, y: self.position.y} : null;
+            const rightPosition = board.isValidPosition({x: self.position.x + 1, y: self.position.y}) &&
+             board.isPositionEmpty({x: self.position.x + 1, y: self.position.y}) ? {x: self.position.x + 1, y: self.position.y} : null;
+            
+            if(leftPosition) {
+                const name = getNewCombatantName(CombatantType.OozeGolem, self.team.getAliveCombatants().map(c => c.name));
+                const oozeGolem = getCombatantByType(CombatantType.OozeGolem, self.team);
+                oozeGolem.position = leftPosition;
+                oozeGolem.name = name;
+                self.team.addCombatant(oozeGolem);
+                board.placeCombatant(oozeGolem, leftPosition);
+            }
+
+            if(rightPosition) {
+                const name = getNewCombatantName(CombatantType.OozeGolem, self.team.getAliveCombatants().map(c => c.name));
+                const oozeGolem = getCombatantByType(CombatantType.OozeGolem, self.team);
+                oozeGolem.position = rightPosition;
+                oozeGolem.name = name;
+                self.team.addCombatant(oozeGolem);
+                board.placeCombatant(oozeGolem, rightPosition);
+            }
+            
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
+}
+
+// function createOozeGolem(position: Position, team: Team, board: Board) {
+//     console.log(position);
+     
+//     const name = getNewCombatantName(CombatantType.OozeGolem, team.getAliveCombatants().map(c => c.name));
+//     const name = "fooo";
+//     const oozeGolem = new OozeGolem(name, position, team);
+//     team.addCombatant(oozeGolem);
+//     board.placeCombatant(oozeGolem, position);
+// }
+
+
+export class WeaveEatingStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.WEAVE_EATING;
+    description = `Magic damage dealt to this combatant will charge it with eldritch energy.`;
+    applicationHooks = {
+        [StatusEffectHook.OnDamageTaken]: (self: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
+            if(damage.amount <= 0 || 
+                damage.type === DamageType.Crush || 
+                damage.type === DamageType.Pierce ||  
+                damage.type === DamageType.Slash ||
+                damage.type === DamageType.Unstoppable) {
+                return;
+            }
+
+            self.applyStatusEffect({
+                name: StatusEffectType.REGENERATING,
+                duration: 3,
+            });
+
+            if(!self.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING)) {
+                self.applyStatusEffect({
+                    name: StatusEffectType.ARCANE_CHANNELING,
+                    duration: Number.POSITIVE_INFINITY,
+                });
+            } else {
+                self.applyStatusEffect({
+                    name: StatusEffectType.ARCANE_OVERCHARGE,
+                    duration: Number.POSITIVE_INFINITY,
+                });
             }
         }
     };

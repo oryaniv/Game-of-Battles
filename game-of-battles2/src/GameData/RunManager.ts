@@ -1,6 +1,17 @@
 import { Team } from "../logic/Team";
 import { Difficulty } from "../GameOverMessageProvider";
 import { generateRandomTeam } from "../boardSetups";
+import { getEnemyTeam } from "./EnemyRepository";
+import { Artificer } from "@/logic/Combatants/Artificer";
+import { Defender } from "@/logic/Combatants/Defender";
+import { Pikeman } from "@/logic/Combatants/Pikeman";
+import { Witch } from "@/logic/Combatants/Witch";
+import { Healer } from "@/logic/Combatants/Healer";
+import { Vanguard } from "@/logic/Combatants/Vanguard";
+import { Wizard } from "@/logic/Combatants/Wizard";
+import { Hunter } from "@/logic/Combatants/Hunter";
+import { FistWeaver } from "@/logic/Combatants/FistWeaver";
+import { VeteranAIAgent } from "@/logic/AI/VeteranAIAgent";
 
 
 export enum RunsStatus {
@@ -23,12 +34,22 @@ export class RunManager {
     private gameRun: GameRun;
 
     private constructor() {
+        // this.gameRun = {
+        //     team: new Team('Player Team', 0),
+        //     score: -1,
+        //     currentLevel: 0,
+        //     difficulty: undefined,
+        //     status: RunsStatus.CREATED
+        // };
+
+        // eslint-disable-next-line no-debugger
+        // debugger;
         this.gameRun = {
-            team: new Team('', 0),
+            team: generateExamplePlayerTeam(),
             score: -1,
-            currentLevel: 0,
-            difficulty: undefined,
-            status: RunsStatus.CREATED
+            currentLevel: 1,
+            difficulty: Difficulty.MEDIUM,
+            status: RunsStatus.IN_PROGRESS
         };
     }
 
@@ -93,33 +114,36 @@ export class RunManager {
     }
 
     public getRun(): GameRun {
-        // return this.gameRun;
-        return {
-            team: generateRandomTeam(0),
-            score: -1,
-            currentLevel: 0,
-            difficulty: undefined,
-            status: RunsStatus.CREATED
-        };
-
-        // return {
-        //     team: generateRandomTeam(0),
-        //     score: -1,
-        //     currentLevel: 1,
-        //     difficulty: Difficulty.EASY,
-        //     status: RunsStatus.IN_PROGRESS
-        // };
+        return this.gameRun;
     }
 
     // Clear run
     public clear(): void {
         this.gameRun = {
-            team: new Team('', 0),
+            team: new Team('Player Team', 0),
             score: -1,
             currentLevel: 0,
             difficulty: undefined,
             status: RunsStatus.CREATED
         };
     }
+
+    public getMatchTeams(): Team[] {
+        const playerTeam = this.getRun().team;
+        // eslint-disable-next-line no-debugger
+        debugger;
+        const enemyTeam = getEnemyTeam(this.getRun().difficulty as Difficulty, this.getCurrentLevel());
+        return [playerTeam, enemyTeam];
+    }
+}
+
+function generateExamplePlayerTeam(): Team {
+    const team = new Team('Your team', 0, new VeteranAIAgent());
+    team.addCombatant(new Vanguard('Aragorn', { x: 3, y: 5}, team));
+    team.addCombatant(new Wizard('Feloron', { x: 3, y: 5}, team));
+    team.addCombatant(new Hunter('Orion', { x: 3, y: 5}, team));
+    team.addCombatant(new FistWeaver('Ororo', { x: 3, y: 5}, team));
+    team.addCombatant(new Wizard('Irenicus', { x: 3, y: 5}, team));
+    return team;
 }
 

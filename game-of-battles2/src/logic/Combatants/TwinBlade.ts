@@ -4,10 +4,11 @@ import { Position } from "../Position";
 import { ShadowStep } from "../SpecialMoves/Singular/Self";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
-import { SneakAttack, TwinSpin } from "../SpecialMoves/Singular/Offensive";
-import { AssassinsMark } from "../SpecialMoves/Singular/Debuffs";
-//import { AssassinsMark } from "../SpecialMoves/Singular/Self";
-// import { TwinSpin } from "../SpecialMoves/Singular/Offensive";
+import { SneakAttack, TwinSpin, VipersKiss } from "../SpecialMoves/Singular/Offensive";
+import { AssassinsMark , ArakansBane} from "../SpecialMoves/Singular/Debuffs";
+import { ReviveTwin } from "../SpecialMoves/Singular/Support";
+import { Riposte } from "../SpecialMoves/Singular/Passives";
+
 
 
 export class TwinBlade extends Combatant {
@@ -38,12 +39,12 @@ export class TwinBlade extends Combatant {
             {type: DamageType.Dark, reaction: DamageReaction.RESISTANCE},
         ],
         [
+           new Riposte(),
            new ShadowStep(),
-           new SneakAttack(),
-           new AssassinsMark(),
+           new VipersKiss(),
            new TwinSpin(),
-           // new ArakansBane(),
-           // new ReviveTwin(),
+           new ArakansBane(),
+           new ReviveTwin(),
         ],
       team);
     }

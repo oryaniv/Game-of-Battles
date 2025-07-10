@@ -6,7 +6,7 @@ import { BlockingStance } from "./SpecialMoves/Singular/Self";
 import { FrozenStatusEffect, ImmobilizedStatusEffect, LuckDowngradeStatusEffect, SlowStatusEffect, StrengthDowngradeStatusEffect, PoisonedStatusEffect, BleedingStatusEffect, TauntedStatusEffect, StupefiedStatusEffect, NauseatedStatusEffect, MesmerizedStatusEffect, StaggeredStatusEffect, DefenseDowngradeStatusEffect, MarkedForPainStatusEffect, 
   MarkedForOblivionStatusEffect, MarkedForExecutionStatusEffect, PanickedStatusEffect, CharmedStatusEffect, NightmareLockedStatusEffect, ForbiddenAfflictionStatusEffect,
    DivineRetributionStatusEffect, PlaguedStatusEffect, BurningStatusEffect, DiamondHookedStatusEffect, SleepingStatusEffect } from "./StatusEffects.ts/NegativeEffects";
-import { EnergyAbsorbStatusEffect, FirstStrikeStatusEffect, FoolsLuckStatusEffect, InspiringKillerStatusEffect, MarchingDefenseStatusEffect, RiposteStatusEffect, SadistStatusEffect, GoingOffStatusEffect, DivineMiracleStatusEffect, LifeDrinkerStatusEffect, LastStandUsedStatusEffect, DecoyStatusEffect, SurpriseBoomStatusEffect, TrollRegenerationStatusEffect, ReloadStatusEffect } from "./StatusEffects.ts/NeutralEffects";
+import { WeaveEatingStatusEffect, PhysDuplicateStatusEffect, DefendingStatusEffect, EnergyAbsorbStatusEffect, FirstStrikeStatusEffect, FoolsLuckStatusEffect, InspiringKillerStatusEffect, MarchingDefenseStatusEffect, RiposteStatusEffect, SadistStatusEffect, GoingOffStatusEffect, DivineMiracleStatusEffect, LifeDrinkerStatusEffect, LastStandUsedStatusEffect, DecoyStatusEffect, SurpriseBoomStatusEffect, TrollRegenerationStatusEffect, ReloadStatusEffect } from "./StatusEffects.ts/NeutralEffects";
 import { ArcaneBarrierStatusEffect, ArcaneChannelingStatusEffect, ArcaneConduitStatusEffect, ArcaneOverchargeStatusEffect, ArcaneShieldWallProtectedStatusEffect, ArcaneShieldWallStatusEffect, BlockingStanceStatusEffect, CircusDiaboliqueStatusEffect, CloakedStatusEffect, DiamondSupremacyStatusEffect, EncouragedStatusEffect, FocusAimStatusEffect, FortifiedStatusEffect, FrenzyStatusEffect, FullMetalJacketStatusEffect, GuardianProtectedStatusEffect, GuardianStatusEffect, IdaiNoHadouStatusEffect, MesmerizingStatusEffect, MobilityBoostStatusEffect, RalliedStatusEffect, RegeneratingStatusEffect, SanctuaryStatusEffect, ShieldWallProtectedStatusEffect, ShieldWallStatusEffect, StrengthBoostStatusEffect, DiamondHookedHoldingStatusEffect, IngeniousUpgradeStatusEffect } from "./StatusEffects.ts/PositiveEffects";
 import { SpecialMove } from "./SpecialMove";
 
@@ -157,8 +157,12 @@ StatusEffectType {
     // 71
     PHYS_DUPLICATE,
     // 72
-    ELEM_DUPLICATE,
+    WEAVE_EATING,
 }
+
+/* 
+PHYS_DUPLICATE, WEAVE_EATING
+*/
 
   export enum StatusEffectHook {
     // for affects to happen when the status effect is applied - like attack up
@@ -221,6 +225,7 @@ StatusEffectType {
   }
 
   const StatusEffectsTable: StatusEffects = {
+    [StatusEffectType.DEFENDING]: new DefendingStatusEffect(),
     [StatusEffectType.BLOCKING_STANCE]: new BlockingStanceStatusEffect(),
     [StatusEffectType.ARCANE_CHANNELING]: new ArcaneChannelingStatusEffect(),
     [StatusEffectType.FOCUS_AIM]: new FocusAimStatusEffect(),
@@ -289,6 +294,8 @@ StatusEffectType {
     [StatusEffectType.INGENIOUS_UPGRADE]: new IngeniousUpgradeStatusEffect(),
     [StatusEffectType.RELOAD]: new ReloadStatusEffect(),
     [StatusEffectType.SLEEPING]: new SleepingStatusEffect(),
+    [StatusEffectType.PHYS_DUPLICATE]: new PhysDuplicateStatusEffect(),
+    [StatusEffectType.WEAVE_EATING]: new WeaveEatingStatusEffect(),
   };
 
   export function getStatusEffect(name: StatusEffectType) : StatusEffect | undefined {

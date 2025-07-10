@@ -289,7 +289,7 @@ export class ColdEdge extends CoopMove {
 }
 
 export class SkeweringHarppon extends CoopMove {
-    name: string = "Skewering Harppon";
+    name: string = "Skewering Harpoon";
     description: string = "Medium Pierce damage to all targets in a 3-tile line in a 4-tile range.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Hunter, CombatantType.Pikeman] }
@@ -489,7 +489,7 @@ export class DanceOfDaggers extends CoopMove {
 
 
 export class KarithrasBoon extends CoopMove {
-    name: string = "Karithras Boon";
+    name: string = "Karithra's Boon";
     description: string = "Attack an enemy. if it dies, get buffs according to target health percent lost. Double damage while cloaked";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         // { combatantTypeOptions: [CombatantType.Rogue, CombatantType.Witch, CombatantType.Fool, CombatantType.Wizard] },

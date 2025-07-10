@@ -12,6 +12,9 @@ import { emitter } from '../eventBus';
 import { EventLogger } from '../eventLogger';
 import { CoopMove } from "./SpecialMoves/Coop/CoopMove";
 import { PlayActionType } from "./AI/HeuristicalAgents";
+import { getEmptyAsType } from "./LogicFlags";
+
+let gameId = 1;
 
 export class Game {
     private currentTeamIndex: number = 0;
@@ -21,6 +24,8 @@ export class Game {
     private combatMaster: CombatMaster;
     private startingTeamIndex: number = 0;
     private skillRecords: Record<string, number> = {};
+    public id: number = gameId++;
+    
     public getRoundCount(): number {
       return this.roundCount;
     }
@@ -358,5 +363,15 @@ export class Game {
       else {
         return skill.name;
       }
+    }
+
+    clear(): void {
+      this.board = getEmptyAsType<Board>();
+      this.teams = [];
+      this.currentTeamIndex = 0;
+      this.currentCombatantIndex = 0;
+      this.actionsRemaining = 0;
+      this.roundCount = 1;
+      this.startingTeamIndex = 0;
     }
   }

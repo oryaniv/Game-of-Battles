@@ -1,3 +1,4 @@
+import { refreshCombatant } from "@/boardSetups";
 import { ActionResult, AttackResult } from "@/logic/attackResult";
 import { getStandardActionResult } from "@/logic/attackResult";
 import { Board } from "@/logic/Board";
@@ -294,4 +295,37 @@ export class BoomBoomJack implements SpecialMove {
     checkRequirements = undefined
     description = `Deploy a walking bomb, which can blow itself up. If it dies, it will explode on the spot
     can have up to 7 bombs at the same time.`
+}
+
+export class ReviveTwin implements SpecialMove {
+    name: string = "Revive Twin";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 0;
+    turnCost: number = 0.5;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Self,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Unstoppable
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const deadTwin = invoker.team.combatants.find(c => c.getCombatantType() === CombatantType.TwinBlades && c.isKnockedOut());
+        if(!deadTwin) {
+            return getStandardActionResult();
+        }
+        const originalPosition = deadTwin.position;
+        if(!board.isPositionEmpty(originalPosition)) {
+            // that's a player friendly exploit :)
+            return getStandardActionResult();
+        } 
+        refreshCombatant(deadTwin, invoker.team);
+        board.placeCombatant(deadTwin, originalPosition);
+        return getStandardActionResult();
+    };
+    checkRequirements = undefined;
+    description = `Revive a twin blade. Can be used only once per game.`
 }

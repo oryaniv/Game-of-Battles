@@ -200,3 +200,38 @@ export class AssassinsMark implements SpecialMove {
     only half an action point.`;
     breaksCloaking = false;
 }
+
+export class ArakansBane implements SpecialMove {
+    name: string = "Arakan's Bane";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 0;
+    turnCost: number = 0.5;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Straight,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 3
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Unstoppable
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const targetCombatant = board.getCombatantAtPosition(target);
+        if(!targetCombatant) {   
+            return getStandardActionResult();
+        }
+        targetCombatant.applyStatusEffect({
+            name: StatusEffectType.SLOW,
+            duration: 3,
+        });
+        targetCombatant.applyStatusEffect({
+            name: StatusEffectType.DEFENSE_DOWNGRADE,
+            duration: 3,
+        });
+        return getStandardActionResult();
+    };
+    checkRequirements = undefined;
+    breaksCloaking = false;
+    description = `Decrease target's movement speed, agility and defense for 3 rounds.`
+}

@@ -124,7 +124,7 @@ export interface CombatantStats {
   
     takeDamage(damage: Damage, board?: Board): void {
       this.stats.hp -= damage.amount;
-      getResultsForStatusEffectHook(this, StatusEffectHook.OnDamageTaken, this, damage, 1);
+      getResultsForStatusEffectHook(this, StatusEffectHook.OnDamageTaken, this, damage, 1, board);
       if (this.stats.hp <= 0) {
         this.stats.hp = 0;
         const onDeathHookResults = getResultsForStatusEffectHook(this, StatusEffectHook.OnDeath, this, {amount: 0, type: DamageType.Unstoppable}, 1, board);

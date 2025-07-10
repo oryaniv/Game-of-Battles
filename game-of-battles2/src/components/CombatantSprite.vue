@@ -11,11 +11,21 @@
   'wizard': combatant.getCombatantType() === 'Wizard',
   'rogue': combatant.getCombatantType() === 'Rogue',
   'fist-weaver': combatant.getCombatantType() === 'Fistweaver',
-  'fool': combatant.getCombatantType() === 'Fool',
+  'fool': combatant.getCombatantType() === 'Fool' || combatant.getCombatantType() === 'Doll',
   'artificer': combatant.getCombatantType() === 'Artificer',
   'healer': combatant.getCombatantType() === 'Healer',
   'standard-bearer': combatant.getCombatantType() === 'Champion',
   'pikeman': combatant.getCombatantType() === 'Pikeman',
+  'gorilla': combatant.getCombatantType() === 'Gorilla',
+  'troll': combatant.getCombatantType() === 'Troll',
+  'dragon': combatant.getCombatantType() === 'Dragon',
+  'weave-eater': combatant.getCombatantType() === 'Weave Eater',
+  'ooze-golem': combatant.getCombatantType() === 'Ooze Golem',
+  'twin-blade': combatant.getCombatantType() === 'Twin Blade',
+  'tower': combatant.getCombatantType() === 'Tower',
+  'ballista': combatant.getCombatantType() === 'Ballista Turret',
+  'bomb': combatant.getCombatantType() === 'Bomb',
+  'wall': combatant.getCombatantType() === 'Wall',
   }">
 
   </div>
@@ -88,7 +98,9 @@ export default defineComponent({
         //CombatantType.Vanguard,
         CombatantType.Witch, CombatantType.Hunter, CombatantType.Vanguard, CombatantType.Defender, CombatantType.Healer,
         CombatantType.Wizard, CombatantType.Rogue, CombatantType.FistWeaver, CombatantType.Fool, CombatantType.Artificer,
-        CombatantType.StandardBearer, CombatantType.Pikeman
+        CombatantType.StandardBearer, CombatantType.Pikeman, CombatantType.Gorilla, CombatantType.Troll, CombatantType.Dragon,
+        CombatantType.WeaveEater, CombatantType.OozeGolem, CombatantType.TwinBlades, CombatantType.BabyBabel,
+         CombatantType.BallistaTurret, CombatantType.Wall, CombatantType.Bomb, CombatantType.Doll, CombatantType.Wall
       ].includes(type);
     };
 
@@ -114,28 +126,6 @@ export default defineComponent({
     overflow: visible;
     image-rendering: pixelated;
 }
-
-/*.sprite-container::after {
-  content: '';
-  position: absolute;
-  bottom: 0px; 
-  left: 50%;
-  transform: translateX(-50%);
-  width: 28px;
-  height: 8px;
-  border-radius: 50%; 
-  box-shadow: 0 0 8px 4px rgba(0, 0, 255, 0.7);
-  z-index: 0;
-  opacity: 0.8;
-}
-
-.sprite-container.white::after {
-  box-shadow: 0 0 8px 4px rgba(255, 0, 0, 0.7);
-}
-
-.sprite-container.black::after {
-  box-shadow: 0 0 8px 4px rgba(0, 0, 255, 0.7);
-} */
 
 .sprite-container.witch {
   background-position: -44px -39px;
@@ -164,7 +154,6 @@ export default defineComponent({
   transform: scale(1.4);
   background-image: url('@/assets/CombatantModels/Hunter_recolor.png');
 }
-
 
 
 .sprite-container.vanguard {
@@ -293,6 +282,99 @@ export default defineComponent({
   background-size: contain;
   transform: scale(1.2) rotateY(180deg);
   background-position: 8px 2px;
+}
+
+.sprite-container.gorilla {
+  background-image: url('@/assets/CombatantModels/Gorilla_no_back.png');
+  background-size: contain;
+  transform: scale(1.3);
+  background-position: 0px 8px;
+}
+
+.sprite-container.troll {
+  background-image: url('@/assets/CombatantModels/Troll.png');
+  transform: scale(1.2);
+  background-size: contain;
+  background-position: 0px 5px;
+}
+
+.sprite-container.dragon {
+  background-image: url('@/assets/CombatantModels/Dragon.png');
+  transform: scale(1.2);
+  background-size: contain;
+  background-position: 0px 5px;
+}
+
+.sprite-container.weave-eater {
+  background-image: url('@/assets/CombatantModels/WeaveEater.png');
+  transform: scale(1.2);
+  background-size: contain;
+  background-position: 0px 1px;
+}
+
+.sprite-container.ooze-golem {
+  background-image: url('@/assets/CombatantModels/OozeGolem.png');
+  transform: scale(1.2);
+  background-position: 0px 10px;
+  background-size: contain;
+}
+
+.sprite-container.twin-blade {
+  background-image: url('@/assets/CombatantModels/TwinBlade.png');
+  transform: scale(1.9);
+  background-position: 8px 16px;
+}
+
+.sprite-container.tower {
+  background-image: url('@/assets/CombatantModels/BlueDeathTower.png');
+  transform: scale(1);
+  background-position: -24px -18px;
+
+}
+
+.sprite-container.tower.black {
+  background-image: url('@/assets/CombatantModels/RedDeathTower.png');
+  transform: scale(1);
+  background-position: -24px -18px;
+}
+
+.sprite-container.ballista {
+  background-image: url('@/assets/CombatantModels/Ballista_Down.png');
+  transform: scale(1.5);
+  background-size: contain;
+  background-position: 0px 11px;
+}
+
+.sprite-container.ballista.black {
+  background-image: url('@/assets/CombatantModels/Ballista_Up.png');
+  transform: scale(1.5);
+  background-size: contain;
+  background-position: 0px 11px;
+}
+
+.sprite-container.bomb {
+  background-image: url('@/assets/CombatantModels/Blue_Bomb.png');
+  transform: scale(0.8);
+  background-size: contain;
+  background-position: 0px 15px;
+}
+
+.sprite-container.bomb.black {
+  background-image: url('@/assets/CombatantModels/Red_Bomb.png');
+  transform: scale(0.8);
+  background-size: contain;
+  background-position: 0px 15px;
+}
+
+.sprite-container.wall {
+  background-image: url('@/assets/CombatantModels/blue_brick.png');
+  transform: scale(1.2);
+  background-size: contain;
+  background-position: 0px 20px;
+}
+
+.sprite-container.wall.black {
+  filter: hue-rotate(115deg);
 }
 
 

@@ -9,3 +9,8 @@ export const ATTACK_DEFENSE_INCREASE_AMOUNT = 10;
 export const AGILITY_LUCK_INCREASE_AMOUNT = 5;
 
 export const WEAKNESS_MINIMIZE_ENABLED = false;
+
+
+export function getEmptyAsType<T>():T {
+    return <T>(<unknown>undefined);
+}

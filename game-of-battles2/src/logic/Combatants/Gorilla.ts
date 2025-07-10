@@ -9,10 +9,10 @@ export class Gorilla extends Combatant {
       super(
         name,
         {
-          hp: 400,
+          hp: 450,
           stamina: 20,
-          attackPower: 50,
-          defensePower: 30,
+          attackPower: 100,
+          defensePower: 80,
           initiative: 1,
           movementSpeed: 5,
           range: 1,

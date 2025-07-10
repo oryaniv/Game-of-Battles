@@ -142,7 +142,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { CombatantDescription } from '@/logic/CombatantDescriptor';
 import { CombatantType } from '@/logic/Combatants/CombatantType';
@@ -150,11 +150,11 @@ import { Team } from '@/logic/Team';
 import { getCombatantByType } from '@/boardSetups';
 import CombatantSprite from '../components/CombatantSprite.vue'; 
 import { getNewCombatantName } from '@/CombatantNameProvider';
-import { Combatant } from '@/logic/Combatants/Combatant';
+import { Combatant } from '@/logic/Combatant';
 import { premadeTeams } from './viewsHelpers/BuildTeamHelper';
 import { combatantsWithDescriptions } from './viewsHelpers/BuildTeamHelper';
 import { getStatUiName, getStatusScale, getDamageSvg } from '@/UIUtils';
-import { DamageType } from './logic/Damage';
+import { DamageType } from '../logic/Damage';
 import { RunManager } from '@/GameData/RunManager';
 
 export default defineComponent({
@@ -164,11 +164,11 @@ export default defineComponent({
   },
   setup() {
 
-    const team = new Team('player team', 0);
+    const playerTeam = new Team('Your team', 0);
 
     const router = useRouter();
 
-    const combatants = ref<CombatantDescription[]>(combatantsWithDescriptions(team));
+    const combatants = ref<CombatantDescription[]>(combatantsWithDescriptions(playerTeam));
 
     const chosenTeam = ref<Combatant[]>([]);
     const hoveredCombatant = ref<CombatantDescription | null>(null);
@@ -180,14 +180,14 @@ export default defineComponent({
     const premadeTeamsForBuild = premadeTeams;
 
     const createCombatantFromType = (combatantType: CombatantType) => {
-      const combatantToPush = getCombatantByType(combatantType, team);
+      const combatantToPush = getCombatantByType(combatantType, playerTeam);
       combatantToPush.name = getNewCombatantName(combatantType, chosenTeam.value.map(c => c.name));
       chosenTeam.value.push(combatantToPush);
     };
 
-    const getSpriteClass = (combatant: CombatantDescription) => {
-      return `sprite-${combatant.class.toLowerCase()} team-${combatant.teamIndex === 0 ? 'blue' : 'red'} facing-${combatant.facing}`;
-    };
+    // const getSpriteClass = (combatant: CombatantDescription) => {
+    //   return `sprite-${combatant.class.toLowerCase()} team-${combatant.teamIndex === 0 ? 'blue' : 'red'} facing-${combatant.facing}`;
+    // };
 
     // New: Handle clicking on a combatant plaque to show details consistently
     const selectCombatantForDetails = (combatant: CombatantDescription) => {
@@ -219,13 +219,13 @@ export default defineComponent({
         }
     };
 
-    const pickRandomTeam = () => {
-      chosenTeam.value = [];
-      const shuffled = combatants.value.sort(() => 0.5 - Math.random());
-      chosenTeam.value = shuffled.slice(0, 5);
-      selectedCombatantForChoice.value = null; // Clear selected on random pick
-      hoveredCombatant.value = null; // Clear hovered on random pick
-    };
+    // const pickRandomTeam = () => {
+    //   chosenTeam.value = [];
+    //   const shuffled = combatants.value.sort(() => 0.5 - Math.random());
+    //   chosenTeam.value = shuffled.slice(0, 5);
+    //   selectedCombatantForChoice.value = null; // Clear selected on random pick
+    //   hoveredCombatant.value = null; // Clear hovered on random pick
+    // };
 
     const pickPremadeTeam = () => {
       chosenTeam.value = [];
@@ -245,7 +245,10 @@ export default defineComponent({
 
     const finishTeamBuilding = () => {
       console.log('Team Building Finished:', chosenTeam.value);
-      RunManager.getInstance().createRun(chosenTeam.value, 0, 0);
+      for(let i = 0; i < chosenTeam.value.length; i++) {
+        playerTeam.addCombatant(chosenTeam.value[i]);
+      }
+      RunManager.getInstance().createRun(playerTeam, 0, 0);
       router.push('/Journey');
       // this.$router.push('/start-match', { params: { team: chosenTeam.value.map(c => c.id) } });
     };
@@ -256,9 +259,9 @@ export default defineComponent({
     };
 
     // This computed property is now less relevant due to new selection flow
-    const selectedCombatantInTeam = computed(() => {
-      return selectedCombatantForChoice.value && chosenTeam.value.some(c => c.id === selectedCombatantForChoice.value!.id);
-    });
+    // const selectedCombatantInTeam = computed(() => {
+    //   return selectedCombatantForChoice.value && chosenTeam.value.some(c => c.id === selectedCombatantForChoice.value!.id);
+    // });
 
     const getStatsToDisplay = (combatant: CombatantDescription) => {
       return Object.entries(combatant.combatantReference.baseStats);
@@ -283,17 +286,17 @@ export default defineComponent({
       selectedCombatantForChoice, // Export the new selected state
       selectedDescriptionView,
       romanNumerals,
-      getSpriteClass,
+      // getSpriteClass,
       selectCombatantForDetails, // Use new handler for details display
       addCombatantToTeam, // New handler for adding to team
       showDescription,
       hideDescription,
-      pickRandomTeam,
+      // pickRandomTeam,
       pickPremadeTeam,
       removeSelected,
       finishTeamBuilding,
       goBack,
-      selectedCombatantInTeam, // Kept for now, but its usage might change
+      // selectedCombatantInTeam, // Kept for now, but its usage might change
       getStatsToDisplay,
       toStatUiName,
       toStatusScale,
@@ -313,7 +316,7 @@ export default defineComponent({
   /* background-image: url('../assets/Backgrounds/Swirl2.png');
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat; 
+  background-repeat: no-repeat; */
   display: flex;
   flex-direction: row; /* Arrange main sections horizontally */
   justify-content: space-around; /* Distribute space */

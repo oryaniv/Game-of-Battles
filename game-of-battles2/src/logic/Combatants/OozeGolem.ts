@@ -4,6 +4,7 @@ import { Position } from "../Position";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
 import { GooSpit, Crush } from "../SpecialMoves/Singular/Offensive";
+import { PhysDuplicate } from "../SpecialMoves/Singular/Passives";
 
 
 export class OozeGolem extends Combatant {
@@ -36,7 +37,7 @@ export class OozeGolem extends Combatant {
         [
            new GooSpit(),
            new Crush(),
-           // new PhysDuplicate()
+           new PhysDuplicate()
         ],
       team);
     }
