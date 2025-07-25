@@ -1,8 +1,8 @@
 
 <template>
   <div class="game-container" :class="{ 'game-over': startGameOverAnimation }">
-    <!-- <div class="team-turn-message">{{ turnMessage }}</div>
-    <div class="round-count">Round: {{ roundCount }}</div> -->
+    <button class="escape-menu-button" @click="showEscapeMenu">Menu</button>
+    <EscMenu @esc-menu-dismissed="dismissEscapeMenu" v-if="escapeMenuVisible" />
     <div class="board-frame" :class="getFrameClass()">
     <div class="board">
       <div class="board-background">
@@ -36,7 +36,7 @@
             class="combatant"
             :style="{ 
               color: teamColors[getCombatant({ x, y }).team.getIndex() === 0 ? 0 : 1],
-              boxShadow: isCurrentCombatant({ x, y }) ? '0 0 10px 5px #CDAD00' : '',
+              boxShadow: isCurrentCombatant({ x, y }) ? '0 0 10px 5px #CDAD00' : isCurrentSkillPartner(getCombatant({ x, y })) ? 'rgba(0, 255, 0, 0.7) 0px 0px 10px 5px' : '',
               
               animation: isCurrentCombatant({ x, y }) ? 'glow 2s infinite alternate' :  ''
               }"
@@ -62,7 +62,7 @@
               >
                 <div v-if="effect.weak">Weak!</div>
                 <div v-if="effect.critical">Critical!</div>
-                {{ effect.damage }}
+                {{ getDamageEffectText(effect) }}
                 <div v-if="effect.miss">Miss!</div>
                 <div v-if="effect.fumble">Fumble!</div>
                 <div v-if="effect.blocked">Blocked!</div>
@@ -73,7 +73,7 @@
               <img
                 v-if="getCombatantEffects({ x: x - 1, y: y - 1 }).length > 0 && getCombatantEffects({ x: x - 1, y: y - 1 })[0].damage !== ''"
                 :key="getCombatantEffects({ x: x - 1, y: y - 1 })[0].id"
-                :src="getDamageSvg(getCombatantEffects({ x: x - 1, y: y - 1 })[0].type)"
+                :src="getActionEffectIcon(getCombatantEffects({ x: x - 1, y: y - 1 })[0])"
                 class="damage-svg-icon"
               />
             </transition-group>
@@ -139,6 +139,8 @@
 </div>
 
 <button v-if="!isGameOver()" @click="playAiTurn(currentCombatant)">AI Play</button>
+<!-- <button @click="showDialog = true">show dialog</button>
+<button @click="changeDialog()">change dialog</button> -->
 
 <div class="action-description-container" v-if="actionDescription">
   <div class="action-description-text">
@@ -287,7 +289,7 @@
         <div class="damage-reactions-list">
           <div class="damage-reaction-header">Damage Reactions:</div>
           <div class="damage-reaction-item" v-for="(reaction, index) in examinedCombatant?.resistances" :key="index">
-            <img class="damage-reaction-icon" :src="getDamageSvg(reaction.type)" alt="Damage Reaction" />
+            <img class="damage-reaction-icon" :src="requireDamageSVG(reaction.type)" alt="Damage Reaction" />
             <span class="damage-reaction-text">{{ getShortDamageReactionText(reaction.reaction) }}</span>
           </div>
         </div>
@@ -304,9 +306,7 @@
           >
             <StatusDescriptionBox v-if="statusDescriptionBox && statusDescriptionBoxIndex === index" :text="statusDescriptionBox" />
             <img class="status-effect-examine-icon" :src="requireStatusEffectSvg(effect.name)" alt="Status Effect" />
-            <!-- <span class="status-effect-name">{{ statusNameToText(effect.name) }}</span> -->
           </div>
-          <!-- <StatusDescriptionBox v-if="statusDescriptionBox" :text="statusDescriptionBox" /> -->
           <div v-if="examinedCombatant?.statusEffects.length === 0">
             None
           </div>
@@ -325,13 +325,25 @@
         {{ hoveringMessage }}
       </div>
     </div>
+
+    <GameMessagePopup v-if="showErrorPopup"
+      :show="showErrorPopup"
+      :title="popupTitle"
+      :message="popupMessage"
+      @dismissed="handlePopupDismissed"
+    />
+
+    <GameDialog v-if="showDialog"
+      :dialog="currentDialog"
+      @dialog-dismissed="handleDialogDismissed"
+    />
   </div>
 
 </template>
 
 <script lang="ts">
 /* eslint-disable */
-import { defineComponent, ref, onMounted, onUnmounted, computed } from 'vue';
+import { defineComponent, ref, onMounted, onUnmounted, computed, nextTick, getCurrentInstance } from 'vue';
 import { emitter } from './eventBus';
 import { Combatant } from './logic/Combatant';
 import { Board } from './logic/Board';
@@ -368,19 +380,24 @@ import { EventLogger } from './eventLogger';
 import { AllOfThem, standardVsSetup, theATeam, theBTeam, allMilitiaSetup, theGorillaTeam,
  generateRandomTeam, generateCombatantIdenticalTeam, placeAllCombatants, debugSetupWhiteTeam,
   debugSetupBlackTeam, playGroundTeams} from './boardSetups';
- import { getGameResultMessage, getGameOverMessage } from './GameOverMessageProvider';
+ import { getGameResultMessage, getGameOverMessage, getTutorialCompleteMessage, getTutorialResultMessage } from './GameOverMessageProvider';
  import { getCommentatorMessage, CommentatorMessage } from './CommentatorMessageProvider';
- import { getSkillEffectIcon, getShortDamageReactionText, getActionDescription, getStatusEffectDescription, 
- getLetterForStatusEffect, requireStatusEffectSvg, delay, statusNameToText } from './UIUtils';
+ import { getActionEffectIcon, ActionEffect, requireDamageSVG, getSkillEffectIcon, getShortDamageReactionText,
+  getActionDescription, getStatusEffectDescription, requireStatusEffectSvg, delay, statusNameToText, getGame, getRelevantDialogs } from './UIUtils';
  import { Difficulty } from './GameOverMessageProvider';
  import { useRouter } from 'vue-router';
- import { RunManager } from './GameData/RunManager';
+ import { RunManager, RunType } from './GameData/RunManager';
  import StatusDescriptionBox from './components/StatusDescriptionBox.vue';
  import ActionEventMessage from './components/ActionEventMessage.vue';
  import CommentatorMessages from './components/CommentatorMessages.vue';
  import CombatantSprite from './components/CombatantSprite.vue';
  import TurnOrderWidget from './components/TurnOrderWidget.vue';
+ import GameMessagePopup from './components/GameMessagePopup.vue';
+ import GameDialog from './components/GameDialog2.vue';
+ import EscMenu from './components/EscMenu.vue';
+ import {DialogMessage} from './UIUtils';
  import { getEmptyAsType } from './logic/LogicFlags';
+ import { TutorialManager, DialogStep, StepMode, stepType } from './GameData/TutorialManager';
 
 export default defineComponent({
   components: {
@@ -388,27 +405,23 @@ export default defineComponent({
     ActionEventMessage,
     CommentatorMessages,
     CombatantSprite,
-    TurnOrderWidget
+    TurnOrderWidget,
+    GameMessagePopup,
+    GameDialog,
+    EscMenu
   },
   setup() {
     const router = useRouter();
  
     const runManager = RunManager.getInstance();
 
-    const board = ref(new Board(10, 10));
-    
-    const matchTeams = playGroundTeams();
+    const gameObject = getGame();
 
-    // const matchTeams = runManager.getMatchTeams();
-
-    const whiteTeam = ref(matchTeams[0]);
-    const blackTeam = ref(matchTeams[1]);
-
-    placeAllCombatants(whiteTeam.value, blackTeam.value, board.value as Board);
-
-    
-    const teams = ref([whiteTeam.value, blackTeam.value]);
-    const game = ref(new Game(teams.value, board.value as Board));
+    const board = ref(gameObject.board);
+    const whiteTeam = ref(gameObject.teams[0]);
+    const blackTeam = ref(gameObject.teams[1]);
+    const teams = ref(gameObject.teams);
+    const game = ref(gameObject);
 
     const teamColors = ref(['white', 'black']);
     const actionsRemaining = ref(5);
@@ -456,10 +469,21 @@ export default defineComponent({
 
     const startGameOverAnimation = ref(false);
 
+    const showErrorPopup = ref(false);
+    const popupTitle = ref('');
+    const popupMessage = ref('');
+
     const getCombatantEffects = (position: Position) => {
       const key = `${position.x},${position.y}`;
       return damageEffects.value[key] || [];
     };
+
+    const getDamageEffectText = (effect: ActionEffect) => {
+      if(isNaN(effect.damage as number)) {
+        return '';
+      }
+      return effect.damage;
+    }
 
     onMounted(() => {
       updateTurnMessage();
@@ -478,8 +502,16 @@ export default defineComponent({
         updateTurnMessage();
       });
 
+      console.log('%c game app onMounted', 'color: blue; font-size: 16px; font-weight: bold;');
+     
+
       document.addEventListener('keydown', (event) => {
-        if(!showActionMenu() || showHoveringMessage()) {
+        if(event.key === 'Escape') {
+           escapeMenuVisible.value = true;
+           return;
+        }
+
+        if(!showActionMenu() || showHoveringMessage() || showErrorPopup.value) {
           return;
         }
 
@@ -527,6 +559,10 @@ export default defineComponent({
           }
         }
       });
+
+      setTimeout(() => {
+        triggerDialog();
+      }, 1000);
     });
 
     onUnmounted(() => {
@@ -539,7 +575,11 @@ export default defineComponent({
         return;
       }
 
-      if(game.value.isGameOver()) {
+      // if(showDialog.value) {
+      //   handleDialogDismissed();
+      // }
+
+      if(isGameOver()) {
         updateHoveringMessage(getGameOverMessage(whiteTeam.value, blackTeam.value), false);
         endGame();
       } else {
@@ -550,11 +590,11 @@ export default defineComponent({
     
 
     const getWhiteTeamCombatants = () => {
-      return whiteTeam.value.combatants;
+      return whiteTeam.value.combatants.filter((combatant) => !combatant.isExpendable());
     }
 
     const getBlackTeamCombatants = () => {
-      return blackTeam.value.combatants;
+      return blackTeam.value.combatants.filter((combatant) => !combatant.isExpendable());
     }
 
     const isCurrentCombatant = (position: Position): boolean => {
@@ -585,9 +625,9 @@ export default defineComponent({
       } else if (coopSkillMode.value) {
         performCoopSkill(position);
       } else if (statusMode.value) {
-        // showStatus(position);
         examineCombatant(position);
       }
+      triggerDialog();
     }
 
     const showActionMenu = () => {
@@ -595,7 +635,7 @@ export default defineComponent({
         return false;
       }
 
-       if(game.value.isGameOver()) {
+       if(isGameOver()) {
          return false;
        }
        const currentTeam = game.value.getCurrentTeam();
@@ -653,7 +693,8 @@ export default defineComponent({
       }
 
       if(validMoves.value.length === 0) {
-        alert("No valid moves");
+        showGameMessage('', 'No valid moves!');
+        // alert("No valid moves");
         validMoves.value = [];
         moveMode.value = false;
         return;
@@ -669,6 +710,7 @@ export default defineComponent({
       validAttacks.value = [];
       showSkillsMenu.value = false;
       showCoopSkill.value = false;
+      selectedCoopSkillPartners.value = null;
       validTargetsForSkill.value = [];
       currentSkill.value = null;
       aoePositions.value = [];
@@ -706,7 +748,8 @@ export default defineComponent({
       attackMode.value = true;
 
       if(validAttacks.value.length === 0) {
-        alert("No valid attacks");
+        showGameMessage('', 'No valid targets in range!');
+        // alert('No valid attacks');
         validAttacks.value = [];
         attackMode.value = false;
         return;
@@ -740,16 +783,18 @@ export default defineComponent({
       const isCritical = attackRes === AttackResult.CriticalHit;
       const isBlocked = reaction === DamageReaction.IMMUNITY;
       const finalDamage = actionResult.damage.amount;
-      const effect = {
+      const isNoneDamage = actionResult.damage.type === DamageType.None;
+      const effect: ActionEffect = {
             id: Date.now(),
-            damage: isMiss || isFumble ? "" : Math.round(finalDamage),
+            damage: isMiss || isFumble  ? "" : Math.round(finalDamage),
             weak: isWeak,
             critical: isCritical,
             miss: isMiss,
             fumble: isFumble,
             blocked: isBlocked,
             color: getDamageColor(actionResult.damage.type),
-            type: actionResult.damage.type
+            type: actionResult.damage.type,
+            statusEffectType: actionResult.statusEffectType
           };
 
           const key = `${position.x},${position.y}`;
@@ -819,23 +864,26 @@ export default defineComponent({
       hasMoved.value = false;
       previousPosition.value = null;
       removeTheDead();
-      // updateTurnMessage();
       if(eventLogBody) {
         eventLogBody.scrollTop = eventLogBody.scrollHeight;
       }
-      if(game.value.isGameOver()) {
+      if(isGameOver()) {
         updateTurnMessage();
         return;
       }
 
       // if the current combatant has an AI agent, let it play the turn
       const currentCombatant = game.value.getCurrentCombatant();
+      const turnDelay = showHoveringMessage() ? 1500 : 1000;
       if(currentCombatant && currentCombatant.getAiAgent() !== undefined) {
-        const turnDelay = showHoveringMessage() ? 1500 : 1000;  
         setTimeout(() => {
           playAiTurn(currentCombatant);
         }, turnDelay);
       }
+
+      setTimeout(() => {
+        triggerDialog();
+      }, turnDelay);
     };
 
     const removeTheDead = () => { 
@@ -963,36 +1011,6 @@ export default defineComponent({
         default:
           return 'white';
       }
-    };
-
-    const getDamageSvg = (type: DamageType): string => {
-        switch (type) {
-          case DamageType.Slash:
-            return require('./assets/Slash.svg');
-          case DamageType.Crush:
-            return require('./assets/Crush2.png');
-          case DamageType.Pierce:
-            return require('./assets/Pierce.svg');
-          case DamageType.Fire:
-            return require('./assets/Flame.svg');
-          case DamageType.Ice:
-            return require('./assets/Ice.svg');
-          case DamageType.Lightning:
-            return require('./assets/Thunder.svg');
-          case DamageType.Blight:
-            return require('./assets/Skull.svg');
-          case DamageType.Holy:
-            return require('./assets/Sun.svg');
-          case DamageType.Dark:
-            return require('./assets/Pentagram.svg');
-          case DamageType.Healing:
-            return require('./assets/Healing.svg');
-          case DamageType.Unstoppable:
-            return require('./assets/Unstoppable.svg');
-          // ... other cases
-          default:
-            return require('./assets/Empty.svg'); // Or a default SVG path
-        }
     };
 
     const showSpecialSkills = () => {
@@ -1137,13 +1155,21 @@ export default defineComponent({
       if(!skill) {
         return;
       }
+
+      if(!isSkillEnabled(skillName)) {
+        showGameMessage('', 'You cannot use this skill!');
+        selectedCoopSkillPartners.value = null;
+        return;
+      }
+
       showCoopSkill.value = false;
       coopSkillMode.value = true;
       currentSkill.value = skill;
       const range = skill.range;
       validTargetsForSkill.value = board.value.getValidTargetsForSkill(currentCombatant.value, range);
       if(validTargetsForSkill.value.length === 0) {
-        alert("No valid targets");
+        showGameMessage('', 'No valid targets for this skill!');
+        selectedCoopSkillPartners.value = null;
         validTargetsForSkill.value = [];
         coopSkillMode.value = false;
         return;
@@ -1161,13 +1187,19 @@ export default defineComponent({
       if(!skill) {
         return;
       }
+
+      if(!isSkillEnabled(skillName)) {
+        showGameMessage('', 'You cannot use this skill!');
+        return;
+      }
+
       showSkillsMenu.value = false;
       skillMode.value = true;
       currentSkill.value = skill;
       const range = skill.range;
       validTargetsForSkill.value = board.value.getValidTargetsForSkill(currentCombatant.value, range);      
       if(validTargetsForSkill.value.length === 0) {
-        alert("No valid targets");
+        showGameMessage('', 'No valid targets for this skill!');
         validTargetsForSkill.value = [];
         skillMode.value = false;
         return;
@@ -1200,7 +1232,7 @@ export default defineComponent({
       && currentSkill.value && currentSkill.value.effect) {
         const actionResults = game.value.executeSkill(currentSkill.value, currentCombatant.value, position, board.value as Board);
         actionResults.forEach((actionResult) => {
-          if(actionResult.attackResult !== AttackResult.NotFound) {
+          if(actionResult.attackResult !== AttackResult.NotFound || actionResult.statusEffectType) {
             const applyPosition = actionResult.position || position;
             applyAttackEffects(actionResult, applyPosition);
           }
@@ -1220,7 +1252,7 @@ export default defineComponent({
         const coopMove = currentSkill.value as CoopMove;
         const actionResults = game.value.executeCoopSkill(coopMove, currentCombatant.value, selectedCoopSkillPartners.value, position, board.value as Board);
         actionResults.forEach((actionResult) => {
-          if(actionResult.attackResult !== AttackResult.NotFound) {
+          if(actionResult.attackResult !== AttackResult.NotFound || actionResult.statusEffectType) {
             const applyPosition = actionResult.position || position;
             applyAttackEffects(actionResult, applyPosition);
           }
@@ -1233,14 +1265,6 @@ export default defineComponent({
         prepareNextTurn();
       }
     }
-
-    // const getStatusEffectSvg = (effectType: StatusEffectType): string => {
-    //   return requireStatusEffectSvg(effectType);
-    // }
-
-    const getStatusEffectLetter = (effectType: StatusEffectType): string => {
-      return getLetterForStatusEffect(effectType); // Default to "?" if not found
-    };
 
      const getStatusEffectColor = (alignment: StatusEffectAlignment): string => {
       switch (alignment) {
@@ -1277,10 +1301,8 @@ export default defineComponent({
     }
 
     const getCombatant = (position: Position): Combatant | null => {
-      // return board.value.getCombatantAtPosition({x: position.x -1, y: position.y - 1});
       const combatant = board.value.getVisibleCombatantAtPosition({x: position.x -1, y: position.y - 1}, currentTeam.value.index);
       return combatant;
-      // return board.value.getVisibleCombatantAtPosition({x: position.x -1, y: position.y - 1}, currentTeam.value.index);
     };
 
     const getCombatantStatusEffects = (position: Position, alignment: StatusEffectAlignment): StatusEffect[] => {
@@ -1289,7 +1311,8 @@ export default defineComponent({
     };
 
     const isGameOver = () => {
-      return game.value.isGameOver();
+      const isTutorial = runManager.getRunType() === RunType.TUTORIAL;
+      return !isTutorial && game.value.isGameOver();
     }
 
     const actionSounds: { [key: string]: Howl } = {};
@@ -1472,13 +1495,27 @@ export default defineComponent({
       return 'temple';
     }
 
+    const endTutorial = async (type: stepType) => {
+      updateHoveringMessage(getTutorialCompleteMessage(type), false);
+      const gameOverMessage = getTutorialResultMessage(type);
+      await delay(1500);
+      startGameOverAnimation.value = true;
+      await delay(2500);
+      router.push({
+        name: 'PostMatch',
+        state: {
+          postMatchMessage: gameOverMessage,
+          playerSurvived: type === stepType.COMPLETE
+        }
+      });
+    }
+
     const endGame = async () => {
       const playerSurvived = !game.value.teams.find((team) => team.isHumanPlayerTeam())?.isDefeated();
       const gameOverMessage = getGameResultMessage(whiteTeam.value, blackTeam.value);
       await delay(1500);
       startGameOverAnimation.value = true;
       await delay(2500);
-      clearGame();
       router.push({
         name: 'PostMatch',
         state: {
@@ -1488,13 +1525,70 @@ export default defineComponent({
       });
     }
 
-    const clearGame = () => {
-      // game.value = null;
-      // board.value = null;
-      // whiteTeam.value = null;
-      // blackTeam.value = null;
-      // teams.value = [];
-      // teamColors.value = [];
+     // --- Function to show the popup ---
+    const showGameMessage = (title: string, message: string) => {
+      popupTitle.value = title;
+      popupMessage.value = message;
+      showErrorPopup.value = true;
+    };
+
+    const handlePopupDismissed = () => {
+      showErrorPopup.value = false;
+    };
+
+    const showDialog = ref(false);
+    const currentDialog = ref<DialogStep>({ id: 0, text: [], trigger: () => false, mode: StepMode.CENTER, done: false, stepType: stepType.REGULAR });
+    const relevantDialogs: DialogStep[] = getRelevantDialogs();
+    
+    const handleDialogDismissed = async () => {
+      if(!currentDialog.value.done) {
+        currentDialog.value.done = true;
+        const shouldPrepeareNextTurn = currentDialog.value.after?.(game.value as Game, board.value as Board);
+        if(shouldPrepeareNextTurn) {
+          prepareNextTurn();
+        }
+      }
+      currentDialog.value.done = true;
+      showDialog.value = false;
+      if(currentDialog.value.stepType === stepType.COMPLETE || currentDialog.value.stepType === stepType.FAIL) {
+        endTutorial(currentDialog.value.stepType);
+      }
+      await nextTick();
+      triggerDialog();
+    };
+
+
+    const triggerDialog = () => {
+      
+      const applicableDialogs = relevantDialogs.filter((dialog: DialogStep) => !dialog.done && 
+      dialog.trigger(game.value as Game, board.value as Board, currentDialog.value));
+
+      const dialog: DialogStep | undefined = applicableDialogs[applicableDialogs.length - 1];
+      if(dialog && dialog.id !== currentDialog.value.id) {
+        showDialog.value = false;
+        currentDialog.value.done = true;
+      }
+      setTimeout(() => {
+        if (dialog) {
+          const before = dialog.before;
+          if(before) {
+            before(game.value as Game, board.value as Board);
+          }
+          currentDialog.value = dialog;
+          showDialog.value = true;
+       }
+      }, 0);
+    };
+    
+
+    const escapeMenuVisible = ref(false);
+
+    const showEscapeMenu = () => {
+      escapeMenuVisible.value = true;
+    }
+
+    const dismissEscapeMenu = () => {
+      escapeMenuVisible.value = false;
     }
 
     return {
@@ -1553,11 +1647,10 @@ export default defineComponent({
       isGameOver,
       getCombatantStatusEffects,
       getStatusEffectColor,
-      getStatusEffectLetter,
       isAoeHighlighted,
       showAoe,
       hideAoe,
-      getDamageSvg,
+      requireDamageSVG,
       playAiTurn,
       getWhiteTeamCombatants,
       getBlackTeamCombatants,
@@ -1596,7 +1689,19 @@ export default defineComponent({
       startGameOverAnimation,
       requireStatusEffectSvg,
       getShortDamageReactionText,
-      getSkillEffectIcon
+      getSkillEffectIcon,
+      showErrorPopup,
+      popupTitle,
+      popupMessage,
+      handlePopupDismissed,
+      showDialog,
+      currentDialog,
+      handleDialogDismissed,
+      getActionEffectIcon,
+      getDamageEffectText,
+      escapeMenuVisible,
+      showEscapeMenu,
+      dismissEscapeMenu
     };
   },
 });
@@ -1899,7 +2004,7 @@ button {
 
 .action-menu {
   position: absolute;
-  left: 12%;
+  left: 11%;
   top: 30%;
 }
 
@@ -2345,7 +2450,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 0px;
-  max-height: 70px;
+  max-height: 68px;
   overflow-y: hidden;
   /* Add more styling as needed */
 }
@@ -2454,17 +2559,6 @@ button {
                      );
 }
 
-.turn-order-combatant-name {
-  font-size: 10px;
-}
-
-.white-team-turn-order-container .turn-order-combatant-name {
-  /*color: white;*/
-}
-
-.black-team-turn-order-container .turn-order-combatant-name {
-  /*color: black;*/
-}
 
 .black-team-turn-order-container {
   position: absolute;
@@ -2498,10 +2592,6 @@ button {
 }
 
 .status-popup {
-  /* position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%); */
   width: 300px;
   padding: 20px;
   background-image: url('./assets/Menus/plumMarble4.png');
@@ -2579,8 +2669,6 @@ button {
 }
 
 
-
-
 .status-effects-header {
   font-weight: bold;
   margin: 20px 0 10px 0;
@@ -2599,16 +2687,6 @@ button {
   flex-direction: column;
   gap: 1.3em;
 }
-
-/* .status-effect-examine-icon {
-  width: 30px;
-  background-color: #2f4f4f;
-  border-radius: 5px;
-  border: 2px solid #A17A50;
-  padding: 5px;
-  display: flex;
-  align-self: center;
-} */
 
 .status-effect-examine-icon {
   width: 40px; /* Increased size slightly for better icon visibility and glow */
@@ -2756,6 +2834,44 @@ button {
   font-size: 4em;
   font-family: "CinzelDecorative-Regular";
   color: gold;
+}
+
+.escape-menu-button {
+  position: absolute;
+  top: 5px;
+  left: 2px;
+  z-index: 100;
+
+  font-family: 'Exo 2', sans-serif;
+  font-size: 1em; /* Slightly smaller font for arc placement */
+  font-weight: bold;
+  color: white;
+  text-align: center;
+  padding: 3px 10px; /* Adjusted padding */
+  border-radius: 0px;
+  cursor: pointer;
+
+  /* Stone slab style from previous concept */
+  background-color: #2F4F4F; 
+  /* background-color: #5E3B68; */
+  border: none;
+  box-shadow:
+    inset 2px 2px 5px rgba(0, 0, 0, 0.6),
+    inset -2px -2px 5px rgba(255, 255, 255, 0.1),
+    0 0 0 2px rgba(161, 122, 80, 0.7),
+    0 0 0 3px rgba(139, 115, 85, 0.5),
+    4px 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.escape-menu-button:hover {
+  background-color: #3A5F5F;
+  box-shadow:
+    inset 1px 1px 2px rgba(255, 255, 255, 0.2),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.4),
+    0 0 0 2px #FFD700,
+    0 0 0 3px #CDAD00,
+    5px 5px 10px rgba(0, 0, 0, 0.5);
+  transform: translateY(-2px); /* Maintain lift on hover */
 }
 
 </style>

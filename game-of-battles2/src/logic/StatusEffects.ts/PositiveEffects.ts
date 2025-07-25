@@ -1,6 +1,6 @@
 import { StatusEffect, StatusEffectType, StatusEffectHook, StatusEffectAlignment } from "../StatusEffect";
 import { Combatant } from "../Combatant";
-import { ActionResult, AttackResult, getStandardActionResult } from "../attackResult";
+import { ActionResult, AttackResult, getDamageActionResult, getStandardActionResult } from "../attackResult";
 import { Damage, DamageReaction, DamageType } from "../Damage";
 import { CombatMaster } from "../CombatMaster";
 import { SpecialMove, SpecialMoveAlignment, SpecialMoveAreaOfEffect } from "../SpecialMove";
@@ -12,6 +12,7 @@ import { AIAgentType } from "../AI/AIAgent";
 import { Doll } from "../Combatants/Fool";
 import { ReplacementPart } from "../SpecialMoves/Singular/Self";
 import {STAT_BUFF_INCREASE_ENABLED, ATTACK_DEFENSE_INCREASE_AMOUNT, AGILITY_LUCK_INCREASE_AMOUNT} from "../LogicFlags";
+import { emitter } from "@/eventBus";
 
 export class BlockingStanceStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.BLOCKING_STANCE;
@@ -576,6 +577,8 @@ export class GuardianProtectedStatusEffect implements StatusEffect {
             caster.stats.hp = Math.min(caster.stats.hp + damageToRestore, caster.baseStats.hp);
             const damageToInflict = damage.amount * 0.5;
             guardian.takeDamage({amount: damageToInflict, type: DamageType.Unstoppable});
+            const damageResult = getDamageActionResult({amount: damageToInflict, type: DamageType.Unstoppable}, guardian.position);
+            emitter.emit('trigger-method', damageResult);
             return getStandardActionResult();
         }
     };

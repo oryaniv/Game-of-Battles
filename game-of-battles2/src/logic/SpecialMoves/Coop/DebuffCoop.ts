@@ -3,7 +3,7 @@ import { coopCostSlash, CoopMove } from "./CoopMove";
 import { CoopPartnerRequirement } from "./CoopMove";
 import { Damage, DamageReaction, DamageType } from "@/logic/Damage";
 import { Position } from "@/logic/Position";
-import { ActionResult, AttackResult, getStandardActionResult } from "@/logic/attackResult";
+import { ActionResult, AttackResult, getStandardActionResult, getStatusEffectActionResult } from "@/logic/attackResult";
 import { Board } from "@/logic/Board";
 import { Combatant } from "@/logic/Combatant";
 import { SpecialMoveRangeType } from "@/logic/SpecialMove";
@@ -96,7 +96,7 @@ export class UltimateCurse extends CoopMove {
         }); 
         
         
-        return getStandardActionResult(target, this.turnCost);
+        return getStatusEffectActionResult(StatusEffectType.STRENGTH_DOWNGRADE, target, this.turnCost);
     };  
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Curve,
@@ -131,7 +131,7 @@ export class DivineRetribution extends CoopMove {
             name: StatusEffectType.DIVINE_RETRIBUTION,
             duration: 3,
         });
-        return getStandardActionResult(target, this.turnCost);
+        return getStatusEffectActionResult(StatusEffectType.DIVINE_RETRIBUTION, target, this.turnCost);
     };
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Straight,

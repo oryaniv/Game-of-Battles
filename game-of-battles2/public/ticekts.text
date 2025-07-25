@@ -9,12 +9,19 @@
 
    * BUGS
     * shouldn't be able to examine a cloaked enemy
+    * (minor) can't examine walls
     * AI should not know to AOE target cloaked foes
+    * devour divinity not working properly
+    * status descriptions on the far right are too long and break the UI
+    * sanctuary appears as divine retribution on the board status LIST
+    * blocking stance not showing icon when applied
+    * sounds for miss result (optional)
+    * effect for missing an ailment (optional) (mostly for fool)
+    * enemy turns should go slower so the player can better track
+    
      
    * the board
-      * status effects will be icons instead of letters <-- 
-      * add green glow on edges for co op partnets upon skill selection 
-      * new action results effects for buffs, debuffs, ailments, etc.
+      * new action results effects for buffs, debuffs, ailments, etc. <---
       * yellow bar for arcane barrier
 
    * right side 
@@ -24,8 +31,6 @@
      * make sure the UI doesn't break on larger screens
     
    * menus on board
-     * weakness/resist messages should be shorter
-     * add 'error' messages when trying to do illegal moves (move after moving, attack with no targets available, etc.)
 
 
    * music and sound
@@ -40,9 +45,6 @@
      
     
 * Result screen
-    * summary line according to game results V
-    * next match in case of victory V
-    * back to main menu in case of loss or end of run V
     * rematch in case of PVP
 
 * Intro screens
@@ -52,12 +54,7 @@
 * tutorial
 
 * main menu
-    * game logo V
-      * new game, options, credits, about the developer V
-      * new game - player vs AI, player vs player, tutorial V
-      * player vs AI - ask if want the tutorial - only once
-      * lead to difficulty select screen V
-        * difficulties: easy, normal, hard V
+    * take care of duel after sending for friend reviews
 
     * options menu
        * see if there's anything more to add
@@ -85,21 +82,21 @@ Metal Mania(insutls?)
 
 https://www.youtube.com/watch?v=pVeX4C9B1Lk - evil laugh sound - need 1.5X speed
 
+https://www.youtube.com/watch?v=fpalvmhf180 - fool laugh sound - need 1.5X speed
 
+click sound effects:
+
+https://www.youtube.com/watch?v=q8ZLBOFQ2g0
+
+https://www.youtube.com/results?search_query=button+click+sound+effect
 
 !-----------------------------------------------------------------------------!
-
-A seamless, abstract background texture. It must have NO visible horizontal lines, vertical lines, grid lines, squares, or any geometric patterns whatsoever. The texture should be purely organic, fluid, and blended. The dominant color is a light, earthy brown (#8C785B), reminiscent of dry, cracked ground. It features subtle, organic, and irregular blotches of muted forest green (#4A6D3A) representing scattered moss or low vegetation, blending softly across the surface. Additionally, add very small, irregular, and subtle blotches or specks of light gray (#777777) to represent little stone or rock elements, giving a natural, slightly textured, and abstract aesthetic, similar to an old, weathered landscape or terrain map.
-
-`A seamless decorative frame, designed to surround a game board. The frame itself should be visually thin, approximately 15-20 pixels wide on each side, so it is not obtrusive. The main frame structure is an ornate, aged stone or carved wood texture in a light, desaturated golden-beige color (#D4C4A3), similar to the Heroes of Might and Magic 2 map frame. Adorning this frame are organic green foliage and vines, specifically in a muted forest green (#4A6D3A), artfully wrapping around and partially obscuring the thin frame. Integrate subtle, small, gem-like or metallic adornments within the frame's design, complementing the overall ancient and natural aesthetic.`
 
 052 – 8997888 • noam.send@gmail.com •
 
 
-    const prompt = `A seamless, abstract background texture for a game menu. The dominant color is a deep, muted plum (#5E3B68) with a luxurious marble texture. The marble veins should be extremely subtle, very dark, and faded gold/bronze (#4A3C2E, a much darker version of #8B7355), blending almost imperceptibly into the plum surface. They should appear as faint, barely-there whispers of texture, ensuring they do not interfere with white text readability.
-    There is no frame or any horizontal/vertical lines across the interior of this background.
-    The overall style should be elegant, functional, and visually appealing for an in-game menu overlay, providing a rich background that allows crisp white text to stand out clearly.`;
-
-
-    v-for="[statName, statValue] in (selectedCombatantForChoice || hoveredCombatant).combatantReference.baseStats"
-          :key="statName"
+A pixel art portrait of the female jester character, "The Fool," from the user's game. The sprite should strictly match the pixel art style and level of detail of the existing combatant sprites, but focused on her head and upper torso.
+    Her head should be drawn at a 45-degree angle, with her winking eye (e.g., her right eye) further from the viewer, and her open eye (e.g., her left eye) closer to the viewer, making it more prominent.
+    She is smiling mischievously and winking with the eye further from the viewer.
+    Crucially, her open eye (the one closer to the viewer) must have a distinct, clearly visible "hex symbol inside a circle" drawn as makeup around it, replacing the usual black circle. This symbol should be precise and well-defined.
+    Her face is covered in white pixelated makeup. Her hair is split blonde/black. The overall feel should be whimsical, mischievous, and slightly eerie. The sprite should be isolated on a transparent background, approximately 64x64 pixels in resolution, rendered in crisp pixel art with no anti-aliasing artifacts.

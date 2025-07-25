@@ -126,6 +126,10 @@ export default defineComponent({
 
 .turn-order-combatant-name {
   font-size: 12px;
+  max-width: 45px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: clip;
 }
 
 .health-stamina-bars{

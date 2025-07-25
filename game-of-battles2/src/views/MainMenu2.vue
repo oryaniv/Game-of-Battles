@@ -47,6 +47,13 @@
     <DescriptionCloud class="description-cloud" v-if="showDescription" :text="description" />
 
     <SettingsMenu v-if="optionsMode" @options-saved="onOptionsSaved" @options-canceled="onOptionsCanceled" />
+
+    <GameMessagePrompt v-if="showTutorialPopup"
+      :show="showTutorialPopup"
+      :title="popupTitle"
+      :message="popupMessage"
+      @dismissed="handlePopupDismissed"
+    />
   </div>
 </template>
 
@@ -55,6 +62,10 @@ import { defineComponent, ref } from 'vue';
 import DescriptionCloud from '../components/DescriptionCloud.vue';
 import SettingsMenu from '../components/SettingsMenu.vue';
 import { useRouter } from 'vue-router'
+import { RunManager, RunType } from '@/GameData/RunManager';
+import { Team } from '@/logic/Team';
+import { Difficulty } from "../GameOverMessageProvider";
+import GameMessagePrompt from '@/components/GameMessagePrompt.vue';
 
 // interface MenuItem {
 //   id: number;
@@ -66,7 +77,8 @@ import { useRouter } from 'vue-router'
 export default defineComponent({
   components: {
     DescriptionCloud,
-    SettingsMenu
+    SettingsMenu, 
+    GameMessagePrompt
   },
   setup() {
 
@@ -80,7 +92,7 @@ export default defineComponent({
     ]);
 
     const newGameMenuItems = ref([
-      { id: 3, label: 'Tutorial', onPress: () => {  }, description: 'Learn how to play' },
+      { id: 3, label: 'Tutorial', onPress: () => { startTutorial(); }, description: 'Learn how to play' },
       { id: 1, label: 'Single Player',  onPress: () => { startSinglePlayer(); }, description: 'Play against the AI' },
       { id: 2, label: 'Showdown', onPress: () => {  }, description: 'Play against another player' },
       { id: 4, label: 'Back', onPress: () => { newGameMode.value = false; }, description: 'Back to Main menu' }
@@ -134,7 +146,35 @@ export default defineComponent({
     };
 
     const startSinglePlayer = () => {
+      if(newPlayer) {
+        suggestTutorial();
+        return;
+      }
       router.push("/Team");
+    };
+
+    const startTutorial = () => {
+      RunManager.getInstance().createRun(new Team('Player Team', 0), 0, 1, RunType.TUTORIAL, Difficulty.EASY);
+      router.push("/Match");
+    };
+
+    const suggestTutorial = () => {
+      showTutorialPopup.value = true;
+    };
+
+    let newPlayer = true;
+
+    const showTutorialPopup = ref(false);
+    const popupTitle = ref('One moment...');
+    const popupMessage = ref('Looks like you are a new player. Care to try the tutorial first?');
+    const handlePopupDismissed = (confirm: boolean) => {
+      showTutorialPopup.value = false;
+      if(confirm) {
+        startTutorial();
+      } else {
+        newPlayer = false;
+        startSinglePlayer();
+      }
     };
 
     return {
@@ -149,7 +189,11 @@ export default defineComponent({
       showDescription,
       description,
       onOptionsSaved,
-      onOptionsCanceled
+      onOptionsCanceled,
+      showTutorialPopup,
+      popupTitle,
+      popupMessage,
+      handlePopupDismissed
     };
   },
 });

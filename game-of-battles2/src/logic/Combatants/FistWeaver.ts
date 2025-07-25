@@ -28,9 +28,9 @@ export class FistWeaver extends Combatant {
         },
         position,
         [
-            {type: DamageType.Crush, reaction: DamageReaction.NONE},
-            {type: DamageType.Pierce, reaction: DamageReaction.NONE},
             {type: DamageType.Slash, reaction: DamageReaction.NONE},
+            {type: DamageType.Pierce, reaction: DamageReaction.NONE},
+            {type: DamageType.Crush, reaction: DamageReaction.NONE},
             {type: DamageType.Fire, reaction: DamageReaction.NONE},
             {type: DamageType.Ice, reaction: DamageReaction.NONE},
             {type: DamageType.Blight, reaction: DamageReaction.WEAKNESS},

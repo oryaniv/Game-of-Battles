@@ -103,11 +103,21 @@ big bug hunt - bug list:
 
 -------------------------------------------
 
-complete all UI gaps
+complete all UI gaps 
+
+"Modren" Graphical interface <---
 
 start campaign for the prototype
 
-Modren Graphical interface
+go into reddit
+
+potential testers:
+
+Elad, Nadav, Kauffman, Emanuel, Zach, Lich, Tendler, Yotam, Anat, Nati, Gavi, G.Kaplan, Elia Peretz, Hezki, Yanai, Yungelson?, X Haim
+
+* the geek stuff guys in slack
+
+Hadar's BF?, Menachem? D.Morris?
 
 
 ----------------------------------
@@ -141,12 +151,6 @@ board/game/rangeCalculator/combatMaster need to be global
 SpecialMoveRange new field - allow empty space targeting
 
 ----------------------------------
-
-go into reddit
-
-potential testers:
-
-Elad, Nadav, Kauffman, Emanuel, Zach, Lich, Tendler, Yotam, Anat, Nati, Gavi, Elia Peretz, Hezki, Yanai, Yungelson?, X Haim
 
 start early access
 

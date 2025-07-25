@@ -1,4 +1,4 @@
-import { getStandardActionResult } from "@/logic/attackResult";
+import { getStandardActionResult, getStatusEffectActionResult } from "@/logic/attackResult";
 import { Board } from "@/logic/Board";
 import { Combatant } from "@/logic/Combatant";
 import { DamageType } from "@/logic/Damage";
@@ -32,7 +32,7 @@ export class Fortify implements SpecialMove {
             name: StatusEffectType.FORTIFIED,
             duration: 3,
         }); 
-        return getStandardActionResult();
+        return getStatusEffectActionResult(StatusEffectType.FORTIFIED, target, 1);
     };
     checkRequirements = undefined;
     description = `Increase ally's defense power for 3 rounds.`
@@ -62,7 +62,7 @@ export class CallOfStrength implements SpecialMove {
             name: StatusEffectType.STRENGTH_BOOST,
             duration: 3,
         }); 
-        return getStandardActionResult();
+        return getStatusEffectActionResult(StatusEffectType.STRENGTH_BOOST, target, 1);
     };
     checkRequirements = undefined;
     description = `Increase ally's attack power for 3 rounds.`
@@ -92,7 +92,7 @@ export class CallOfVigor implements SpecialMove {
             name: StatusEffectType.MOBILITY_BOOST,
             duration: 3,
         }); 
-        return getStandardActionResult();
+        return getStatusEffectActionResult(StatusEffectType.MOBILITY_BOOST, target, 1);
     };
     checkRequirements = undefined;
     description = `Increase ally's agility and movement speed for 3 rounds.`
@@ -122,7 +122,7 @@ export class Encourage implements SpecialMove {
             name: StatusEffectType.ENCOURAGED,
             duration: 5,
         }); 
-        return getStandardActionResult();
+        return getStatusEffectActionResult(StatusEffectType.ENCOURAGED, target, 1);
     };
     checkRequirements = undefined;
     description = `Ally gains the Encouraged status for 5 rounds. Upon ending their turn, they have a small chance to gain an additional action point.`
@@ -152,7 +152,7 @@ export class FullMetalJacket implements SpecialMove {
             name: StatusEffectType.FULL_METAL_JACKET,
             duration: 3,
         }); 
-        return getStandardActionResult();
+        return getStatusEffectActionResult(StatusEffectType.FULL_METAL_JACKET, target, 1);
     };
     checkRequirements = undefined;
     description = `For 3 rounds, ally becomes a construct, gains defense boost, attack boost if their attacks are physical based,

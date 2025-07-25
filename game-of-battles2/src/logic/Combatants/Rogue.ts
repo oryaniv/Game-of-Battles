@@ -21,7 +21,7 @@ export class Rogue extends Combatant {
             hp: HEALTH_INCREASE_ENABLED ? 50 + HEALTH_INCREASE_AMOUNT : 50,
             stamina: STAMINA_INCREASE_ENABLED ? 30 + STAMINA_INCREASE_AMOUNT : 30,
             attackPower: STAT_BUFF_INCREASE_ENABLED ? 80 : 25,
-            defensePower: STAT_BUFF_INCREASE_ENABLED ? 50 : 15,
+            defensePower: STAT_BUFF_INCREASE_ENABLED ? 55 : 15,
             initiative: 7,
             movementSpeed: 4,
             range: 1,

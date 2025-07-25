@@ -1,6 +1,7 @@
 import { Team } from './logic/Team';
 import {  KidAIAgent, TeenagerAIAgent, RookieAIAgent } from './logic/AI/DeterministicAgents';
 import { VeteranAIAgent } from './logic/AI/VeteranAIAgent';
+import { stepType } from './GameData/TutorialManager';
 
 const enum VitriolLevel {
     LOW,
@@ -47,6 +48,20 @@ export function getGameResultMessage(team1: Team, team2: Team) {
         return getPvPMessages(team1, team2);
     } 
     return getPvAIMessages(team1, team2);
+}
+
+export function getTutorialCompleteMessage(type: stepType) {
+    if(type === stepType.COMPLETE) {
+        return 'Lesson Complete';
+    }
+    return 'Lesson Failed';
+}
+
+export function getTutorialResultMessage(type: stepType) {
+    if(type === stepType.COMPLETE) {
+        return 'Good boy, go on!';
+    }
+    return 'Dishonorably discharged';
 }
 
 function isPvP(team1: Team, team2: Team): boolean {

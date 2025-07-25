@@ -63,26 +63,6 @@ export interface GameOptions {
   disablePostBattleComments: boolean;
 }
 
-// Placeholder for your OptionsManager
-// In a real app, this would interact with localStorage/Firestore etc.
-// class OptionsManager {
-//   loadOptions(): GameOptions {
-//     console.log("Loading options (placeholder)...");
-//     // Return default or loaded options.
-//     // For now, return some default values.
-//     return {
-//       soundOn: false,
-//       showGridBars: true,
-//       disableBattleComments: false,
-//       disablePostBattleComments: false,
-//     };
-//   }
-
-//   saveOptions(options: GameOptions): void {
-//     console.log("Saving options (placeholder):", options);
-//     // Implement actual saving logic here
-//   }
-// }
 
 function loadOptions(): GameOptions {
   return {

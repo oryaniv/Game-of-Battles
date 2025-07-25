@@ -155,7 +155,7 @@ import { premadeTeams } from './viewsHelpers/BuildTeamHelper';
 import { combatantsWithDescriptions } from './viewsHelpers/BuildTeamHelper';
 import { getStatUiName, getStatusScale, getDamageSvg } from '@/UIUtils';
 import { DamageType } from '../logic/Damage';
-import { RunManager } from '@/GameData/RunManager';
+import { RunManager, RunType } from '@/GameData/RunManager';
 
 export default defineComponent({
   name: 'TeamBuilder',
@@ -248,7 +248,7 @@ export default defineComponent({
       for(let i = 0; i < chosenTeam.value.length; i++) {
         playerTeam.addCombatant(chosenTeam.value[i]);
       }
-      RunManager.getInstance().createRun(playerTeam, 0, 0);
+      RunManager.getInstance().createRun(playerTeam, 0, 0, RunType.SINGLE_PLAYER);
       router.push('/Journey');
       // this.$router.push('/start-match', { params: { team: chosenTeam.value.map(c => c.id) } });
     };

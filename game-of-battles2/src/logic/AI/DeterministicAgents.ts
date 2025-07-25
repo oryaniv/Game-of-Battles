@@ -11,6 +11,16 @@ import { getClosestEnemy, getValidAttacks, getValidAttackWithSkillsIncluded, get
 import { HeuristicalAIAgent } from "./HeuristicalAgents";
 
 
+export class HollowAIAgent implements AIAgent {
+    playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
+        return getStandardActionResult();
+    }
+
+    getAIAgentType(): AIAgentType {
+        return AIAgentType.DETERMINISTIC;
+    }
+}
+
 export class DummyAIAgent implements AIAgent {
     playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
         game.executeSkipTurn();
@@ -261,5 +271,40 @@ export class RookieAIAgent implements AIAgent {
             game.executeSkipTurn();
         }
         return [getStandardActionResult()];
+    }
+}
+
+export class TrollAIAgent implements AIAgent {
+
+    private baseAgent: RookieAIAgent;
+    private beastRaged: boolean = false;
+
+    constructor() {
+        this.baseAgent = new RookieAIAgent();
+    }
+
+    playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
+        const actionResult = this.trollRampaging(combatant, game, board);
+        return actionResult;
+    }
+
+    getAIAgentType(): AIAgentType {
+        return AIAgentType.DETERMINISTIC;
+    }
+
+    private trollRampaging(combatant: Combatant, game: Game, board: Board): ActionResult[] {
+        const combatRound = game.getCurrentRound();
+        const roundsToRage = [1, 5, 10, 15, 20];
+        
+        if(roundsToRage.includes(combatRound) && !this.beastRaged) {
+            this.beastRaged = true;
+            return game.executeSkill(combatant.specialMoves.find(move => move.name === "Beast Rage")!, combatant, combatant.position, board);
+        }
+
+        if(!roundsToRage.includes(combatRound) && this.beastRaged) {
+            this.beastRaged = false;
+        }
+
+        return this.baseAgent.playTurn(combatant, game, board) as ActionResult[];
     }
 }

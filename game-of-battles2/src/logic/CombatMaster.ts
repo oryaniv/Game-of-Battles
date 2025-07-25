@@ -1,4 +1,5 @@
-import { ActionResult, AttackResult, getStandardActionResult } from "./attackResult";
+import { emitter } from "@/eventBus";
+import { ActionResult, AttackResult, getStandardActionResult, getStatusEffectActionResult } from "./attackResult";
 import { Board } from "./Board";
 import { Combatant } from "./Combatant";
 import { Damage, DamageReaction, DamageType } from "./Damage";
@@ -121,6 +122,7 @@ export class CombatMaster {
           targetCombatant.updateStatusEffect({name: statusEffect, duration: duration});
         } else {
           targetCombatant.applyStatusEffect({name: statusEffect, duration: duration}, afflictor);
+          emitter.emit('trigger-method', getStatusEffectActionResult(statusEffect, target, duration));
         }
      }
 
@@ -182,7 +184,9 @@ export class CombatMaster {
     }
 
       calculateAttackRoll(attacker: Combatant, target: Combatant, board: Board): AttackResult {
-        if(target.hasStatusEffect(StatusEffectType.SLEEPING) && board.getDistanceBetweenPositions(attacker.position, target.position) <= 1) {
+        const isMeleeAndEnemyAsleep = target.hasStatusEffect(StatusEffectType.SLEEPING) && board.getDistanceBetweenPositions(attacker.position, target.position) <= 1;
+        const isAlwaysCrit = target.hasStatusEffect(StatusEffectType.ALWAYS_BE_CRIT);
+        if(isMeleeAndEnemyAsleep || isAlwaysCrit) {
           return AttackResult.CriticalHit;
         }
 

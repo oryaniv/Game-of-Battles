@@ -4,7 +4,7 @@ import { Position } from "../Position";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
 import { VenomousSpit, Horns, Claws, TrollKick } from "../SpecialMoves/Singular/Offensive";
-import { TrollRegeneration } from "../SpecialMoves/Singular/Self";
+import { TrollRegeneration, BeastRage } from "../SpecialMoves/Singular/Self";
 
 export class Troll extends Combatant {
     constructor(name: string, position: Position, team: Team) {
@@ -39,6 +39,7 @@ export class Troll extends Combatant {
           new Claws(),
           new TrollKick(),
           new TrollRegeneration(),
+          new BeastRage(),
         ],
       team);
     }

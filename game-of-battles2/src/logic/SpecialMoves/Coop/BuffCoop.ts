@@ -3,7 +3,7 @@ import { CoopMove, coopCostSlash } from "./CoopMove";
 import { CoopPartnerRequirement } from "./CoopMove";
 import { Damage, DamageReaction, DamageType } from "@/logic/Damage";
 import { Position } from "@/logic/Position";
-import { ActionResult, AttackResult, getStandardActionResult } from "@/logic/attackResult";
+import { ActionResult, AttackResult, getStandardActionResult, getStatusEffectActionResult } from "@/logic/attackResult";
 import { Board } from "@/logic/Board";
 import { Combatant } from "@/logic/Combatant";
 import { SpecialMoveRangeType, SpecialMoveTriggerType } from "@/logic/SpecialMove";
@@ -36,7 +36,8 @@ export class UnitedWeStand extends CoopMove {
                     duration: 3,
                 }); 
             }
-            return getStandardActionResult(invoker.position, this.turnCost);
+
+            return getStatusEffectActionResult(StatusEffectType.STRENGTH_BOOST, invoker.position, 1);
         });
 
         return unitedWeStandResults;
@@ -72,7 +73,7 @@ export class IngeniousUpgrade extends CoopMove {
                 duration: 5,
             }); 
         }
-        return getStandardActionResult();
+        return getStatusEffectActionResult(StatusEffectType.INGENIOUS_UPGRADE, target, 1);
     };
     cost: number = coopCostSlash ? 5 : 8;
     range: SpecialMoveRange = {

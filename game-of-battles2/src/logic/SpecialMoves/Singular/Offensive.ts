@@ -4,12 +4,13 @@ import { isSamePosition, Position } from "@/logic/Position";
 import { SpecialMove, SpecialMoveAlignment, SpecialMoveAreaOfEffect, SpecialMoveRange, SpecialMoveRangeType, SpecialMoveTriggerType } from "@/logic/SpecialMove";
 import { Board } from "@/logic/Board";
 import { StatusEffectType, StatusEffectHook, StatusEffect, StatusEffectAlignment } from "@/logic/StatusEffect";
-import { AttackResult, getStandardActionResult } from "@/logic/attackResult";
+import { AttackResult, getDamageActionResult, getStandardActionResult } from "@/logic/attackResult";
 import { Combatant } from "@/logic/Combatant";
 import { CombatMaster } from "@/logic/CombatMaster";
 import { ActionResult } from "@/logic/attackResult";
 import { RangeCalculator } from "@/logic/RangeCalculator";
 import { CombatantType } from "@/logic/Combatants/CombatantType";
+import { emitter } from "@/eventBus";
 
 export class DefensiveStrike implements SpecialMove {
     name: string = "Defensive Strike";
@@ -754,7 +755,11 @@ export class TitanicFist implements SpecialMove {
             }
             if(getPushResult.collisionObject) {
                 targetCombatant?.takeDamage({amount: 10, type: DamageType.Crush}, board);
+                const damageResult = getDamageActionResult({amount: 10, type: DamageType.Crush}, getPushResult.moveTo);
                 getPushResult.collisionObject?.takeDamage({amount: 10, type: DamageType.Crush}, board);
+                const damageResult2 = getDamageActionResult({amount: 10, type: DamageType.Crush}, getPushResult.collisionObject?.position);
+                emitter.emit('trigger-method', damageResult);
+                emitter.emit('trigger-method', damageResult2);
             }
         }
         return result;
@@ -1396,4 +1401,31 @@ export class TwinSpin implements SpecialMove {
     checkRequirements = undefined;
     description = `Medium Slashe damage to target. 50% more damage if target is flanked or attacker is cloaked. Double damage if
     another allied Twin Blade is adjacent to the target.`   
+}
+
+export class YouScumBag implements SpecialMove {
+    name: string = "You ScumBag!";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 1;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Curve,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 50
+    };
+    damage: Damage = {
+        amount: 40,
+        type: DamageType.Unstoppable
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const targetCombatant = board.getCombatantAtPosition(target);
+        if(!targetCombatant) {
+            return getStandardActionResult();
+        }
+        targetCombatant.takeDamage({amount: this.damage.amount, type: this.damage.type});
+        return getDamageActionResult(this.damage, target, 1);
+    };
+    checkRequirements = undefined;
+    description = `You are a lowly, filthy, maggot scumbag and you should die!`
 }

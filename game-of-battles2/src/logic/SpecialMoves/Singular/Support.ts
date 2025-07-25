@@ -1,5 +1,6 @@
 import { refreshCombatant } from "@/boardSetups";
-import { ActionResult, AttackResult } from "@/logic/attackResult";
+import { emitter } from "@/eventBus";
+import { ActionResult, AttackResult, getStatusEffectActionResult } from "@/logic/attackResult";
 import { getStandardActionResult } from "@/logic/attackResult";
 import { Board } from "@/logic/Board";
 // 
@@ -80,7 +81,7 @@ export class Regenerate implements SpecialMove {
             name: StatusEffectType.REGENERATING,
             duration: 5,
         }); 
-        return getStandardActionResult();
+        return getStatusEffectActionResult(StatusEffectType.REGENERATING, target, 1);
     };
     checkRequirements = undefined
     description = `Ally gains the Regenerating status for 5 rounds. Each turn, they restore a small amount of health. only works on organic allies.`   
@@ -142,6 +143,7 @@ export class RallyToTheBanner implements SpecialMove {
                 name: StatusEffectType.RALLIED,
                 duration: 3,
             });
+            emitter.emit('trigger-method', getStatusEffectActionResult(StatusEffectType.RALLIED, AOETarget, 1));
         });
 
         return getStandardActionResult();

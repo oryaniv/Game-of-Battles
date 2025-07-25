@@ -372,6 +372,84 @@ export class WeaveEating implements SpecialMove {
 }
 
 
+export class AlwaysBlock implements SpecialMove {
+    name: string = "Always Block";
+    triggerType = SpecialMoveTriggerType.Passive;
+    cost: number = 0;
+    turnCost: number = 0;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.None,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Crush
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        invoker.applyStatusEffect({
+            name: StatusEffectType.ALWAYS_BLOCK,
+            duration: Number.POSITIVE_INFINITY,
+        });
+        return getStandardActionResult();
+    };
+    requirements = undefined;
+    description = `This combatant will always block.`
+}
+
+export class AlwaysBeCrit implements SpecialMove {
+    name: string = "Always Be Crit";
+    triggerType = SpecialMoveTriggerType.Passive;
+    cost: number = 0;
+    turnCost: number = 0;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.None,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Crush
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        invoker.applyStatusEffect({
+            name: StatusEffectType.ALWAYS_BE_CRIT,
+            duration: Number.POSITIVE_INFINITY,
+        });
+        return getStandardActionResult();
+    };
+    requirements = undefined;
+    description = `This combatant will always be hit with a critical.`
+}
+
+export class AlwaysByHit implements SpecialMove {
+    name: string = "Always By Hit";
+    triggerType = SpecialMoveTriggerType.Passive;
+    cost: number = 0;
+    turnCost: number = 0;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.None,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Unstoppable
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        invoker.applyStatusEffect({
+            name: StatusEffectType.ALWAYS_BY_HIT,
+            duration: Number.POSITIVE_INFINITY,
+        });
+        return getStandardActionResult();
+    };
+    requirements = undefined;
+    description = `This combatant will always be hit normally.`
+}
+
 
     
 

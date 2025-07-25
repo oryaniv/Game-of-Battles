@@ -1,4 +1,4 @@
-import { ActionResult, getStandardActionResult } from "@/logic/attackResult";
+import { ActionResult, getStandardActionResult, getStatusEffectActionResult } from "@/logic/attackResult";
 import { Board } from "@/logic/Board";
 import { Combatant } from "@/logic/Combatant";
 import { DamageType } from "@/logic/Damage";
@@ -7,6 +7,7 @@ import { Position } from "@/logic/Position";
 import { SpecialMove, SpecialMoveAlignment, SpecialMoveAreaOfEffect, SpecialMoveRange, SpecialMoveRangeType, SpecialMoveTriggerType } from "@/logic/SpecialMove";
 import { StatusEffectType } from "@/logic/StatusEffect";
 import { CombatMaster } from "@/logic/CombatMaster";
+import { emitter } from "@/eventBus";
 
 export class YoMama implements SpecialMove {
     name: string = "Yo Mama!";
@@ -80,13 +81,12 @@ export class SmellIt implements SpecialMove {
         type: DamageType.Unstoppable
     };
     effect: (invoker: Combatant, target: Position, board: Board) => ActionResult | ActionResult[] = (invoker, target, board) => {
-        const combatMaster = CombatMaster.getInstance();
         const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
         getAllTargets.forEach(AOETarget => {
             const targetCombatant = board.getCombatantAtPosition(AOETarget);
             if(targetCombatant) {
-                // combatMaster.tryInflictStatusEffect(invoker, AOETarget, board, StatusEffectType.NAUSEATED, 3, 0.6);
                 targetCombatant.applyStatusEffect({name: StatusEffectType.NAUSEATED, duration: 3});
+                emitter.emit('trigger-method', getStatusEffectActionResult(StatusEffectType.NAUSEATED, AOETarget, 1));
             }   
         });
         return getStandardActionResult(target);
@@ -112,7 +112,7 @@ export class LookeyHere implements SpecialMove {
     };
     effect: (invoker: Combatant, target: Position, board: Board) => ActionResult | ActionResult[] = (invoker, target, board) => {
         invoker.applyStatusEffect({name: StatusEffectType.MESMERIZING, duration: Number.POSITIVE_INFINITY});
-        return getStandardActionResult(invoker.position);
+        return getStatusEffectActionResult(StatusEffectType.MESMERIZING, invoker.position, 1);
     };
     checkRequirements = (self: Combatant) => {
         return !self.hasMoved;

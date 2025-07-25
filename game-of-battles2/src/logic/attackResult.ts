@@ -1,5 +1,6 @@
 import { Damage, DamageReaction, DamageType } from "./Damage";
 import { Position } from "./Position";
+import { StatusEffectType } from "./StatusEffect";
 
 export enum AttackResult {
     Hit,
@@ -21,6 +22,7 @@ export interface ActionResult {
     cost: number;
     reaction: DamageReaction;
     position?: Position;
+    statusEffectType?: StatusEffectType;
 }
 
 
@@ -34,5 +36,29 @@ export function getStandardActionResult(position?: Position, cost: number = 1): 
         cost: cost,
         reaction: DamageReaction.NONE,
         position: position
+    };
+}
+
+export function getDamageActionResult(resultDamage: Damage, position?: Position, cost: number = 1): ActionResult {
+    return {
+        attackResult: AttackResult.NotFound,
+        damage: resultDamage,
+        cost: cost,
+        reaction: DamageReaction.NONE,
+        position: position
+    };
+}
+
+export function getStatusEffectActionResult(statusEffectType: StatusEffectType, position?: Position, cost: number = 1): ActionResult {
+    return {
+        attackResult: AttackResult.NotFound,
+        damage: {
+            amount: Number.NaN,
+            type: DamageType.None
+        },
+        cost: cost,
+        reaction: DamageReaction.NONE,
+        position: position,
+        statusEffectType: statusEffectType
     };
 }

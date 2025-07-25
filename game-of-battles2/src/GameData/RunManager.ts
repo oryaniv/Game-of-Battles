@@ -21,12 +21,19 @@ export enum RunsStatus {
     DIED
 }
 
+export enum RunType {
+    TUTORIAL,
+    SINGLE_PLAYER,
+    MULTI_PLAYER
+}
+
 interface GameRun {
     team: Team;
     score: number;
     currentLevel: number;
     difficulty?: Difficulty;
     status: RunsStatus;
+    type?: RunType;
 }
 
 export class RunManager {
@@ -39,17 +46,29 @@ export class RunManager {
         //     score: -1,
         //     currentLevel: 0,
         //     difficulty: undefined,
-        //     status: RunsStatus.CREATED
+        //     status: RunsStatus.CREATED,
+        //     type: undefined
         // };
 
         // eslint-disable-next-line no-debugger
         // debugger;
+
+        // this.gameRun = {
+        //     team: generateExamplePlayerTeam(),
+        //     score: -1,
+        //     currentLevel: 1,
+        //     difficulty: Difficulty.MEDIUM,
+        //     status: RunsStatus.IN_PROGRESS,
+        //     type: RunType.SINGLE_PLAYER
+        // };
+
         this.gameRun = {
             team: generateExamplePlayerTeam(),
             score: -1,
-            currentLevel: 1,
-            difficulty: Difficulty.MEDIUM,
-            status: RunsStatus.IN_PROGRESS
+            currentLevel: 7,
+            difficulty: Difficulty.EASY,
+            status: RunsStatus.IN_PROGRESS,
+            type: RunType.TUTORIAL
         };
     }
 
@@ -81,6 +100,10 @@ export class RunManager {
         return this.gameRun.status;
     }
 
+    public getRunType(): RunType | undefined {
+        return this.gameRun.type;
+    }
+
     // Setters
     public setTeam(team: Team): void {
         this.gameRun.team = team;
@@ -102,12 +125,17 @@ export class RunManager {
         this.gameRun.status = status;
     }
 
+    public setRunType(type: RunType): void {
+        this.gameRun.type = type;
+    }
+
     // Create new run
-    public createRun(team: Team, score: number, level: number, difficulty?: Difficulty): void {
+    public createRun(team: Team, score: number, level: number, type: RunType, difficulty?: Difficulty): void {
         this.setTeam(team);
         this.setScore(score);
         this.setCurrentLevel(level);
         this.setStatus(RunsStatus.CREATED);
+        this.setRunType(type);
         if (difficulty) {
             this.setDifficulty(difficulty);
         }
@@ -124,7 +152,8 @@ export class RunManager {
             score: -1,
             currentLevel: 0,
             difficulty: undefined,
-            status: RunsStatus.CREATED
+            status: RunsStatus.CREATED,
+            type: undefined
         };
     }
 

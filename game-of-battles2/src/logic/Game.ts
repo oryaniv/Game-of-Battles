@@ -247,9 +247,6 @@ export class Game {
       
       this.currentTeamIndex = 1 - this.currentTeamIndex;
       this.actionsRemaining = this.teams[this.currentTeamIndex].getAliveCombatants().length;
-      // const eventLogger = EventLogger.getInstance();
-      // eventLogger.addBreak();
-      // eventLogger.logEvent(`${this.getCurrentTeam().name}'s Turn`);
       emitter.emit('change-team');
     }
 

@@ -26,6 +26,14 @@
   'ballista': combatant.getCombatantType() === 'Ballista Turret',
   'bomb': combatant.getCombatantType() === 'Bomb',
   'wall': combatant.getCombatantType() === 'Wall',
+  'normal-target': combatant.getCombatantType() === 'Target',
+  'crit-target': combatant.getCombatantType() === 'Crit Target',
+  'block-target': combatant.getCombatantType() === 'Block Target',
+  'fire-target': combatant.getCombatantType() === 'Fire Target',
+  'ice-target': combatant.getCombatantType() === 'Ice Target',
+  'lightning-target': combatant.getCombatantType() === 'Lightning Target',
+  'blight-target': combatant.getCombatantType() === 'Blight Target',
+  'pierce-target': combatant.getCombatantType() === 'Pierce Target',
   }">
 
   </div>
@@ -100,7 +108,9 @@ export default defineComponent({
         CombatantType.Wizard, CombatantType.Rogue, CombatantType.FistWeaver, CombatantType.Fool, CombatantType.Artificer,
         CombatantType.StandardBearer, CombatantType.Pikeman, CombatantType.Gorilla, CombatantType.Troll, CombatantType.Dragon,
         CombatantType.WeaveEater, CombatantType.OozeGolem, CombatantType.TwinBlades, CombatantType.BabyBabel,
-         CombatantType.BallistaTurret, CombatantType.Wall, CombatantType.Bomb, CombatantType.Doll, CombatantType.Wall
+         CombatantType.BallistaTurret, CombatantType.Wall, CombatantType.Bomb, CombatantType.Doll, CombatantType.Wall,
+         CombatantType.NormalTarget, CombatantType.CritTarget, CombatantType.BlockTarget, CombatantType.FireTarget,
+         CombatantType.IceTarget, CombatantType.LightningTarget, CombatantType.BlightTarget, CombatantType.PierceTarget
       ].includes(type);
     };
 
@@ -377,7 +387,61 @@ export default defineComponent({
   filter: hue-rotate(115deg);
 }
 
+.sprite-container.normal-target {
+  background-image: url('@/assets/CombatantModels/NormalTarget.svg');
+  transform: scale(1.1);
+  background-size: contain;
+  background-position: 0px 10px;
+}
 
+.sprite-container.crit-target {
+  background-image: url('@/assets/CombatantModels/CritTarget.svg');
+  transform: scale(1.1);
+  background-size: contain;
+  background-position: 0px 10px;
+}
+
+.sprite-container.block-target {
+  background-image: url('@/assets/CombatantModels/BlockTarget.svg');
+  transform: scale(1.1);
+  background-size: contain;
+  background-position: 0px 10px;
+}
+
+.sprite-container.fire-target {
+  background-image: url('@/assets/CombatantModels/FireTarget.svg');
+  transform: scale(1.1);
+  background-size: contain;
+  background-position: 0px 10px;
+}
+
+.sprite-container.ice-target {
+  background-image: url('@/assets/CombatantModels/IceTarget.svg');
+  transform: scale(1.1);
+  background-size: contain;
+  background-position: 0px 10px;
+}
+
+.sprite-container.lightning-target {
+  background-image: url('@/assets/CombatantModels/LightningTarget.svg');
+  transform: scale(1.1);
+  background-size: contain;
+  background-position: 0px 10px;
+}
+
+.sprite-container.blight-target {
+  background-image: url('@/assets/CombatantModels/BlightTarget.svg');
+  transform: scale(1.1);
+  background-size: contain;
+  background-position: 0px 10px;
+}
+
+.sprite-container.pierce-target {
+  background-image: url('@/assets/CombatantModels/PierceTarget.svg');
+  transform: scale(1.1);
+  background-size: contain;
+  background-position: 0px 10px;
+}
 
 .svg-sprite-container .combatant-sprite {
   width: 15px;

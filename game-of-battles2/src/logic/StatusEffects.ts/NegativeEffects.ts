@@ -2,7 +2,7 @@ import { StatusEffectAlignment } from "../StatusEffect";
 import { Combatant } from "../Combatant";
 import { StatusEffectHook, StatusEffectType } from "../StatusEffect";
 import { StatusEffect } from "../StatusEffect";
-import { AttackResult, getStandardActionResult } from "../attackResult";
+import { AttackResult, getDamageActionResult, getStandardActionResult, getStatusEffectActionResult } from "../attackResult";
 import { DamageType, Damage } from "../Damage";
 import { DamageReaction } from "../Damage";
 import { CombatMaster } from "../CombatMaster";
@@ -10,6 +10,7 @@ import { Board } from "../Board";
 import { CharmedAIAgent, PanickedAIAgent, StunLockedAIAgent, TauntedAIAgent } from "../AI/StatusAIAgent";
 import { AIAgentType } from "../AI/AIAgent";
 import {STAT_BUFF_INCREASE_ENABLED, ATTACK_DEFENSE_INCREASE_AMOUNT, AGILITY_LUCK_INCREASE_AMOUNT} from "../LogicFlags";
+import { emitter } from "@/eventBus";
 
 export class ImmobilizedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.IMMOBILIZED;
@@ -505,6 +506,8 @@ export class DivineRetributionStatusEffect implements StatusEffect {
 
             const damageAmount = damage.amount * 0.5;
             self.takeDamage({amount: damageAmount, type: DamageType.Unstoppable});
+            const damageResult = getDamageActionResult({amount: damageAmount, type: DamageType.Unstoppable}, target.position);
+            emitter.emit('trigger-method', damageResult);
             return {
                 attackResult: AttackResult.Hit,
                 damage: {amount: damageAmount, type: DamageType.Unstoppable},
@@ -558,6 +561,7 @@ export class PlaguedStatusEffect implements StatusEffect {
                     name: StatusEffectType.PLAGUED,
                     duration: 3,
                 });
+                emitter.emit('trigger-method', getStatusEffectActionResult(StatusEffectType.PLAGUED, combatant.position, 1));
             });
         }
     };

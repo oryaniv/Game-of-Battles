@@ -4,6 +4,7 @@ import { Position } from "../Position";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
 import { DragonBreath, DragonFireBall, Claws, DieMortal } from "../SpecialMoves/Singular/Offensive";
+import { DragonRage } from "../SpecialMoves/Singular/Self";
 
 export class Dragon extends Combatant {
     constructor(name: string, position: Position, team: Team) {
@@ -37,7 +38,7 @@ export class Dragon extends Combatant {
           new DragonBreath(),
           new DragonFireBall(),
           new Claws(),
-          // new DragonRage(),
+          new DragonRage(),
           new DieMortal(),
         ],
       team);

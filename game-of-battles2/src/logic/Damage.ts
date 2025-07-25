@@ -11,6 +11,7 @@ export enum DamageType {
     Unstoppable = "Unstoppable",
     // Not actually a damage type, but used for healing
     Healing = "Healing",
+    None = "None",
 }
 
 

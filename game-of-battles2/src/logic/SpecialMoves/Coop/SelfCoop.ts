@@ -3,7 +3,7 @@ import { CoopMove, coopCostSlash } from "./CoopMove";
 import { CoopPartnerRequirement } from "./CoopMove";
 import { Damage, DamageReaction, DamageType } from "@/logic/Damage";
 import { Position } from "@/logic/Position";
-import { ActionResult, AttackResult, getStandardActionResult } from "@/logic/attackResult";
+import { ActionResult, AttackResult, getStandardActionResult, getStatusEffectActionResult } from "@/logic/attackResult";
 import { Board } from "@/logic/Board";
 import { Combatant } from "@/logic/Combatant";
 import { SpecialMoveRangeType } from "@/logic/SpecialMove";
@@ -13,6 +13,7 @@ import { SpecialMoveRange } from "@/logic/SpecialMove";
 import { CombatMaster } from "@/logic/CombatMaster";
 import { StatusEffect, StatusEffectAlignment, StatusEffectType } from "@/logic/StatusEffect";
 import { Doll } from "@/logic/Combatants/Fool";
+import { emitter } from "@/eventBus";
 
 export class IdaiNoHadou extends CoopMove {
     name: string = "Idai no Hadou";
@@ -34,15 +35,7 @@ export class IdaiNoHadou extends CoopMove {
         for(const statusEffect of negativeStatusEffects) {
             invoker?.removeStatusEffect(statusEffect.name);
         }
-        return {
-            attackResult: AttackResult.Hit,
-            damage: {
-                amount: 20,
-                type: DamageType.Healing
-            },
-            cost: this.turnCost,
-            reaction: DamageReaction.NONE
-        };
+        return getStatusEffectActionResult(StatusEffectType.IDAI_NO_HADOU, invoker.position, this.turnCost);
     };
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Self,
@@ -96,7 +89,7 @@ export class Frenzy extends CoopMove {
             name: StatusEffectType.FRENZY,
             duration: 3,
         });
-        return getStandardActionResult(invoker.position, this.turnCost);
+        return getStatusEffectActionResult(StatusEffectType.FRENZY, invoker.position, this.turnCost);
     };
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Self,
@@ -162,6 +155,7 @@ export class Teleportation extends CoopMove {
                 duration: 50,
             });
             invoker.removeStatusEffect(StatusEffectType.ARCANE_CHANNELING);
+            emitter.emit('trigger-method', getStatusEffectActionResult(StatusEffectType.ARCANE_BARRIER, target, 1));
         }
         if(invoker.hasStatusEffect(StatusEffectType.ARCANE_OVERCHARGE)) {
             const combatMaster = CombatMaster.getInstance();
@@ -204,7 +198,7 @@ export class ArcaneOvercharge extends CoopMove {
             name: StatusEffectType.ARCANE_OVERCHARGE,
             duration: Number.POSITIVE_INFINITY,
         });
-        return getStandardActionResult(invoker.position, this.turnCost);
+        return getStatusEffectActionResult(StatusEffectType.ARCANE_OVERCHARGE, invoker.position, this.turnCost);
     };
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Self,
@@ -231,7 +225,7 @@ export class ArcaneBarrier extends CoopMove {
             name: StatusEffectType.ARCANE_BARRIER,
             duration: 50,
         });
-        return getStandardActionResult(invoker.position, this.turnCost);
+        return getStatusEffectActionResult(StatusEffectType.ARCANE_BARRIER, invoker.position, this.turnCost);
     };
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Self,

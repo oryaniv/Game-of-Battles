@@ -37,4 +37,15 @@ export enum CombatantType {
     Doll = "Doll",
     BallistaTurret = "Ballista Turret",
     BabyBabel = "Tower",
+
+    // tutorial combatants
+    NormalTarget = "Target",
+    CritTarget = "Crit Target",
+    BlockTarget = "Block Target",
+    IceTarget = "Ice Target",
+    LightningTarget = "Lightning Target",
+    BlightTarget = "Blight Target",
+    FireTarget = "Fire Target",
+    PierceTarget = "Pierce Target"
+    
 }

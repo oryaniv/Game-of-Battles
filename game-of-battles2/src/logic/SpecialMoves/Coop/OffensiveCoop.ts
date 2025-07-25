@@ -3,7 +3,7 @@ import { coopCostSlash, CoopMove } from "./CoopMove";
 import { CoopPartnerRequirement } from "./CoopMove";
 import { Damage, DamageReaction, DamageType } from "@/logic/Damage";
 import { Position } from "@/logic/Position";
-import { ActionResult, AttackResult, getStandardActionResult } from "@/logic/attackResult";
+import { ActionResult, AttackResult, getDamageActionResult, getStandardActionResult, getStatusEffectActionResult } from "@/logic/attackResult";
 import { Board } from "@/logic/Board";
 import { Combatant } from "@/logic/Combatant";
 import { SpecialMoveRangeType, SpecialMoveTriggerType } from "@/logic/SpecialMove";
@@ -14,6 +14,7 @@ import { CombatMaster } from "@/logic/CombatMaster";
 import { getResultsForStatusEffectHook, StatusEffect, StatusEffectAlignment, StatusEffectHook, StatusEffectType } from "@/logic/StatusEffect";
 import { shuffleArray } from "@/logic/AI/AIUtils";
 import { FistWeaver } from "@/logic/Combatants/FistWeaver";
+import { emitter } from "@/eventBus";
 
 
 export class ShieldBash extends CoopMove {
@@ -43,7 +44,11 @@ export class ShieldBash extends CoopMove {
             }
             if(getPushResult.collisionObject) {
                 targetCombatant?.takeDamage({amount: 10, type: DamageType.Crush}, board);
+                const damageResult = getDamageActionResult({amount: 10, type: DamageType.Crush}, getPushResult.moveTo);
                 getPushResult.collisionObject?.takeDamage({amount: 10, type: DamageType.Crush}, board);
+                const damageResult2 = getDamageActionResult({amount: 10, type: DamageType.Crush}, getPushResult.collisionObject?.position);
+                emitter.emit('trigger-method', damageResult);
+                emitter.emit('trigger-method', damageResult2);
             }
         }
         return result;
@@ -545,12 +550,6 @@ export class KarithrasBoon extends CoopMove {
                     duration: 5,
                 });
             },
-            // (recipient: Combatant) => {
-            //     recipient.applyStatusEffect({
-            //         name: StatusEffectType.CLOAKED,
-            //         duration: 5,
-            //     });
-            // },
         ];
 
         const combatMaster = CombatMaster.getInstance();
@@ -577,6 +576,7 @@ export class KarithrasBoon extends CoopMove {
                         name: StatusEffectType.CLOAKED,
                         duration: 5,
                     });
+                    emitter.emit('trigger-method', getStatusEffectActionResult(StatusEffectType.CLOAKED, invoker.position, 1));
                 }
             }
         }
@@ -884,6 +884,7 @@ export class DiamondHook extends CoopMove {
                     duration: 5,
                 });
                 invoker.addRelatedCombatant('DIAMOND_HOOKED_HOLDING', targetCombatant);
+                emitter.emit('trigger-method', getStatusEffectActionResult(StatusEffectType.DIAMOND_HOOKED_HOLDING, invoker.position, 1));
             }            
         }
         return results;

@@ -1,5 +1,31 @@
 import { DamageReaction, DamageType } from "./logic/Damage";
 import { getStatusEffect, StatusEffect, StatusEffectApplication, StatusEffectType } from "./logic/StatusEffect";
+import { Board } from "./logic/Board";
+import { placeAllCombatants, playGroundTeams } from "./boardSetups";
+import { Game } from "./logic/Game";
+import { getEmptyAsType } from "./logic/LogicFlags";
+import { RunManager, RunType } from "./GameData/RunManager";
+import { TutorialManager, DialogStep } from "./GameData/TutorialManager";
+
+
+// Define the structure for a single dialog message
+export interface DialogMessage {
+  header: string;
+  text: string;
+}
+
+export interface ActionEffect {
+  id: number,
+  damage: string | number,
+  weak: boolean,
+  critical: boolean,
+  miss: boolean,
+  fumble: boolean,
+  blocked: boolean,
+  color: string,
+  type?: DamageType
+  statusEffectType?: StatusEffectType;
+}
 
 export const getActionDescription = (action: string) => {
     switch (action) {
@@ -30,9 +56,6 @@ export const getStatusEffectDescription = (statusEffect: StatusEffectApplication
     return getStatusEffect(statusEffect.name)?.description || '';
 }
 
-export const getLetterForStatusEffect = (effectType: StatusEffectType): string => {
-    return statusEffectLetters[effectType] || "?"; // Default to "?" if not found
-};
 
 export const getShortDamageReactionText = (reaction: DamageReaction): string => {
     switch (reaction) {
@@ -46,63 +69,6 @@ export const getShortDamageReactionText = (reaction: DamageReaction): string => 
             return "Void";
     }
 }
-
-
-const statusEffectLetters: { [key in StatusEffectType]?: string } = {
-    [StatusEffectType.BLOCKING_STANCE]: "B",
-    [StatusEffectType.ARCANE_CHANNELING]: "H",
-    [StatusEffectType.FOCUS_AIM]: "A",
-    [StatusEffectType.IMMOBILIZED]: "Z",
-    [StatusEffectType.FORTIFIED]: "O",
-    [StatusEffectType.FROZEN]: "F",
-    [StatusEffectType.REGENERATING]: "R",
-    [StatusEffectType.STRENGTH_BOOST]: "S",
-    [StatusEffectType.MOBILITY_BOOST]: "M",
-    [StatusEffectType.ENCOURAGED]: "E",
-    [StatusEffectType.RALLIED]: "L",
-    [StatusEffectType.STRENGTH_DOWNGRADE]: "SD",
-    [StatusEffectType.LUCK_DOWNGRADE]: "LD",
-    [StatusEffectType.SLOW]: "SW",
-    [StatusEffectType.POISONED]: "P",
-    [StatusEffectType.BLEEDING]: "BL",
-    [StatusEffectType.TAUNTED]: "TA",
-    [StatusEffectType.STUPEFIED]: "ST",
-    [StatusEffectType.NAUSEATED]: "NA",
-    [StatusEffectType.MESMERIZED]: "ME",
-    [StatusEffectType.MESMERIZING]: "ME",
-    [StatusEffectType.STAGGERED]: "SG",
-    [StatusEffectType.DEFENSE_DOWNGRADE]: "DD",
-    [StatusEffectType.CLOAKED]: "CL",
-    [StatusEffectType.MARKED_FOR_PAIN]: "MR1",
-    [StatusEffectType.MARKED_FOR_EXECUTION]: "MR2",
-    [StatusEffectType.MARKED_FOR_OBLIVION]: "MR3",
-    [StatusEffectType.FULL_METAL_JACKET]: "FMJ",
-    [StatusEffectType.PANICKED]: "PN",
-    [StatusEffectType.CHARMED]: "CHM",
-    [StatusEffectType.CIRCUS_DIABOLIQUE]: "CQ",
-    [StatusEffectType.NIGHTMARE_LOCKED]: "NQ",
-    [StatusEffectType.FORBIDDEN_AFFLICTION]: "FA",
-    [StatusEffectType.DIVINE_RETRIBUTION]: "DR",
-    [StatusEffectType.SANCTUARY]: "SC",
-    [StatusEffectType.IDAI_NO_HADOU]: "INH",
-    [StatusEffectType.PLAGUED]: "PLG",
-    [StatusEffectType.BURNING]: "BRN",
-    [StatusEffectType.FRENZY]: "FZ",
-    [StatusEffectType.ARCANE_OVERCHARGE]: "AO",
-    [StatusEffectType.ARCANE_BARRIER]: "AB",
-    [StatusEffectType.ARCANE_CONDUIT]: "ACO",
-    [StatusEffectType.GUARDIAN_PROTECTED]: "GP",
-    [StatusEffectType.GUARDIAN]: "G",
-    [StatusEffectType.SHIELD_WALL_PROTECTED]: "SWP",
-    [StatusEffectType.SHIELD_WALL]: "SW",
-    [StatusEffectType.ARCANE_SHIELD_WALL_PROTECTED]: "ASP",
-    [StatusEffectType.ARCANE_SHIELD_WALL]: "ASW",
-    [StatusEffectType.DIAMOND_HOOKED]: "DH",
-    [StatusEffectType.DIAMOND_HOOKED_HOLDING]: "DHH",
-    [StatusEffectType.INGENIOUS_UPGRADE]: "IU",
-    [StatusEffectType.SLEEPING]: "SL",
-    // ... add mappings for other status effect types
-  };
 
   export const getStatUiName = (statName: string) => {
     switch (statName) {
@@ -473,6 +439,8 @@ export function requireStatusEffectSvg(effectType: StatusEffectType): string {
       return require('./assets/CombatantModels/OozeGolem.png');
     case StatusEffectType.WEAVE_EATING:
       return require('./assets/CombatantModels/WeaveEater.png');
+    case StatusEffectType.FRENZY:
+      return require('./assets/statusIcons/FRENZY.svg');
     default:
       return '';
   }
@@ -488,6 +456,8 @@ export function getSkillEffectIcon(skillName: string) {
     case 'Dragon Fire Ball':
     case 'Flame Thrower':
     case 'Brimstone Rain':
+    case 'Self Destruct':
+    case 'Teleport Blast':
       return require('./assets/statusIcons/BURNING.svg');
     case 'Icicle':
     case 'Ice Cannon':
@@ -511,7 +481,7 @@ export function getSkillEffectIcon(skillName: string) {
     case 'Karithra\'s Boon':
     case 'Whirlwind Attack':
       return require('./assets/statusIcons/SLASH.svg');
-    case 'Wind Run Assault"':
+    case 'Wind Run Assault':
     case 'Titanic Fist':
     case 'Troll Kick':
     case 'Crush':
@@ -529,7 +499,7 @@ export function getSkillEffectIcon(skillName: string) {
     case 'Arc Shot':
     case 'Scorpion Bolt':
     case 'Rain of Arrows':
-    case 'Harpoon':
+    case 'Skewering Harpoon':
     case 'Snipe Shot':
       return require('./assets/statusIcons/PIERCE.svg');
     case 'Toxic Arrow':
@@ -546,6 +516,7 @@ export function getSkillEffectIcon(skillName: string) {
     case 'Grasp of Zirash':
     case 'Hunger of Zirash':
     case 'Forbidden Art':
+    case 'Soul Scythe':
       return require('./assets/statusIcons/DARK.svg');
     case 'Heal':
     case 'Regenerate':
@@ -554,10 +525,14 @@ export function getSkillEffectIcon(skillName: string) {
     case 'Reinforce Construct':
     case 'Meditate':
     case 'Blood Rite':
+    case 'Renewed Strength':
+    case 'Devour Divinity':
+    case 'Replacement Part':
       return require('./assets/statusIcons/REGENERATING.svg');
     case 'Arcane Channeling':
       return require('./assets/statusIcons/ARCANE_CHANNELING.svg');
-    case 'Shield Breaker': 
+    case 'Shield Breaker':
+    case 'Shatter Steel':
       return require('./assets/statusIcons/DEFENSE_DOWNGRADE.svg');
     case 'Focus Aim':
       return require('./assets/statusIcons/FOCUS_AIM.svg');
@@ -593,6 +568,7 @@ export function getSkillEffectIcon(skillName: string) {
       return require('./assets/statusIcons/IDAI_NO_HADOU.svg');
     case 'Rally to the Banner':
       return require('./assets/statusIcons/RALLIED.svg');
+    case 'United We Stand':
     case 'Call of Strength':
       return require('./assets/statusIcons/STRENGTH_BOOST.svg');
     case 'Call of Vigor':
@@ -624,8 +600,139 @@ export function getSkillEffectIcon(skillName: string) {
       return require('./assets/statusIcons/CHARMED.svg');
     case 'Nasty Nasty Dolly':
       return require('./assets/statusIcons/FOOLS_LUCK.svg');
+    case 'Swapping Gale':
+      return require('./assets/statusIcons/DECOY.svg');
+    case 'Last Stand of Heroes':
+      return require('./assets/ACHILLES.svg');
+    case 'Fortify':
+      return require('./assets/statusIcons/FORTIFIED.svg');
+    case 'Blocking Stance':
+      return require('./assets/statusIcons/BLOCKING_STANCE.svg');
+    case 'Weaken':
+      return require('./assets/statusIcons/STRENGTH_DOWNGRADE.svg');
+    case 'Evil Eye':
+      return require('./assets/statusIcons/LUCK_DOWNGRADE.svg');
+    case 'Slow':
+      return require('./assets/statusIcons/SLOW.svg');
+    case 'Siphon Energy':
+    case 'Catastrophic Calamity':
+      return require('./assets/Unstoppable.svg');
+    case 'Ultimate Curse':
+      return require('./assets/statusIcons/NIGHTMARE_LOCKED.svg');
+    case 'Diamond Hook':
+      return require('./assets/statusIcons/DIAMOND_HOOKED_HOLDING.svg');
+    case 'Teleportation':
+      return require('./assets/statusIcons/TELEPORTATION.svg');
     default:
       return '';
   }
-
 }
+
+
+export function requireDamageSVG(type: DamageType): string {
+  switch (type) {
+    case DamageType.Slash:
+      return require('./assets/Slash.svg');
+    case DamageType.Crush:
+      return require('./assets/Crush2.png');
+    case DamageType.Pierce:
+      return require('./assets/Pierce.svg');
+    case DamageType.Fire:
+      return require('./assets/Flame.svg');
+    case DamageType.Ice:
+      return require('./assets/Ice.svg');
+    case DamageType.Lightning:
+      return require('./assets/Thunder.svg');
+    case DamageType.Blight:
+      return require('./assets/Skull.svg');
+    case DamageType.Holy:
+      return require('./assets/Sun.svg');
+    case DamageType.Dark:
+      return require('./assets/Pentagram.svg');
+    case DamageType.Healing:
+      return require('./assets/Healing.svg');
+    case DamageType.Unstoppable:
+      return require('./assets/Unstoppable.svg');
+    // ... other cases
+    default:
+      return require('./assets/Empty.svg'); // Or a default SVG path
+  }
+}
+
+export function getActionEffectIcon(effect: ActionEffect) {
+  // eslint-disable-next-line
+  debugger;
+  if (effect.type && effect.type !== DamageType.None) {
+    return requireDamageSVG(effect.type);
+  }
+  if (effect.statusEffectType) {
+    return requireStatusEffectSvg(effect.statusEffectType);
+  }
+  alert('No icon found for action effect');
+  return '';
+}
+
+
+export function getGame(): Game {
+  const runManager = RunManager.getInstance();
+  const runType = runManager.getRunType();
+  if (runType === undefined || runType === RunType.SINGLE_PLAYER) {
+    return getSinglePlayerGame();
+  }
+  if (runType === RunType.TUTORIAL) {
+    return getTutorialGame();
+  }
+
+  // if (runType === RunType.MULTI_PLAYER) {
+  //   return getMultiPlayerGame();
+  // }
+
+  return getEmptyAsType<Game>();
+}
+
+export function getSinglePlayerGame(): Game {
+  const board = new Board(10, 10);
+
+  const matchTeams = playGroundTeams();
+
+  // const matchTeams = runManager.getMatchTeams();
+
+  const whiteTeam = matchTeams[0];
+  const blackTeam = matchTeams[1];
+
+  const teams = [whiteTeam, blackTeam];
+
+  placeAllCombatants(whiteTeam, blackTeam, board);
+
+  const game = new Game(teams, board);
+  return game;
+}
+
+
+export function getTutorialGame(): Game {
+  const tutorialManager = TutorialManager.getInstance();
+  const runManager = RunManager.getInstance();
+  const tutorial = tutorialManager.getTutorial(runManager.getCurrentLevel());
+  if (!tutorial) {
+    throw new Error('Tutorial not found');
+  }
+  return tutorial.gamePlan;
+}
+
+export function getRelevantDialogs(): DialogStep[] {
+  const runManager = RunManager.getInstance();
+  const runType = runManager.getRunType();
+  if (runType === undefined || runType === RunType.SINGLE_PLAYER) {
+    return [];
+  }
+  if (runType === RunType.TUTORIAL) {
+    const tutorialManager = TutorialManager.getInstance();
+    const tutorial = tutorialManager.getTutorial(runManager.getCurrentLevel());
+    if (!tutorial) {
+      throw new Error('Tutorial not found');
+    }
+    return tutorial.steps;
+  }
+  return [];
+}
+

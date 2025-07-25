@@ -22,7 +22,7 @@ import { Rogue } from "./logic/Combatants/Rogue";
 import { Artificer } from "./logic/Combatants/Artificer";
 import { Iskariot } from "./logic/Combatants/Iskariot";
 import { Myrmidon } from "./logic/Combatants/Myrmidon";
-import { RookieAIAgent } from "./logic/AI/DeterministicAgents";
+import { DummyAIAgent, RookieAIAgent } from "./logic/AI/DeterministicAgents";
 import { VeteranAIAgent } from "./logic/AI/VeteranAIAgent";
 import { Troll } from "./logic/Combatants/Troll";
 import { Dragon } from "./logic/Combatants/Dragon";
@@ -38,27 +38,32 @@ export function playGroundTeams(): Team[] {
     const veternAIAgentNoCoop = new VeteranAIAgent();
     veternAIAgentNoCoop.setCollectCoop(false);
     const rookieAIAgent = new RookieAIAgent();
-    const whiteTeam = new Team('White Team', 0);
-    const blackTeam = new Team('Black Team', 1);
+    const whiteTeam = new Team('Blue Team', 0);
+    const blackTeam = new Team('Red Team', 1, new DummyAIAgent());
 
-    whiteTeam.addCombatant(new Wizard('P1', { x: 3, y: 3}, whiteTeam));
-    whiteTeam.addCombatant(new Artificer('A1', { x: 3, y: 5}, whiteTeam));
-    whiteTeam.addCombatant(new Healer('L1', { x: 3, y: 5}, whiteTeam));
-    whiteTeam.addCombatant(new Vanguard('P2', { x: 3, y: 4}, whiteTeam));
-    whiteTeam.addCombatant(new Hunter('P3', { x: 3, y: 6}, whiteTeam));
-    whiteTeam.addCombatant(new Fool('P4', { x: 3, y: 7}, whiteTeam));
-    whiteTeam.addCombatant(new Witch('P5', { x: 3, y: 8}, whiteTeam));
-    whiteTeam.addCombatant(new FistWeaver('P6', { x: 3, y: 9}, whiteTeam));
-    whiteTeam.addCombatant(new Pikeman('P7', { x: 3, y: 10}, whiteTeam));
-    whiteTeam.addCombatant(new Rogue('P8', { x: 3, y: 11}, whiteTeam));
-    whiteTeam.addCombatant(new Defender('P9', { x: 3, y: 12}, whiteTeam));
-    whiteTeam.addCombatant(new StandardBearer('P10', { x: 3, y: 13}, whiteTeam));
+   
+    
+    whiteTeam.addCombatant(new Defender('Ed', { x: 7, y: 5}, whiteTeam));
+    whiteTeam.addCombatant(new Fool('Aleph', { x: 6, y: 5}, whiteTeam));
+    
+    // whiteTeam.addCombatant(new Fool('P4', { x: 3, y: 7}, whiteTeam));
+    // whiteTeam.addCombatant(new Witch('P5', { x: 3, y: 8}, whiteTeam));
+
+    // blackTeam.addCombatant(new Vanguard('Ragnar', { x: 3, y: 4}, blackTeam));
+    // blackTeam.addCombatant(new FistWeaver('Elena', { x: 3, y: 9}, blackTeam));
+    // blackTeam.addCombatant(new Pikeman('Zhao', { x: 3, y: 10}, blackTeam));
+    // blackTeam.addCombatant(new Healer('Alina', { x: 4, y: 5}, blackTeam));
+    // blackTeam.addCombatant(new Rogue('Nina', { x: 4, y: 3}, blackTeam));
+    blackTeam.addCombatant(new StandardBearer('Bullseye', { x: 4, y: 3}, blackTeam));
+    // whiteTeam.addCombatant(new Fool('P9', { x: 4, y: 4}, whiteTeam));
+    // // whiteTeam.addCombatant(new Vanguard('P9', { x: 3, y: 12}, whiteTeam));
+    // whiteTeam.addCombatant(new StandardBearer('P10', { x: 3, y: 1}, whiteTeam));
    
     
     // whiteTeam.addCombatant(new Vanguard('P2', { x: 3, y: 4}, whiteTeam));
     
-    blackTeam.addCombatant(new Wizard('W1', { x: 3, y: 5}, blackTeam));
-
+    // blackTeam.addCombatant(new Witch('W1', { x: 3, y: 5}, blackTeam));
+    
 
     // blackTeam.addCombatant(new TwinBlade('V3', { x: 5, y: 6}, blackTeam));
     // blackTeam.addCombatant(new TwinBlade('V4', { x: 5, y: 7}, blackTeam));
@@ -69,10 +74,12 @@ export function playGroundTeams(): Team[] {
     // blackTeam.addCombatant(new WeaveEater('V5', { x: 5, y: 8}, blackTeam));
     // blackTeam.addCombatant(new WeaveEater('V6', { x: 5, y: 9}, blackTeam));
 
-    blackTeam.combatants[0].applyStatusEffect({
-        name: StatusEffectType.SLOW,
-        duration: 1,
-    });
+    // blackTeam.combatants[0].applyStatusEffect({
+    //     name: StatusEffectType.SLOW,
+    //     duration: 1,
+    // });
+
+    // whiteTeam.combatants[0].stats.stamina = 0;
 
     // blackTeam.combatants[0].applyStatusEffect({
     //     name: StatusEffectType.NIGHTMARE_LOCKED,
@@ -89,8 +96,6 @@ export function playGroundTeams(): Team[] {
     //     duration: 1,
     // });
     
-
-
     return [whiteTeam, blackTeam];
 }
 

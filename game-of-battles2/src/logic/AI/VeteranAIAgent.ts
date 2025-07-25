@@ -3192,9 +3192,122 @@ class VeteranAIAgentTrollPlayer implements VeteranAIAgentPlayer {
     }
 }
 
-class VeteranAIAgentDragonPlayer implements VeteranAIAgentPlayer {
+class VeteranAIAgentDragonPlayer extends VeteranAIAgentGenericPlayer {
+    protected getBaseMovementValue(): number {
+        return super.getBaseMovementValue();
+    }
+
+    protected getBaseSkipValue(): number {
+        return super.getBaseSkipValue();
+    }
+
+    protected getBaseDefendValue(): number {
+        return -1000;
+    }
+
+    protected getBaseBasicAttackValue(): number {
+        return 6;
+    }
+
+    protected getAggressivenessLevel(): number {
+        return AggressivenessLevel.FrontLine;
+    }
+
     evaluate(combatant: Combatant, game: Game, board: Board, turnPlay: TurnPlay): number {
+        const evaluation = super.evaluate(combatant, game, board, turnPlay);
+        if(evaluation > -1000) {
+            return evaluation;
+        }
+
+        const movePosition = turnPlay.position;
+        const target = turnPlay.playAction.target;
+        const specialMove = turnPlay.playAction.skillName;
+        
+        if(specialMove === "Dragon's Breath") {
+            return this.evaluateDragonBreath(combatant, game, board, movePosition, target);
+        }
+
+        if(specialMove === "Dragon Fire Ball") {
+            return this.evaluateDragonFireBall(combatant, game, board, movePosition, target);
+        }
+
+        if(specialMove === "Claws") {
+            return this.evaluateClaws(combatant, game, board, movePosition, target);
+        }
+
+        if(specialMove === "Dragon Rage") {
+            return this.evaluateDragonRage(combatant, game, board, movePosition, target);
+        }
+
+        if(specialMove === "Die, Mortal!") {
+            return this.evaluateDieMortal(combatant, game, board, movePosition, target);
+        }
+
         return 0;
+    }
+
+    private evaluateDragonBreath(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        let baseValue = 0;
+        const moveValue = this.evaluateMovement(combatant, game, board, movePosition);
+        baseValue += moveValue;
+        const originalPosition = combatant.position;
+        let totalEnemieshit = 0;
+        theoreticalReplacement(combatant, board, movePosition, true);
+        const getAllTargets = board.getAreaOfEffectPositions(combatant, target!,
+             SpecialMoveAreaOfEffect.Line, SpecialMoveAlignment.All);
+
+        getAllTargets.forEach(AOETarget => {
+            const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
+            if(!targetCombatant) {
+                return;
+            }
+            const targetHitValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position, DamageType.Fire) + 10;
+            if(targetCombatant.team.getName() !== combatant.team.getName()) {
+                totalEnemieshit += 1;
+            }
+            baseValue += targetCombatant.team.getName() !== combatant.team.getName() ? targetHitValue : -targetHitValue;
+        });
+        theoreticalReplacement(combatant, board, originalPosition, false);
+        baseValue += totalEnemieshit === 0 ? -10 : 0;
+        return baseValue;
+    }
+
+    private evaluateDragonFireBall(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        const getAllTargets = board.getAreaOfEffectPositions(combatant, target!, SpecialMoveAreaOfEffect.Nova, SpecialMoveAlignment.All);
+        let baseValue = 0;
+        let totalEnemieshit = 0;
+        
+        getAllTargets.forEach(AOETarget => {
+            const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
+            if(!targetCombatant) {
+                return;
+            }
+            const targetHitValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position, DamageType.Fire) + 10;
+            if(targetCombatant.team.getName() !== combatant.team.getName()) {
+                totalEnemieshit += 1;
+            }
+            baseValue += targetCombatant.team.getName() !== combatant.team.getName() ? targetHitValue : -targetHitValue;
+        });
+        baseValue += totalEnemieshit === 0 ? -10 : 0;
+        return baseValue;
+    }
+
+    private evaluateClaws(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        return this.evaluateBasicAttack(combatant, game, board, movePosition, target, DamageType.Slash) + 20;
+    }
+
+    private evaluateDragonRage(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        if(game.getCurrentRound() >= 15) {
+            return 1000 - (game.getActionsRemaining() * 150);
+        }
+        return -50;
+    }
+
+    private evaluateDieMortal(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        if(game.getCurrentRound() >= 15) {
+            return 150 + this.evaluateBasicAttack(combatant, game, board, movePosition, target, DamageType.Unstoppable);
+        }
+        return -50;
     }
 }
 
@@ -3628,6 +3741,61 @@ class VeteranAIAgentTwinBladesPlayer extends VeteranAIAgentGenericPlayer  {
     }
 }
 
+class VeteranAIAgentNormalTargetPlayer extends VeteranAIAgentGenericPlayer {
+    protected getBaseMovementValue(): number {
+        return super.getBaseMovementValue();
+    }
+
+    protected getBaseSkipValue(): number {
+        return 0;
+    }
+}
+
+class VeteranAIAgentCritTargetPlayer extends VeteranAIAgentGenericPlayer {
+    protected getBaseMovementValue(): number {
+        return super.getBaseMovementValue();
+    }
+}
+
+
+class VeteranAIAgentBlockTargetPlayer extends VeteranAIAgentGenericPlayer {
+    protected getBaseMovementValue(): number {
+        return super.getBaseMovementValue();
+    }
+}
+
+class VeteranAIAgentIceTargetPlayer extends VeteranAIAgentGenericPlayer {
+    protected getBaseMovementValue(): number {
+        return super.getBaseMovementValue();
+    }
+}
+
+class VeteranAIAgentFireTargetPlayer extends VeteranAIAgentGenericPlayer {
+    protected getBaseMovementValue(): number {
+        return super.getBaseMovementValue();
+    }
+}
+
+class VeteranAIAgentLightningTargetPlayer extends VeteranAIAgentGenericPlayer {
+    protected getBaseMovementValue(): number {
+        return super.getBaseMovementValue();
+    }
+}
+
+class VeteranAiAgentBlightTargetPlayer extends VeteranAIAgentGenericPlayer {
+    protected getBaseMovementValue(): number {
+        return super.getBaseMovementValue();
+    }
+}
+
+class VeteranAiAgentPierceTargetPlayer extends VeteranAIAgentGenericPlayer {
+    protected getBaseMovementValue(): number {
+        return super.getBaseMovementValue();
+    }
+}
+
+
+
 
 const agentByCombatantType = {
     [CombatantType.Defender]: new VeteranAIAgentDefenderPlayer(),
@@ -3663,6 +3831,15 @@ const agentByCombatantType = {
     [CombatantType.OozeGolem]: new VeteranAIAgentOozeGolemPlayer(),
     [CombatantType.WeaveEater]: new VeteranAIAgentWeaveEaterPlayer(),
     [CombatantType.TwinBlades]: new VeteranAIAgentTwinBladesPlayer(),
+
+    [CombatantType.NormalTarget]: new VeteranAIAgentNormalTargetPlayer(),
+    [CombatantType.CritTarget]: new VeteranAIAgentCritTargetPlayer(),
+    [CombatantType.BlockTarget]: new VeteranAIAgentBlockTargetPlayer(),
+    [CombatantType.IceTarget]: new VeteranAIAgentIceTargetPlayer(),
+    [CombatantType.FireTarget]: new VeteranAIAgentFireTargetPlayer(),
+    [CombatantType.LightningTarget]: new VeteranAIAgentLightningTargetPlayer(),
+    [CombatantType.BlightTarget]: new VeteranAiAgentBlightTargetPlayer(),
+    [CombatantType.PierceTarget]: new VeteranAiAgentPierceTargetPlayer(),
 }
 
 function addCoverValue(combatant: Combatant, game: Game, board: Board, movePosition: Position): number {

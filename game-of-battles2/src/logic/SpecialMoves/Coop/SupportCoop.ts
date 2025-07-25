@@ -3,7 +3,7 @@ import { coopCostSlash, CoopMove } from "./CoopMove";
 import { CoopPartnerRequirement } from "./CoopMove";
 import { Damage, DamageReaction, DamageType } from "@/logic/Damage";
 import { Position } from "@/logic/Position";
-import { ActionResult, AttackResult, getStandardActionResult } from "@/logic/attackResult";
+import { ActionResult, AttackResult, getDamageActionResult, getStandardActionResult, getStatusEffectActionResult } from "@/logic/attackResult";
 import { Board } from "@/logic/Board";
 import { Combatant } from "@/logic/Combatant";
 import { SpecialMoveRangeType } from "@/logic/SpecialMove";
@@ -12,6 +12,7 @@ import { SpecialMoveAreaOfEffect } from "@/logic/SpecialMove";
 import { SpecialMoveRange } from "@/logic/SpecialMove";
 import { CombatMaster } from "@/logic/CombatMaster";
 import { StatusEffect, StatusEffectAlignment, StatusEffectType } from "@/logic/StatusEffect";
+import { emitter } from "@/eventBus";
 
 export class RainOfGrace extends CoopMove {
     name: string = "Rain of Grace";
@@ -105,7 +106,7 @@ export class LastStandOfHeroes extends CoopMove {
             name: StatusEffectType.LAST_STAND_USED,
             duration: Number.POSITIVE_INFINITY,
         });
-        return getStandardActionResult(target, -2);
+        return getStatusEffectActionResult(StatusEffectType.ENCOURAGED, target, -2);
     };
     cost: number = 10;
     range: SpecialMoveRange = {
@@ -142,9 +143,10 @@ export class ShieldWall extends CoopMove {
                 targetCombatant.applyStatusEffect({name: StatusEffectType.SHIELD_WALL_PROTECTED, duration: Number.POSITIVE_INFINITY});
                 targetCombatant.addRelatedCombatant('SHIELD_WALL', invoker);
                 invoker.addRelatedCombatant(`SHIELD_WALL_PROTECTED_${index}`, targetCombatant);
+                emitter.emit('trigger-method', getStatusEffectActionResult(StatusEffectType.SHIELD_WALL_PROTECTED, AOETarget, 1));
             }
         });
-        return getStandardActionResult(invoker.position, this.turnCost);
+        return getStatusEffectActionResult(StatusEffectType.SHIELD_WALL, invoker.position, this.turnCost);
     };
     cost: number = coopCostSlash ? 8 : 10;
     range: SpecialMoveRange = {
@@ -182,9 +184,10 @@ export class ArcaneShieldWall extends CoopMove {
                 targetCombatant.applyStatusEffect({name: StatusEffectType.ARCANE_SHIELD_WALL_PROTECTED, duration: Number.POSITIVE_INFINITY});
                 targetCombatant.addRelatedCombatant('ARCANE_SHIELD_WALL', invoker);
                 invoker.addRelatedCombatant(`ARCANE_SHIELD_WALL_PROTECTED_${index}`, targetCombatant);
+                emitter.emit('trigger-method', getStatusEffectActionResult(StatusEffectType.ARCANE_SHIELD_WALL_PROTECTED, AOETarget, 1));
             }
         });
-        return getStandardActionResult(invoker.position, this.turnCost);
+        return getStatusEffectActionResult(StatusEffectType.ARCANE_SHIELD_WALL, invoker.position, this.turnCost);
     };
 
     range: SpecialMoveRange = {
@@ -216,6 +219,8 @@ export class BloodRite extends CoopMove {
         }
         const sacrificeAmount = targetCombatant.stats.hp;
         targetCombatant.takeDamage({amount: sacrificeAmount, type: DamageType.Unstoppable}, board);
+        const damageResult = getDamageActionResult({amount: sacrificeAmount, type: DamageType.Crush}, targetCombatant.position);
+        emitter.emit('trigger-method', damageResult);
         const healingResults = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align).map(AOETarget => {
             const combatantToHeal = board.getCombatantAtPosition(AOETarget);
             if(combatantToHeal && combatantToHeal.name !== targetCombatant.name) {
@@ -293,7 +298,7 @@ export class Sanctuary extends CoopMove {
             name: StatusEffectType.SANCTUARY,
             duration: 5,
         });
-        return getStandardActionResult(target, this.turnCost);
+        return getStatusEffectActionResult(StatusEffectType.SANCTUARY, target, this.turnCost);
     };
     cost: number = coopCostSlash ? 8 : 10;
     range: SpecialMoveRange = {
@@ -321,7 +326,7 @@ export class ArcaneConduit extends CoopMove {
             name: StatusEffectType.ARCANE_CONDUIT,
             duration: 2,
         });
-        return getStandardActionResult(invoker.position, this.turnCost);
+        return getStatusEffectActionResult(StatusEffectType.ARCANE_CONDUIT, invoker.position, this.turnCost);
     };
     cost: number = 10;
     range: SpecialMoveRange = {
@@ -350,16 +355,17 @@ export class Guardian extends CoopMove {
         }
         invoker.applyStatusEffect({
             name: StatusEffectType.GUARDIAN,
-            duration: 1,
+            duration: 5,
         });
         
         targetCombatant.applyStatusEffect({
             name: StatusEffectType.GUARDIAN_PROTECTED,
-            duration: 1,
+            duration: 5,
         });
+        emitter.emit('trigger-method', getStatusEffectActionResult(StatusEffectType.GUARDIAN_PROTECTED, target, 1));
         invoker.addRelatedCombatant('GUARDIAN_PROTECTED', targetCombatant);
         targetCombatant.addRelatedCombatant('GUARDIAN', invoker);
-        return getStandardActionResult(invoker.position, this.turnCost);
+        return getStatusEffectActionResult(StatusEffectType.GUARDIAN, invoker.position, this.turnCost);
     };
     cost: number = 8;
     range: SpecialMoveRange = {

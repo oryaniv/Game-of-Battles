@@ -14,6 +14,11 @@ export class Team {
         this.combatants.sort((a, b) => b.stats.initiative - a.stats.initiative);
     }
 
+    removeCombatant(combatant: Combatant) {
+        this.combatants = this.combatants.filter((c) => c !== combatant);
+        combatant.aiAgent = undefined;
+    }
+
     getName(): string {
         return this.name;
     }

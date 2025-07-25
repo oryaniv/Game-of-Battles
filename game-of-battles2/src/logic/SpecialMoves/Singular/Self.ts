@@ -4,7 +4,7 @@ import { Position } from "@/logic/Position";
 import { SpecialMove, SpecialMoveAlignment, SpecialMoveAreaOfEffect, SpecialMoveRange, SpecialMoveRangeType, SpecialMoveTriggerType } from "@/logic/SpecialMove";
 import { Board } from "@/logic/Board";
 import { StatusEffectType, StatusEffectHook } from "@/logic/StatusEffect";
-import { AttackResult, getStandardActionResult } from "@/logic/attackResult";
+import { AttackResult, getStandardActionResult, getStatusEffectActionResult } from "@/logic/attackResult";
 import { Combatant } from "@/logic/Combatant";
 
 
@@ -32,7 +32,7 @@ export class BlockingStance implements SpecialMove {
             name: StatusEffectType.BLOCKING_STANCE,
             duration: Number.POSITIVE_INFINITY,
         }); 
-        return getStandardActionResult();
+        return getStatusEffectActionResult(StatusEffectType.BLOCKING_STANCE, invoker.position, 1);
         
     };
     checkRequirements = (self: Combatant) => {
@@ -65,7 +65,7 @@ export class ArcaneChanneling implements SpecialMove {
             name: StatusEffectType.ARCANE_CHANNELING,
             duration: Number.POSITIVE_INFINITY,
         }); 
-        return getStandardActionResult();
+        return getStatusEffectActionResult(StatusEffectType.ARCANE_CHANNELING, target, 1);
     };
     checkRequirements = (self: Combatant) => {
         return !self.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING);
@@ -97,7 +97,7 @@ export class FocusAim implements SpecialMove {
             name: StatusEffectType.FOCUS_AIM,
             duration: Number.POSITIVE_INFINITY,
         }); 
-        return getStandardActionResult();
+        return getStatusEffectActionResult(StatusEffectType.FOCUS_AIM, target, 1);
     };
     checkRequirements = (self: Combatant) => {
         return !self.hasStatusEffect(StatusEffectType.FOCUS_AIM);
@@ -177,10 +177,32 @@ export class DragonRage implements SpecialMove {
         type: DamageType.Unstoppable
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
+        return getStandardActionResult(target, -2);
+    };
+    checkRequirements = undefined;
+}     
+
+export class BeastRage implements SpecialMove {
+    name: string = "Dragon Rage";
+    description = `Gain and additional action point.`
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 10;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Self,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Unstoppable
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
         return getStandardActionResult(target, -1);
     };
     checkRequirements = undefined;
-}           
+}  
 
 export class SelfDestruct implements SpecialMove {
     name: string = "Self Destruct";

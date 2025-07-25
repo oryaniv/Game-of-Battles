@@ -1,6 +1,6 @@
 import { DamageReaction, DamageType } from "@/logic/Damage";
 
-import { AttackResult, getStandardActionResult } from "@/logic/attackResult";
+import { AttackResult, getStandardActionResult, getStatusEffectActionResult, getDamageActionResult } from "@/logic/attackResult";
 import { SpecialMoveAreaOfEffect } from "@/logic/SpecialMove";
 import { SpecialMoveAlignment } from "@/logic/SpecialMove";
 import { SpecialMoveRangeType } from "@/logic/SpecialMove";
@@ -12,6 +12,7 @@ import { Board } from "@/logic/Board";
 import { Combatant } from "@/logic/Combatant";
 import { StatusEffectType } from "@/logic/StatusEffect";
 import { CombatMaster } from "@/logic/CombatMaster";
+import { emitter } from "@/eventBus";
 
 export class Weaken implements SpecialMove {
     name: string = "Weaken";
@@ -37,7 +38,7 @@ export class Weaken implements SpecialMove {
             name: StatusEffectType.STRENGTH_DOWNGRADE,
             duration: 3,
         }); 
-        return getStandardActionResult();
+        return getStatusEffectActionResult(StatusEffectType.STRENGTH_DOWNGRADE, target, 1);
     };
     checkRequirements = undefined;
     description = `Reduce Enemy's attack power for 3 rounds.`
@@ -67,7 +68,7 @@ export class Slow implements SpecialMove {
             name: StatusEffectType.SLOW,
             duration: 3,
         }); 
-        return getStandardActionResult();
+        return getStatusEffectActionResult(StatusEffectType.SLOW, target, 1);
     };
     checkRequirements = undefined;
     description = `Reduce Enemy's movement speed and agility for 3 rounds.`
@@ -99,7 +100,7 @@ export class EvilEye implements SpecialMove {
                 name: StatusEffectType.LUCK_DOWNGRADE,
                 duration: 3,
             }); 
-            return getStandardActionResult();
+            emitter.emit('trigger-method', getStatusEffectActionResult(StatusEffectType.LUCK_DOWNGRADE, AOETarget, 1));
         });
 
         return getStandardActionResult();
@@ -135,7 +136,7 @@ export class SiphonEnergy implements SpecialMove {
             name: StatusEffectType.ENERGY_ABSORB,
             duration: 2,
         });  
-        return getStandardActionResult();
+        return getDamageActionResult({amount: staminaToSiphon, type: DamageType.Unstoppable}, invoker.position);
     };
     checkRequirements = (self: Combatant) => {
         return !self.hasStatusEffect(StatusEffectType.ENERGY_ABSORB);
@@ -163,18 +164,21 @@ export class AssassinsMark implements SpecialMove {
         if(!targetCombatant) {
             return getStandardActionResult();
         }
+        let statusEffectType = StatusEffectType.MARKED_FOR_PAIN;
         if(targetCombatant.hasStatusEffect(StatusEffectType.MARKED_FOR_PAIN)) {
             targetCombatant.removeStatusEffect(StatusEffectType.MARKED_FOR_PAIN);
             targetCombatant.applyStatusEffect({
                 name: StatusEffectType.MARKED_FOR_EXECUTION,
                 duration: 5,
             });
+            statusEffectType = StatusEffectType.MARKED_FOR_EXECUTION;
         } else if (targetCombatant.hasStatusEffect(StatusEffectType.MARKED_FOR_EXECUTION)) {
             targetCombatant.removeStatusEffect(StatusEffectType.MARKED_FOR_EXECUTION);
             targetCombatant.applyStatusEffect({
                 name: StatusEffectType.MARKED_FOR_OBLIVION,
                 duration: 5,
             });
+            statusEffectType = StatusEffectType.MARKED_FOR_OBLIVION;
         } else if(targetCombatant.hasStatusEffect(StatusEffectType.MARKED_FOR_OBLIVION)) {
             return getStandardActionResult();
         } else {
@@ -186,12 +190,13 @@ export class AssassinsMark implements SpecialMove {
         return  {
             attackResult: AttackResult.NotFound,
             damage: {
-                amount: 0,
-                type: DamageType.Unstoppable
+                amount: Number.NaN,
+                type: DamageType.None
             },
             cost: 0.5,
             reaction: DamageReaction.NONE,
-            position: target
+            position: target,
+            statusEffectType: statusEffectType
         };
     };
     checkRequirements = undefined;
@@ -229,7 +234,7 @@ export class ArakansBane implements SpecialMove {
             name: StatusEffectType.DEFENSE_DOWNGRADE,
             duration: 3,
         });
-        return getStandardActionResult();
+        return getStatusEffectActionResult(StatusEffectType.SLOW, target, 1);
     };
     checkRequirements = undefined;
     breaksCloaking = false;

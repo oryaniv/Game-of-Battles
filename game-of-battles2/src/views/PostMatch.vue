@@ -2,7 +2,7 @@
   <div class="post-match-screen">
     <div class="message">{{ receivedMessage }}</div>
     <div class="button-container">
-      <button v-if="playerSurvived && !runCompleted" class="game-button" @click="continueToNextLevel">Next Match</button>
+      <button v-if="playerSurvived && !runCompleted" class="game-button" @click="continueToNextLevel">{{ nextMatchText() }}</button>
       <button v-if="!playerSurvived || runCompleted" class="game-button" @click="returnToMenu">Main Menu</button>
     </div>
   </div>
@@ -11,7 +11,8 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { RunManager, RunsStatus } from '@/GameData/RunManager';
+import { RunManager, RunsStatus, RunType } from '@/GameData/RunManager';
+import { TutorialManager } from '@/GameData/TutorialManager';
 import { getDifficulyLevelCount } from '@/GameData/EnemyRepository';
 import { refreshTeam } from '@/boardSetups';
 
@@ -26,8 +27,6 @@ export default defineComponent({
 
     const continueToNextLevel = () => {
       const playerTeam = runManager.getTeam();
-      // eslint-disable-next-line no-debugger
-      debugger;
       refreshTeam(playerTeam);
       router.push('/Match');
     };
@@ -43,6 +42,8 @@ export default defineComponent({
     });
 
     const getStateParams = () => {
+      // eslint-disable-next-line no-debugger
+      debugger;
       if(!window.history || !window.history.state) {
         return;
       }
@@ -54,10 +55,20 @@ export default defineComponent({
     const updateRun = () => {
       // eslint-disable-next-line no-debugger
       debugger;
-    //   if(false && !playerSurvived.value) {
-    //     runManager.setStatus(RunsStatus.FAILED);
-    //     return;
-    //   }
+
+      if(runManager.getRunType() === RunType.SINGLE_PLAYER) {
+        updateSinglePlayerRun();
+      }
+      else if(runManager.getRunType() === RunType.MULTI_PLAYER) {
+        updateMultiplayerRun();
+      }
+      else if(runManager.getRunType() === RunType.TUTORIAL) {
+        updateTutorialRun();
+      }
+    }
+
+
+    const updateSinglePlayerRun = () => {
       runManager.setCurrentLevel(runManager.getCurrentLevel() + 1);
       runManager.setScore(100);
       const difficulty = runManager.getDifficulty();
@@ -68,13 +79,36 @@ export default defineComponent({
       }
     }
 
+    const updateMultiplayerRun = () => {
+      
+    }
+
+    const updateTutorialRun = () => {
+       runManager.setCurrentLevel(runManager.getCurrentLevel() + 1);
+       if(runManager.getCurrentLevel() > TutorialManager.getInstance().getTutorialCount()) {
+        runCompleted.value = true;
+        runManager.setStatus(RunsStatus.COMPLETED);
+       }
+    }
+
+    const nextMatchText = () => {
+      if(runManager.getRunType() === RunType.SINGLE_PLAYER) {
+        return 'Next Match';
+      }
+      else if(runManager.getRunType() === RunType.TUTORIAL) {
+        return 'Next Lesson';
+      }
+      return 'Next Something';
+    }
+
     return {
       receivedMessage,
       playerSurvived,
       continueToNextLevel,
       returnToMenu,
       getStateParams,
-      runCompleted
+      runCompleted,
+      nextMatchText
     };
   }
 });

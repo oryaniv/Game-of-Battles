@@ -4,7 +4,7 @@ import { StatusEffectHook, StatusEffectType } from "../StatusEffect";
 import { StatusEffect } from "../StatusEffect";
 import { Board } from "../Board";
 import { SpecialMoveAlignment, SpecialMoveAreaOfEffect } from "../SpecialMove";
-import { ActionResult, AttackResult, getStandardActionResult } from "../attackResult";
+import { ActionResult, AttackResult, getStandardActionResult, getStatusEffectActionResult } from "../attackResult";
 import { Position } from "../Position";
 import { Damage, DamageType } from "../Damage";
 import { DamageReaction } from "../Damage";
@@ -126,7 +126,8 @@ export class FirstStrikeStatusEffect implements StatusEffect {
             });
 
             const combatMaster = CombatMaster.getInstance();
-            combatMaster.executeAttack(self, attacker.position, board, damage);
+            const firstStrikeResult = combatMaster.executeAttack(self, attacker.position, board, self.basicAttack());
+            emitter.emit('trigger-method', firstStrikeResult);
             if(attacker.isKnockedOut()) {
                return getStandardActionResult(attacker.position);
             }
@@ -156,7 +157,8 @@ export class RiposteStatusEffect implements StatusEffect {
             const rangeCalculator = new RangeCalculator();
             if(rangeCalculator.areInMeleeRange(self, attacker)) {
                 const combatMaster = CombatMaster.getInstance();
-                combatMaster.executeAttack(self, attacker.position, board, damage);
+                const riposteResult = combatMaster.executeAttack(self, attacker.position, board, self.basicAttack());
+                emitter.emit('trigger-method', riposteResult);
             }
         },
     };
@@ -183,6 +185,7 @@ export class SadistStatusEffect implements StatusEffect {
                     name: StatusEffectType.STRENGTH_BOOST,
                     duration: 3,
                 });
+                emitter.emit('trigger-method', getStatusEffectActionResult(StatusEffectType.STRENGTH_BOOST, self.position, 1));
             }
         },
     };
@@ -194,8 +197,7 @@ export class GoingOffStatusEffect implements StatusEffect {
     description = `This combatant will explode on death, inflicting fire damage to all enemies in 1-tile radius nova.`;
     applicationHooks = {
         [StatusEffectHook.OnDeath]: (caster: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
-            // eslint-disable-next-line
-            // debugger;
+
             const combatMaster = CombatMaster.getInstance();
             const getAllTargets = board.getAreaOfEffectPositions(caster, caster.position, SpecialMoveAreaOfEffect.Nova, SpecialMoveAlignment.All);
             getAllTargets.forEach((targetPosition) => {
@@ -301,7 +303,6 @@ export class SurpriseBoomStatusEffect implements StatusEffect {
                 }
                 return result;
             });
-            // caster.takeDamage({amount: caster.stats.hp, type: DamageType.Unstoppable});
             return results;
         },
     };
@@ -418,12 +419,55 @@ export class WeaveEatingStatusEffect implements StatusEffect {
                     name: StatusEffectType.ARCANE_CHANNELING,
                     duration: Number.POSITIVE_INFINITY,
                 });
+                emitter.emit('trigger-method', getStatusEffectActionResult(StatusEffectType.ARCANE_CHANNELING, self.position, 1));
             } else {
                 self.applyStatusEffect({
                     name: StatusEffectType.ARCANE_OVERCHARGE,
                     duration: Number.POSITIVE_INFINITY,
                 });
+                emitter.emit('trigger-method', getStatusEffectActionResult(StatusEffectType.ARCANE_OVERCHARGE, self.position, 1));
             }
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
+}
+
+export class AlwaysBlockStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.ALWAYS_BLOCK;
+    description = `This combatant will always block all incoming damage.`;
+    applicationHooks = {
+        [StatusEffectHook.OnBeingAttacked]: (self: Combatant, defender: Combatant, damage: Damage, attackCost: number) => {
+            return {attackResult: AttackResult.Blocked, damage: {amount: 0, type: DamageType.Unstoppable}, cost: 2, reaction: DamageReaction.IMMUNITY, position: self.position};
+        }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
+}
+
+export class AlwaysBeCritStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.ALWAYS_BE_CRIT;
+    description = `This combatant will always be hit with a critical.`;
+    applicationHooks = {
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
+}
+
+export class AlwaysByHitStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.ALWAYS_BY_HIT;
+    description = `This combatant will always be hit normally.`;
+    applicationHooks = {
+        [StatusEffectHook.OnBeingAttacked]: (self: Combatant, attacker: Combatant, damage: Damage, attackCost: number) => {
+            // eslint-disable-next-line
+            debugger;
+            // const isWeakTo = self.resistances.find((r) => r.type === damage.type)?.reaction === DamageReaction.WEAKNESS;
+            // let damageAmount = isWeakTo ? damage.amount * 1.25 : damage.amount;
+            // damageAmount = attacker.hasStatusEffect(StatusEffectType.STRENGTH_BOOST) ? damageAmount * 1.30 : damageAmount;
+            const delta = attacker.stats.attackPower - self.stats.defensePower;
+            const baseDamage = {amount: damage.amount * (delta * 0.01 + 1), type: damage.type};
+            const isWeakTo = self.resistances.find((r) => r.type === baseDamage.type)?.reaction === DamageReaction.WEAKNESS;
+            const finalDamageAmount = isWeakTo ? baseDamage.amount * 1.25 : baseDamage.amount;
+            self.takeDamage({ amount: finalDamageAmount, type: damage.type });
+            return {attackResult: AttackResult.Hit, damage: { amount: finalDamageAmount, type: damage.type }, cost: isWeakTo ? 0.5 : 1,
+                 reaction: isWeakTo ? DamageReaction.WEAKNESS : DamageReaction.NONE, position: self.position};
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
