@@ -191,7 +191,7 @@ const PVAI_MESSAGES = {
             "You will never win this way",
             "They whooped your a**",
             "Are you even trying?",
-            "You should really read the tutorial",
+            "You should really try the tutorial",
             "They'll charge me for murder because of you..."
         ],
         [VitriolLevel.MEDIUM]: [
@@ -200,14 +200,16 @@ const PVAI_MESSAGES = {
             "Was that your best?",
             "Learn the game, buddy",
             "You fight like a younger man, nothing held back. Admirable, but mistaken",
+            "You are dead, dead, dead.",
+            "life's hard, get over it!"
         ],
         [VitriolLevel.LOW]: [
-            "Certified SMT moment",
-            "Say it with me: 'Thank you, Die for me, Web demo'",
+            "You thought you were hot. Guess what? you're not!",
             "Almost, but no.",
             "So close... try again",
             "Valiant, yet not enough",
             "You're playing with the big boys now...",
+            "You are not worthy..."
         ],
     },
     [GameResult.WIN]: {
@@ -215,7 +217,7 @@ const PVAI_MESSAGES = {
             "Superb!",
             "GG, care for a rematch?",
             "That was fun, let's do it again!",
-            "This is the kind of skill you'll need when this game goes full version",
+            "Outstanding. Think you can do this again?",
         ],
         [VitriolLevel.MEDIUM]: [
             "Well done, but don't rest in your laurels yet",

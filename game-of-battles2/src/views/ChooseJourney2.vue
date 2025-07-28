@@ -12,32 +12,38 @@
         class="difficulty-pyramid Easy"
         :class="{ 'selected-pyramid': selectedDifficulty === 'Easy' }"
         @click="selectDifficulty('Easy')"
+        @mouseenter="showDescription('Easy')"
+        @mouseleave="hideDescription"
       >
         <div class="pyramid-block block-top"></div>
         <div class="pyramid-block block-mid-1"></div>
         <div class="pyramid-block block-bottom"></div>
-        <p class="pyramid-label">Easy</p>
+        <p v-if="animationPhase === 'idle'" class="pyramid-label">Easy</p>
       </div>
 
       <!-- Normal Pyramid -->
       <div
         class="difficulty-pyramid Normal"
         :class="{ 'selected-pyramid': selectedDifficulty === 'Normal' }"
-        @click="startPyramidAnimation('Normal')"
+        @click="selectDifficulty('Normal')"
+        @mouseenter="showDescription('Normal')"
+        @mouseleave="hideDescription"
       >
         <div class="pyramid-block block-top"></div>
         <div class="pyramid-block block-mid-2"></div>
         <div class="pyramid-block block-mid-1"></div>
         <div class="pyramid-block block-mid-0"></div>
         <div class="pyramid-block block-bottom"></div>
-        <p class="pyramid-label">Normal</p>
+        <p v-if="animationPhase === 'idle'" class="pyramid-label">Normal</p>
       </div>
 
       <!-- Hard Pyramid -->
       <div
         class="difficulty-pyramid Hard"
         :class="{ 'selected-pyramid': selectedDifficulty === 'Hard' }"
-        @click="startPyramidAnimation('Hard')"
+        @click="selectDifficulty('Hard')"
+        @mouseenter="showDescription('Hard')"
+        @mouseleave="hideDescription"
       >
         <div class="pyramid-block block-top"></div>
         <div class="pyramid-block block-mid-4"></div>
@@ -46,7 +52,7 @@
         <div class="pyramid-block block-mid-1"></div>
         <div class="pyramid-block block-mid-0"></div>
         <div class="pyramid-block block-bottom"></div>
-        <p class="pyramid-label">Hard</p>
+        <p v-if="animationPhase === 'idle'" class="pyramid-label">Hard</p>
       </div>
     </div>
 
@@ -73,6 +79,8 @@
       </div> 
     </div>
 
+    <DescriptionCloud v-if="descriptionText && animationPhase === 'idle'" class="description-cloud" :text="descriptionText" />
+
   </div>
 </template>
 
@@ -84,13 +92,15 @@ import { Difficulty } from "../GameOverMessageProvider";
 import { Team } from '@/logic/Team';
 import { Combatant } from '@/logic/Combatant';
 import CombatantSprite from '../components/CombatantSprite.vue';
+import DescriptionCloud from '../components/DescriptionCloud.vue';
 import { getEnemyTeamCombatantTypes } from '../GameData/EnemyRepository';
 import { getCombatantByType } from '@/boardSetups';
 
 export default defineComponent({
   name: 'JourneyScreen',
   components: {
-    CombatantSprite
+    CombatantSprite,
+    DescriptionCloud
   },
   setup() {
 
@@ -196,7 +206,9 @@ export default defineComponent({
     // --- Animation Sequence ---
     const startPyramidAnimation = async (difficulty: Difficulty) => { // Made async
       if (animationPhase.value !== 'idle') return; // Prevent re-triggering
-
+      
+      // eslint-disable-next-line
+      debugger;
       runManager.setDifficulty(difficulty);
       runManager.setStatus(RunsStatus.IN_PROGRESS);
       runManager.setCurrentLevel(1);
@@ -242,6 +254,8 @@ export default defineComponent({
     };
 
     const startPlayerPlaqueDescent = async () => {
+      // eslint-disable-next-line
+      debugger;
       animationPhase.value = 'descending';
       const totalLevels = -1 || blockHeights[selectedDifficulty.value as keyof typeof blockHeights].length;
 
@@ -318,6 +332,8 @@ export default defineComponent({
     };
 
     const straightDescend = () => {
+      // eslint-disable-next-line
+      debugger;
       animationPhase.value = 'descending';
       if(!allBlocksElements.value || !selectedDifficulty.value) {
         return;
@@ -348,8 +364,8 @@ export default defineComponent({
       }
 
       setTimeout(() => {
-        // revealNextEnemy(1);
-        nextFight();
+        revealNextEnemy(1);
+        // nextFight();
       }, 2500);
     }
 
@@ -442,6 +458,23 @@ export default defineComponent({
       animationTimeouts.forEach(clearTimeout);
     });
 
+    const descriptionText = ref('');
+
+    const showDescription = (difficulty: string) => {
+      if(difficulty === 'Easy') {
+        descriptionText.value = 'Easy AI is basic and forgiving, but don\'t let your guard down.';
+      }
+      if(difficulty === 'Normal') {
+        descriptionText.value = "Normal AI will exploit your mistakes, yet won't play optimally.";
+      }
+      if(difficulty === 'Hard') {
+        descriptionText.value = "Hard AI doesn't pull any punches. You must know the game and plan ahead.";
+      }
+    }
+    const hideDescription = () => {
+      descriptionText.value = '';
+    }
+
     return {
       selectedDifficulty,
       animationPhase,
@@ -458,7 +491,10 @@ export default defineComponent({
       getDifficultyLetter,
       revealNextEnemy,
       enemyTeam,
-      nextFight
+      nextFight,
+      descriptionText,
+      showDescription,
+      hideDescription
     };
   },
 });
@@ -533,13 +569,17 @@ export default defineComponent({
   overflow: hidden;
   box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.6);
   margin: 0px 10px;
+  position: relative;
 }
 
 .journey-logo-circle-inner {
-  background-color: black;
-  width: 90%;
-  height: 90%;
-  border-radius: 50%;
+    background-color: black;
+    width: 84%;
+    height: 90%;
+    border-radius: 50%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
 }
 
 /* --- Difficulty Pyramids Container --- */
@@ -637,12 +677,12 @@ export default defineComponent({
 .pyramid-label {
   font-family: 'Metal Mania', sans-serif;
   font-size: 2em;
-  color: #FFD700;
+  color: white;
   text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
   margin-top: 10px;
   margin-bottom: 15px;
   position: absolute;
-  top: -60px;
+  bottom: 10px;
   text-align: center;
   width: 100%;
   transition: opacity 0.3s ease;
@@ -650,9 +690,6 @@ export default defineComponent({
 
 /* Hide label by default, show on hover */
 .difficulty-pyramid .pyramid-label {
-    opacity: 0;
-}
-.difficulty-pyramid:hover .pyramid-pyramid-label {
     opacity: 1;
 }
 
@@ -748,6 +785,10 @@ export default defineComponent({
 
 .enemy-plaque.enemy-plaque-hard .enemy-letter {
   color: darkred;
+}
+
+.description-cloud {
+  width: 600px;
 }
 
 

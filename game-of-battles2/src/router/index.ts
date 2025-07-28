@@ -3,12 +3,13 @@ import HomeView from '../views/HomeView.vue'
 import SoundOnOff from '../views/SoundOnOff.vue'
 import MainMenu2 from '../views/MainMenu2.vue'
 import BuildTeam from '../views/BuildTeam.vue'
+import TutorialList from '../views/TutorialList.vue'
 import TeamBuilder from '../views/BuildTeam2.vue'
 import ChooseJourney from '../views/ChooseJourney.vue'
 import ChooseJourney2 from '../views/ChooseJourney2.vue'
 import Credits from '../views/Credits.vue'
-import Movie from '../views/Movie.vue'
 import IntroSequence from '../views/IntroSequence.vue'
+import COHLogo from '../views/COHLogo.vue'
 import GameApp from '../GameApp.vue'
 import PostMatch from '../views/PostMatch.vue'
 import { Route } from '@playwright/test'
@@ -25,14 +26,19 @@ const routes: Array<RouteRecordRaw> = [
     component: IntroSequence,
   },
   {
-    path: '/Movie',
-    name: 'Movie',
-    component: Movie,
+    path: '/COHLogo',
+    name: 'COHLogo',
+    component: COHLogo,
   },
   {
     path: '/MainMenu',
     name: 'MainMenu',
     component: MainMenu2,
+  },
+  {
+    path: '/TutorialList',
+    name: 'TutorialList',
+    component: TutorialList,
   },
   {
     path: '/Team',

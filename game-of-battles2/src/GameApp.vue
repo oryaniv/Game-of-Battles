@@ -1572,7 +1572,10 @@ export default defineComponent({
         if (dialog) {
           const before = dialog.before;
           if(before) {
-            before(game.value as Game, board.value as Board);
+            const shouldPrepeareNextTurn = before(game.value as Game, board.value as Board);
+            if(shouldPrepeareNextTurn) {
+              prepareNextTurn();
+            }
           }
           currentDialog.value = dialog;
           showDialog.value = true;

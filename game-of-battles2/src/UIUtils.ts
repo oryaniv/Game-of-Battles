@@ -441,6 +441,8 @@ export function requireStatusEffectSvg(effectType: StatusEffectType): string {
       return require('./assets/CombatantModels/WeaveEater.png');
     case StatusEffectType.FRENZY:
       return require('./assets/statusIcons/FRENZY.svg');
+    case StatusEffectType.DRILL_SERGEANT:
+      return require('./assets/statusIcons/TUTOR.png');
     default:
       return '';
   }
@@ -501,6 +503,7 @@ export function getSkillEffectIcon(skillName: string) {
     case 'Rain of Arrows':
     case 'Skewering Harpoon':
     case 'Snipe Shot':
+    case 'Stinger':
       return require('./assets/statusIcons/PIERCE.svg');
     case 'Toxic Arrow':
     case 'Viper\'s Kiss':
@@ -693,9 +696,9 @@ export function getGame(): Game {
 export function getSinglePlayerGame(): Game {
   const board = new Board(10, 10);
 
-  const matchTeams = playGroundTeams();
+  // const matchTeams = playGroundTeams();
 
-  // const matchTeams = runManager.getMatchTeams();
+  const matchTeams = RunManager.getInstance().getMatchTeams();
 
   const whiteTeam = matchTeams[0];
   const blackTeam = matchTeams[1];

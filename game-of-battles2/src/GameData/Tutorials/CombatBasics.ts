@@ -14,8 +14,8 @@ import { BlockTarget, CritTarget, NormalTarget } from "@/logic/Combatants/Tutori
 
 export class CombatBasics implements Tutorial {
     id: number = 3;
-    title: string = "Skip and Attack";
-    description: string = "Skip and Attack";
+    title: string = "Combat Basics";
+    description: string = "Learn about critical hits, fumbles and action management";
     steps: DialogStep[] = [
        {
          id: 1,

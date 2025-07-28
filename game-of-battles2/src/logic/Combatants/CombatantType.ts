@@ -1,6 +1,6 @@
 export enum CombatantType {
     // debug component
-    Militia = "Militia",
+    Militia = "Goblin",
 
     // player combatants
     Defender = "Defender", 

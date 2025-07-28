@@ -225,7 +225,7 @@ export class WhirlwindAttack extends CoopMove {
     name: string = "Whirlwind Attack";
     description: string = "All targets in a 1-tile nova around you are dealt medium Slash damage.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
-        { combatantTypeOptions: [CombatantType.Vanguard, CombatantType.Pikeman] }
+        { combatantTypeOptions: [CombatantType.Vanguard, CombatantType.Pikeman, CombatantType.StandardBearer] }
     ];
     damage: Damage = {
         amount: 35,

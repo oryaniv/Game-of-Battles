@@ -34,6 +34,7 @@
   'lightning-target': combatant.getCombatantType() === 'Lightning Target',
   'blight-target': combatant.getCombatantType() === 'Blight Target',
   'pierce-target': combatant.getCombatantType() === 'Pierce Target',
+  'militia': combatant.getCombatantType() === 'Goblin',
   }">
 
   </div>
@@ -110,7 +111,8 @@ export default defineComponent({
         CombatantType.WeaveEater, CombatantType.OozeGolem, CombatantType.TwinBlades, CombatantType.BabyBabel,
          CombatantType.BallistaTurret, CombatantType.Wall, CombatantType.Bomb, CombatantType.Doll, CombatantType.Wall,
          CombatantType.NormalTarget, CombatantType.CritTarget, CombatantType.BlockTarget, CombatantType.FireTarget,
-         CombatantType.IceTarget, CombatantType.LightningTarget, CombatantType.BlightTarget, CombatantType.PierceTarget
+         CombatantType.IceTarget, CombatantType.LightningTarget, CombatantType.BlightTarget, CombatantType.PierceTarget,
+         CombatantType.Militia
       ].includes(type);
     };
 
@@ -441,6 +443,14 @@ export default defineComponent({
   transform: scale(1.1);
   background-size: contain;
   background-position: 0px 10px;
+}
+
+.sprite-container.militia {
+  background-image: url('@/assets/CombatantModels/Goblin_no_back.png');
+  transform: scale(1.3);
+  background-size: contain;
+  background-position: -2px 15px;
+  background-repeat: no-repeat;
 }
 
 .svg-sprite-container .combatant-sprite {

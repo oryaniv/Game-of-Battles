@@ -1429,3 +1429,51 @@ export class YouScumBag implements SpecialMove {
     checkRequirements = undefined;
     description = `You are a lowly, filthy, maggot scumbag and you should die!`
 }
+
+export class Stinger implements SpecialMove {
+    name: string = "Stinger";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 2;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Straight,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 8
+    };
+    damage: Damage = {
+        amount: 30,
+        type: DamageType.Pierce
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage);
+        return result;
+    };
+    checkRequirements = undefined
+    description = `Medium Pierce damage to target`   
+}
+
+export class Slicer implements SpecialMove {
+    name: string = "Slicer";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 2;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Melee,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 1
+    };
+    damage: Damage = {
+        amount: 30,
+        type: DamageType.Slash
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        const combatMaster = CombatMaster.getInstance();
+        const result = combatMaster.executeAttack(invoker, target, board, this.damage);
+        return result;
+    };
+    checkRequirements = undefined
+    description = `Medium Slash damage to target`   
+}

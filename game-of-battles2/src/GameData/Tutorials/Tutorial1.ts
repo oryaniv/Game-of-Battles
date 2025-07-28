@@ -14,7 +14,7 @@ import { NormalTarget, CritTarget, BlockTarget } from "@/logic/Combatants/Tutori
 export class IntroTutorial implements Tutorial {
     id: number = 1;
     title: string = "Introduction";
-    description: string = "Tutorial 1";
+    description: string = "Make your first steps into 'Die For Me!'";
     steps: DialogStep[] = [
         {
             id: 1,
@@ -24,7 +24,6 @@ And I can clearly see why! You must be the most pathetic maggot scum I’ve seen
 `HOWEVER, you do what I say when I say just the way I say, and maybe you won’t leave here just to embarrass yourself, me and this game. I will review your progress, and should you fail me like the scumbag you are, I’m gonna claim your head. IS THAT CLEAR?`
 ],
             trigger: (game: Game, board: Board) => {
-                console.log('Tutorial 1 step 1');
                 return true;
             },
             mode: StepMode.CENTER,

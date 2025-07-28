@@ -15,7 +15,7 @@ import { Hunter } from "@/logic/Combatants/Hunter";
 export class SkipAndAttack implements Tutorial {
     id: number = 2;
     title: string = "Skip and Attack";
-    description: string = "Skip and Attack";
+    description: string = "Learn about quick skip and attacking";
     steps: DialogStep[] = [
         {
             id: 1,

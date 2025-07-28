@@ -1,8 +1,7 @@
 <template>
   <div class="min-h-screen flex items-center justify-center p-4">
     <div class="main-menu-container-arc">
-      <h1 v-if="!newGameMode" class="main-menu-title-arc">DIE FOR ME</h1>
-      <h2 v-if="!newGameMode" class="main-menu-subtitle-arc">Web Demo</h2>
+      <h1 v-if="!newGameMode" class="main-menu-title-arc">DIE FOR ME!</h1>
 
       <h2 v-if="newGameMode" class="new-game-title">New Game</h2>
 
@@ -62,17 +61,9 @@ import { defineComponent, ref } from 'vue';
 import DescriptionCloud from '../components/DescriptionCloud.vue';
 import SettingsMenu from '../components/SettingsMenu.vue';
 import { useRouter } from 'vue-router'
-import { RunManager, RunType } from '@/GameData/RunManager';
-import { Team } from '@/logic/Team';
-import { Difficulty } from "../GameOverMessageProvider";
 import GameMessagePrompt from '@/components/GameMessagePrompt.vue';
 
-// interface MenuItem {
-//   id: number;
-//   label: string;
-//   onPress: () => void;
-//   description: string;
-// }
+
 
 export default defineComponent({
   components: {
@@ -154,8 +145,7 @@ export default defineComponent({
     };
 
     const startTutorial = () => {
-      RunManager.getInstance().createRun(new Team('Player Team', 0), 0, 1, RunType.TUTORIAL, Difficulty.EASY);
-      router.push("/Match");
+      router.push("/TutorialList");
     };
 
     const suggestTutorial = () => {

@@ -119,3 +119,51 @@ export class Doll extends Combatant {
     return { amount: 1, type: DamageType.Unstoppable };
   }
 }
+
+
+const foolLogo = 
+{
+  'general': 'a game logo shaped as the head of A chaotic female trickster - flamboyant, colorful, and jovial',
+  'size': '500x500',
+  'colors': `white, black, and gold`,
+  'background': 'none, transparent',
+  'angle': '70 degrees to the left',
+  'head-details': {
+    'hair': {
+      style: 'pigtails',
+      pigtails: [
+        {color: 'blonde'},
+        {color: 'raven-black'}
+      ]
+    },
+    'face-makeup': {
+      'left-half': {
+        'color': 'white'
+      },
+      'right-half': {
+        'color': 'black'
+      }
+    },
+    'eyes': {
+      'left-eye': {
+        'tattoo-painted-on-eye': 'black crescent moon.',
+        'active': 'squinting'
+      },
+      'right-eye': {
+        'color': 'blue',
+        'tattoo-painted-on-eye': 'a black hexagon inside a white circle.',
+        'action': 'open'
+      },
+    },
+    'horns': {
+      'left-horn': {
+        'color': 'black'
+      },
+      'right-horn': {
+        'color': 'gold'
+      }
+    },
+    'mouth': 'lipstick-red, tender lips, closed, smiling mischeivously',
+    'nose': 'small, straight, cute',
+  }
+}

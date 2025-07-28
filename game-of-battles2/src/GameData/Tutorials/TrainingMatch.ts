@@ -13,7 +13,7 @@ import { Wizard } from "@/logic/Combatants/Wizard";
 export class TrainingMatch implements Tutorial {
     id: number = 7;
     title: string = "Training Match";
-    description: string = "Training Match";
+    description: string = "Test your skills against the training team";
     steps: DialogStep[] = [
         {
             id: 1,

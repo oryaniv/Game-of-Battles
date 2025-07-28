@@ -209,8 +209,6 @@ export class Game {
 
       // if game over, return
       if(this.isGameOver()) {
-        const eventLogger = EventLogger.getInstance();
-        // eventLogger.logEvent(`Game Over`);
         return;
       }
 

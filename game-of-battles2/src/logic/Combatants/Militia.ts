@@ -8,11 +8,11 @@ export class Militia extends Combatant {
       super(
         name,
         {
-          hp: 30,
-          attackPower: 10,
-          defensePower: 10,
+          hp: 40,
+          attackPower: 40,
+          defensePower: 30,
           stamina: 20,
-          initiative: 1,
+          initiative: 2,
           movementSpeed: 3,
           range: 1,
           agility: 5,

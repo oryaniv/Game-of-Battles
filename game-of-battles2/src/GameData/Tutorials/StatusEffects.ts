@@ -11,9 +11,9 @@ import { getEmptyAsType } from "@/logic/LogicFlags";
 import { Vanguard } from "@/logic/Combatants/Vanguard";
 import { Healer } from "@/logic/Combatants/Healer";
 import { Witch } from "@/logic/Combatants/Witch";
-import { Heal } from "@/logic/SpecialMoves/Singular/Support";
-import { CallOfStrength } from "@/logic/SpecialMoves/Singular/Buffs";
-import { Weaken } from "@/logic/SpecialMoves/Singular/Debuffs";
+import { Heal, Regenerate } from "@/logic/SpecialMoves/Singular/Support";
+import { CallOfStrength, CallOfVigor } from "@/logic/SpecialMoves/Singular/Buffs";
+import { Slow, Weaken } from "@/logic/SpecialMoves/Singular/Debuffs";
 import { Wall } from "@/logic/Combatants/ArtificerConstructs";
 import { StatusEffectType } from "@/logic/StatusEffect";
 import { Combatant } from "@/logic/Combatant";
@@ -22,8 +22,8 @@ import { YouScumBag } from "@/logic/SpecialMoves/Singular/Offensive";
 
 export class StatusEffectsTutorial implements Tutorial {
     id: number = 5;
-    title: string = "Status Effects";
-    description: string = "Status Effects";
+    title: string = "Support and Status Effects";
+    description: string = "Learn about support skills, buffs and debuffs";
     steps: DialogStep[] = [
        {
         id: 1,
@@ -65,13 +65,6 @@ export class StatusEffectsTutorial implements Tutorial {
             const currentCombatant = game.getCurrentCombatant();
             currentCombatant.getAiAgent()?.playTurn(currentCombatant, game, board);
             game.nextTurn();
-
-
-            // const playerTeam = game.teams[0];
-            // playerTeam.combatants[0].applyStatusEffect({
-            //     name: StatusEffectType.STRENGTH_BOOST,
-            //     duration: 3,
-            // }); 
 
             return true;
          },
@@ -155,7 +148,7 @@ export class StatusEffectsTutorial implements Tutorial {
         },
         done: false
        },
-       {
+        {
         id: 6,
         text: [
             `Works like magic, every goddamn time, I swear.`,
@@ -192,16 +185,138 @@ export class StatusEffectsTutorial implements Tutorial {
        {
          id: 7,
          text: [
-            
+            `One big ugly bruiser, isn't he? and he'll squash your brains too, if you get too close.`,
+            `But even if your enemy looks intimidating, there are ways to take him down a peg.`,
+            `I'm giving you command of Karen. She's a nerve racking, Mood killing, ear blasting nag of a hag, but she's exactly what you need
+            in order to get that ape where you want him.`,
+            `Go on, use her skill on him.`
          ],
          mode: StepMode.SIDE,
          stepType: stepType.REGULAR,
          trigger: (game: Game, board: Board, currentDialog: DialogStep) => {
-            return currentDialog.id === 6 && currentDialog.done;
+            const blueWallDestroyed = board.isPositionEmpty({x: 6, y: 7});
+            return currentDialog.id === 6 && currentDialog.done && blueWallDestroyed;
+         },
+         after: (game: Game, board: Board) => {
+            const blueWall = new Wall('Wall_2', { x: 6, y: 7}, game.teams[0]);
+            blueWall.stats.defensePower = 40;
+            blueWall.applyStatusEffect({
+                name: StatusEffectType.ALWAYS_BY_HIT,
+                duration: Number.POSITIVE_INFINITY,
+            });
+            board.placeCombatant(blueWall, { x: 6, y: 7});
+
+            const witch = board.getCombatantAtPosition({x: 4, y: 9});
+            if(!witch) {
+                return false;
+            }
+            const playerTeam = game.teams[0];
+            witch.team = playerTeam; 
+            playerTeam.addCombatant(witch);
          },
          done: false
-       }
-    ];
+       },
+       {
+        id: 8,
+        text: [
+           `Look at him, look how dumbfounded he looks, that stupod oaf. All it took was some
+           badmouthing from Karen, and he ain't so tought anymore, is he?`
+        ],
+        mode: StepMode.SIDE,
+        stepType: stepType.REGULAR,
+        trigger: (game: Game, board: Board, currentDialog: DialogStep) => {
+           const blueWall = board.getCombatantAtPosition({x: 6, y: 7});
+           if(!blueWall) {
+            return false;
+           }
+           return currentDialog.id === 7 && blueWall.stats.hp < 60;
+        },
+        done: false
+      },
+        {
+            id: 9,
+            text: [
+                `Oh, he looks pissed, and have brought another goon like him for help. Now there are two of them 
+                against one of you!`,
+                `Well don't just stand there, fight them, and help the specialists at your disposal to make them
+                pay!`
+            ],
+            trigger: (game: Game, board: Board, currentDialog: DialogStep) => {
+                return currentDialog.id === 8 && currentDialog.done;
+            },
+            before: (game: Game, board: Board) => {
+                const tutor = game.teams[1].combatants.find((combatant: Combatant) => combatant.getCombatantType() === CombatantType.StandardBearer);
+                game.executeSkill(new YouScumBag(), tutor!, {x: 6, y: 7}, board);
+
+                const redVanguard1 = game.teams[1].combatants.find((combatant: Combatant) => combatant.getCombatantType() === CombatantType.Vanguard);
+                redVanguard1?.removeStatusEffect(StatusEffectType.STRENGTH_DOWNGRADE);
+
+                const redVanguard2 =  new Vanguard('Bruiser', { x: 7, y: 8}, game.teams[1]);
+                game.teams[1].addCombatant(redVanguard2);
+                board.placeCombatant(redVanguard2, { x: 7, y: 8});
+                redVanguard2.insertAiAgent(new ToddlerAIAgent());
+
+                const karenTheWitch = board.getCombatantAtPosition({x: 4, y: 9});
+                karenTheWitch!.specialMoves = [new Weaken(), new Slow()];
+
+                const healer = board.getCombatantAtPosition({x: 4, y: 5});
+                healer!.specialMoves = [new Heal(), new Regenerate()];
+
+                const standardBearer = board.getCombatantAtPosition({x: 2, y: 7});
+                standardBearer!.specialMoves = [new CallOfStrength(), new CallOfVigor()];
+                
+
+                game.teams[1].removeCombatant(tutor!);
+                ///////////
+                // const healer = board.getCombatantAtPosition({x: 4, y: 5});
+                // healer!.specialMoves = [new Heal(), new Regenerate()];
+                // const playerTeam = game.teams[0];
+                // healer!.team = playerTeam; 
+                // playerTeam.addCombatant(healer!);
+
+                // const standardBearer = board.getCombatantAtPosition({x: 2, y: 7});
+                // standardBearer!.specialMoves = [new CallOfStrength(), new CallOfVigor()];
+                // standardBearer!.team = playerTeam; 
+                // playerTeam.addCombatant(standardBearer!);
+            },
+            mode: StepMode.SIDE,
+            stepType: stepType.REGULAR,
+            done: false
+        },
+        {
+            id: 10,
+            text: [
+                `Two big bruisers felled down by one, just like that.`,
+                `That should teach you the importance of support skills. The specialists here has got a lot more of those
+                in the bag, and if you use them right, even the biggest and baddest of them all can be taken down.`,
+            ],
+            mode: StepMode.CENTER,
+            stepType: stepType.COMPLETE,
+            trigger: (game: Game, board: Board, currentDialog: DialogStep) => {
+                const redVanguards = game.teams[1].combatants.filter((combatant: Combatant) => combatant.getCombatantType() === CombatantType.Vanguard);
+                return currentDialog.id === 9 && redVanguards.every((combatant: Combatant) => combatant.isKnockedOut());
+            },
+            done: false
+        },
+        {
+            id: 11,
+            text: [
+                `What bloody baloney is this? You've got three supporters on your side but you can't
+                take one bruiser more? Why am I even wasting my time on idiots like you? Get the hell out of here
+                before I beat you harder than any of them!`,
+            ],
+            mode: StepMode.CENTER,
+            stepType: stepType.FAIL,
+            trigger: (game: Game, board: Board, currentDialog: DialogStep) => {
+                const blueVanguard = game.teams[0].combatants.find((combatant: Combatant) => combatant.getCombatantType() === CombatantType.Vanguard);
+                if(!blueVanguard) {
+                    return false;
+                }
+                return currentDialog.id === 9 && blueVanguard.isKnockedOut();
+            },
+            done: false
+        }
+        ];
     gamePlan: Game = (() => {
         const board = new Board(10, 10);
         const playerTeam = new Team('Your Team', 0);
@@ -223,6 +338,10 @@ export class StatusEffectsTutorial implements Tutorial {
         board.placeCombatant(corporal, { x: 2, y: 7});
         board.placeCombatant(activist, { x: 4, y: 9});
         const tutor = new StandardBearer('Tutor', { x: 3, y: 0}, tutorialTeam);
+        tutor.applyStatusEffect({
+            name: StatusEffectType.DRILL_SERGEANT,
+            duration: Number.POSITIVE_INFINITY,
+        });
         tutor.stats.initiative = 100;
         tutorialTeam.addCombatant(tutor);
         playerTeam.combatants[0].specialMoves = playerTeam.combatants[0].specialMoves.filter((move: SpecialMove) => false);

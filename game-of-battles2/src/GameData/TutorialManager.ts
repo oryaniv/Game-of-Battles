@@ -75,7 +75,7 @@ export interface DialogStep {
     trigger: (game: Game, board: Board, currentDialog: DialogStep) => boolean;
     mode: StepMode;
     done: boolean;
-    before?: (game: Game, board: Board) => void;
-    after?: (game: Game, board: Board) => void;
+    before?: (game: Game, board: Board) => void | boolean;
+    after?: (game: Game, board: Board) => void | boolean;
     stepType: stepType;
 }

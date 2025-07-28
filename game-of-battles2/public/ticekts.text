@@ -1,75 +1,51 @@
 
 !------------------------- FINAL UI REQUIREMENT LIST ------------------------!
 
-* logic BUGS
-  * is it possible that the healer's divine miracle did not replenish between balancing fights?
-  * veteran casters are almost helpless when out of stamina, not trying to attack 
 
 * Battle screen UI
 
    * BUGS
+    * repair the pyramids screen
+    * settings to affect the game itself
+    * return to main menu from in game to have different texts on the buttons
+    * buttons on dark slate background to be plum colored
     * shouldn't be able to examine a cloaked enemy
-    * (minor) can't examine walls
+    * should be able to examine non-team combatants, like walls and targets
     * AI should not know to AOE target cloaked foes
+    * Wizard vetetran agent to be more aggressive (less barrier, overcharge instead of attacking)
+    * rookie/kid agent to stop targeting empty spaces with AOE skills
+    * make sure that healer's divine mircale renews for next battle (if used)
     * devour divinity not working properly
     * status descriptions on the far right are too long and break the UI
     * sanctuary appears as divine retribution on the board status LIST
     * blocking stance not showing icon when applied
-    * sounds for miss result (optional)
     * effect for missing an ailment (optional) (mostly for fool)
     * enemy turns should go slower so the player can better track
+    * Turn order icons X for red team appears working
+    * add "none" on turn order icons if there are not status effects
+    * "multikill" should not be scored unless x enemies are actually killed (rampage is bugged here)
+    * co op menu: bad ui on the partner's section
+    * co op menu: "actions" instead of "turns"
+    * co op: partners stays highlighted even after using skill (happened in tutorial)
+    * yellow bar for arcane barrier (optional)
+    * make sure the event messages disappear after a short while
+    * make sure the UI doesn't break on larger screens
+    * custom messages (for tutorials or bosses)
+    * new sounds for buffs and debuffs (generic for each type, not for every status)
+    * sounds for miss result (optional)
+    * unique track for each difficulty + boss
+    * sounds for moving, for pressing buttons.
+    * player team to start on the bottom
+    * have red team members face the other direction (optional)
     
-     
-   * the board
-      * new action results effects for buffs, debuffs, ailments, etc. <---
-      * yellow bar for arcane barrier
+    * play testing - all difficulties + tutorials
+    * loading screen if needed
 
-   * right side 
-      * make sure the event messages disappear after a short while
+     * take care of duel after sending for friend reviews
 
-   * left side
-     * make sure the UI doesn't break on larger screens
-    
-   * menus on board
-
-
-   * music and sound
-     * new sounds for buffs and debuffs (generic for each type, not for every status)
-     * unique track for each difficulty + boss
-     * sounds for moving, for pressing buttons.
-
-   * game flow
-     
-
-   * custom messages (for tutorials or bosses)
-     
-    
-* Result screen
-    * rematch in case of PVP
-
-* Intro screens
-  * enable sound yes/no V
-  * loading screen if needed
-  
-* tutorial
-
-* main menu
-    * take care of duel after sending for friend reviews
-
-    * options menu
-       * see if there's anything more to add
-
-    * credits
+     * credits
        * any artists who own sounds/svg's/ images
 
-    * about me page
-    * link to linkedin/ reddit/ my site
-
-    * share links to the game
-
-
-* Team select screen
-  * remove the stat/description as long as no click
 
 
 useful fonts for the future:

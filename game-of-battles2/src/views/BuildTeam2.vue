@@ -250,7 +250,6 @@ export default defineComponent({
       }
       RunManager.getInstance().createRun(playerTeam, 0, 0, RunType.SINGLE_PLAYER);
       router.push('/Journey');
-      // this.$router.push('/start-match', { params: { team: chosenTeam.value.map(c => c.id) } });
     };
 
     const goBack = () => {

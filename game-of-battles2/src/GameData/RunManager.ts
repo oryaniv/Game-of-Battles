@@ -62,13 +62,21 @@ export class RunManager {
         //     type: RunType.SINGLE_PLAYER
         // };
 
+        // this.gameRun = {
+        //     team: generateExamplePlayerTeam(),
+        //     score: -1,
+        //     currentLevel: 6,
+        //     difficulty: Difficulty.EASY,
+        //     status: RunsStatus.IN_PROGRESS,
+        //     type: RunType.TUTORIAL
+        // };
+
         this.gameRun = {
             team: generateExamplePlayerTeam(),
             score: -1,
-            currentLevel: 7,
-            difficulty: Difficulty.EASY,
-            status: RunsStatus.IN_PROGRESS,
-            type: RunType.TUTORIAL
+            currentLevel: 1,
+            status: RunsStatus.CREATED,
+            type: RunType.SINGLE_PLAYER
         };
     }
 

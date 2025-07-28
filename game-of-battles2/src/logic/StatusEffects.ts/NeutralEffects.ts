@@ -461,6 +461,9 @@ export class AlwaysByHitStatusEffect implements StatusEffect {
             // const isWeakTo = self.resistances.find((r) => r.type === damage.type)?.reaction === DamageReaction.WEAKNESS;
             // let damageAmount = isWeakTo ? damage.amount * 1.25 : damage.amount;
             // damageAmount = attacker.hasStatusEffect(StatusEffectType.STRENGTH_BOOST) ? damageAmount * 1.30 : damageAmount;
+            if(self.isDefending()) {
+                return ;
+            }
             const delta = attacker.stats.attackPower - self.stats.defensePower;
             const baseDamage = {amount: damage.amount * (delta * 0.01 + 1), type: damage.type};
             const isWeakTo = self.resistances.find((r) => r.type === baseDamage.type)?.reaction === DamageReaction.WEAKNESS;
@@ -469,6 +472,14 @@ export class AlwaysByHitStatusEffect implements StatusEffect {
             return {attackResult: AttackResult.Hit, damage: { amount: finalDamageAmount, type: damage.type }, cost: isWeakTo ? 0.5 : 1,
                  reaction: isWeakTo ? DamageReaction.WEAKNESS : DamageReaction.NONE, position: self.position};
         }
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
+}
+
+export class DrillSergeantStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.DRILL_SERGEANT;
+    description = `This is your drill sergeant. God have mercy on your soul if you piss him off.`;
+    applicationHooks = {
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
 }

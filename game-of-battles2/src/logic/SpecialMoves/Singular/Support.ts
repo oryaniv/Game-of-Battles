@@ -27,7 +27,7 @@ export class Heal implements SpecialMove {
         type: SpecialMoveRangeType.Curve,
         align: SpecialMoveAlignment.SelfAndAlly,
         areaOfEffect: SpecialMoveAreaOfEffect.Single,
-        range: 3
+        range: 4
     };
     damage: Damage = {
         amount: 40,
@@ -66,7 +66,7 @@ export class Regenerate implements SpecialMove {
         type: SpecialMoveRangeType.Curve,
         align: SpecialMoveAlignment.SelfAndAlly,
         areaOfEffect: SpecialMoveAreaOfEffect.Single,
-        range: 3
+        range: 4
     };
     damage: Damage = {
         amount: 0,
