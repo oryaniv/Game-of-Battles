@@ -5,8 +5,8 @@
         <h3 class="popup-message-title">{{ title }}</h3>
         <p class="popup-message-text">{{ message }}</p>
         <div class="buttons-container">
-          <button @click="dismiss(true)" class="game-button popup-ok-button yes">Sure, why not</button>
-          <button @click="dismiss(false)" class="game-button popup-ok-button no">Nah, I'm good</button>
+          <button @click="dismiss(true)" class="game-button popup-ok-button yes">{{ yesButtonText }}</button>
+          <button @click="dismiss(false)" class="game-button popup-ok-button no">{{ noButtonText }}</button>
         </div>
       </div>
     </div>
@@ -33,6 +33,14 @@ export default defineComponent({
     message: {
       type: String,
       default: "An unexpected event occurred."
+    },
+    yesButtonText: {
+      type: String,
+      default: "Sure, why not"
+    },
+    noButtonText: {
+      type: String,
+      default: "Nah, I'm good"
     }
   },
   emits: ['dismissed'], // Emit event when popup is dismissed
@@ -143,7 +151,7 @@ export default defineComponent({
   min-width: 100px;
   
   /* Inherit base button styles */
-  background-color: #2F4F4F;
+  background-color: #5E3B68;
   border: none;
   box-shadow:
     inset 1px 1px 2px rgba(255, 255, 255, 0.2),
@@ -162,7 +170,7 @@ export default defineComponent({
 }
 
 .game-button.popup-ok-button:hover {
-  background-color: #3A5F5F;
+  background-color: #7A5B8C;
   cursor: pointer;
   box-shadow:
     inset 1px 1px 2px rgba(255, 255, 255, 0.3),
@@ -173,7 +181,7 @@ export default defineComponent({
 }
 
 .game-button.popup-ok-button:active {
-  background-color: #2A4545;
+  background-color: #7A5B8C;
   box-shadow:
     inset 0px 0px 5px rgba(0, 0, 0, 0.8),
     0 0 0 2px #A17A50,

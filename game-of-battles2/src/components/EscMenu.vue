@@ -2,7 +2,7 @@
  <div class="esc-menu-overlay">
     <div class="esc-menu-container">
         <div class="esc-menu-content">
-            <h1 class="esc-menu-title">Die For Me!</h1>
+            <h1 class="esc-menu-title">Di<img class="skull-icon" src="../assets/Skull_and_crossbones.svg" alt="Skull" /> For Me!</h1>
             <div class="esc-menu-options">
                 <button @click="dismissEscMenu" class="esc-menu-option">
                     Continue
@@ -23,6 +23,8 @@
       :show="showAreYouSurePopup"
       :title="popupTitle"
       :message="popupMessage"
+      :yesButtonText="yesButtonText"
+      :noButtonText="noButtonText"
       @dismissed="handlePopupDismissed"
     />
  </div>
@@ -37,10 +39,10 @@ import SettingsMenu from './SettingsMenu.vue';
 
 export default defineComponent({
     name: 'EscMenu',
-    emits: ['esc-menu-dismissed'],
+    emits: ['esc-menu-dismissed', 'options-saved'],
     components: {
         SettingsMenu,
-        GameMessagePrompt
+        GameMessagePrompt,
     },
     setup(props, {emit}) {
 
@@ -76,11 +78,15 @@ export default defineComponent({
 
         const onOptionsSaved = () => {
            showSettingsMenu.value = false;
+           emit('options-saved');
         };
 
         const onOptionsCanceled = () => {
            showSettingsMenu.value = false;
         };
+
+        const yesButtonText = ref('Afraid so...');
+        const noButtonText = ref('Hell No!');
 
         return {
             dismissEscMenu,
@@ -92,7 +98,9 @@ export default defineComponent({
             handlePopupDismissed,
             shouldReturnToMainMenu,
             onOptionsSaved,
-            onOptionsCanceled
+            onOptionsCanceled,
+            yesButtonText,
+            noButtonText
         }
     }
 })
@@ -197,6 +205,12 @@ h1.esc-menu-title {
     0 0 0 2px #A17A50,
     1px 1px 3px rgba(0, 0, 0, 0.3);
   transform: translateY(1px);
+}
+
+.skull-icon {
+  width: 40px;
+  height: 40px;
+  vertical-align: middle;
 }
 
 </style>

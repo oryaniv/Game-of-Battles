@@ -15,9 +15,20 @@
         @mouseenter="showDescription('Easy')"
         @mouseleave="hideDescription"
       >
-        <div class="pyramid-block block-top"></div>
-        <div class="pyramid-block block-mid-1"></div>
-        <div class="pyramid-block block-bottom"></div>
+        <div class="pyramid-block block-top">
+          <PyramidBlock v-if="enemyPlaques[2]" :enemyPlaque="enemyPlaques[2]" 
+          :playerPlaqueCurrentLevel="playerPlaqueCurrentLevel" :difficulty="selectedDifficulty" />
+        </div>
+
+        <div class="pyramid-block block-mid-1">
+           <PyramidBlock v-if="enemyPlaques[1]" :enemyPlaque="enemyPlaques[1]" 
+          :playerPlaqueCurrentLevel="playerPlaqueCurrentLevel" :difficulty="selectedDifficulty" />
+        </div>
+        
+        <div class="pyramid-block block-bottom">
+          <PyramidBlock v-if="enemyPlaques[0]" :enemyPlaque="enemyPlaques[0]" 
+          :playerPlaqueCurrentLevel="playerPlaqueCurrentLevel" :difficulty="selectedDifficulty" />
+        </div>
         <p v-if="animationPhase === 'idle'" class="pyramid-label">Easy</p>
       </div>
 
@@ -29,11 +40,26 @@
         @mouseenter="showDescription('Normal')"
         @mouseleave="hideDescription"
       >
-        <div class="pyramid-block block-top"></div>
-        <div class="pyramid-block block-mid-2"></div>
-        <div class="pyramid-block block-mid-1"></div>
-        <div class="pyramid-block block-mid-0"></div>
-        <div class="pyramid-block block-bottom"></div>
+        <div class="pyramid-block block-top">
+          <PyramidBlock v-if="enemyPlaques[4]" :enemyPlaque="enemyPlaques[4]" 
+          :playerPlaqueCurrentLevel="playerPlaqueCurrentLevel" :difficulty="selectedDifficulty" />
+        </div>
+        <div class="pyramid-block block-mid-2">
+          <PyramidBlock v-if="enemyPlaques[3]" :enemyPlaque="enemyPlaques[3]" 
+          :playerPlaqueCurrentLevel="playerPlaqueCurrentLevel" :difficulty="selectedDifficulty" />
+        </div>
+        <div class="pyramid-block block-mid-1">
+          <PyramidBlock v-if="enemyPlaques[2]" :enemyPlaque="enemyPlaques[2]" 
+          :playerPlaqueCurrentLevel="playerPlaqueCurrentLevel" :difficulty="selectedDifficulty" />
+        </div>
+        <div class="pyramid-block block-mid-0">
+          <PyramidBlock v-if="enemyPlaques[1]" :enemyPlaque="enemyPlaques[1]" 
+          :playerPlaqueCurrentLevel="playerPlaqueCurrentLevel" :difficulty="selectedDifficulty" />
+        </div>
+        <div class="pyramid-block block-bottom">
+          <PyramidBlock v-if="enemyPlaques[0]" :enemyPlaque="enemyPlaques[0]" 
+          :playerPlaqueCurrentLevel="playerPlaqueCurrentLevel" :difficulty="selectedDifficulty" />
+        </div>
         <p v-if="animationPhase === 'idle'" class="pyramid-label">Normal</p>
       </div>
 
@@ -45,38 +71,45 @@
         @mouseenter="showDescription('Hard')"
         @mouseleave="hideDescription"
       >
-        <div class="pyramid-block block-top"></div>
-        <div class="pyramid-block block-mid-4"></div>
-        <div class="pyramid-block block-mid-3"></div>
-        <div class="pyramid-block block-mid-2"></div>
-        <div class="pyramid-block block-mid-1"></div>
-        <div class="pyramid-block block-mid-0"></div>
-        <div class="pyramid-block block-bottom"></div>
+        <div class="pyramid-block block-top">
+          <PyramidBlock v-if="enemyPlaques[6]" :enemyPlaque="enemyPlaques[6]" 
+          :playerPlaqueCurrentLevel="playerPlaqueCurrentLevel" :difficulty="selectedDifficulty" />
+        </div>
+        <div class="pyramid-block block-mid-4">
+          <PyramidBlock v-if="enemyPlaques[5]" :enemyPlaque="enemyPlaques[5]" 
+          :playerPlaqueCurrentLevel="playerPlaqueCurrentLevel" :difficulty="selectedDifficulty" />
+        </div>
+        <div class="pyramid-block block-mid-3">
+          <PyramidBlock v-if="enemyPlaques[4]" :enemyPlaque="enemyPlaques[4]" 
+          :playerPlaqueCurrentLevel="playerPlaqueCurrentLevel" :difficulty="selectedDifficulty" />
+        </div>
+        <div class="pyramid-block block-mid-2">
+          <PyramidBlock v-if="enemyPlaques[3]" :enemyPlaque="enemyPlaques[3]" 
+          :playerPlaqueCurrentLevel="playerPlaqueCurrentLevel" :difficulty="selectedDifficulty" />
+        </div>
+        <div class="pyramid-block block-mid-1">
+          <PyramidBlock v-if="enemyPlaques[2]" :enemyPlaque="enemyPlaques[2]" 
+          :playerPlaqueCurrentLevel="playerPlaqueCurrentLevel" :difficulty="selectedDifficulty" />
+        </div>
+        <div class="pyramid-block block-mid-0">
+          <PyramidBlock v-if="enemyPlaques[1]" :enemyPlaque="enemyPlaques[1]" 
+          :playerPlaqueCurrentLevel="playerPlaqueCurrentLevel" :difficulty="selectedDifficulty" />
+        </div>
+        <div class="pyramid-block block-bottom">
+          <PyramidBlock v-if="enemyPlaques[0]" :enemyPlaque="enemyPlaques[0]" 
+          :playerPlaqueCurrentLevel="playerPlaqueCurrentLevel" :difficulty="selectedDifficulty" />
+        </div>
         <p v-if="animationPhase === 'idle'" class="pyramid-label">Hard</p>
       </div>
     </div>
 
     <!-- Player Plaque (will animate down the selected pyramid) -->
-    <div v-if="animationPhase === 'descending' || animationPhase === 'ascending'"
+    <div v-if="animationPhase === 'descending' || animationPhase === 'ascending' || animationPhase === 'pre-ascending'"
          class="player-plaque"
          :style="playerPlaqueStyle">
       <div class="combatant-sprite-in-plaque">
         <CombatantSprite :combatant="iconCombatant" />
       </div>
-    </div>
-
-    <!-- Enemy Plaques (appear on levels) -->
-    <div v-for="(enemy) in enemyPlaques"
-         :key="enemy.id"
-         class="enemy-plaque"
-         :class="getEnemyIconClass(enemy)"
-         :style="enemyPlaqueStyle(enemy.level)">
-      <div class="enemy-icon">
-        <div v-if="!enemy.combatant" class="enemy-letter">{{ getDifficultyLetter(enemy) }}</div>
-        <div v-else class="enemy-combatant-icon">
-          <CombatantSprite :combatant="enemy.combatant" />
-        </div>
-      </div> 
     </div>
 
     <DescriptionCloud v-if="descriptionText && animationPhase === 'idle'" class="description-cloud" :text="descriptionText" />
@@ -93,14 +126,17 @@ import { Team } from '@/logic/Team';
 import { Combatant } from '@/logic/Combatant';
 import CombatantSprite from '../components/CombatantSprite.vue';
 import DescriptionCloud from '../components/DescriptionCloud.vue';
+import PyramidBlock from '../components/PyramidBlock.vue';
 import { getEnemyTeamCombatantTypes } from '../GameData/EnemyRepository';
 import { getCombatantByType } from '@/boardSetups';
+import { delay } from '@/UIUtils';
 
 export default defineComponent({
   name: 'JourneyScreen',
   components: {
     CombatantSprite,
-    DescriptionCloud
+    DescriptionCloud,
+    PyramidBlock
   },
   setup() {
 
@@ -112,9 +148,9 @@ export default defineComponent({
    
 
     const selectedDifficulty = ref<Difficulty | undefined>(currentRun.difficulty || undefined);
-    const animationPhase = ref<'idle' | 'zooming' | 'descending' | 'ascending' | 'complete'>
-    (currentRun.status === RunsStatus.CREATED ? 'idle' : 'ascending');
-    const playerPlaqueCurrentLevel = ref(currentRun.currentLevel || 0); // 0 = top, 1 = first block, etc.
+    const animationPhase = ref<'idle' | 'zooming' | 'descending' | 'pre-ascending' | 'ascending' | 'complete'>
+    (currentRun.status === RunsStatus.CREATED ? 'idle' : 'pre-ascending');
+    const playerPlaqueCurrentLevel = ref(currentRun.currentLevel || 1); // 0 = top, 1 = first block, etc.
     const animationTimeouts: ReturnType<typeof setTimeout>[] = [];
 
     // New reactive refs for player plaque position
@@ -159,7 +195,7 @@ export default defineComponent({
     
 
     const enemyPlaques = computed(() => {
-      if(selectedDifficulty.value && (animationPhase.value === 'ascending' || animationPhase.value === 'descending')) {
+      if(selectedDifficulty.value && (animationPhase.value === 'ascending' || animationPhase.value === 'descending' || animationPhase.value === 'pre-ascending')) {
         return enemyData.value[selectedDifficulty.value];
       }
       return [];
@@ -184,31 +220,10 @@ export default defineComponent({
       }
     };
 
-    const getEnemyIconClass = (enemy:any) => {
-      console.log(enemy);
- 
-      if(!selectedDifficulty.value || animationPhase.value === 'idle') {
-        return '';
-      }
-      if(selectedDifficulty.value === 'Easy') {
-        return 'enemy-plaque-easy';
-      }
-
-      if(selectedDifficulty.value === 'Normal') {
-        return 'enemy-plaque-normal';
-      }
-
-      if(selectedDifficulty.value === 'Hard') {
-        return 'enemy-plaque-hard';
-      }
-    }
-
     // --- Animation Sequence ---
     const startPyramidAnimation = async (difficulty: Difficulty) => { // Made async
       if (animationPhase.value !== 'idle') return; // Prevent re-triggering
       
-      // eslint-disable-next-line
-      debugger;
       runManager.setDifficulty(difficulty);
       runManager.setStatus(RunsStatus.IN_PROGRESS);
       runManager.setCurrentLevel(1);
@@ -254,8 +269,7 @@ export default defineComponent({
     };
 
     const startPlayerPlaqueDescent = async () => {
-      // eslint-disable-next-line
-      debugger;
+
       animationPhase.value = 'descending';
       const totalLevels = -1 || blockHeights[selectedDifficulty.value as keyof typeof blockHeights].length;
 
@@ -319,21 +333,14 @@ export default defineComponent({
           currentLevel++;
           animationTimeouts.push(setTimeout(descend, descentInterval));
         } else {
-
-          // Animation complete
           runManager.setStatus(RunsStatus.IN_PROGRESS);
-          // animationPhase.value = 'complete';
-          console.log(`Animation for ${selectedDifficulty.value} complete!`);
-          // Here you would navigate to the next screen
-          // this.$router.push('/game-start', { params: { difficulty: selectedDifficulty.value } });
         }
       };
       descend();
     };
 
     const straightDescend = () => {
-      // eslint-disable-next-line
-      debugger;
+
       animationPhase.value = 'descending';
       if(!allBlocksElements.value || !selectedDifficulty.value) {
         return;
@@ -365,28 +372,24 @@ export default defineComponent({
 
       setTimeout(() => {
         revealNextEnemy(1);
-        // nextFight();
+        setTimeout(() => {
+          nextFight();
+        }, 1000);
       }, 2500);
     }
 
-    const ascend = () => {
-      // animationPhase.value = 'ascending';
-      //playerPlaqueY.value -= 250;
-      console.log('ascending');
-    }
-
     const revealNextEnemy = (level: number) => {
-      console.log('revealing next enemy');
       if(!selectedDifficulty.value) {
         return;
       }
+
       // eslint-disable-next-line
       debugger;
       const combatantType = getEnemyTeamCombatantTypes(selectedDifficulty.value!, level)[0];
       const combatant = getCombatantByType(combatantType, enemyTeam.value);
       const currentEnemy = enemyData.value[selectedDifficulty.value][level - 1];
       console.log(combatant, currentEnemy);
-     //  currentEnemy.combatant = null;
+      currentEnemy.combatant = combatant;
     }
 
     const nextFight = () => {
@@ -413,44 +416,70 @@ export default defineComponent({
       };
     }
 
-    const placePlayerPlaque = () => {
+    const placePlayerPlaque = async () => {
       if(!selectedDifficulty.value || animationPhase.value === 'idle' || !allBlocksElements.value) {
         return;
       }
-      const block = allBlocksElements.value[selectedDifficulty.value][playerPlaqueCurrentLevel.value];
+
+      
+      const block = allBlocksElements.value[selectedDifficulty.value][playerPlaqueCurrentLevel.value - 1];
       const blockRects = block.getBoundingClientRect();
-      const containerRect = document.querySelector('.journey-screen-container')?.getBoundingClientRect() || { top: 0, left: 0 };
-      let targetY = 0;
-      let targetX = blockRects.left + blockRects.width / 2 - containerRect.left;
+      let targetY = blockRects.top + (blockRects.height / 2) - 85;
+      let targetX = blockRects.left + blockRects.width / 2 + 150;
       playerPlaqueX.value = targetX;
       playerPlaqueY.value = targetY;
+
+      const scrollContainer = document.querySelector('.journey-screen-container');
+      if (scrollContainer) {
+        scrollContainer.scrollTo({ top: targetY - window.innerHeight + blockRects.height , behavior: 'auto' });
+      }
+
+      await delay(1000);
+
+      if(animationPhase.value === 'pre-ascending') {
+        startAscencion();
+      }
     }
 
-    const getDifficultyLetter = (enemy:any) => {
-
-      if(enemy.isBoss) {
-        return 'B';
+    const startAscencion = () => {
+      if(!selectedDifficulty.value || animationPhase.value === 'idle' || !allBlocksElements.value) {
+        return;
       }
 
-      if(enemy.isSecret) {
-        return '?';
-      }
+      animationPhase.value = 'ascending';
+      const mutliplier = updatePlayerNextLevel();
+      const block = allBlocksElements.value[selectedDifficulty.value][playerPlaqueCurrentLevel.value - 1];
+      const blockRects = block.getBoundingClientRect();
+      console.log(mutliplier);
+      playerPlaqueY.value = playerPlaqueY.value - (blockRects.height * mutliplier) + 25 * mutliplier;
 
-      if(selectedDifficulty.value === 'Easy') {
-        return 'E';
-      }
-      if(selectedDifficulty.value === 'Normal') {
-        return 'N';
-      }
-      if(selectedDifficulty.value === 'Hard') {
-        return 'H';
-      }
+      
+      setTimeout(() => {
+        revealNextEnemy(playerPlaqueCurrentLevel.value);
+        setTimeout(() => {
+          // nextFight();
+        }, 1000);
+      }, 2500);
+    }
+
+    const updatePlayerNextLevel = () => {
+      // eslint-disable-next-line
+      debugger;
+       const nextEnemyData = enemyData.value[selectedDifficulty.value!][playerPlaqueCurrentLevel.value];
+       if(nextEnemyData.isSecret && !runManager.getHasPerferctStreak()) {
+         runManager.setCurrentLevel(playerPlaqueCurrentLevel.value + 2);
+         playerPlaqueCurrentLevel.value = playerPlaqueCurrentLevel.value + 2;
+         return 2
+       } else {
+         runManager.setCurrentLevel(playerPlaqueCurrentLevel.value + 1);
+         playerPlaqueCurrentLevel.value = playerPlaqueCurrentLevel.value + 1;
+         return 1;
+       }
     }
 
     onMounted(() => {
       assignAllBlocksElements();
       placePlayerPlaque();
-      console.log(allBlocksElements.value);
     });
 
     // --- Cleanup ---
@@ -484,11 +513,8 @@ export default defineComponent({
       playerPlaqueStyle,
       enemyPlaqueStyle,
       selectDifficulty: startPyramidAnimation, // Bind click to start animation
-      ascend,
       straightDescend,
       iconCombatant,
-      getEnemyIconClass,
-      getDifficultyLetter,
       revealNextEnemy,
       enemyTeam,
       nextFight,
@@ -650,6 +676,9 @@ export default defineComponent({
   margin-bottom: -10px;
   transition: all 0.3s ease;
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Easy Pyramid (3 blocks) */
@@ -718,80 +747,9 @@ export default defineComponent({
   transform: scale(1.8);
 }
 
-/* --- Enemy Plaque --- */
-.enemy-plaque {
-  position: absolute;
-  width: 150px; /* Size of enemy plaque */
-  height: 150px;
-  background-color: rgba(0, 0, 0, 0.7); /* Dark, semi-transparent background */
-  border-radius: 5px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  z-index: 25; /* Below player plaque, above pyramid */
-  opacity: 0; /* Hidden by default */
-  transition: opacity 0.3s ease-out;
-}
-
-.enemy-plaque.enemy-plaque-easy {
-  border: 5px solid #2F4F4F;
-}
-
-.enemy-plaque.enemy-plaque-normal {
-  border: 5px solid #5E3B68;
-}
-
-.enemy-plaque.enemy-plaque-hard {
-  border: 5px solid darkred;
-}
-
-.enemy-plaque .enemy-icon {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-.enemy-plaque.enemy-plaque-easy .enemy-icon {
-  background-image: url('../assets/Backgrounds/simpleLand5.png');
-}
-
-.enemy-plaque.enemy-plaque-normal .enemy-icon {
-  background-image: url('../assets/Backgrounds/cave3.png');
-}
-
-.enemy-plaque.enemy-plaque-hard .enemy-icon {
-  background-image: url('../assets/Backgrounds/temple10.png');
-}
-
-.enemy-plaque .enemy-letter {
-  font-family: 'Metal Mania', sans-serif;
-  font-size: 7em;
-  text-align: center;
-}
-
-.enemy-plaque.enemy-plaque-easy .enemy-letter {
-  color: #2F4F4F;
-}
-
-.enemy-plaque.enemy-plaque-normal .enemy-letter {
-  color: #5E3B68;
-}
-
-.enemy-plaque.enemy-plaque-hard .enemy-letter {
-  color: darkred;
-}
-
 .description-cloud {
   width: 600px;
-}
-
-
+} 
 
 
 /* Font Imports (if not global) */

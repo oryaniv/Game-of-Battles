@@ -45,13 +45,25 @@ export function getCommentatorMessage(actionResults: ActionResult[], team: Team,
         }
         
 
-        if(result.position !== undefined) {
-            const combatant = board.getCombatantAtPosition(result.position);
-            if(combatant && combatant.team.getIndex() !== team.getIndex() && combatant.isKnockedOut()) {
-                kills++;
-            }
+        // if(result.position !== undefined) {
+        //     const combatant = board.getCombatantAtPosition(result.position);
+        //     if(combatant && combatant.team.getIndex() !== team.getIndex() && combatant.isKnockedOut()) {
+        //         kills++;
+        //     }
+        // }
+    });
+
+    const actionsPositions = actionResults.filter(ar => ar.position !== undefined)
+                 .map((ar => ar.position));
+    const positionSet = new Set(actionsPositions);
+
+    Array.from(positionSet).forEach(position => {
+        const combatant = board.getCombatantAtPosition(position!);
+        if(combatant && combatant.team.getIndex() !== team.getIndex() && combatant.isKnockedOut()) {
+            kills++;
         }
     });
+
 
     if(hasFailedResults()) {
         resultMessages.push({

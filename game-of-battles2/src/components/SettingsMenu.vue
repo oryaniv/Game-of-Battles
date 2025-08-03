@@ -285,7 +285,7 @@ export default defineComponent({
 }
 
 .game-button:hover {
-  background-color: #3A5F5F;
+  background-color: #7A5B8C;
   cursor: pointer;
   box-shadow:
     inset 1px 1px 2px rgba(255, 255, 255, 0.3),
@@ -296,7 +296,7 @@ export default defineComponent({
 }
 
 .game-button:active {
-  background-color: #2A4545;
+  background-color: #7A5B8C;
   box-shadow:
     inset 0px 0px 5px rgba(0, 0, 0, 0.8),
     0 0 0 2px #A17A50,

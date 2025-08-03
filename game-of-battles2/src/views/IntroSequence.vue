@@ -64,11 +64,17 @@ export default defineComponent({
       sequenceTimers.push(setTimeout(() => {
         currentStep.value = 4; // Show press any key text
         // Add global keydown listener ONLY at the final step
-        window.addEventListener('keydown', handleKeyPress);
+        
       }, 500 + 2000 + 2000 + 2000)); // 0.5s initial + 2s text1 + 2s text2 + 2s logo
     };
 
-    const handleKeyPress = () => {
+    
+
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if(event.key === 'Escape') {
+        router.push("/MainMenu");
+      }
+
       if (currentStep.value === 4) {
         // Navigate to MainMenu
         console.log('Key pressed! Navigating to /MainMenu');
@@ -80,6 +86,8 @@ export default defineComponent({
         router.push("/MainMenu");
       }
     };
+
+    window.addEventListener('keydown', handleKeyPress);
 
     onMounted(() => {
       startSequence();

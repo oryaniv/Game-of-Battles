@@ -14,7 +14,7 @@ const LOCAL_STORAGE_KEYS = {
     disablePostBattleComments: `${GAME_PREFIX}_disablePostBattleComments`
 }
 
-class OptionsManager {
+export class OptionsManager {
 
     private static instance: OptionsManager;
     private options: GameOptions;

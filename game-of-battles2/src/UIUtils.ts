@@ -52,6 +52,11 @@ export const getActionDescription = (action: string) => {
     }
 }
 
+export const getStatusEffectIsVisible = (statusEffect: StatusEffectApplication) => {
+  const isVisible = getStatusEffect(statusEffect.name)?.isVisible;
+  return isVisible === false ? false : true;
+}
+
 export const getStatusEffectDescription = (statusEffect: StatusEffectApplication) => {
     return getStatusEffect(statusEffect.name)?.description || '';
 }
@@ -304,6 +309,7 @@ export function statusNameToText(statusName: StatusEffectType): string {
 }
 
 export function requireStatusEffectSvg(effectType: StatusEffectType): string {
+
   switch (effectType) {
     case StatusEffectType.ARCANE_CHANNELING:
       return require('./assets/statusIcons/ARCANE_CHANNELING.svg');
@@ -696,16 +702,16 @@ export function getGame(): Game {
 export function getSinglePlayerGame(): Game {
   const board = new Board(10, 10);
 
-  // const matchTeams = playGroundTeams();
+  const matchTeams = playGroundTeams();
 
-  const matchTeams = RunManager.getInstance().getMatchTeams();
+  // const matchTeams = RunManager.getInstance().getMatchTeams();
 
   const whiteTeam = matchTeams[0];
   const blackTeam = matchTeams[1];
 
   const teams = [whiteTeam, blackTeam];
 
-  placeAllCombatants(whiteTeam, blackTeam, board);
+  // placeAllCombatants(whiteTeam, blackTeam, board);
 
   const game = new Game(teams, board);
   return game;

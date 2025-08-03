@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen flex items-center justify-center p-4">
     <div class="main-menu-container-arc">
-      <h1 v-if="!newGameMode" class="main-menu-title-arc">DIE FOR ME!</h1>
+      <h1 v-if="!newGameMode" class="main-menu-title-arc">Di<img class="skull-icon" src="../assets/Skull_and_crossbones.svg" alt="Skull" /> For Me!</h1>
 
       <h2 v-if="newGameMode" class="new-game-title">New Game</h2>
 
@@ -53,6 +53,10 @@
       :message="popupMessage"
       @dismissed="handlePopupDismissed"
     />
+
+    <div class="circle-of-hex-logo">
+       <img class="hex-logo" src="../assets/Logo/FCOH_circle_without_50mt.png" alt="Hex Logo" />
+    </div>
   </div>
 </template>
 
@@ -79,7 +83,7 @@ export default defineComponent({
       { id: 3, label: 'Credits', onPress: () => { showCredits(); }, description: 'Show game credits' },
       { id: 1, label: 'New Game', onPress: () => { newGameMode.value = true; }, description: 'Play against the AI or another player' },
       { id: 2, label: 'Settings', onPress: () => { optionsMode.value = true; }, description: 'Change game settings' },
-      { id: 4, label: 'About Me', onPress: () => { aboutMode.value = true; }, description: 'About the developer' },
+      { id: 4, label: 'About us', onPress: () => { aboutMode.value = true; }, description: 'Learn about the developers' },
     ]);
 
     const newGameMenuItems = ref([
@@ -206,6 +210,12 @@ export default defineComponent({
 }
 .p-4 {
   padding: 1rem; /* 16px */
+}
+
+.skull-icon {
+  width: 90px;
+  height: 90px;
+  vertical-align: middle;
 }
 
 /* Main Menu Container for Arc Concept */
@@ -349,6 +359,20 @@ export default defineComponent({
   transform: translate(-50%, 0%);
   z-index: 100;
   max-width: 20%;
+}
+
+.circle-of-hex-logo {
+  position: absolute;
+  bottom:0;
+  right:0;
+  z-index: 100;
+  width: 100px;
+  height: 100px;
+}
+
+.hex-logo {
+  width: 100%;
+  height: 100%;
 }
 
 /* Ensure fonts are loaded if not globally */

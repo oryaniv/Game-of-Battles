@@ -13,6 +13,9 @@
             </div>
         </div>
         <div class="status-effects-container">
+          <div class="status-effect-none" v-if="filterPassiveStatusEffects(thisCombatant.getStatusEffects()).length === 0">
+            None
+          </div>
           <div class="status-effect-item" 
           :class="getIconSizeClass(filterPassiveStatusEffects(thisCombatant.getStatusEffects()).length)"
           v-for="(statusEffect, index) in filterPassiveStatusEffects(thisCombatant.getStatusEffects())" :key="statusEffect.name"
@@ -116,20 +119,21 @@ export default defineComponent({
 
 .turn-order-combatant-icon.white {
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
 }
 
 .turn-order-combatant-icon.black {
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
 }
 
 .turn-order-combatant-name {
-  font-size: 12px;
+  font-size: 10px;
   max-width: 45px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: clip;
+  text-align: center;
 }
 
 .health-stamina-bars{
@@ -173,12 +177,20 @@ export default defineComponent({
   height: 100%;
 }
 
+.turn-order-combatant-icon .status-effect-none {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .turn-order-combatant-icon .status-effects-container {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   max-width: 52px;
-  margin-bottom: 5px;
+  /* margin-bottom: 5px; */
 
     /* --- CRITICAL CHANGES HERE --- */
   height: 50px; /* Fixed height for the status effect display area */
@@ -223,6 +235,11 @@ export default defineComponent({
   position: absolute;
   top: 0;
   left: -2px;
+}
+
+.black-team-turn-order-container .dead-x{
+  bottom: 0;
+  top: auto;
 }
 
 </style>

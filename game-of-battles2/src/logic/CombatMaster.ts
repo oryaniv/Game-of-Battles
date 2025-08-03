@@ -118,6 +118,7 @@ export class CombatMaster {
         if(Math.random() >= chanceWithDelta) {
             return;
         }
+
         if(targetCombatant.hasStatusEffect(statusEffect)) {
           targetCombatant.updateStatusEffect({name: statusEffect, duration: duration});
         } else {

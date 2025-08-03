@@ -32,7 +32,7 @@ export class BlockingStance implements SpecialMove {
             name: StatusEffectType.BLOCKING_STANCE,
             duration: Number.POSITIVE_INFINITY,
         }); 
-        return getStatusEffectActionResult(StatusEffectType.BLOCKING_STANCE, invoker.position, 1);
+        return getStatusEffectActionResult(StatusEffectType.BLOCKING_STANCE, target, 1);
         
     };
     checkRequirements = (self: Combatant) => {

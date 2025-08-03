@@ -9,7 +9,7 @@ const enum VitriolLevel {
     HIGH,
 }
 
-const enum ResultGap {
+export const enum ResultGap {
     SMALL,
     MEDIUM,
     LARGE,
@@ -188,7 +188,7 @@ const PVAI_MESSAGES = {
     [GameResult.LOSS]: {
         [VitriolLevel.HIGH]: [
             "That was pathetic",
-            "You will never win this way",
+            "You will never win!",
             "They whooped your a**",
             "Are you even trying?",
             "You should really try the tutorial",
@@ -199,9 +199,10 @@ const PVAI_MESSAGES = {
             "Clearly a skill issue...",
             "Was that your best?",
             "Learn the game, buddy",
-            "You fight like a younger man, nothing held back. Admirable, but mistaken",
+            "Welcome to Die",
             "You are dead, dead, dead.",
-            "life's hard, get over it!"
+            "life's hard, get over it!",
+            "You went full retard"
         ],
         [VitriolLevel.LOW]: [
             "You thought you were hot. Guess what? you're not!",
@@ -209,7 +210,8 @@ const PVAI_MESSAGES = {
             "So close... try again",
             "Valiant, yet not enough",
             "You're playing with the big boys now...",
-            "You are not worthy..."
+            "You are not worthy...",
+            "God have mercy on your soul"
         ],
     },
     [GameResult.WIN]: {

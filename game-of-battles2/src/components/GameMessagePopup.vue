@@ -140,7 +140,7 @@ export default defineComponent({
   min-width: 100px;
   
   /* Inherit base button styles */
-  background-color: #2F4F4F;
+  background-color: #5E3B68;
   border: none;
   box-shadow:
     inset 1px 1px 2px rgba(255, 255, 255, 0.2),
@@ -152,7 +152,7 @@ export default defineComponent({
 }
 
 .game-button.popup-ok-button:hover {
-  background-color: #3A5F5F;
+  background-color: #7A5B8C;
   cursor: pointer;
   box-shadow:
     inset 1px 1px 2px rgba(255, 255, 255, 0.3),

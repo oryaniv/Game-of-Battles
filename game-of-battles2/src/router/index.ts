@@ -12,6 +12,7 @@ import IntroSequence from '../views/IntroSequence.vue'
 import COHLogo from '../views/COHLogo.vue'
 import GameApp from '../GameApp.vue'
 import PostMatch from '../views/PostMatch.vue'
+import LogoScreen from '../views/LogoScreen.vue'
 import { Route } from '@playwright/test'
 
 const routes: Array<RouteRecordRaw> = [
@@ -29,6 +30,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/COHLogo',
     name: 'COHLogo',
     component: COHLogo,
+  },
+  {
+    path: '/LogoScreen',
+    name: 'LogoScreen',
+    component: LogoScreen,
   },
   {
     path: '/MainMenu',

@@ -19,6 +19,7 @@ export default defineComponent({
 
 <style scoped>
 .status-description-box {
+  min-width: 50%;
   border: 1px solid #ccc;
   padding: 10px;
   margin: 24px 5px 5px 5px;

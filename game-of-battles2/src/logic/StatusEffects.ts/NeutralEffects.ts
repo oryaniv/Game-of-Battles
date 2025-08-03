@@ -56,6 +56,7 @@ export class InspiringKillerStatusEffect implements StatusEffect {
 
 export class EnergyAbsorbStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.ENERGY_ABSORB;
+    isVisible?: boolean = false;
     description = ``;
     applicationHooks =  {
     };
@@ -142,7 +143,7 @@ export class FirstStrikeStatusEffect implements StatusEffect {
 
 export class StruckFirstStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.STRUCK_FIRST;
-    description = '';
+    description = `This combatant had already struck first.`;
     isVisible?: boolean = false;
     applicationHooks =  {
     };

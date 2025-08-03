@@ -439,8 +439,8 @@ export class FrenzyStatusEffect implements StatusEffect {
 }
 
 export class SanctuaryStatusEffect implements StatusEffect {
-    name: StatusEffectType = StatusEffectType.DIVINE_RETRIBUTION;
-    description = `All attacks against this combatant are blocked, except unstoppable. removed upon moving or attacking, including attack-based skills`;
+    name: StatusEffectType = StatusEffectType.SANCTUARY;
+    description = `All attacks against this combatant are blocked, except unstoppable damage. Sanctuary is removed upon moving or attacking, including attack-based skills`;
     applicationHooks = {
         [StatusEffectHook.OnBeingAttacked]: (self: Combatant, defender: Combatant, damage: Damage, attackCost: number) => {
             return {attackResult: AttackResult.Blocked, damage: {amount: 0, type: DamageType.Unstoppable}, cost: attackCost * 2, reaction: DamageReaction.IMMUNITY, position: self.position};

@@ -39,27 +39,21 @@ export function playGroundTeams(): Team[] {
     veternAIAgentNoCoop.setCollectCoop(false);
     const rookieAIAgent = new RookieAIAgent();
     const whiteTeam = new Team('Blue Team', 0);
-    const blackTeam = new Team('Red Team', 1, new DummyAIAgent());
+    const blackTeam = new Team('Red Team', 1);
 
    
     
-    whiteTeam.addCombatant(new Defender('Ed', { x: 7, y: 5}, whiteTeam));
     whiteTeam.addCombatant(new Fool('Aleph', { x: 6, y: 5}, whiteTeam));
-    
-    // whiteTeam.addCombatant(new Fool('P4', { x: 3, y: 7}, whiteTeam));
     // whiteTeam.addCombatant(new Witch('P5', { x: 3, y: 8}, whiteTeam));
 
     // blackTeam.addCombatant(new Vanguard('Ragnar', { x: 3, y: 4}, blackTeam));
     // blackTeam.addCombatant(new FistWeaver('Elena', { x: 3, y: 9}, blackTeam));
     // blackTeam.addCombatant(new Pikeman('Zhao', { x: 3, y: 10}, blackTeam));
-    // blackTeam.addCombatant(new Healer('Alina', { x: 4, y: 5}, blackTeam));
-    // blackTeam.addCombatant(new Rogue('Nina', { x: 4, y: 3}, blackTeam));
-    blackTeam.addCombatant(new StandardBearer('Bullseye', { x: 4, y: 3}, blackTeam));
+    blackTeam.addCombatant(new Militia('googo', { x: 4, y: 5}, blackTeam));
+    blackTeam.addCombatant(new Militia('feii', { x: 4, y: 4}, blackTeam));
     // whiteTeam.addCombatant(new Fool('P9', { x: 4, y: 4}, whiteTeam));
     // // whiteTeam.addCombatant(new Vanguard('P9', { x: 3, y: 12}, whiteTeam));
-    // whiteTeam.addCombatant(new StandardBearer('P10', { x: 3, y: 1}, whiteTeam));
-   
-    
+    // whiteTeam.addCombatant(new StandardBearer('P10', { x: 3, y: 1}, whiteTeam)); 
     // whiteTeam.addCombatant(new Vanguard('P2', { x: 3, y: 4}, whiteTeam));
     
     // blackTeam.addCombatant(new Witch('W1', { x: 3, y: 5}, blackTeam));
@@ -74,12 +68,97 @@ export function playGroundTeams(): Team[] {
     // blackTeam.addCombatant(new WeaveEater('V5', { x: 5, y: 8}, blackTeam));
     // blackTeam.addCombatant(new WeaveEater('V6', { x: 5, y: 9}, blackTeam));
 
-    // blackTeam.combatants[0].applyStatusEffect({
-    //     name: StatusEffectType.SLOW,
-    //     duration: 1,
+    // whiteTeam.combatants[0].applyStatusEffect({
+    //     name: StatusEffectType.STRUCK_FIRST,
+    //     duration: 3,
     // });
 
-    // whiteTeam.combatants[0].stats.stamina = 0;
+    // whiteTeam.combatants[0].applyStatusEffect({
+    //     name: StatusEffectType.BLEEDING,
+    //     duration: 3,
+    // });
+
+    // whiteTeam.combatants[0].applyStatusEffect({
+    //     name: StatusEffectType.DEFENSE_DOWNGRADE,
+    //     duration: 3,
+    // });
+
+    // whiteTeam.combatants[0].applyStatusEffect({
+    //     name: StatusEffectType.ARCANE_BARRIER,
+    //     duration: 3,
+    // });
+
+    // whiteTeam.combatants[1].applyStatusEffect({
+    //     name: StatusEffectType.LAST_STAND_USED,
+    //     duration: 3,
+    // });
+
+    // whiteTeam.combatants[1].applyStatusEffect({
+    //     name: StatusEffectType.SLOW,
+    //     duration: 3,
+    // });
+
+    // whiteTeam.combatants[1].applyStatusEffect({
+    //     name: StatusEffectType.ARCANE_CHANNELING,
+    //     duration: 3,
+    // });
+
+    // whiteTeam.combatants[2].applyStatusEffect({
+    //     name: StatusEffectType.ENERGY_ABSORB,
+    //     duration: 3,
+    // });
+
+    // whiteTeam.combatants[2].applyStatusEffect({
+    //     name: StatusEffectType.ENCOURAGED,
+    //     duration: 3,
+    // });
+
+    // blackTeam.combatants[0].applyStatusEffect({
+    //     name: StatusEffectType.BLEEDING,
+    //     duration: 3,
+    // });
+
+    // blackTeam.combatants[0].applyStatusEffect({
+    //     name: StatusEffectType.ARCANE_BARRIER,
+    //     duration: 3,
+    // });
+
+    // blackTeam.combatants[0].applyStatusEffect({
+    //     name: StatusEffectType.BURNING,
+    //     duration: 3,
+    // });
+
+    // blackTeam.combatants[0].applyStatusEffect({
+    //     name: StatusEffectType.SLOW,
+    //     duration: 3,
+    // });
+
+    // blackTeam.combatants[1].applyStatusEffect({
+    //     name: StatusEffectType.DEFENSE_DOWNGRADE,
+    //     duration: 3,
+    // });
+
+    // blackTeam.combatants[1].applyStatusEffect({
+    //     name: StatusEffectType.ENCOURAGED,
+    //     duration: 3,
+    // });
+    // blackTeam.combatants[1].applyStatusEffect({
+    //     name: StatusEffectType.SLEEPING,
+    //     duration: 3,
+    // });
+    // blackTeam.combatants[1].applyStatusEffect({
+    //     name: StatusEffectType.CIRCUS_DIABOLIQUE,
+    //     duration: 3,
+    // });
+    // blackTeam.combatants[1].applyStatusEffect({
+    //     name: StatusEffectType.TAUNTED,
+    //     duration: 3,
+    // });
+    // blackTeam.combatants[1].applyStatusEffect({
+    //     name: StatusEffectType.STAGGERED,
+    //     duration: 3,
+    // });
+
 
     // blackTeam.combatants[0].applyStatusEffect({
     //     name: StatusEffectType.NIGHTMARE_LOCKED,
@@ -277,12 +356,12 @@ export function generateCombatantIdenticalTeam(team: Team, teamIndex: number, ag
 export function placeAllCombatants(team1: Team, team2: Team, board: Board) {
     const frontLineTypes = [CombatantType.Defender, CombatantType.StandardBearer, CombatantType.Vanguard, CombatantType.Pikeman, CombatantType.FistWeaver];
     const backLineTypes = [CombatantType.Rogue, CombatantType.Hunter, CombatantType.Wizard, CombatantType.Healer, CombatantType.Witch, CombatantType.Fool,CombatantType.Artificer];
-    const whiteTeamFrontY = 1;
-    const whiteTeamBackY = 0;
+    const whiteTeamFrontY = 8;
+    const whiteTeamBackY = 9;
     let whiteTeamBackXStart = 2;
     let whiteTeamfrontXStart = 3;
-    const blackTeamFrontY = 8;
-    const blackTeamBackY = 9;
+    const blackTeamFrontY = 1;
+    const blackTeamBackY = 0;
     let blackTeamBackXStart = 7;
     let blackTeamFrontXStart = 6;
     

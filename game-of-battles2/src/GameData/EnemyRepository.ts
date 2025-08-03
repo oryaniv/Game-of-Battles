@@ -54,12 +54,11 @@ function getAiAgent(difficulty: Difficulty, level: number) {
 const enemyData = {
     Easy: [
         [
-          // CombatantType.Defender,
-          // CombatantType.Witch,
-          // CombatantType.Hunter,
-          // CombatantType.Healer,
-          // CombatantType.Vanguard,
-          CombatantType.Dragon,
+          CombatantType.Defender,
+          CombatantType.Witch,
+          CombatantType.Hunter,
+          CombatantType.Healer,
+          CombatantType.Vanguard,
         ], 
         [
           CombatantType.Pikeman,

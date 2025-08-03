@@ -2,7 +2,7 @@
 <template>
   <div class="game-container" :class="{ 'game-over': startGameOverAnimation }">
     <button class="escape-menu-button" @click="showEscapeMenu">Menu</button>
-    <EscMenu @esc-menu-dismissed="dismissEscapeMenu" v-if="escapeMenuVisible" />
+    <EscMenu @esc-menu-dismissed="dismissEscapeMenu" @options-saved="onOptionsSaved" v-if="escapeMenuVisible" />
     <div class="board-frame" :class="getFrameClass()">
     <div class="board">
       <div class="board-background">
@@ -23,7 +23,8 @@
                     validSkillFriendly: isSkillTargetValid({ x: x - 1, y: y - 1 }) && isFriendly({ x: x , y: y  }),
                     validSkillNeutral: isSkillTargetValid({ x: x - 1, y: y - 1 }) && isNeutral({ x: x , y: y  }),
                     validForCheckStatus: isTargetValidForCheckStatus({ x: x - 1, y: y - 1 }),
-                    'aoe-highlight': isAoeHighlighted({ x: x - 1, y: y - 1 })
+                    'aoe-highlight': isAoeHighlighted({ x: x - 1, y: y - 1 }),
+                    'strong-grid': !!showGridBars
            }"
           @click="performAction({ x: x - 1, y:  y - 1})"
           @mouseover="showAoe({ x: x - 1, y: y - 1 })"
@@ -109,9 +110,9 @@
     <!-- Actions Remaining indicator -->
     <div v-if="actionsRemaining > 0" class="actions">
       <span class="actions-remaining-label">Actions Remaining</span>
-      <div  v-for="x in Math.floor(actionsRemaining)" class="turn-icon" :key="x">
+      <div  v-for="x in Math.floor(actionsRemaining)" class="turn-icon" :class="{ 'red': getCurrentTeamIndex() === 1 }" :key="x">
       </div>
-      <div v-if="actionsRemaining !== Math.round(actionsRemaining)" class="half-turn-icon" :key="x">
+      <div v-if="actionsRemaining !== Math.round(actionsRemaining)" class="half-turn-icon" :class="{ 'red': getCurrentTeamIndex() === 1 }" :key="x">
       </div>
     </div>
 
@@ -138,7 +139,7 @@
   </div>
 </div>
 
-<button v-if="!isGameOver()" @click="playAiTurn(currentCombatant)">AI Play</button>
+<!-- <button v-if="!isGameOver()" @click="playAiTurn(currentCombatant)">AI Play</button> -->
 <!-- <button @click="showDialog = true">show dialog</button>
 <button @click="changeDialog()">change dialog</button> -->
 
@@ -209,18 +210,20 @@
                 </div>
             </span>
             <span class="skill-name">{{ skill.move.name }}</span>
-            <span class="skill-turn-cost">Turns: {{ skill.move.turnCost }}</span>
+            <span class="skill-turn-cost">Actions: {{ skill.move.turnCost }}</span>
             <span class="skill-cost">{{ skill.move.cost }} SP</span>
           </div>
         </div>
-        <div v-if="selectedCoopSkillDescription" class="skill-description">
+        <div v-if="selectedCoopSkillDescription" class="skill-coop-description">
           <div class="partner-list">
             <div class="partner-list-header">Partners</div>
-            <div class="partner-list-item" v-for="partner in selectedCoopSkillPartners" :key="partner.name">
-              {{ partner.name }} - {{ partner.getCombatantType() }}
+            <div class="partner-list-item-container">
+              <div class="partner-list-item" v-for="partner in selectedCoopSkillPartners" :key="partner.name">
+                <span class="partner-list-item-text">{{ partner.name }} - {{ partner.getCombatantType() }}</span>
+              </div>
             </div>
           </div>
-          {{ selectedCoopSkillDescription }}
+          <span class="skill-coop-description-text">{{ selectedCoopSkillDescription }}</span>
         </div>
         </div>
     </div>
@@ -240,15 +243,15 @@
   </div>
 
   <!-- Turn Event Message Box -->
-  <div class="event-indicator-container" v-if="getEvents().length > 0">
+  <div class="event-indicator-container" :class="{ 'show': getEvents().length > 0 }">
     <div class="event-indicator-text">
-         <ActionEventMessage :message="getEvents()[getEvents().length - 1].messageBody" 
-         :actionPart="getEvents()[getEvents().length - 1].actionPart" 
-         :actionType="getEvents()[getEvents().length - 1].actionType" />
+         <ActionEventMessage :message="getEvents().length > 0 ? getEvents()[getEvents().length - 1].messageBody : ''" 
+         :actionPart="getEvents().length > 0 ? getEvents()[getEvents().length - 1].actionPart : ''" 
+         :actionType="getEvents().length > 0 ? getEvents()[getEvents().length - 1].actionType : 5" />
     </div>
   </div>
   
-  <div class="commentator-messages-container">
+  <div class="commentator-messages-container" v-if="!disableBattleComments">
     <CommentatorMessages :messages="commentatorMessages" />
   </div>
 
@@ -259,6 +262,20 @@
         {{ examinedCombatant?.name }} the {{ examinedCombatant?.getCombatantType() }}
       </div>
       <div class="status-popup-body">
+        <div class="health-stamina-status-bars-container">
+          <div class="health-status-bar-container">
+             <div class="health-status-text">{{ Math.ceil(examinedCombatant?.stats.hp)}}/{{ Math.ceil(examinedCombatant?.baseStats.hp) }}</div>
+             <div class="health-status-bar">
+              <div class="bar-fill-health" :style="{ width: (examinedCombatant?.stats.hp / examinedCombatant?.baseStats.hp) * 100 + '%' }"></div>
+             </div>
+          </div>
+          <div class="stamina-status-bar-container">
+            <div class="stamina-status-text">{{ Math.ceil(examinedCombatant?.stats.stamina)}}/{{ Math.ceil(examinedCombatant?.baseStats.stamina) }}</div>
+            <div class="stamina-status-bar">
+              <div class="bar-fill-stamina" :style="{ width: (examinedCombatant?.stats.stamina / examinedCombatant?.baseStats.stamina) * 100 + '%' }"></div>
+            </div>
+          </div>
+        </div>
         <div
           v-for="[statName, statValue] in filterNotRelevantStats(Object.entries(examinedCombatant?.stats))"
           :key="statName"
@@ -294,10 +311,9 @@
           </div>
         </div>
         <div class="status-effects-header">Status Effects:</div>
-        <div class="status-effects-list">
-          
+        <div class="status-effects-list" :style="{ gap: getStatusEffectGap() }">
           <div
-            v-for="(effect, index) in examinedCombatant?.statusEffects"
+            v-for="(effect, index) in examinedCombatantStatuses"
             :key="effect.name"
             class="status-effect-item"
             :style="{ color: getStatusEffectColor(effect.type) }"
@@ -306,6 +322,10 @@
           >
             <StatusDescriptionBox v-if="statusDescriptionBox && statusDescriptionBoxIndex === index" :text="statusDescriptionBox" />
             <img class="status-effect-examine-icon" :src="requireStatusEffectSvg(effect.name)" alt="Status Effect" />
+            <span class="status-effect-duration">
+              <img v-if="effect.duration === Infinity" class="status-effect-duration-icon" src="@/assets/INFINITY.svg" alt="Infinity" />
+              <span v-else>{{ effect.duration }}</span>
+            </span>
           </div>
           <div v-if="examinedCombatant?.statusEffects.length === 0">
             None
@@ -383,7 +403,8 @@ import { AllOfThem, standardVsSetup, theATeam, theBTeam, allMilitiaSetup, theGor
  import { getGameResultMessage, getGameOverMessage, getTutorialCompleteMessage, getTutorialResultMessage } from './GameOverMessageProvider';
  import { getCommentatorMessage, CommentatorMessage } from './CommentatorMessageProvider';
  import { getActionEffectIcon, ActionEffect, requireDamageSVG, getSkillEffectIcon, getShortDamageReactionText,
-  getActionDescription, getStatusEffectDescription, requireStatusEffectSvg, delay, statusNameToText, getGame, getRelevantDialogs } from './UIUtils';
+  getActionDescription, getStatusEffectDescription, requireStatusEffectSvg, delay,
+   statusNameToText, getGame, getRelevantDialogs, getStatusEffectIsVisible } from './UIUtils';
  import { Difficulty } from './GameOverMessageProvider';
  import { useRouter } from 'vue-router';
  import { RunManager, RunType } from './GameData/RunManager';
@@ -398,6 +419,7 @@ import { AllOfThem, standardVsSetup, theATeam, theBTeam, allMilitiaSetup, theGor
  import {DialogMessage} from './UIUtils';
  import { getEmptyAsType } from './logic/LogicFlags';
  import { TutorialManager, DialogStep, StepMode, stepType } from './GameData/TutorialManager';
+ import { OptionsManager } from './GameData/OptionsManager';
 
 export default defineComponent({
   components: {
@@ -473,6 +495,12 @@ export default defineComponent({
     const popupTitle = ref('');
     const popupMessage = ref('');
 
+    const optionsManager = OptionsManager.getInstance();
+    const soundOn = ref(optionsManager.getSoundOn());
+    const showGridBars = ref(optionsManager.getShowGridBars());
+    const disableBattleComments = ref(optionsManager.getDisableBattleComments());
+    const disablePostBattleComments = ref(optionsManager.getDisablePostBattleComments());
+
     const getCombatantEffects = (position: Position) => {
       const key = `${position.x},${position.y}`;
       return damageEffects.value[key] || [];
@@ -487,8 +515,6 @@ export default defineComponent({
 
     onMounted(() => {
       updateTurnMessage();
-      
-
       actionsRemaining.value = currentTeam.value.combatants.length;
       emitter.on('trigger-method', (actionResultData:any) => {
         applyAttackEffects(actionResultData, actionResultData.position);
@@ -507,53 +533,61 @@ export default defineComponent({
 
       document.addEventListener('keydown', (event) => {
         if(event.key === 'Escape') {
-           escapeMenuVisible.value = true;
+           escapeMenuVisible.value = !escapeMenuVisible.value;
            return;
         }
 
         if(!showActionMenu() || showHoveringMessage() || showErrorPopup.value) {
           return;
         }
-
+        
         if(actionSelected()) {
-          if(event.key.toLowerCase() === 'c') {
+          if(event.key.toLowerCase() === 'c' || event.key.toLowerCase() === 'ב') {
             cancel();
           }
         } else {
             switch (event.key.toLowerCase()) {
             case 's':
+            case 'ד':
               if(hasActiveSpecialMoves()) {
                 showSpecialSkills();
               }
               break;
             case 'a':
+            case 'ש':
               if(canAttack()) {
                 showAttackOptions();
               }
               break;
             case 'm':
+            case 'צ':
               if (canMove()) {
                 showMoveOptions();
               }
               break;
             case 'x':
+            case 'ס':
               // showStatus();
               showCombatantsForStatus();
               break;
             case 'd':
+            case 'ג':
               if(canDefend() && (!hasMoved.value || canDefendAndMove())) {
                 defend();
               }
               break;
             case 'k':
+            case 'ל':
               skip();
               break;
             case 'o':
+            case 'ם':
               if(hasAnyCoopMoves()) {
                 showCoopSkillMenu();
               }
               break;
             case 'u':
+            case 'ן':
               undoMove();
               break;
           }
@@ -574,10 +608,6 @@ export default defineComponent({
       if(!game.value) {
         return;
       }
-
-      // if(showDialog.value) {
-      //   handleDialogDismissed();
-      // }
 
       if(isGameOver()) {
         updateHoveringMessage(getGameOverMessage(whiteTeam.value, blackTeam.value), false);
@@ -720,6 +750,8 @@ export default defineComponent({
       examinedCombatant.value = null;
       statusDescriptionBox.value = null;
       statusDescriptionBoxIndex.value = null;
+      examinedCombatantStatuses.value = [];
+      selectedCoopSkillDescription.value = null;
     };
 
     const isMoveValid = (position: Position): boolean => {
@@ -937,54 +969,6 @@ export default defineComponent({
       const currentStamina = combatant.stats.stamina;
       return { width: (combatant.stats.stamina / combatant.baseStats.stamina) * 100 + '%' };
     };
-
-
-    const getCombatantSprite = (combatant: Combatant) => {
-      return typeToSprite(combatant.getCombatantType());
-    }
-
-    const typeToSprite = (type: CombatantType) => {
-      switch (type) {
-        case CombatantType.Militia:
-          return require('./assets/Militia.svg');
-        case CombatantType.Defender:
-          return require('./assets/Defender.svg');
-        case CombatantType.Hunter:
-          return require('./assets/Hunter.svg');
-        case CombatantType.Healer:
-          return require('./assets/Healer.svg');
-        case CombatantType.Wizard:
-          return require('./assets/Wizard.svg');
-        case CombatantType.StandardBearer:
-          return require('./assets/StandardBearer.svg');
-        case CombatantType.Witch:
-          return require('./assets/Witch.svg');
-        case CombatantType.Fool:
-          return require('./assets/Fool.svg');
-        case CombatantType.Pikeman:
-          return require('./assets/Pikeman.svg');
-        case CombatantType.Vanguard:
-          return require('./assets/Vanguard.svg');
-        case CombatantType.FistWeaver:
-          return require('./assets/FistWeaver.svg');
-        case CombatantType.Artificer:
-          return require('./assets/Artificer.svg');
-        case CombatantType.Rogue:
-          return require('./assets/Rogue.svg');
-        case CombatantType.Gorilla:
-          return require('./assets/Gorilla.svg');
-        case CombatantType.Bomb:
-          return require('./assets/Bomb.svg');
-        case CombatantType.Wall:
-          return require('./assets/Wall.svg');
-        case CombatantType.Doll:
-          return require('./assets/Fool.svg');
-        case CombatantType.BallistaTurret:
-          return require('./assets/Ballista.svg');
-        case CombatantType.BabyBabel:
-          return require('./assets/Babel.svg');
-      }
-    }
 
     const getDamageColor = (type: DamageType): string => {
       switch (type) {
@@ -1261,6 +1245,7 @@ export default defineComponent({
         coopSkillMode.value = false;
         validTargetsForSkill.value = [];
         aoePositions.value = [];
+        selectedCoopSkillPartners.value = null;
         game.value.nextTurn();
         prepareNextTurn();
       }
@@ -1278,6 +1263,22 @@ export default defineComponent({
           return 'white'; // Default color
       }
     };
+
+    const getStatusEffectGap = () => {
+      if(examinedCombatantStatuses.value.length === 2) {
+        return '20px';
+      }
+      if(examinedCombatantStatuses.value.length === 3) {
+        return '15px';
+      }
+      if(examinedCombatantStatuses.value.length === 4) {
+        return '10px';
+      }
+      if(examinedCombatantStatuses.value.length >= 5) {
+        return '5px';
+      }
+      return '0px';
+    }
 
     const showAoe = (position: Position) => {
         if(currentSkill.value && currentCombatant.value && isSkillTargetValid(position)) {
@@ -1367,16 +1368,9 @@ export default defineComponent({
     loadSounds();
 
     const showStatusPopup = ref(false);
+    const examinedCombatantStatuses = ref<StatusEffectApplication[]>([]);
     const hideStatusPopup = () => {
       showStatusPopup.value = false;
-    };
-
-    const showStatus = () => {
-      const stats = getCurrentCombatant()?.stats;
-      for(const [statName, statValue] of Object.entries(stats)) {
-        console.log(statName, statValue);
-      }
-      showStatusPopup.value = true;
     };
 
     const examineCombatant = (position: Position) => {
@@ -1385,17 +1379,22 @@ export default defineComponent({
         combatantsForStatus.value = [];
         examinedCombatant.value = combatant;
         showStatusPopup.value = true;
+        examinedCombatantStatuses.value = combatant.statusEffects.filter((effect) => getStatusEffectIsVisible(effect));
         statusMode.value = false;
       }
     }
 
     const filterNotRelevantStats = (stats: [string, number][]) => {
-      return stats.filter(([statName]) => !['range'].includes(statName));
+      return stats.filter(([statName]) => !['range','hp', 'stamina'].includes(statName));
     }
 
     const showCombatantsForStatus = () => {
-      const allLivingCombatants = [...whiteTeam.value.combatants, ...blackTeam.value.combatants].filter((combatant) => !combatant.isKnockedOut());
-      combatantsForStatus.value = allLivingCombatants;
+      const allLivingNotEnemyCloakedCombatants = board.value.getAllCombatants()
+                                            .filter((combatant) => !combatant.isKnockedOut())
+                                            .filter((combatant) => !combatant.isCloaked() || 
+                                            combatant.team.index === currentTeam.value.index);
+
+      combatantsForStatus.value = allLivingNotEnemyCloakedCombatants;
       statusMode.value = true;
     }
 
@@ -1594,6 +1593,13 @@ export default defineComponent({
       escapeMenuVisible.value = false;
     }
 
+    const onOptionsSaved = () => {
+      soundOn.value = optionsManager.getSoundOn();
+      showGridBars.value = optionsManager.getShowGridBars();
+      disableBattleComments.value = optionsManager.getDisableBattleComments();
+      disablePostBattleComments.value = optionsManager.getDisablePostBattleComments();
+    }
+
     return {
       board,
       teams,
@@ -1631,7 +1637,6 @@ export default defineComponent({
       getCombatantEffects,
       showSpecialSkills,
       showSkillsMenu,
-      getCombatantSprite,
       getCombatantSpecialMoves,
       getCombatantCoopMoves,
       hasActiveSpecialMoves,
@@ -1661,7 +1666,6 @@ export default defineComponent({
       getCurrentTeamIndex,
       showStatusPopup,
       hideStatusPopup,
-      showStatus,
       getStatUiName,
       getStatusScale,
       statusNameToText,
@@ -1704,7 +1708,14 @@ export default defineComponent({
       getDamageEffectText,
       escapeMenuVisible,
       showEscapeMenu,
-      dismissEscapeMenu
+      dismissEscapeMenu,
+      showGridBars,
+      disableBattleComments,
+      disablePostBattleComments,
+      onOptionsSaved,
+      getStatusEffectIsVisible,
+      examinedCombatantStatuses,
+      getStatusEffectGap
     };
   },
 });
@@ -1806,20 +1817,26 @@ button {
 .turn-icon {
   width: 25px;
   height: 25px;
-  background-image: url('./assets/flaming_sword.jpg');
+  background-image: url('./assets/ACHILLES.svg');
   background-size: cover;
   background-position: center;
   display: inline-block;
+  margin-right: 3px;
 }
 
 .half-turn-icon {
   width: 25px;
   height: 25px;
-  background-image: url('./assets/flaming_sword.jpg');
+  background-image: url('./assets/ACHILLES.svg');
   background-size: cover;
   background-position: center;
   display: inline-block;
-  filter: brightness(0.5);
+  opacity: 0.5;
+  margin-right: 3px;
+}
+
+.half-turn-icon.red, .turn-icon.red {
+  filter: brightness(0) saturate(100%) invert(12%) sepia(78%) saturate(7500%) hue-rotate(9deg) brightness(93%) contrast(115%);
 }
 
 .round-count {
@@ -1905,6 +1922,10 @@ button {
 
 .temple .board .panel {
   border: 1px solid #641616a8;
+}
+
+.temple .board .panel.strong-grid, .cave .board .panel.strong-grid, .forest .board .panel.strong-grid {
+  border: 1px solid black;
 }
 
 .validMove {
@@ -2412,20 +2433,41 @@ button {
   cursor: not-allowed;
 }
 
-.skill-description {
+.skill-description, .skill-coop-description {
   font-size: 14px;
   padding: 10px;
-  border-top: 1px solid white;
+  border-top: 2px solid white;
   text-align: center;
+}
+
+.skill-coop-description {
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-top: 0px;
+}
+
+.skill-coop-description-text {
+  margin-top: 10px;
+  display: block;
+  padding: 0 5px 0 5px;
 }
 
 .partner-list {
   border-bottom: 1px solid white;
 }
 
+
 .partner-list-header {
   font-size: 24px;
 }   
+
+.partner-list-item-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 10px;
+    margin-top: 5px;
+}
 
 .partner-list-item {
   font-size: 20px;
@@ -2517,9 +2559,6 @@ button {
 }
 
 .turn-order-item {
-  /*border-radius: 5px;*/
-  /*min-width: 35px;
-  max-width: 35px;*/
   position: relative;
   margin: 5px;
   text-align: center;
@@ -2565,14 +2604,14 @@ button {
 
 .black-team-turn-order-container {
   position: absolute;
-  bottom: 0;
+  top: 0;
   right: 2%;
   
 }
 
 .white-team-turn-order-container {
   position: absolute;
-  top: 0;
+  bottom: 0;
   right: 2%;
   
 }
@@ -2647,6 +2686,22 @@ button {
   position: relative;
 }
 
+.bar-fill-health {
+  height: 100%;
+  background-color: red;
+  border-radius: 5px;
+  position: absolute;
+  z-index: 2;
+}
+
+.bar-fill-stamina {
+  height: 100%;
+  background-color: blue;
+  border-radius: 5px;
+  position: absolute;
+  z-index: 2;
+}
+
 .bar-fill {
   height: 100%;
   background-color: green;
@@ -2665,7 +2720,7 @@ button {
 
 .bar-fill-buff {
   height: 100%;
-  background-color: blue;
+  background-color: #42A5F5;
   border-radius: 5px;
   position: absolute;
   z-index: 1;
@@ -2681,14 +2736,21 @@ button {
   margin: 15px 0 0 0px;
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: normal;
 }
 
 .status-effect-item {
   margin-bottom: 5px;
   display: inline-flex;
   flex-direction: column;
-  gap: 1.3em;
+  column-gap: 1.3em;
+}
+
+.status-effect-duration {
+  font-size: 12px;
+  text-align: center;
+  margin-top: 5px;
+  font-weight: bold;
 }
 
 .status-effect-examine-icon {
@@ -2731,6 +2793,57 @@ button {
   text-align: center;
 }
 
+.health-stamina-status-bars-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 15px;
+}
+
+.health-status-bar-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  overflow: hidden;
+  position: relative;
+}
+
+.stamina-status-bar-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  overflow: hidden;
+  position: relative;
+}
+
+.health-status-text {
+  font-size: 12px;
+  text-align: center;
+}
+
+.health-status-bar {
+  width: 100%;
+  height: 10px;
+  background-color: #555;
+  border-radius: 5px;
+  overflow: hidden;
+  position: relative;
+}
+
+.stamina-status-text {
+  font-size: 12px;
+  text-align: center;
+}
+
+.stamina-status-bar {
+  width: 100%;
+  height: 10px;
+  background-color: #555;
+  border-radius: 5px;
+  overflow: hidden;
+  position: relative;
+}
+
 .damage-reactions-list {
   margin-top: 30px;
   display: flex;
@@ -2769,7 +2882,7 @@ button {
   height: 30px;
   z-index: 10;
   border: none;
-  transition: all 0.3s ease;
+  transition: all 0.6s ease;
 
    background-image: radial-gradient(circle at center,
                        rgba(30, 0, 40, 0.9) 0%,
@@ -2784,6 +2897,14 @@ button {
    box-shadow: 
      0 0 15px 5px rgba(245, 232, 210, 0.6),
      0 0 25px 8px rgba(245, 232, 210, 0.4) inset;
+
+   opacity: 0;
+   transform: translateX(20px);
+}
+
+.event-indicator-container.show {
+   opacity: 1;
+   transform: translateX(0px);
 }
 
 .event-indicator-text {

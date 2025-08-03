@@ -5,46 +5,81 @@
 * Battle screen UI
 
    * BUGS
-    * repair the pyramids screen
-    * settings to affect the game itself
-    * return to main menu from in game to have different texts on the buttons
-    * buttons on dark slate background to be plum colored
-    * shouldn't be able to examine a cloaked enemy
-    * should be able to examine non-team combatants, like walls and targets
+
+    * buttons on dark slate background to be plum colored V
+    * return to main menu from in game to have different texts on the buttons V
+    * actions to be achilles helmets instead of flaming swords + red helmets for red team V
+    * shouldn't be able to examine a cloaked enemy V
+    * should be able to examine non-team combatants, like walls and targets V
+    * if esc menu is on, pressing esc again should close it V
+    * shortcuts should also work with caps lock and HE buttons V
+    * add "none" on turn order icons if there are not status effects V
+    * Turn order icons X for red team appears wrong V
+    * co op menu: "actions" instead of "turns" V
+    * co op menu: bad ui on the partner's section V
+    * hide status effects that shouldn't be visible (first struck, etc.) V
+    * new logo screen V
+    * logo screen, intro seq skippable with esc V
+    * status descriptions on the far right are too long and break the UI V
+    * co op: partners stays highlighted even after using skill (happened in tutorial) V
+    * "multikill" should not be scored unless x enemies are actually killed (rampage is bugged here) V
+    * sanctuary appears as divine retribution on the board status LIST V
+    * yellow bar for arcane barrier (optional/after beta) X
+    * make sure the event messages disappear after a short while V
+    * status screen to show remaining health and stamina separately V
+    * duration for status effects in the examine screen V
+    * add skull to the opening "die for me" text in main menu, and the one in the esc menuV
+    * player team to start on the bottom V
+    * ? to not be dead icon when skipping it V
+
+    * effect for missing an ailment (optional) (mostly for fool)
+    * blocking stance not showing icon when applied (it's because the status effect is enum 0, annoying JS)
+    * have red team members face the other direction (optional)
+
+    // Logic
+    * devour divinity not working properly
     * AI should not know to AOE target cloaked foes
     * Wizard vetetran agent to be more aggressive (less barrier, overcharge instead of attacking)
     * rookie/kid agent to stop targeting empty spaces with AOE skills
     * make sure that healer's divine mircale renews for next battle (if used)
-    * devour divinity not working properly
-    * status descriptions on the far right are too long and break the UI
-    * sanctuary appears as divine retribution on the board status LIST
-    * blocking stance not showing icon when applied
-    * effect for missing an ailment (optional) (mostly for fool)
     * enemy turns should go slower so the player can better track
-    * Turn order icons X for red team appears working
-    * add "none" on turn order icons if there are not status effects
-    * "multikill" should not be scored unless x enemies are actually killed (rampage is bugged here)
-    * co op menu: bad ui on the partner's section
-    * co op menu: "actions" instead of "turns"
-    * co op: partners stays highlighted even after using skill (happened in tutorial)
-    * yellow bar for arcane barrier (optional)
-    * make sure the event messages disappear after a short while
-    * make sure the UI doesn't break on larger screens
-    * custom messages (for tutorials or bosses)
+    * enemy turn - separate moving and acting for transparency sake
+
+    // sound
+    * sounds for logo screen, intro seq.
     * new sounds for buffs and debuffs (generic for each type, not for every status)
     * sounds for miss result (optional)
     * unique track for each difficulty + boss
     * sounds for moving, for pressing buttons.
-    * player team to start on the bottom
-    * have red team members face the other direction (optional)
+    * apply settings for sounds and for post battle messages
     
+    // testing
+    * make sure the UI doesn't break on larger screens(fullscreen/ large desktop)
     * play testing - all difficulties + tutorials
-    * loading screen if needed
 
-     * take care of duel after sending for friend reviews
+    // deployment
+    * deploy on vercel
+    * loading screen if needed     
 
-     * credits
-       * any artists who own sounds/svg's/ images
+
+  * TICKETS FOR AFTER/during BETA
+
+    * credits
+        * any artists who own sounds/svg's/ images
+    * take care of duel after sending for friend reviews
+    * custom messages for bosses
+    * custom end game messages for bosses
+    * tooltips for stats in build team screen/ examine combatant screen
+    * skill tab in build team screen
+    * range and trajectory hints for skills
+    * after complete run "congratz" screen
+    * high scores screen
+    * fill the about me screen
+    * achievements screen and infra
+
+
+
+
 
 
 
@@ -62,9 +97,13 @@ https://www.youtube.com/watch?v=fpalvmhf180 - fool laugh sound - need 1.5X speed
 
 click sound effects:
 
-https://www.youtube.com/watch?v=q8ZLBOFQ2g0
+https://www.youtube.com/watch?v=q8ZLBOFQ2g0 (2 and 9 best)
 
 https://www.youtube.com/results?search_query=button+click+sound+effect
+
+sword clash sound effect: 
+
+https://www.youtube.com/watch?v=8t3-s7HL360
 
 !-----------------------------------------------------------------------------!
 
@@ -76,3 +115,6 @@ A pixel art portrait of the female jester character, "The Fool," from the user's
     She is smiling mischievously and winking with the eye further from the viewer.
     Crucially, her open eye (the one closer to the viewer) must have a distinct, clearly visible "hex symbol inside a circle" drawn as makeup around it, replacing the usual black circle. This symbol should be precise and well-defined.
     Her face is covered in white pixelated makeup. Her hair is split blonde/black. The overall feel should be whimsical, mischievous, and slightly eerie. The sprite should be isolated on a transparent background, approximately 64x64 pixels in resolution, rendered in crisp pixel art with no anti-aliasing artifacts.
+
+
+`A minimalist logo portrait of a female jester character, "The Fool." The style should be simple, clean, and highly effective, using only two colors: black and a vibrant yellow/gold. The image focuses on her head and upper torso. Her head should be drawn at a 45-degree angle. She has a mischievous smile. One eye is open and looking directly at the viewer, while the other eye is winking playfully. Her hair is styled in pigtails, split into two distinct colors (one black, one yellow/gold). The overall aesthetic is striking, iconic, and conveys her playful yet mysterious nature. The logo should be isolated on a transparent background, rendered in a clean, vector-like style (not pixel art).`

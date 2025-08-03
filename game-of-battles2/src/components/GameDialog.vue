@@ -78,12 +78,8 @@ export default defineComponent({
     const currentStep = ref(0); // Current step in a sequence
 
     // Determine if it's a sequence or a single message
-    // eslint-disable-next-line
-    debugger;
+
     const isSequence = computed(() => props.sequence && props.sequence.length > 0);
-
-    
-
     // The dialog content currently being displayed
     const currentDialog = computed<DialogMessage>(() => {
       // Ensure sequence is not empty before trying to access elements

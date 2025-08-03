@@ -23,6 +23,9 @@ export class EventLogger {
 
     public logEvent(message: GameEventMessage): void {
         this.events.push(message);
+        setTimeout(() => {
+            this.clearEvents();
+        }, 2000);
     }
 
     public addBreak(): void {
@@ -31,6 +34,10 @@ export class EventLogger {
             actionPart: undefined,
             actionType: PlayActionType.SKIP
         });
+    }
+
+    private clearEvents(): void {
+        this.events = [];
     }
 
     public getEvents(): GameEventMessage[] {
