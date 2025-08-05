@@ -28,7 +28,8 @@ export default defineComponent({
     const continueToNextLevel = () => {
       const playerTeam = runManager.getTeam();
       refreshTeam(playerTeam);
-      router.push('/Match');
+      // router.push('/Match');
+      router.push('/Journey');
     };
 
     const returnToMenu = () => {
@@ -42,8 +43,6 @@ export default defineComponent({
     });
 
     const getStateParams = () => {
-      // eslint-disable-next-line no-debugger
-      debugger;
       if(!window.history || !window.history.state) {
         return;
       }
@@ -53,8 +52,6 @@ export default defineComponent({
     }
 
     const updateRun = () => {
-      // eslint-disable-next-line no-debugger
-      debugger;
 
       if(runManager.getRunType() === RunType.SINGLE_PLAYER) {
         updateSinglePlayerRun();
@@ -69,11 +66,10 @@ export default defineComponent({
 
 
     const updateSinglePlayerRun = () => {
-      runManager.setCurrentLevel(runManager.getCurrentLevel() + 1);
       runManager.setScore(100);
       const difficulty = runManager.getDifficulty();
       const difficultyLevelCount = getDifficulyLevelCount(difficulty!);
-      if(runManager.getCurrentLevel() > difficultyLevelCount) {
+      if(runManager.getCurrentLevel() + 1 > difficultyLevelCount) {
         runCompleted.value = true;
         runManager.setStatus(RunsStatus.COMPLETED);
       }
@@ -131,6 +127,7 @@ export default defineComponent({
   margin-bottom: 2em;
   font-family: 'Cinzel Decorative', sans-serif;
   font-size: 2.5em;
+  max-width: 70%;
 }
 
 .button-container {

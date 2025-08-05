@@ -106,7 +106,7 @@ export class EvilEye implements SpecialMove {
         return getStandardActionResult();
     };
     checkRequirements = undefined;
-    description = `Reduce luck of all enemies in a 1-tile cross-shaped area.`
+    description = `Reduce luck of all enemies in a 1-tile cross-shaped area for 3 rounds.`
 }
 
 export class SiphonEnergy implements SpecialMove {

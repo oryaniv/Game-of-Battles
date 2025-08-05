@@ -438,7 +438,7 @@ export class MarkedDetonatedStatusEffect implements StatusEffect {
 
 export class PanickedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.PANICKED;
-    description = `This combatant is panicked, and will flee from the closest enemy.`;
+    description = `This combatant will flee as far as possible from the closest enemy.`;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant) => {
             if(!self.isOrganic()) {

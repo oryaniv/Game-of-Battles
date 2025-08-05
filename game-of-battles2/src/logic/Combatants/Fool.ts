@@ -23,7 +23,7 @@ export class Fool extends Combatant {
             movementSpeed: 4,
             range: 2,
             agility: 7,
-            luck: STAT_BUFF_INCREASE_ENABLED ? -15 : 10,
+            luck: STAT_BUFF_INCREASE_ENABLED ? 13 : 10,
           },
           position,
           [

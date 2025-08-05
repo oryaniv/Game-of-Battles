@@ -103,20 +103,20 @@ export class CombatMaster {
 
 
     public tryInflictStatusEffect(afflictor: Combatant, target: Position, board: Board,
-       statusEffect: StatusEffectType, duration: number, chance: number): void {
+       statusEffect: StatusEffectType, duration: number, chance: number): boolean {
         const targetCombatant = board.getCombatantAtPosition(target);
         if(!targetCombatant) {
-            return;
+            return false;
         }
 
         const onBeingAilmentInflictedHookResult = this.getOnBeingAilmentInflictedHookResults(targetCombatant, afflictor, statusEffect);
         if(onBeingAilmentInflictedHookResult) {
-            return;
+            return false;
         }
 
         const chanceWithDelta = chance + ((afflictor.stats.luck - targetCombatant.stats.luck) * 0.02);
         if(Math.random() >= chanceWithDelta) {
-            return;
+            return false;
         }
 
         if(targetCombatant.hasStatusEffect(statusEffect)) {
@@ -125,6 +125,8 @@ export class CombatMaster {
           targetCombatant.applyStatusEffect({name: statusEffect, duration: duration}, afflictor);
           emitter.emit('trigger-method', getStatusEffectActionResult(statusEffect, target, duration));
         }
+
+        return true;
      }
 
 

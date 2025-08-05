@@ -3,9 +3,10 @@ import { Damage } from "@/logic/Damage";
 import { Position } from "@/logic/Position";
 import { SpecialMove, SpecialMoveAlignment, SpecialMoveAreaOfEffect, SpecialMoveRange, SpecialMoveRangeType, SpecialMoveTriggerType } from "@/logic/SpecialMove";
 import { Board } from "@/logic/Board";
-import { StatusEffectType, StatusEffectHook } from "@/logic/StatusEffect";
-import { AttackResult, getStandardActionResult, getStatusEffectActionResult } from "@/logic/attackResult";
+import { StatusEffectType, StatusEffectHook, StatusEffect, StatusEffectAlignment } from "@/logic/StatusEffect";
+import { ActionResult, AttackResult, getStandardActionResult, getStatusEffectActionResult } from "@/logic/attackResult";
 import { Combatant } from "@/logic/Combatant";
+import { emitter } from "@/eventBus";
 
 
 export class BlockingStance implements SpecialMove {
@@ -32,6 +33,7 @@ export class BlockingStance implements SpecialMove {
             name: StatusEffectType.BLOCKING_STANCE,
             duration: Number.POSITIVE_INFINITY,
         }); 
+        emitter.emit('trigger-method', getStatusEffectActionResult(StatusEffectType.BLOCKING_STANCE, target, 1));
         return getStatusEffectActionResult(StatusEffectType.BLOCKING_STANCE, target, 1);
         
     };
@@ -177,14 +179,14 @@ export class DragonRage implements SpecialMove {
         type: DamageType.Unstoppable
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
-        return getStandardActionResult(target, -2);
+        return getStatusEffectActionResult(StatusEffectType.ENCOURAGED, target, -2);
     };
     checkRequirements = undefined;
 }     
 
 export class BeastRage implements SpecialMove {
-    name: string = "Dragon Rage";
-    description = `Gain and additional action point.`
+    name: string = "Beast Rage";
+    description = `Gain an additional action point.`
     triggerType = SpecialMoveTriggerType.Active;
     cost: number = 10;
     turnCost: number = 1;
@@ -199,9 +201,11 @@ export class BeastRage implements SpecialMove {
         type: DamageType.Unstoppable
     };
     effect = (invoker: Combatant, target: Position, board: Board) => {
-        return getStandardActionResult(target, -1);
+        return getStatusEffectActionResult(StatusEffectType.ENCOURAGED, target, -1);
     };
-    checkRequirements = undefined;
+    checkRequirements = (self: Combatant) => {
+        return!self.hasMoved;
+    };
 }  
 
 export class SelfDestruct implements SpecialMove {
@@ -260,4 +264,86 @@ export class ReplacementPart implements SpecialMove {
     checkRequirements = (self: Combatant) => {
         return self.hasStatusEffect(StatusEffectType.INGENIOUS_UPGRADE);
     }
+}
+
+export class DragonAura implements SpecialMove {
+    name: string = "Dragon Aura";
+    description = `Gain the Dragon Aura status for 200 rounds. Any non-unstoppable damage taken may be reduced down to 0, and the duration is cut by the amount of damage taken.`
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 10;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Self,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Unstoppable
+    };
+    effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
+        invoker.applyStatusEffect({
+            name: StatusEffectType.ARCANE_BARRIER,
+            duration: 200,
+        });
+        return getStatusEffectActionResult(StatusEffectType.ARCANE_BARRIER, invoker.position, this.turnCost);
+    };
+    checkRequirements = (self: Combatant) => {
+        return!self.hasMoved;
+    };
+}
+
+export class ChainBreaker implements SpecialMove {
+    name: string = "Chain Breaker";
+    description = `Break the chain of status effects.`
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 10;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Self,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Unstoppable
+    };
+    effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
+        const negativeStatusEffects: StatusEffect[] = invoker.getStatusEffects().filter(status => status.alignment === StatusEffectAlignment.Negative);
+        for(const statusEffect of negativeStatusEffects) {
+            invoker?.removeStatusEffect(statusEffect.name);
+        }
+        return getStandardActionResult();
+    };
+    checkRequirements = (self: Combatant) => {
+        return!self.hasMoved;
+    };
+}
+
+export class AdditionalTurns1 implements SpecialMove {
+    name: string = "Divine Celerity";
+    description = `Gain 1 additional action point every round.`
+    triggerType = SpecialMoveTriggerType.Passive;
+    cost: number = 10;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Self,
+        align: SpecialMoveAlignment.Self,
+        areaOfEffect: SpecialMoveAreaOfEffect.Single,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Unstoppable
+    };
+    effect = (invoker: Combatant, target: Position, board: Board) => {
+        invoker.applyStatusEffect({
+            name: StatusEffectType.DIVINE_ALACRITY,
+            duration: Number.POSITIVE_INFINITY,
+        });
+        return getStatusEffectActionResult(StatusEffectType.DIVINE_ALACRITY, invoker.position, this.turnCost);
+    };
+    checkRequirements = undefined;
 }

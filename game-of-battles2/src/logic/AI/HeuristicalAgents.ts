@@ -54,7 +54,7 @@ export abstract class HeuristicalAIAgent implements AIAgent {
         const actionTarget = bestPlay.playAction.target || combatant.position;
         return bestPlay.playAction.executionFunction(combatant, actionTarget, game, board);
     }
-
+        
     getAIAgentType(): AIAgentType {
         return AIAgentType.SPECIALIZED;
     }
@@ -423,6 +423,10 @@ export function isLowStamina(combatant: Combatant): boolean {
 
 export function isStaminaDepleted(combatant: Combatant): boolean {
     return combatant.stats.stamina <= 2;
+}
+
+export function isCloakedEnemy(combatant: Combatant, targetCombatant: Combatant) {
+    return targetCombatant.isCloaked() && combatant.team.getIndex() !== targetCombatant.team.getIndex();
 }
 
 export function isTargetInMelee(combatant: Combatant | Position, target: Combatant, board: Board): boolean {

@@ -2,7 +2,7 @@ import { Board } from "../Board";
 import { Combatant } from "../Combatant";
 import { Position } from "../Position";
 import { Game } from "../Game";
-import { SpecialMove, SpecialMoveAlignment, SpecialMoveTriggerType } from "../SpecialMove";
+import { SpecialMove, SpecialMoveAlignment, SpecialMoveAreaOfEffect, SpecialMoveTriggerType } from "../SpecialMove";
 import { DamageReaction } from "../Damage";
 
 interface SkillTargeting {
@@ -79,6 +79,7 @@ export function getValidAttackWithSkillsIncluded(combatant: Combatant, board: Bo
     let allCombatantOffensiveSkills = combatant.specialMoves.filter(
         (move) => move.range.align === SpecialMoveAlignment.Enemy &&
         move.triggerType === SpecialMoveTriggerType.Active &&
+        move.range.areaOfEffect === SpecialMoveAreaOfEffect.Single &&
         combatant.canUseSkill(move)
     );
     allCombatantOffensiveSkills = shuffleArray(allCombatantOffensiveSkills);
@@ -93,12 +94,10 @@ export function getValidAttackWithSkillsIncluded(combatant: Combatant, board: Bo
     return null;
 }
 
-export function getValidAttackWithSkillsIncludedOptimal(combatant: Combatant, board: Board) {
+export function getValidAttackWithSkillsIncludedOptimal(combatant: Combatant, board: Board, collectCoop: boolean = false) {
     let allCombatantOffensiveSkills = combatant.specialMoves.filter(
         (move) => move.range.align === SpecialMoveAlignment.Enemy &&
-        move.triggerType === SpecialMoveTriggerType.Active &&
-        // (move.checkRequirements === undefined || move.checkRequirements(combatant)) && 
-        // combatant.stats.stamina >= move.cost
+        (move.triggerType === SpecialMoveTriggerType.Active || (collectCoop && move.triggerType === SpecialMoveTriggerType.Cooperative)) &&
         combatant.canUseSkill(move)
     );
     allCombatantOffensiveSkills = shuffleArray(allCombatantOffensiveSkills);

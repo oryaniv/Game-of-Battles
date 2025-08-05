@@ -3,6 +3,7 @@ import { Damage, DamageReaction, DamageType } from "../Damage";
 import { Position } from "../Position";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
+import { GorillaSmash } from "../SpecialMoves/Singular/Offensive";
 
 export class Gorilla extends Combatant {
     constructor(name: string, position: Position, team: Team) {
@@ -31,7 +32,9 @@ export class Gorilla extends Combatant {
             {type: DamageType.Holy, reaction: DamageReaction.NONE},
             {type: DamageType.Dark, reaction: DamageReaction.NONE},
         ],
-        [],
+        [
+          new GorillaSmash()
+        ],
       team);
     }
 

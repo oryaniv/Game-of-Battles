@@ -1,4 +1,4 @@
-import { ActionResult, getStandardActionResult, getStatusEffectActionResult } from "@/logic/attackResult";
+import { ActionResult, getStandardActionResult, getStatusEffectActionResult, getMissActionResult } from "@/logic/attackResult";
 import { Board } from "@/logic/Board";
 import { Combatant } from "@/logic/Combatant";
 import { DamageType } from "@/logic/Damage";
@@ -30,8 +30,8 @@ export class YoMama implements SpecialMove {
         if(!targetCombatant) {
             return getStandardActionResult();
         }
-        combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.TAUNTED, 3, 0.6);
-        return getStandardActionResult();
+        const hit = combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.TAUNTED, 3, 0.6);
+        return hit ? getStandardActionResult() : getMissActionResult();
     };
      checkRequirements = undefined;
     description = `Target enemy may become taunted by you for 3 rounds.`
@@ -56,7 +56,10 @@ export class StupidestCrapEver implements SpecialMove {
         const combatMaster = CombatMaster.getInstance();
         const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
         getAllTargets.forEach(AOETarget => {
-            combatMaster.tryInflictStatusEffect(invoker, AOETarget, board, StatusEffectType.STUPEFIED, 2, 0.6);
+            const hit = combatMaster.tryInflictStatusEffect(invoker, AOETarget, board, StatusEffectType.STUPEFIED, 2, 0.6);
+            if(!hit) {
+                emitter.emit('trigger-method', getMissActionResult(AOETarget, this.turnCost));
+            }
         });
 
         return getStandardActionResult();
@@ -119,4 +122,37 @@ export class LookeyHere implements SpecialMove {
     };
     description = `Enemies in a 2-tile radius nova around you may become mesmerized and unable to act for 1 round.
     This will keep on as long as you skip your turn.`;
+}
+
+
+export class DragonRoar implements SpecialMove {
+    name: string = "Dragon Roar";
+    description = `All surrounding enemies may become Panciked for 2 rounds. Cannot use after moving.`
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 10;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Self,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Nova,
+        range: 0
+    };
+    damage: Damage = {
+        amount: 0,
+        type: DamageType.Unstoppable
+    };
+    effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
+        const combatMaster = CombatMaster.getInstance();
+        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
+        getAllTargets.forEach(AOETarget => {
+            const hit = combatMaster.tryInflictStatusEffect(invoker, AOETarget, board, StatusEffectType.PANICKED, 2, 0.6);
+            if(!hit) {
+                emitter.emit('trigger-method', getMissActionResult(AOETarget, this.turnCost));
+            }
+        });
+        return getStandardActionResult();
+    };
+    checkRequirements = (self: Combatant) => {
+        return !self.hasMoved;
+    };
 }

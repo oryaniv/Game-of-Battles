@@ -233,13 +233,13 @@ export default defineComponent({
 
 .dead-x {
   position: absolute;
-  top: 0;
+  bottom: 0;
   left: -2px;
 }
 
 .black-team-turn-order-container .dead-x{
-  bottom: 0;
-  top: auto;
+  top: 0;
+  bottom: auto;
 }
 
 </style>

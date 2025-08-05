@@ -41,7 +41,7 @@ export function getStandardActionResult(position?: Position, cost: number = 1): 
 
 export function getDamageActionResult(resultDamage: Damage, position?: Position, cost: number = 1): ActionResult {
     return {
-        attackResult: AttackResult.NotFound,
+        attackResult: AttackResult.Hit,
         damage: resultDamage,
         cost: cost,
         reaction: DamageReaction.NONE,
@@ -60,5 +60,18 @@ export function getStatusEffectActionResult(statusEffectType: StatusEffectType, 
         reaction: DamageReaction.NONE,
         position: position,
         statusEffectType: statusEffectType
+    };
+}
+
+export function getMissActionResult(position?: Position, cost: number = 1): ActionResult {
+    return {
+        attackResult: AttackResult.Miss,
+        damage: {
+            amount: 0,
+            type: DamageType.Unstoppable
+        },
+        cost: cost,
+        reaction: DamageReaction.NONE,
+        position: position
     };
 }

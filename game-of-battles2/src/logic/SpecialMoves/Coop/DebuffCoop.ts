@@ -29,25 +29,40 @@ export class DevourDivinity extends CoopMove {
     meterCost: number = 0;
     effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
+        let statusesRemoved = 0;
         getAllTargets.map(AOETarget => {
             const targetCombatant = board.getCombatantAtPosition(AOETarget);
             if(!targetCombatant) {
                 return getStandardActionResult();
             }
             const positiveStatusEffects: StatusEffect[] = targetCombatant.getStatusEffects().filter(status => status.alignment === StatusEffectAlignment.Positive);
-            const length = positiveStatusEffects.length;
-            invoker.stats.hp = Math.min(invoker.stats.hp + (10 * length), invoker.baseStats.hp);
-            invoker.applyStatusEffect({
-                name: StatusEffectType.STRENGTH_BOOST,
-                duration: length,
-            });
             for(const statusEffect of positiveStatusEffects) {
                 targetCombatant?.removeStatusEffect(statusEffect.name);
+                statusesRemoved++;
             }
             return getStandardActionResult(AOETarget, this.turnCost);
         });
 
-        return getStandardActionResult();
+        if(statusesRemoved > 0) {
+            const healingAmount = 10 * statusesRemoved;
+            invoker.stats.hp = Math.min(invoker.stats.hp + healingAmount, invoker.baseStats.hp);
+            invoker.applyStatusEffect({
+                name: StatusEffectType.STRENGTH_BOOST,
+                duration: statusesRemoved,
+            });
+            return {
+                attackResult: AttackResult.Hit,
+                damage: {
+                    amount: healingAmount,
+                    type: DamageType.Healing
+                },
+                cost: 1,
+                reaction: DamageReaction.NONE,
+                position: invoker.position
+            };
+        } else {
+            return getStandardActionResult(invoker.position, this.turnCost);
+        }
     };
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Curve,

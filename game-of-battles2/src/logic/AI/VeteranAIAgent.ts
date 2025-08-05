@@ -51,7 +51,8 @@ import { HeuristicalAIAgent, PlayActionType, TurnPlay, areManyAlliesNearby, areM
       hasPurifySkill,
       hasMeditateSkill,
       getNearbyAllies,
-      getAdjacentEnemies} from "./HeuristicalAgents";
+      getAdjacentEnemies,
+      isCloakedEnemy} from "./HeuristicalAgents";
 import { BoardObject } from "../BoardObject";
 
 export enum AggressivenessLevel {
@@ -354,7 +355,7 @@ class VeteranAIAgentDefenderPlayer extends VeteranAIAgentGenericPlayer {
             const getAllTargets = board.getAreaOfEffectPositions(combatant, combatant.position, SpecialMoveAreaOfEffect.Nova, SpecialMoveAlignment.SelfAndAlly);
             const protectedTargets = getAllTargets.filter(AOETarget => { 
                 const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-                // eslint-disable-next-line
+                
                 if(!targetCombatant) {
                     return false;
                 }
@@ -634,7 +635,7 @@ class VeteranAIAgentHunterPlayer extends VeteranAIAgentGenericPlayer {
         const moveValue = this.evaluateMovement(combatant, game, board, movePosition);
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant) {
+            if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             const targetHitValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position, DamageType.Pierce) - moveValue;
@@ -654,7 +655,7 @@ class VeteranAIAgentHunterPlayer extends VeteranAIAgentGenericPlayer {
         const moveValue = this.evaluateMovement(combatant, game, board, movePosition);
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant) {
+            if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             let targetHitValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position, DamageType.Fire) + 4 - moveValue;
@@ -831,7 +832,7 @@ class VeteranAIAgentHealerPlayer extends VeteranAIAgentGenericPlayer {
         const moveValue = this.evaluateMovement(combatant, game, board, movePosition);
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant) {
+            if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             if(isSameTeam(combatant, targetCombatant)) {
@@ -1064,7 +1065,7 @@ class VeteranAIAgentWizardPlayer extends VeteranAIAgentGenericPlayer {
             
             getAllTargets.forEach(AOETarget => {
                 const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-                if(!targetCombatant) {
+                if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
                     return;
                 }
                 let burstTargetValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position, DamageType.Fire) + 10;
@@ -1093,7 +1094,7 @@ class VeteranAIAgentWizardPlayer extends VeteranAIAgentGenericPlayer {
         
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant) {
+            if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             const targetHitValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position, DamageType.Unstoppable) + 25;
@@ -1113,7 +1114,7 @@ class VeteranAIAgentWizardPlayer extends VeteranAIAgentGenericPlayer {
         
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant) {
+            if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             let targetHitValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position, DamageType.Fire) + 10;
@@ -1533,7 +1534,7 @@ class VeteranAIAgentWitchPlayer extends VeteranAIAgentGenericPlayer {
         const getAllTargets = board.getAreaOfEffectPositions(combatant, target!, SpecialMoveAreaOfEffect.Cross, SpecialMoveAlignment.Enemy);
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant) {
+            if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             if(targetCombatant.team.index === combatant.team.index) {
@@ -1616,7 +1617,7 @@ class VeteranAIAgentWitchPlayer extends VeteranAIAgentGenericPlayer {
         const moveValue = this.evaluateMovement(combatant, game, board, movePosition);
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant || isSameTeam(combatant, targetCombatant)) {
+            if(!targetCombatant || isSameTeam(combatant, targetCombatant) || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             const positiveStatusEffectsLength = targetCombatant.getStatusEffects()
@@ -1651,7 +1652,7 @@ class VeteranAIAgentWitchPlayer extends VeteranAIAgentGenericPlayer {
         const moveValue = this.evaluateMovement(combatant, game, board, movePosition);
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant || isSameTeam(combatant, targetCombatant)) {
+            if(!targetCombatant || isSameTeam(combatant, targetCombatant) || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             const negativeStatusEffectsLength = targetCombatant.getStatusEffects()
@@ -1791,7 +1792,7 @@ class VeteranAIAgentFoolPlayer extends VeteranAIAgentGenericPlayer {
         const getAllTargets = board.getAreaOfEffectPositions(combatant, target!, SpecialMoveAreaOfEffect.Cross, SpecialMoveAlignment.Enemy);
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant) {
+            if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             if(targetCombatant.team.index === combatant.team.index) {
@@ -1809,7 +1810,7 @@ class VeteranAIAgentFoolPlayer extends VeteranAIAgentGenericPlayer {
         const getAllTargets = board.getAreaOfEffectPositions(combatant, target!, SpecialMoveAreaOfEffect.Great_Nova, SpecialMoveAlignment.Enemy);
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant) {
+            if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             if(targetCombatant.team.index === combatant.team.index) {
@@ -1853,7 +1854,7 @@ class VeteranAIAgentFoolPlayer extends VeteranAIAgentGenericPlayer {
         const getAllTargets = board.getAreaOfEffectPositions(combatant, target!, SpecialMoveAreaOfEffect.Line, SpecialMoveAlignment.Enemy);
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant) {
+            if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             if(targetCombatant.team.index === combatant.team.index) {
@@ -1876,7 +1877,7 @@ class VeteranAIAgentFoolPlayer extends VeteranAIAgentGenericPlayer {
         
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant) {
+            if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             let targetHitValue = 6;
@@ -1900,7 +1901,7 @@ class VeteranAIAgentFoolPlayer extends VeteranAIAgentGenericPlayer {
         const getAllTargets = board.getAreaOfEffectPositions(combatant, target!, SpecialMoveAreaOfEffect.Great_Nova, SpecialMoveAlignment.Enemy);
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant) {
+            if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             if(targetCombatant.team.index === combatant.team.index) {
@@ -1995,7 +1996,7 @@ class VeteranAIAgentPikemanPlayer extends VeteranAIAgentGenericPlayer {
 
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant) {
+            if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             const targetHitValue = 3 + this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position, DamageType.Ice) - moveValue;
@@ -2016,7 +2017,7 @@ class VeteranAIAgentPikemanPlayer extends VeteranAIAgentGenericPlayer {
         const moveValue = this.evaluateMovement(combatant, game, board, movePosition);
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant) {
+            if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             const targetHitValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position, DamageType.Pierce) - moveValue;
@@ -2075,7 +2076,7 @@ class VeteranAIAgentPikemanPlayer extends VeteranAIAgentGenericPlayer {
 
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant) {
+            if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             const targetHitValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position);
@@ -2203,7 +2204,7 @@ class VeteranAIAgentVanguardPlayer extends VeteranAIAgentGenericPlayer {
 
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant) {
+            if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             const targetHitValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position, DamageType.Lightning);
@@ -2229,7 +2230,7 @@ class VeteranAIAgentVanguardPlayer extends VeteranAIAgentGenericPlayer {
 
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant) {
+            if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             const targetHitValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position);
@@ -2268,7 +2269,7 @@ class VeteranAIAgentVanguardPlayer extends VeteranAIAgentGenericPlayer {
         const getAllTargets = board.getAreaOfEffectPositions(combatant, target!, SpecialMoveAreaOfEffect.Cross, SpecialMoveAlignment.Enemy);
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant || targetCombatant.team.getIndex() === combatant.team.getIndex() ) {
+            if(!targetCombatant || targetCombatant.team.getIndex() === combatant.team.getIndex() || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             
@@ -2305,7 +2306,7 @@ class VeteranAIAgentVanguardPlayer extends VeteranAIAgentGenericPlayer {
         const getAllTargets = board.getAreaOfEffectPositions(combatant, target!, SpecialMoveAreaOfEffect.Cone, SpecialMoveAlignment.All);
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant) {
+            if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             const targetHitValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position);
@@ -2448,7 +2449,7 @@ class VeteranAIAgentFistWeaverPlayer extends VeteranAIAgentGenericPlayer {
 
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant) {
+            if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             const targetHitValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position, DamageType.Holy) + 3;
@@ -3044,7 +3045,7 @@ class VeteranAIAgentArtificerPlayer extends VeteranAIAgentGenericPlayer {
 
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant) {
+            if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             const targetHitValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position, DamageType.Fire);
@@ -3147,7 +3148,7 @@ class VeteranAIAgentBallistaTurretPlayer extends VeteranAIAgentGenericPlayer {
         let totalEnemieshit = 0;
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant) {
+            if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             const targetHitValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position, DamageType.Pierce);
@@ -3227,7 +3228,7 @@ class VeteranAIAgentDragonPlayer extends VeteranAIAgentGenericPlayer {
             return this.evaluateDragonBreath(combatant, game, board, movePosition, target);
         }
 
-        if(specialMove === "Dragon Fire Ball") {
+        if(specialMove === "Inferno") {
             return this.evaluateDragonFireBall(combatant, game, board, movePosition, target);
         }
 
@@ -3243,7 +3244,37 @@ class VeteranAIAgentDragonPlayer extends VeteranAIAgentGenericPlayer {
             return this.evaluateDieMortal(combatant, game, board, movePosition, target);
         }
 
+        if(specialMove === "Dragon Roar") {
+            return this.evaluateDragonRoar(combatant, game, board, movePosition, target);
+        }
+
+        if(specialMove === "Dragon Aura") {
+            return this.evaluateDragonAura(combatant, game, board, movePosition, target);
+        }
+
+        if(specialMove === "Chain Breaker") {
+            return this.evaluateChainBreaker(combatant, game, board, movePosition, target);
+        }
+
         return 0;
+    }
+
+    private evaluateDragonRoar(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        const adjacentEnemies = getAdjacentEnemies(combatant, board, game);
+        return adjacentEnemies.length >= 4 ? 150 : 0;
+    }
+
+    private evaluateDragonAura(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        if([1,5,10].includes(game.getCurrentRound()) && !combatant.hasStatusEffect(StatusEffectType.ARCANE_BARRIER)) {
+            return 100;
+        }
+        return 0;
+    }
+
+    private evaluateChainBreaker(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
+        const allNegativeStatusEffects = combatant.getStatusEffects()
+        .filter((statusEffect) => statusEffect.alignment === StatusEffectAlignment.Negative);
+        return allNegativeStatusEffects.length >= 5 ? 120 : 0;
     }
 
     private evaluateDragonBreath(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
@@ -3258,7 +3289,7 @@ class VeteranAIAgentDragonPlayer extends VeteranAIAgentGenericPlayer {
 
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant) {
+            if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             const targetHitValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position, DamageType.Fire) + 10;
@@ -3266,6 +3297,7 @@ class VeteranAIAgentDragonPlayer extends VeteranAIAgentGenericPlayer {
                 totalEnemieshit += 1;
             }
             baseValue += targetCombatant.team.getName() !== combatant.team.getName() ? targetHitValue : -targetHitValue;
+            baseValue += !targetCombatant.hasStatusEffect(StatusEffectType.BURNING) ? 5 : -3;
         });
         theoreticalReplacement(combatant, board, originalPosition, false);
         baseValue += totalEnemieshit === 0 ? -10 : 0;
@@ -3279,10 +3311,10 @@ class VeteranAIAgentDragonPlayer extends VeteranAIAgentGenericPlayer {
         
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant) {
+            if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
-            const targetHitValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position, DamageType.Fire) + 10;
+            const targetHitValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position, DamageType.Fire) + 12;
             if(targetCombatant.team.getName() !== combatant.team.getName()) {
                 totalEnemieshit += 1;
             }
@@ -3370,7 +3402,7 @@ class VeteranAIAgentBombPlayer extends VeteranAIAgentGenericPlayer {
         let totalEnemieshit = 0;
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant) {
+            if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             if(targetCombatant.name === combatant.name) {
@@ -3468,7 +3500,7 @@ class VeteranAIAgentBabyBabelPlayer extends VeteranAIAgentGenericPlayer {
         
         getAllTargets.forEach(AOETarget => {
             const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-            if(!targetCombatant) {
+            if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
                 return;
             }
             const damageType = isSamePosition(target!, AOETarget) ? DamageType.Crush : DamageType.Pierce;

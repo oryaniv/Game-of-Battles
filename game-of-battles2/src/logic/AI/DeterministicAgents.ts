@@ -8,7 +8,7 @@ import { SpecialMoveAlignment } from "../SpecialMove";
 import { StatusEffectType } from "../StatusEffect";
 import { AIAgent, AIAgentType } from "./AIAgent";
 import { getClosestEnemy, getValidAttacks, getValidAttackWithSkillsIncluded, getValidAttackWithSkillsIncludedOptimal, getValidBasicAttackWithOptimalTarget, getValidMovePositions, getValidSupportSkills, isBasicAttackTargetingBetter, isSkillTargetingBetter, mergeDeep, moveTowards, shuffleArray } from "./AIUtils";
-import { HeuristicalAIAgent } from "./HeuristicalAgents";
+import { getAdjacentEnemies, HeuristicalAIAgent } from "./HeuristicalAgents";
 
 
 export class HollowAIAgent implements AIAgent {
@@ -205,8 +205,13 @@ export class RookieAIAgent implements AIAgent {
         return AIAgentType.DETERMINISTIC;
     }
 
+    private collectCoop: boolean = true;
+    setCollectCoop(collectCoop: boolean) {
+        this.collectCoop = collectCoop;
+    }
+
     private searchAndDestroyCleverlyOrBuff(combatant: Combatant, game: Game, board: Board): ActionResult[] {
-        const skillAttacksOptimizedWithoutMove = getValidAttackWithSkillsIncludedOptimal(combatant, board);
+        const skillAttacksOptimizedWithoutMove = getValidAttackWithSkillsIncludedOptimal(combatant, board, this.collectCoop);
         const validNewPositions = getValidMovePositions(combatant, board);
         const skillAttacksOptimizedAfterMove = [];
         for (let i = 0; i < validNewPositions.length; i++) {
@@ -215,7 +220,7 @@ export class RookieAIAgent implements AIAgent {
             const skillAttacksOptimizedAfterCurrentPosition = getValidAttackWithSkillsIncludedOptimal(Object.assign({}, combatant, { 
                 position, hasStatusEffect: combatant.hasStatusEffect, hasMoved: true,
                 canUseSkill: combatant.canUseSkill
-            }), board);
+            }), board, this.collectCoop);
             if(skillAttacksOptimizedAfterCurrentPosition) {
                 skillAttacksOptimizedAfterMove.push(
                     skillAttacksOptimizedAfterCurrentPosition
@@ -294,7 +299,7 @@ export class TrollAIAgent implements AIAgent {
 
     private trollRampaging(combatant: Combatant, game: Game, board: Board): ActionResult[] {
         const combatRound = game.getCurrentRound();
-        const roundsToRage = [1, 5, 10, 15, 20];
+        const roundsToRage = [2, 5, 10, 15, 20];
         
         if(roundsToRage.includes(combatRound) && !this.beastRaged) {
             this.beastRaged = true;
@@ -306,5 +311,32 @@ export class TrollAIAgent implements AIAgent {
         }
 
         return this.baseAgent.playTurn(combatant, game, board) as ActionResult[];
+    }
+}
+
+export class GorillaAIAgent implements AIAgent {
+    private baseAgent: KidAIAgent;
+    private beastRaged: boolean = false;
+
+    constructor() {
+        this.baseAgent = new KidAIAgent();
+    }
+
+    playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
+        const actionResult = this.gorillaAttacking(combatant, game, board);
+        return actionResult;
+    }
+
+    private gorillaAttacking(combatant: Combatant, game: Game, board: Board): ActionResult[] {
+        const adjacentEnemies = getAdjacentEnemies(combatant, board, game);
+        if(adjacentEnemies.length >= 4) {
+            return game.executeSkill(combatant.specialMoves.find(move => move.name === "Gorilla Smash!")!, combatant, combatant.position, board);
+        }
+
+        return this.baseAgent.playTurn(combatant, game, board) as ActionResult[];
+    }
+
+    getAIAgentType(): AIAgentType {
+        return AIAgentType.DETERMINISTIC;
     }
 }

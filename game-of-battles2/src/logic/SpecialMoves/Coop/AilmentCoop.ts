@@ -3,7 +3,7 @@ import { coopCostSlash, CoopMove } from "./CoopMove";
 import { CoopPartnerRequirement } from "./CoopMove";
 import { Damage, DamageReaction, DamageType } from "@/logic/Damage";
 import { Position } from "@/logic/Position";
-import { ActionResult, AttackResult, getStandardActionResult } from "@/logic/attackResult";
+import { ActionResult, AttackResult, getMissActionResult, getStandardActionResult, getStatusEffectActionResult } from "@/logic/attackResult";
 import { Board } from "@/logic/Board";
 import { Combatant } from "@/logic/Combatant";
 import { SpecialMoveRangeType } from "@/logic/SpecialMove";
@@ -12,6 +12,7 @@ import { SpecialMoveAreaOfEffect } from "@/logic/SpecialMove";
 import { SpecialMoveRange } from "@/logic/SpecialMove";
 import { CombatMaster } from "@/logic/CombatMaster";
 import { StatusEffect, StatusEffectAlignment, StatusEffectType } from "@/logic/StatusEffect";
+import { emitter } from "@/eventBus";
 
 export class HellScream extends CoopMove {
     name: string = "Hell Scream";
@@ -30,11 +31,13 @@ export class HellScream extends CoopMove {
         const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
 
         getAllTargets.map(AOETarget => {
-            combatMaster.tryInflictStatusEffect(invoker, AOETarget, board, StatusEffectType.PANICKED, 3, 0.6);
-            return getStandardActionResult(AOETarget, this.turnCost);
+            const hit = combatMaster.tryInflictStatusEffect(invoker, AOETarget, board, StatusEffectType.PANICKED, 3, 0.6);
+            if(!hit) {
+                emitter.emit('trigger-method', getMissActionResult(AOETarget, this.turnCost));
+            }
         });
 
-        return getStandardActionResult();
+        return getStandardActionResult(invoker.position, this.turnCost);
     };
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Curve,
@@ -72,8 +75,8 @@ export class BlowAKiss extends CoopMove {
         if(!targetCombatant) {
             return getStandardActionResult(invoker.position, this.turnCost);
         }
-        combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.CHARMED, 2, 0.6);
-        return getStandardActionResult(invoker.position, this.turnCost);
+        const hit = combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.CHARMED, 2, 0.6);
+        return hit ? getStandardActionResult(target, this.turnCost) : getMissActionResult(target, this.turnCost);
     };
     checkRequirements = (self: Combatant) => {
         return this.checkCoopRequirements(self);
@@ -103,7 +106,10 @@ export class StandUpComedyGoneWrong extends CoopMove {
         const combatMaster = CombatMaster.getInstance();
         const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
         getAllTargets.map(AOETarget => {
-            combatMaster.tryInflictStatusEffect(invoker, AOETarget, board, StatusEffectType.TAUNTED, 3, 0.6);
+            const hit = combatMaster.tryInflictStatusEffect(invoker, AOETarget, board, StatusEffectType.TAUNTED, 3, 0.6);
+            if(!hit) {
+                emitter.emit('trigger-method', getMissActionResult(AOETarget, this.turnCost));
+            }
         });
         return getStandardActionResult(invoker.position, this.turnCost);
     };
@@ -168,8 +174,8 @@ export class SleepingDart extends CoopMove {
         if(!targetCombatant) {
             return getStandardActionResult(invoker.position, this.turnCost);
         }
-        combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.SLEEPING, 2, 0.9);
-        return getStandardActionResult(invoker.position, this.turnCost);
+        const hit = combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.SLEEPING, 2, 0.9);
+        return hit ? getStandardActionResult(target, this.turnCost) : getMissActionResult(target, this.turnCost);
     };
     checkRequirements = (self: Combatant) => {
         return this.checkCoopRequirements(self);

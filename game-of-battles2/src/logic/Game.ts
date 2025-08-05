@@ -5,7 +5,7 @@ import { CombatMaster } from "./CombatMaster";
 import { Damage } from "./Damage";
 import { Position } from "./Position";
 import { SpecialMove, SpecialMoveTriggerType } from "./SpecialMove";
-import { StatusEffectHook } from "./StatusEffect";
+import { StatusEffectHook, StatusEffectType } from "./StatusEffect";
 import { getResultsForStatusEffectHook } from "./StatusEffect";
 import { Team } from "./Team";
 import { emitter } from '../eventBus';
@@ -244,8 +244,18 @@ export class Game {
       this.getCurrentTeam().updateStatusEffects();
       
       this.currentTeamIndex = 1 - this.currentTeamIndex;
-      this.actionsRemaining = this.teams[this.currentTeamIndex].getAliveCombatants().length;
+      this.actionsRemaining = this.getActionPointsForTeam();
       emitter.emit('change-team');
+    }
+
+    private getActionPointsForTeam(): number {
+      let actionPoints = this.teams[this.currentTeamIndex].getAliveCombatants().length;
+      this.teams[this.currentTeamIndex].getAliveCombatants().forEach((combatant) => {
+        if(combatant.hasStatusEffect(StatusEffectType.DIVINE_ALACRITY)) {
+          actionPoints++;
+        }
+      });
+      return actionPoints;
     }
 
     private teamNextCombatant(): void {

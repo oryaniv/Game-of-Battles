@@ -223,12 +223,19 @@ export class DivineMiracleStatusEffect implements StatusEffect {
     description = `Once per Battle, upon their health dropping to 0, this combatant will heal and have all negative statuses removed`;
     applicationHooks = {
         [StatusEffectHook.OnDeath]: (caster: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
+            if(caster.hasStatusEffect(StatusEffectType.DIVINE_MIRACLE_USED)) {
+                return;
+            }
             caster.stats.hp = Math.min(40, caster.baseStats.hp);
             const negativeStatusEffects: StatusEffect[] = caster.getStatusEffects().filter(status => status.alignment === StatusEffectAlignment.Negative);
             for(const statusEffect of negativeStatusEffects) {
                 caster?.removeStatusEffect(statusEffect.name);
             }
-            caster.removeStatusEffect(StatusEffectType.DIVINE_MIRACLE);
+            // caster.removeStatusEffect(StatusEffectType.DIVINE_MIRACLE);
+            caster.applyStatusEffect({
+                name: StatusEffectType.DIVINE_MIRACLE_USED,
+                duration: Number.POSITIVE_INFINITY,
+            });
             return {
                 attackResult: AttackResult.Hit,
                 damage: {
@@ -483,4 +490,21 @@ export class DrillSergeantStatusEffect implements StatusEffect {
     applicationHooks = {
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
+}
+
+export class DivineMiracleUsedStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.DIVINE_MIRACLE_USED;
+    description = `This combatant has used their divine miracle.`;
+    isVisible?: boolean = false;
+    applicationHooks = {
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Neutral;
+}
+
+export class DivineAlacrityStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.DIVINE_ALACRITY;
+    description = `This combatant gains an additional action point every round.`;
+    applicationHooks = {
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Neutral;
 }

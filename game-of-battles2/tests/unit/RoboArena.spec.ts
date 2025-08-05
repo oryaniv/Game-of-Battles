@@ -31,7 +31,7 @@ let errorCount = 0;
 
 describe('RoboArenta', () => {
 
-    it.skip('Ai Agent match 1', () => {
+    it.only('Ai Agent match 1', () => {
         const roundCounts = [];
         const winnerCounts = [];
         for(let i = 0; i < 1000; i++) {
@@ -47,9 +47,9 @@ describe('RoboArenta', () => {
         console.log(`round count average is ${roundCounts
             .reduce((a, b) => a + b, 0) / roundCounts.length}`);
 
-        const veteranWinCount = winnerCounts.filter((winner) => winner === 'Team Veteran').length;
+        const veteranWinCount = winnerCounts.filter((winner) => winner === 'Team withCoop').length;
         const veteranWinPercentage = veteranWinCount / winnerCounts.length;
-        console.log(`veteran win percentage is ${veteranWinPercentage}`);
+        console.log(`withCoop win percentage is ${veteranWinPercentage}`);
 
         console.log(`error count is ${errorCount}`);
             expect(true).toBe(true);
@@ -57,7 +57,7 @@ describe('RoboArenta', () => {
 
 
 
-    it.only('Balancing battles', () => {
+    it.skip('Balancing battles', () => {
         const matchDataCollection: MatchData[] = [];
         const teamRecords: TeamRecord[] = [];
 
@@ -113,16 +113,18 @@ function exampleMatch(matchCount: number) {
     const veteranAIAgentNoCoop = new VeteranAIAgent();
     veteranAIAgentNoCoop.setCollectCoop(false);
     const rookieAIAgent = new RookieAIAgent();
+    const rookieWithCoop = new RookieAIAgent();
+    rookieWithCoop.setCollectCoop(true);
 
-    const team1 = generateRandomTeam(0, veteranAIAgentWithCoop);
-    const team2 =  generateCombatantIdenticalTeam(team1, 1, veteranAIAgentNoCoop);
-    team1.name = 'Team Veteran';
-    team2.name = 'Team Rookie';
+    // const team1 = generateRandomTeam(0, rookieWithCoop);
+    // const team2 =  generateCombatantIdenticalTeam(team1, 1, rookieAIAgent);
+    // team1.name = 'Team withCoop';
+    // team2.name = 'Team withoutCoop';
 
-    // const team1 = generateRandomTeam(0, veteranAIAgentNoCoop);
-    // const team2 =  generateCombatantIdenticalTeam(team1, 1, veteranAIAgentWithCoop);
-    // team1.name = 'Team Rookie';
-    // team2.name = 'Team Veteran';
+    const team1 = generateRandomTeam(0, rookieAIAgent);
+    const team2 =  generateCombatantIdenticalTeam(team1, 1, rookieWithCoop);
+    team1.name = 'Team withoutCoop';
+    team2.name = 'Team withCoop';
 
     
     const board = new Board(10, 10);

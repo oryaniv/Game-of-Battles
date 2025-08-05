@@ -139,7 +139,7 @@
   </div>
 </div>
 
-<!-- <button v-if="!isGameOver()" @click="playAiTurn(currentCombatant)">AI Play</button> -->
+<button v-if="!isGameOver()" @click="playAiTurn(currentCombatant)">AI Play</button>
 <!-- <button @click="showDialog = true">show dialog</button>
 <button @click="changeDialog()">change dialog</button> -->
 
@@ -324,7 +324,7 @@
             <img class="status-effect-examine-icon" :src="requireStatusEffectSvg(effect.name)" alt="Status Effect" />
             <span class="status-effect-duration">
               <img v-if="effect.duration === Infinity" class="status-effect-duration-icon" src="@/assets/INFINITY.svg" alt="Infinity" />
-              <span v-else>{{ effect.duration }}</span>
+              <span v-else>{{ Math.ceil(effect.duration) }}</span>
             </span>
           </div>
           <div v-if="examinedCombatant?.statusEffects.length === 0">

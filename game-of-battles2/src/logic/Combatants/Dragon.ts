@@ -4,7 +4,8 @@ import { Position } from "../Position";
 import { Team } from "../Team";
 import { CombatantType } from "./CombatantType";
 import { DragonBreath, DragonFireBall, Claws, DieMortal } from "../SpecialMoves/Singular/Offensive";
-import { DragonRage } from "../SpecialMoves/Singular/Self";
+import { DragonRage, DragonAura, ChainBreaker, AdditionalTurns1 } from "../SpecialMoves/Singular/Self";
+import { DragonRoar } from "../SpecialMoves/Singular/Ailments";
 
 export class Dragon extends Combatant {
     constructor(name: string, position: Position, team: Team) {
@@ -13,7 +14,7 @@ export class Dragon extends Combatant {
         {
           hp: 500,
           stamina: 2000,
-          attackPower: 100,
+          attackPower: 120,
           defensePower: 100,
           initiative: 1,
           movementSpeed: 5,
@@ -34,14 +35,15 @@ export class Dragon extends Combatant {
             {type: DamageType.Dark, reaction: DamageReaction.NONE},
         ],
         [
-          // new AdditionaTurns1(),
+          new AdditionalTurns1(),
           new DragonBreath(),
           new DragonFireBall(),
           new Claws(),
           new DragonRage(),
           new DieMortal(),
-          // new DragonAura(),
-          // new ChainBreaker(),
+          new DragonAura(),
+          new ChainBreaker(),
+          new DragonRoar()
         ],
       team);
     }

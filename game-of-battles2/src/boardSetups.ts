@@ -31,6 +31,7 @@ import { OozeGolem } from "./logic/Combatants/OozeGolem";
 import { TwinBlade } from "./logic/Combatants/TwinBlade";
 import { BabyBabel, Wall, BallistaTurret, Bomb } from "./logic/Combatants/ArtificerConstructs";
 import { StatusEffectType } from "./logic/StatusEffect";
+import { Heal } from "./logic/SpecialMoves/Singular/Support";
 
 export function playGroundTeams(): Team[] {
     const veternAIAgentWithCoop = new VeteranAIAgent();
@@ -38,20 +39,24 @@ export function playGroundTeams(): Team[] {
     const veternAIAgentNoCoop = new VeteranAIAgent();
     veternAIAgentNoCoop.setCollectCoop(false);
     const rookieAIAgent = new RookieAIAgent();
-    const whiteTeam = new Team('Blue Team', 0);
-    const blackTeam = new Team('Red Team', 1);
+    const rookieWithCoop = new RookieAIAgent();
+    rookieWithCoop.setCollectCoop(true);
+    const whiteTeam = new Team('Blue Team', 0, veternAIAgentWithCoop);
+    const blackTeam = new Team('Red Team', 1, veternAIAgentWithCoop );
 
    
-    
-    whiteTeam.addCombatant(new Fool('Aleph', { x: 6, y: 5}, whiteTeam));
-    // whiteTeam.addCombatant(new Witch('P5', { x: 3, y: 8}, whiteTeam));
+    whiteTeam.addCombatant(new Vanguard('Layla', { x: 3, y: 0}, whiteTeam));
+    whiteTeam.addCombatant(new Defender('Dorgo', { x: 6, y: 5}, whiteTeam));
+    whiteTeam.addCombatant(new FistWeaver('P5', { x: 3, y: 7}, whiteTeam));
+    whiteTeam.addCombatant(new Wizard('P9', { x: 5, y: 3}, whiteTeam));
+    whiteTeam.addCombatant(new Fool('P10', { x: 5, y: 1}, whiteTeam));
 
-    // blackTeam.addCombatant(new Vanguard('Ragnar', { x: 3, y: 4}, blackTeam));
-    // blackTeam.addCombatant(new FistWeaver('Elena', { x: 3, y: 9}, blackTeam));
-    // blackTeam.addCombatant(new Pikeman('Zhao', { x: 3, y: 10}, blackTeam));
-    blackTeam.addCombatant(new Militia('googo', { x: 4, y: 5}, blackTeam));
-    blackTeam.addCombatant(new Militia('feii', { x: 4, y: 4}, blackTeam));
-    // whiteTeam.addCombatant(new Fool('P9', { x: 4, y: 4}, whiteTeam));
+    blackTeam.addCombatant(new Healer('Ragnar', { x: 3, y: 4}, blackTeam));
+    blackTeam.addCombatant(new Witch('Elena', { x: 3, y: 9}, blackTeam));
+    blackTeam.addCombatant(new Pikeman('Zhao', { x: 3, y: 8}, blackTeam));
+    blackTeam.addCombatant(new Hunter('Nina', { x: 4, y: 5}, blackTeam));
+    blackTeam.addCombatant(new FistWeaver('Rina', { x: 4, y: 5}, blackTeam));
+    // 
     // // whiteTeam.addCombatant(new Vanguard('P9', { x: 3, y: 12}, whiteTeam));
     // whiteTeam.addCombatant(new StandardBearer('P10', { x: 3, y: 1}, whiteTeam)); 
     // whiteTeam.addCombatant(new Vanguard('P2', { x: 3, y: 4}, whiteTeam));
@@ -68,8 +73,11 @@ export function playGroundTeams(): Team[] {
     // blackTeam.addCombatant(new WeaveEater('V5', { x: 5, y: 8}, blackTeam));
     // blackTeam.addCombatant(new WeaveEater('V6', { x: 5, y: 9}, blackTeam));
 
-    // whiteTeam.combatants[0].applyStatusEffect({
-    //     name: StatusEffectType.STRUCK_FIRST,
+
+
+
+    // whiteTeam.combatants[1].applyStatusEffect({
+    //     name: StatusEffectType.ARCANE_CHANNELING,
     //     duration: 3,
     // });
 

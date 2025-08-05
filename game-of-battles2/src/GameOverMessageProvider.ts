@@ -192,17 +192,19 @@ const PVAI_MESSAGES = {
             "They whooped your a**",
             "Are you even trying?",
             "You should really try the tutorial",
-            "They'll charge me for murder because of you..."
+            "They'll charge me for murder because of you...",
+            "Are you a journalist?"
         ],
         [VitriolLevel.MEDIUM]: [
             "Git gud, scrub",
             "Clearly a skill issue...",
             "Was that your best?",
             "Learn the game, buddy",
-            "Welcome to Die",
+            "Welcome to Die!",
             "You are dead, dead, dead.",
             "life's hard, get over it!",
-            "You went full retard"
+            "You went full retard",
+            "What a truly foolish end."
         ],
         [VitriolLevel.LOW]: [
             "You thought you were hot. Guess what? you're not!",
@@ -211,7 +213,8 @@ const PVAI_MESSAGES = {
             "Valiant, yet not enough",
             "You're playing with the big boys now...",
             "You are not worthy...",
-            "God have mercy on your soul"
+            "God have mercy on your soul",
+            "Death comes to all"
         ],
     },
     [GameResult.WIN]: {

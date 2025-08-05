@@ -1,6 +1,6 @@
 import { StatusEffect, StatusEffectType, StatusEffectHook, StatusEffectAlignment } from "../StatusEffect";
 import { Combatant } from "../Combatant";
-import { ActionResult, AttackResult, getDamageActionResult, getStandardActionResult } from "../attackResult";
+import { ActionResult, AttackResult, getDamageActionResult, getStandardActionResult, getMissActionResult } from "../attackResult";
 import { Damage, DamageReaction, DamageType } from "../Damage";
 import { CombatMaster } from "../CombatMaster";
 import { SpecialMove, SpecialMoveAlignment, SpecialMoveAreaOfEffect } from "../SpecialMove";
@@ -205,7 +205,10 @@ export class MesmerizingStatusEffect implements StatusEffect {
             getAllTargets.filter(AOETarget => board.getCombatantAtPosition(AOETarget) !== null)
                          .filter(AOETarget => board.getCombatantAtPosition(AOETarget)?.team.getName() !== self.team.getName())
                          .forEach(AOETarget => {
-                combatMaster.tryInflictStatusEffect(self, AOETarget, board, StatusEffectType.MESMERIZED, 1, 0.6);
+                const hit = combatMaster.tryInflictStatusEffect(self, AOETarget, board, StatusEffectType.MESMERIZED, 1, 0.6);
+                if(!hit) {
+                    emitter.emit('trigger-method', getMissActionResult(AOETarget, 1));
+                }
             });
         } 
     };
@@ -235,7 +238,10 @@ export class CircusDiaboliqueStatusEffect implements StatusEffect {
             getAllTargets.filter(AOETarget => board.getCombatantAtPosition(AOETarget) !== null)
                          .filter(AOETarget => board.getCombatantAtPosition(AOETarget)?.team.getName() !== self.team.getName())
                          .forEach(AOETarget => {
-                combatMaster.tryInflictStatusEffect(self, AOETarget, board, StatusEffectType.NIGHTMARE_LOCKED, 2, 0.6);
+                const hit = combatMaster.tryInflictStatusEffect(self, AOETarget, board, StatusEffectType.NIGHTMARE_LOCKED, 2, 0.6);
+                if(!hit) {
+                    emitter.emit('trigger-method', getMissActionResult(AOETarget, 1));
+                }
             });
         } 
     };

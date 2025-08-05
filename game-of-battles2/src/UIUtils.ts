@@ -303,6 +303,18 @@ export function statusNameToText(statusName: StatusEffectType): string {
       return "Physical Damage Reproduction";
     case 72:
       return "Weave Eating";
+    case 73:
+      return "Always Block";
+    case 74:
+      return "Always Be Crit";
+    case 75:
+      return "Always By Hit";
+    case 76:
+      return "Drill Sergeant";
+    case 77:
+      return "Divine Miracle Used";
+    case 78:
+      return "Divine Celerity";
     default:
       return "";
     }
@@ -449,6 +461,8 @@ export function requireStatusEffectSvg(effectType: StatusEffectType): string {
       return require('./assets/statusIcons/FRENZY.svg');
     case StatusEffectType.DRILL_SERGEANT:
       return require('./assets/statusIcons/TUTOR.png');
+    case StatusEffectType.DIVINE_ALACRITY:
+      return require('./assets/statusIcons/DIVINE_ALACRITY.svg');
     default:
       return '';
   }
@@ -461,7 +475,7 @@ export function getSkillEffectIcon(skillName: string) {
     case 'Fireball':
     case 'Flame Cannon':
     case 'Dragon\'s Breath':
-    case 'Dragon Fire Ball':
+    case 'Inferno':
     case 'Flame Thrower':
     case 'Brimstone Rain':
     case 'Self Destruct':
@@ -595,9 +609,9 @@ export function getSkillEffectIcon(skillName: string) {
     case 'Hell Scream':
       return require('./assets/statusIcons/PANIC.svg');
     case 'Yo Mama!':
+    case 'Stand Up Comedy Gone Wrong':
       return require('./assets/statusIcons/TAUNTED.svg');
     case 'Stupidest Crap Ever':
-    case 'Stand Up Comedy Gone Wrong':
       return require('./assets/statusIcons/STUPEFIED.svg');
     case 'Smellitt':
       return require('./assets/statusIcons/NAUSEATED.svg');
@@ -669,12 +683,11 @@ export function requireDamageSVG(type: DamageType): string {
 }
 
 export function getActionEffectIcon(effect: ActionEffect) {
-  // eslint-disable-next-line
-  debugger;
+
   if (effect.type && effect.type !== DamageType.None) {
     return requireDamageSVG(effect.type);
   }
-  if (effect.statusEffectType) {
+  if (effect.statusEffectType !== undefined) {
     return requireStatusEffectSvg(effect.statusEffectType);
   }
   alert('No icon found for action effect');
@@ -711,7 +724,7 @@ export function getSinglePlayerGame(): Game {
 
   const teams = [whiteTeam, blackTeam];
 
-  // placeAllCombatants(whiteTeam, blackTeam, board);
+  placeAllCombatants(whiteTeam, blackTeam, board);
 
   const game = new Game(teams, board);
   return game;

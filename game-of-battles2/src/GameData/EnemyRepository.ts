@@ -4,7 +4,7 @@ import { Team } from "@/logic/Team";
 import { getNewCombatantName } from "@/CombatantNameProvider";
 import { getCombatantByType } from "@/boardSetups";
 import { HeuristicalAIAgent } from "@/logic/AI/HeuristicalAgents";
-import { KidAIAgent, RookieAIAgent } from "@/logic/AI/DeterministicAgents";
+import { GorillaAIAgent, KidAIAgent, RookieAIAgent, TrollAIAgent } from "@/logic/AI/DeterministicAgents";
 import { VeteranAIAgent } from "@/logic/AI/VeteranAIAgent";
 
 
@@ -43,10 +43,18 @@ function createCombatantFromType(combatantType: CombatantType, team: Team) {
 function getAiAgent(difficulty: Difficulty, level: number) {
   switch(difficulty) {
     case Difficulty.EASY:
-      return new KidAIAgent();
+      if(level === 3) {
+        return new GorillaAIAgent();
+      } else {
+        return new KidAIAgent();
+      }
     case Difficulty.MEDIUM:
-      return new RookieAIAgent();
-    case Difficulty.HARD:
+      if(level === 5) {
+        return new TrollAIAgent();
+      } else {
+        return new RookieAIAgent();
+      }
+    case Difficulty.HARD: 
       return new VeteranAIAgent();
   }
 }
@@ -54,11 +62,13 @@ function getAiAgent(difficulty: Difficulty, level: number) {
 const enemyData = {
     Easy: [
         [
-          CombatantType.Defender,
+          // CombatantType.Defender,
+          // CombatantType.Witch,
+          // CombatantType.Hunter,
+          // CombatantType.Healer,
+          // CombatantType.Vanguard,
           CombatantType.Witch,
-          CombatantType.Hunter,
-          CombatantType.Healer,
-          CombatantType.Vanguard,
+          CombatantType.Witch
         ], 
         [
           CombatantType.Pikeman,
@@ -73,12 +83,13 @@ const enemyData = {
     ],
     Normal: [
         [
-          CombatantType.TwinBlades,
           // CombatantType.StandardBearer,
           // CombatantType.Healer,
           // CombatantType.Wizard,
           // CombatantType.FistWeaver,
           // CombatantType.Artificer
+          CombatantType.Witch,
+          CombatantType.Witch
         ],
         [
           CombatantType.Rogue,
@@ -106,12 +117,11 @@ const enemyData = {
     ],
     Hard: [
         [
-          CombatantType.Dragon,
-          // CombatantType.Vanguard,
-          // CombatantType.FistWeaver,
-          // CombatantType.Hunter,
-          // CombatantType.Fool,
-          // CombatantType.Pikeman
+          CombatantType.Vanguard,
+          CombatantType.FistWeaver,
+          CombatantType.Hunter,
+          CombatantType.Fool,
+          CombatantType.Pikeman
         ],
         [
           CombatantType.Wizard,

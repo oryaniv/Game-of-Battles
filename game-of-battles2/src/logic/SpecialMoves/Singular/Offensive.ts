@@ -1167,23 +1167,27 @@ export class DragonBreath implements SpecialMove {
         range: 1
     };
     damage: Damage = {
-        amount: 30,
+        amount: 25,
         type: DamageType.Fire   
     };
-    effect = (invoker: Combatant, target: Position, board: Board) => {
+    effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
         const combatMaster = CombatMaster.getInstance();
-        const result = combatMaster.executeAttack(invoker, target, board, this.damage);
-        if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
-            combatMaster.tryInflictStatusEffect(invoker, target, board, StatusEffectType.BURNING, 3, 0.5);
-        }
-        return result;
+        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
+        const flameThrowerResults = getAllTargets.map(AOETarget => {
+            const result = combatMaster.executeAttack(invoker, AOETarget, board, this.damage, true, this.turnCost);
+            if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
+                combatMaster.tryInflictStatusEffect(invoker, AOETarget, board, StatusEffectType.BURNING, 3, 0.6);
+            }
+            return result;
+        });
+        return flameThrowerResults;
     };
     checkRequirements = undefined
     description = `Medium Fire damage to target, chance to inflict Burning for 3 rounds.`   
 }
 
 export class DragonFireBall implements SpecialMove {
-    name: string = "Dragon Fire Ball";
+    name: string = "Inferno";
     triggerType = SpecialMoveTriggerType.Active;
     cost: number = 3;
     turnCost: number = 1;
@@ -1230,6 +1234,9 @@ export class DieMortal implements SpecialMove {
     effect = (invoker: Combatant, target: Position, board: Board) => {
         const combatMaster = CombatMaster.getInstance();
         const result = combatMaster.executeAttack(invoker, target, board, this.damage, true);
+        if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
+            return getDamageActionResult(this.damage, target, this.turnCost);
+        }
         return result;
     };
     checkRequirements = undefined
@@ -1476,4 +1483,38 @@ export class Slicer implements SpecialMove {
     };
     checkRequirements = undefined
     description = `Medium Slash damage to target`   
+}
+
+export class GorillaSmash implements SpecialMove {
+    name: string = "Gorilla Smash!";
+    triggerType = SpecialMoveTriggerType.Active;
+    cost: number = 2;
+    turnCost: number = 1;
+    range: SpecialMoveRange = {
+        type: SpecialMoveRangeType.Self,
+        align: SpecialMoveAlignment.Enemy,
+        areaOfEffect: SpecialMoveAreaOfEffect.Nova,
+        range: 1
+    };
+    damage: Damage = {
+        amount: 40,
+        type: DamageType.Crush
+    };
+    effect = (invoker: Combatant, target: Position, board: Board): ActionResult | ActionResult[] => {
+        const combatMaster = CombatMaster.getInstance();
+        const getAllTargets = board.getAreaOfEffectPositions(invoker, target, this.range.areaOfEffect, this.range.align);
+        const whirlwindAttackResults = getAllTargets.map(AOETarget => {
+            const targetCombatant = board.getCombatantAtPosition(AOETarget);
+            if(!targetCombatant || targetCombatant.name === invoker.name) {
+                return getStandardActionResult(AOETarget, this.turnCost);
+            }
+            return combatMaster.executeAttack(invoker, AOETarget, board, this.damage, true, this.turnCost);
+        });
+
+        return whirlwindAttackResults;
+    };
+    checkRequirements = (self: Combatant) => {
+        return!self.hasMoved;
+    };
+    description = `Medium Crush damage to all enemies around you.`   
 }
