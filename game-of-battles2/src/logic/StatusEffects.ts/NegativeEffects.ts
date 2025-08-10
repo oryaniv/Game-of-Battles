@@ -617,7 +617,7 @@ export class DiamondHookedStatusEffect implements StatusEffect {
 
 export class SleepingStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.SLEEPING;
-    description = `Combatant cannot act. Next melee attack on it will be a critical hit. Removed by taking damage.`;
+    description = `Combatant cannot act. Next melee attack against them will be a critical hit. Removed by taking damage.`;
     applicationHooks = {
         [StatusEffectHook.OnApply]: (self: Combatant) => {
             if(!self.isOrganic()) {

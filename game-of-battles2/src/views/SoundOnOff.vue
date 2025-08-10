@@ -19,6 +19,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { OptionsManager } from '@/GameData/OptionsManager';
 
 export default defineComponent({
   name: 'SoundOnOff',
@@ -29,17 +30,9 @@ export default defineComponent({
   },
   methods: {
     selectSoundPreference(soundOn: boolean) {
-      // Here you would store the user's preference (e.g., in localStorage or Vuex)
-      // and then proceed to the main game.
-      console.log('Sound preference selected:', soundOn ? 'On' : 'Off');
-      // Example: Save to local storage
-      localStorage.setItem('gameSoundOn', String(soundOn));
-
-      // Hide the popup
+      OptionsManager.getInstance().setSoundOn(soundOn);
       this.showSoundPopup = false;
-
-      // In a real app, you might then navigate to the main game screen
-      this.$router.push("/Intro");
+      this.$router.push("/LogoScreen");
     },
   },
 });

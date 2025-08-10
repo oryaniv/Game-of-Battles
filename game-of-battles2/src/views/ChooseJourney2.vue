@@ -121,7 +121,7 @@
 import { defineComponent, ref, computed, onBeforeUnmount, onMounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { RunManager, RunsStatus } from '../GameData/RunManager';
-import { Difficulty } from "../GameOverMessageProvider";
+import { Difficulty } from "../logic/Difficulty";
 import { Team } from '@/logic/Team';
 import { Combatant } from '@/logic/Combatant';
 import CombatantSprite from '../components/CombatantSprite.vue';

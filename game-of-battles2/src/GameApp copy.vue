@@ -702,9 +702,9 @@ export default defineComponent({
       }
     }
 
-    const playAiTurn = (currentCombatant: Combatant) => {
+    const playAiTurn = async (currentCombatant: Combatant) => {
       const aiActionResult: ActionResult | ActionResult[] = 
-      currentCombatant.getAiAgent()!.playTurn(game.value.getCurrentCombatant(), game.value as Game, board.value as Board);
+      await currentCombatant.getAiAgent()!.playTurn(game.value.getCurrentCombatant(), game.value as Game, board.value as Board);
       if(Array.isArray(aiActionResult)) {
         aiActionResult.forEach((actionResult) => {
           actionResult.position && applyAttackEffects(actionResult, actionResult.position);

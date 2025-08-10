@@ -2,6 +2,7 @@ import { Team } from './logic/Team';
 import {  KidAIAgent, TeenagerAIAgent, RookieAIAgent } from './logic/AI/DeterministicAgents';
 import { VeteranAIAgent } from './logic/AI/VeteranAIAgent';
 import { stepType } from './GameData/TutorialManager';
+import { Difficulty, ResultGap } from './logic/Difficulty';
 
 const enum VitriolLevel {
     LOW,
@@ -9,23 +10,11 @@ const enum VitriolLevel {
     HIGH,
 }
 
-export const enum ResultGap {
-    SMALL,
-    MEDIUM,
-    LARGE,
-    COMICAL,
-}
-
 export enum GameResult {
     WIN,
     LOSS,
 }
 
-export enum Difficulty {
-    EASY = 'Easy',
-    MEDIUM = 'Normal',
-    HARD = 'Hard',
-}
 
 export function getGameOverMessage(team1: Team, team2: Team) {
     if(!isPvP(team1, team2)) {

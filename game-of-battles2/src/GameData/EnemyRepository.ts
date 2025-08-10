@@ -1,9 +1,8 @@
 import { CombatantType } from "@/logic/Combatants/CombatantType";
-import { Difficulty } from "../GameOverMessageProvider";
+import { Difficulty } from "../logic/Difficulty";
 import { Team } from "@/logic/Team";
 import { getNewCombatantName } from "@/CombatantNameProvider";
 import { getCombatantByType } from "@/boardSetups";
-import { HeuristicalAIAgent } from "@/logic/AI/HeuristicalAgents";
 import { GorillaAIAgent, KidAIAgent, RookieAIAgent, TrollAIAgent } from "@/logic/AI/DeterministicAgents";
 import { VeteranAIAgent } from "@/logic/AI/VeteranAIAgent";
 

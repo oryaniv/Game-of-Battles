@@ -14,6 +14,8 @@ import { CombatMaster } from "@/logic/CombatMaster";
 import { StatusEffect, StatusEffectAlignment, StatusEffectType } from "@/logic/StatusEffect";
 import { BallistaTurret, BabyBabel } from "@/logic/Combatants/ArtificerConstructs";
 import { IdGenerator } from "@/logic/IdGenerator";
+import { SoundByte } from "@/GameData/SoundLibrary";
+import { SoundManager } from "@/GameData/SoundManager";
 
 export class UnitedWeStand extends CoopMove {
     name: string = "United We Stand";
@@ -107,6 +109,7 @@ export class BuildBallistaTurret extends CoopMove {
         const ballista = new BallistaTurret(`Ballista_${IdGenerator.generateId()}`, target, invokverTeam);
         invokverTeam.addCombatant(ballista);
         board.placeCombatant(ballista, target);
+        SoundManager.getInstance().playSound(SoundByte.SMITH);
         return getStandardActionResult(invoker.position, this.turnCost);
     };
     cost: number = coopCostSlash ? 10 : 14;
@@ -142,6 +145,7 @@ export class BuildBabyBabel extends CoopMove {
         const babyBabel = new BabyBabel(`Tower_${IdGenerator.generateId()}`, target, invokverTeam);
         invokverTeam.addCombatant(babyBabel);
         board.placeCombatant(babyBabel, target);
+        SoundManager.getInstance().playSound(SoundByte.SMITH);
         return getStandardActionResult(invoker.position, this.turnCost);
     };
     cost: number = coopCostSlash ? 10 : 14;

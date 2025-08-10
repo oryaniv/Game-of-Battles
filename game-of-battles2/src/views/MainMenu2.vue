@@ -1,6 +1,7 @@
 <template>
   <div class="min-h-screen flex items-center justify-center p-4">
     <div class="main-menu-container-arc">
+      <h3 class="main-menu-subtitle-arc">Umbral Moon</h3>
       <h1 v-if="!newGameMode" class="main-menu-title-arc">Di<img class="skull-icon" src="../assets/Skull_and_crossbones.svg" alt="Skull" /> For Me!</h1>
 
       <h2 v-if="newGameMode" class="new-game-title">New Game</h2>
@@ -61,11 +62,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref,onMounted } from 'vue';
 import DescriptionCloud from '../components/DescriptionCloud.vue';
 import SettingsMenu from '../components/SettingsMenu.vue';
 import { useRouter } from 'vue-router'
 import GameMessagePrompt from '@/components/GameMessagePrompt.vue';
+import { SoundManager } from '@/GameData/SoundManager';
+import { Track } from '@/GameData/SoundLibrary';
+import { playMenuButtonSound } from '@/GameData/SoundUtils';
 
 
 
@@ -75,22 +79,22 @@ export default defineComponent({
     SettingsMenu, 
     GameMessagePrompt
   },
+  
   setup() {
-
     const router = useRouter();
     
     const mainMenuItems = ([
       { id: 3, label: 'Credits', onPress: () => { showCredits(); }, description: 'Show game credits' },
-      { id: 1, label: 'New Game', onPress: () => { newGameMode.value = true; }, description: 'Play against the AI or another player' },
-      { id: 2, label: 'Settings', onPress: () => { optionsMode.value = true; }, description: 'Change game settings' },
-      { id: 4, label: 'About us', onPress: () => { aboutMode.value = true; }, description: 'Learn about the developers' },
+      { id: 1, label: 'New Game', onPress: () => { playMenuButtonSound(); newGameMode.value = true; }, description: 'Play against the AI or another player' },
+      { id: 2, label: 'Settings', onPress: () => { playMenuButtonSound(); optionsMode.value = true; }, description: 'Change game settings' },
+      { id: 4, label: 'About us', onPress: () => { playMenuButtonSound(); aboutMode.value = true; }, description: 'Learn about the developers' },
     ]);
 
     const newGameMenuItems = ref([
-      { id: 3, label: 'Tutorial', onPress: () => { startTutorial(); }, description: 'Learn how to play' },
-      { id: 1, label: 'Single Player',  onPress: () => { startSinglePlayer(); }, description: 'Play against the AI' },
-      { id: 2, label: 'Showdown', onPress: () => {  }, description: 'Play against another player' },
-      { id: 4, label: 'Back', onPress: () => { newGameMode.value = false; }, description: 'Back to Main menu' }
+      { id: 3, label: 'Tutorial', onPress: () => { playMenuButtonSound(); startTutorial(); }, description: 'Learn how to play' },
+      { id: 1, label: 'Single Player',  onPress: () => { playMenuButtonSound(); startSinglePlayer(); }, description: 'Play against the AI' },
+      { id: 2, label: 'Showdown', onPress: () => { playMenuButtonSound();  }, description: 'Play against another player' },
+      { id: 4, label: 'Back', onPress: () => { playMenuButtonSound(); newGameMode.value = false; }, description: 'Back to Main menu' }
     ]);
 
     const handleMenuItemClick = (label: string) => {
@@ -170,6 +174,10 @@ export default defineComponent({
         startSinglePlayer();
       }
     };
+
+    onMounted(() => {
+      SoundManager.getInstance().playMusic(Track.MAIN_MENU);
+    });
 
     return {
       mainMenuItems,
@@ -251,7 +259,7 @@ export default defineComponent({
 
 .main-menu-title-arc {
   font-family: 'Metal Mania', sans-serif; /* Your logo font for the title */
-  margin-top: -20px;
+  margin-top: -10px;
   font-size: 5.5em; /* Large size for main title */
   color: #7A5B8C; /* Your chosen brighter plum for the logo text */
   text-shadow:
@@ -262,11 +270,21 @@ export default defineComponent({
 }
 
 .main-menu-subtitle-arc {
-  margin-top: -60px;
-  color: white;
-  font-family: 'Exo 2';
-  font-size: 20px;
-  font-style: italic;
+    margin-top: -30px;
+    margin-bottom: 10px;
+    
+    font-family: 'Cinzel Decorative';
+    font-size: 24px;
+    font-style: italic;
+    font-weight: bold;
+    text-align: center;
+
+
+    color: black;
+    text-shadow:
+    -1px -1px 0px #7A5B8C,
+    1px 1px 0px #5E3B68,
+    0 0 10px rgba(255, 215, 0, 0.4);
 }
 
 .new-game-title {

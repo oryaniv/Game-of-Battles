@@ -4,6 +4,8 @@ declare module 'howler' {
       play(): number;
       pause(): void;
       stop(): void;
+      volume(volume: number): void;
+      playing(): boolean;
       // Add other methods you use
     }
   }

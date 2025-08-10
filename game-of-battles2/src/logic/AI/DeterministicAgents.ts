@@ -7,13 +7,13 @@ import { Position } from "../Position";
 import { SpecialMoveAlignment } from "../SpecialMove";
 import { StatusEffectType } from "../StatusEffect";
 import { AIAgent, AIAgentType } from "./AIAgent";
-import { getClosestEnemy, getValidAttacks, getValidAttackWithSkillsIncluded, getValidAttackWithSkillsIncludedOptimal, getValidBasicAttackWithOptimalTarget, getValidMovePositions, getValidSupportSkills, isBasicAttackTargetingBetter, isSkillTargetingBetter, mergeDeep, moveTowards, shuffleArray } from "./AIUtils";
+import { agentMove, getClosestEnemy, getValidAttacks, getValidAttackWithSkillsIncluded, getValidAttackWithSkillsIncludedOptimal, getValidBasicAttackWithOptimalTarget, getValidMovePositions, getValidSupportSkills, isBasicAttackTargetingBetter, isSkillTargetingBetter, mergeDeep, moveTowards, shuffleArray } from "./AIUtils";
 import { getAdjacentEnemies, HeuristicalAIAgent } from "./HeuristicalAgents";
 
 
 export class HollowAIAgent implements AIAgent {
-    playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
-        return getStandardActionResult();
+    async playTurn(combatant: Combatant, game: Game, board: Board): Promise<ActionResult | ActionResult[]> {
+        return Promise.resolve(getStandardActionResult());
     }
 
     getAIAgentType(): AIAgentType {
@@ -22,9 +22,9 @@ export class HollowAIAgent implements AIAgent {
 }
 
 export class DummyAIAgent implements AIAgent {
-    playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
+    async playTurn(combatant: Combatant, game: Game, board: Board): Promise<ActionResult | ActionResult[]> {
         game.executeSkipTurn();
-        return getStandardActionResult();
+        return Promise.resolve(getStandardActionResult());
     }
 
     getAIAgentType(): AIAgentType {
@@ -33,9 +33,9 @@ export class DummyAIAgent implements AIAgent {
 }
 
 export class BunkerDummyAIAgent implements AIAgent {
-    playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
+    async playTurn(combatant: Combatant, game: Game, board: Board): Promise<ActionResult | ActionResult[]> {
         game.executeDefend();
-        return getStandardActionResult();
+        return Promise.resolve(getStandardActionResult());
     }
 
     getAIAgentType(): AIAgentType {
@@ -44,9 +44,9 @@ export class BunkerDummyAIAgent implements AIAgent {
 }
 
 export class ToddlerAIAgent implements AIAgent {
-    playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
+    async playTurn(combatant: Combatant, game: Game, board: Board): Promise<ActionResult | ActionResult[]> {
         const actionResult = this.searchAndDestroy(combatant, game, board);
-        return actionResult;
+        return Promise.resolve(actionResult);
     }
 
     getAIAgentType(): AIAgentType {
@@ -73,7 +73,10 @@ export class ToddlerAIAgent implements AIAgent {
             }
         }
         const closestEnemyPosition = getClosestEnemy(combatant, game, board);
-        moveTowards(combatant, closestEnemyPosition, board);
+        const movedPosition = moveTowards(combatant, closestEnemyPosition, board);
+        if(movedPosition !== undefined) {
+            combatant.move(movedPosition, board);
+        }
         game.executeSkipTurn();
         return getStandardActionResult();
     }
@@ -84,26 +87,26 @@ export class ToddlerAIAgent implements AIAgent {
 
 
 export class KidAIAgent implements AIAgent {
-    playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
+    async playTurn(combatant: Combatant, game: Game, board: Board): Promise<ActionResult | ActionResult[]> {
         const actionResult = this.searchAndDestroy(combatant, game, board);
-        return actionResult;
+        return Promise.resolve(actionResult);
     }
 
     getAIAgentType(): AIAgentType {
         return AIAgentType.DETERMINISTIC;
     }
 
-    private searchAndDestroy(combatant: Combatant, game: Game, board: Board): ActionResult[] {
+    private async searchAndDestroy(combatant: Combatant, game: Game, board: Board): Promise<ActionResult | ActionResult[]> {
         const skillAttacks = getValidAttackWithSkillsIncluded(combatant, board);
         if(skillAttacks) {
             const randomTarget = skillAttacks.targets[Math.floor(Math.random() * skillAttacks.targets.length)];
-            return game.executeSkill(skillAttacks.skill, combatant, randomTarget, board);
+            return Promise.resolve(game.executeSkill(skillAttacks.skill, combatant, randomTarget, board));
         }
         const validAttacks = getValidAttacks(combatant, board);
         // can attack without moving
         if(validAttacks.length > 0) {
             const randomTarget = validAttacks[Math.floor(Math.random() * validAttacks.length)];
-            return [game.executeBasicAttack(combatant, randomTarget, board)];
+            return Promise.resolve([game.executeBasicAttack(combatant, randomTarget, board)]);
         } else {
             const validNewPositions = getValidMovePositions(combatant, board);
             for (let i = 0; i < validNewPositions.length; i++) {
@@ -114,31 +117,34 @@ export class KidAIAgent implements AIAgent {
                     canUseSkill: combatant.canUseSkill
                 }), board);
                 if(skillAttacks) {
-                    combatant.move(position, board);
+                    await agentMove(combatant, position, board);
                     const randomTarget = skillAttacks.targets[Math.floor(Math.random() * skillAttacks.targets.length)];
-                    return game.executeSkill(skillAttacks.skill, combatant, randomTarget, board);
+                    return Promise.resolve(game.executeSkill(skillAttacks.skill, combatant, randomTarget, board));
                 }
 
                 const validAttacks = getValidAttacks(Object.assign({}, combatant, { position, canUseSkill: combatant.canUseSkill }), board);
                 if(validAttacks.length > 0) {
-                    combatant.move(position, board);
+                    await agentMove(combatant, position, board);
                     const randomTarget = validAttacks[Math.floor(Math.random() * validAttacks.length)];
-                    return [game.executeBasicAttack(combatant, randomTarget, board)];
+                    return Promise.resolve([game.executeBasicAttack(combatant, randomTarget, board)]);
                 }
             }
         }
         const closestEnemyPosition = getClosestEnemy(combatant, game, board);
-        moveTowards(combatant, closestEnemyPosition, board);
+        const movedPosition = moveTowards(combatant, closestEnemyPosition, board);
+        if(movedPosition !== undefined) {
+            await agentMove(combatant, movedPosition, board);
+        }
         game.executeSkipTurn();
-        return [getStandardActionResult()];
+        return Promise.resolve([getStandardActionResult()]);
     }
 }
 
 export class TeenagerAIAgent implements AIAgent {
 
-    playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
+    async playTurn(combatant: Combatant, game: Game, board: Board): Promise<ActionResult | ActionResult[]> {
         const actionResult = this.searchAndDestroyOrBuff(combatant, game, board);
-        return actionResult;
+        return Promise.resolve(actionResult);
     }
 
     getAIAgentType(): AIAgentType {
@@ -182,7 +188,10 @@ export class TeenagerAIAgent implements AIAgent {
         }
 
         const closestEnemyPosition = getClosestEnemy(combatant, game, board);
-        moveTowards(combatant, closestEnemyPosition, board);
+        const movedPosition = moveTowards(combatant, closestEnemyPosition, board);
+        if(movedPosition !== undefined) {
+            combatant.move(movedPosition, board);
+        }
 
         // Try to use a self/ally skill instead of just skipping turn
         const supportSkills = getValidSupportSkills(combatant, board);
@@ -196,9 +205,9 @@ export class TeenagerAIAgent implements AIAgent {
 }
 
 export class RookieAIAgent implements AIAgent {
-    playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
+    async playTurn(combatant: Combatant, game: Game, board: Board): Promise<ActionResult | ActionResult[]> {
         const actionResult = this.searchAndDestroyCleverlyOrBuff(combatant, game, board);
-        return actionResult;
+        return Promise.resolve(actionResult);
     }
 
     getAIAgentType(): AIAgentType {
@@ -210,7 +219,7 @@ export class RookieAIAgent implements AIAgent {
         this.collectCoop = collectCoop;
     }
 
-    private searchAndDestroyCleverlyOrBuff(combatant: Combatant, game: Game, board: Board): ActionResult[] {
+    private async searchAndDestroyCleverlyOrBuff(combatant: Combatant, game: Game, board: Board): Promise<ActionResult | ActionResult[]> {
         const skillAttacksOptimizedWithoutMove = getValidAttackWithSkillsIncludedOptimal(combatant, board, this.collectCoop);
         const validNewPositions = getValidMovePositions(combatant, board);
         const skillAttacksOptimizedAfterMove = [];
@@ -234,8 +243,8 @@ export class RookieAIAgent implements AIAgent {
 
         const bestOfTheBestOfTheBest = isSkillTargetingBetter(skillAttacksOptimizedWithoutMove || bestOfTheBest, bestOfTheBest);
         if(bestOfTheBestOfTheBest) {
-            combatant.position !== bestOfTheBestOfTheBest.position && combatant.move(bestOfTheBestOfTheBest.position, board);
-            return game.executeSkill(bestOfTheBestOfTheBest.skill, combatant, bestOfTheBestOfTheBest.targets[0], board);
+            combatant.position !== bestOfTheBestOfTheBest.position && await agentMove(combatant, bestOfTheBestOfTheBest.position, board);
+            return await game.executeSkill(bestOfTheBestOfTheBest.skill, combatant, bestOfTheBestOfTheBest.targets[0], board);
         }
 
 
@@ -262,20 +271,22 @@ export class RookieAIAgent implements AIAgent {
 
         if(bestOfTheBestOfTheBestBasicAttack) {
             combatant.position !== bestOfTheBestOfTheBestBasicAttack.position && combatant.move(bestOfTheBestOfTheBestBasicAttack.position, board);
-            return [game.executeBasicAttack(combatant, bestOfTheBestOfTheBestBasicAttack.targets[0], board)];
+            return [await game.executeBasicAttack(combatant, bestOfTheBestOfTheBestBasicAttack.targets[0], board)];
         }
         
         const closestEnemyPosition = getClosestEnemy(combatant, game, board);
-        moveTowards(combatant, closestEnemyPosition, board);
-        
+        const movedPosition = moveTowards(combatant, closestEnemyPosition, board);
+        if(movedPosition !== undefined) {
+            await agentMove(combatant, movedPosition, board);
+        }
         // Try to use a self/ally skill instead of just skipping turn
         const supportSkills = getValidSupportSkills(combatant, board);
         if(supportSkills) {
-            return game.executeSkill(supportSkills.skill, combatant, combatant.position, board);
+            return await game.executeSkill(supportSkills.skill, combatant, combatant.position, board);
         } else {
-            game.executeSkipTurn();
+            await game.executeSkipTurn();
         }
-        return [getStandardActionResult()];
+        return Promise.resolve([getStandardActionResult()]);
     }
 }
 
@@ -288,52 +299,52 @@ export class TrollAIAgent implements AIAgent {
         this.baseAgent = new RookieAIAgent();
     }
 
-    playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
+    async playTurn(combatant: Combatant, game: Game, board: Board): Promise<ActionResult | ActionResult[]> {
         const actionResult = this.trollRampaging(combatant, game, board);
-        return actionResult;
+        return Promise.resolve(actionResult);
     }
 
     getAIAgentType(): AIAgentType {
         return AIAgentType.DETERMINISTIC;
     }
 
-    private trollRampaging(combatant: Combatant, game: Game, board: Board): ActionResult[] {
+    private async trollRampaging(combatant: Combatant, game: Game, board: Board): Promise<ActionResult | ActionResult[]> {
         const combatRound = game.getCurrentRound();
         const roundsToRage = [2, 5, 10, 15, 20];
         
         if(roundsToRage.includes(combatRound) && !this.beastRaged) {
             this.beastRaged = true;
-            return game.executeSkill(combatant.specialMoves.find(move => move.name === "Beast Rage")!, combatant, combatant.position, board);
+            return Promise.resolve(game.executeSkill(combatant.specialMoves.find(move => move.name === "Beast Rage")!, combatant, combatant.position, board));
         }
 
         if(!roundsToRage.includes(combatRound) && this.beastRaged) {
             this.beastRaged = false;
         }
 
-        return this.baseAgent.playTurn(combatant, game, board) as ActionResult[];
+        return await this.baseAgent.playTurn(combatant, game, board);
     }
 }
 
 export class GorillaAIAgent implements AIAgent {
     private baseAgent: KidAIAgent;
-    private beastRaged: boolean = false;
 
     constructor() {
         this.baseAgent = new KidAIAgent();
     }
 
-    playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
-        const actionResult = this.gorillaAttacking(combatant, game, board);
-        return actionResult;
+    async playTurn(combatant: Combatant, game: Game, board: Board): Promise<ActionResult | ActionResult[]> {
+        const actionResult = await this.gorillaAttacking(combatant, game, board);
+        return Promise.resolve(actionResult);
     }
 
-    private gorillaAttacking(combatant: Combatant, game: Game, board: Board): ActionResult[] {
+    private async gorillaAttacking(combatant: Combatant, game: Game, board: Board): Promise<ActionResult | ActionResult[]> {
         const adjacentEnemies = getAdjacentEnemies(combatant, board, game);
-        if(adjacentEnemies.length >= 4) {
-            return game.executeSkill(combatant.specialMoves.find(move => move.name === "Gorilla Smash!")!, combatant, combatant.position, board);
+        if(adjacentEnemies.length >= 3) {
+            return Promise.resolve(game.executeSkill(combatant.specialMoves
+                .find(move => move.name === "Gorilla Smash!")!, combatant, combatant.position, board));
         }
 
-        return this.baseAgent.playTurn(combatant, game, board) as ActionResult[];
+        return await this.baseAgent.playTurn(combatant, game, board);
     }
 
     getAIAgentType(): AIAgentType {

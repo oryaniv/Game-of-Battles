@@ -13,23 +13,30 @@ import { defineComponent, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { RunManager, RunsStatus, RunType } from '@/GameData/RunManager';
 import { TutorialManager } from '@/GameData/TutorialManager';
+import { OptionsManager } from '@/GameData/OptionsManager';
 import { getDifficulyLevelCount } from '@/GameData/EnemyRepository';
 import { refreshTeam } from '@/boardSetups';
 
 export default defineComponent({
   setup() {
     const router = useRouter();
-    // const route = useRoute(); 
     const receivedMessage = ref('');
     const playerSurvived = ref(false);
     const runCompleted = ref(false);
     const runManager = RunManager.getInstance();
+    const optionsManager = OptionsManager.getInstance();
+    const isPostBattleCommentDisabled = ref(optionsManager.getDisablePostBattleComments());
 
     const continueToNextLevel = () => {
-      const playerTeam = runManager.getTeam();
-      refreshTeam(playerTeam);
-      // router.push('/Match');
-      router.push('/Journey');
+      if(runManager.getRunType() === RunType.TUTORIAL) {
+        router.push('/Match');
+      }
+
+      if(runManager.getRunType() === RunType.SINGLE_PLAYER) {
+        const playerTeam = runManager.getTeam();
+        refreshTeam(playerTeam);
+        router.push('/Journey');
+      }
     };
 
     const returnToMenu = () => {
@@ -47,8 +54,12 @@ export default defineComponent({
         return;
       }
       
-      receivedMessage.value = window.history.state.postMatchMessage;
       playerSurvived.value = window.history.state.playerSurvived;
+      if(!playerSurvived.value && isPostBattleCommentDisabled.value) {
+        receivedMessage.value = 'Game Over';
+      } else {
+        receivedMessage.value = window.history.state.postMatchMessage;
+      }
     }
 
     const updateRun = () => {

@@ -7,6 +7,8 @@ import { StatusEffectType, StatusEffectHook, StatusEffect, StatusEffectAlignment
 import { ActionResult, AttackResult, getStandardActionResult, getStatusEffectActionResult } from "@/logic/attackResult";
 import { Combatant } from "@/logic/Combatant";
 import { emitter } from "@/eventBus";
+import { SoundByte } from "@/GameData/SoundLibrary";
+import { SoundManager } from "@/GameData/SoundManager";
 
 
 export class BlockingStance implements SpecialMove {
@@ -128,6 +130,11 @@ export class ShadowStep implements SpecialMove {
             name: StatusEffectType.CLOAKED,
             duration: 5,
         });
+        // SoundManager.getInstance().playSound(SoundByte.SHADOW_STEP);
+        // return getStatusEffectActionResult(StatusEffectType.CLOAKED, target, 1);
+        setTimeout(() => {
+            emitter.emit('trigger-method', getStatusEffectActionResult(StatusEffectType.CLOAKED, target, 1));
+        }, 0);
         return getStandardActionResult();
     };  
     checkRequirements = (self: Combatant) => {

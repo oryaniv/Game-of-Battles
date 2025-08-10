@@ -15,7 +15,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { Difficulty } from "../GameOverMessageProvider";
+import { Difficulty } from "../logic/Difficulty";
 import CombatantSprite from './CombatantSprite.vue';
 import { RunManager } from '../GameData/RunManager';
 
@@ -60,7 +60,7 @@ export default defineComponent({
       }
     }
 
-    const isDefeatdEnemy = (enemy) => {
+    const isDefeatdEnemy = (enemy: any) => {
       const runManager = RunManager.getInstance();
       const hasPerferctStreak = runManager.getHasPerferctStreak();
       return (!enemy.isSecret || hasPerferctStreak) && props.playerPlaqueCurrentLevel > enemy.level;

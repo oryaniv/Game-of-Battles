@@ -1,21 +1,6 @@
 import { Team } from "../logic/Team";
-import { Difficulty } from "../GameOverMessageProvider";
-import { generateRandomTeam } from "../boardSetups";
+import { Difficulty, ResultGap } from "../logic/Difficulty";
 import { getEnemyTeam } from "./EnemyRepository";
-import { Artificer } from "@/logic/Combatants/Artificer";
-import { Defender } from "@/logic/Combatants/Defender";
-import { Pikeman } from "@/logic/Combatants/Pikeman";
-import { Witch } from "@/logic/Combatants/Witch";
-import { Healer } from "@/logic/Combatants/Healer";
-import { Vanguard } from "@/logic/Combatants/Vanguard";
-import { Wizard } from "@/logic/Combatants/Wizard";
-import { Hunter } from "@/logic/Combatants/Hunter";
-import { FistWeaver } from "@/logic/Combatants/FistWeaver";
-import { VeteranAIAgent } from "@/logic/AI/VeteranAIAgent";
-import { ResultGap } from "../GameOverMessageProvider";
-import { Dragon } from "@/logic/Combatants/Dragon";
-import { StandardBearer } from "@/logic/Combatants/StandardBearer";
-import { Fool } from "@/logic/Combatants/Fool";
 
 
 export enum RunsStatus {
@@ -46,15 +31,15 @@ export class RunManager {
     private gameRun: GameRun;
 
     private constructor() {
-        // this.gameRun = {
-        //     team: new Team('Player Team', 0),
-        //     score: -1,
-        //     currentLevel: 0,
-        //     difficulty: undefined,
-        //     status: RunsStatus.CREATED,
-        //     type: undefined,
-        //     record: []
-        // };
+        this.gameRun = {
+            team: new Team('Player Team', 0),
+            score: -1,
+            currentLevel: 0,
+            difficulty: Difficulty.MEDIUM,
+            status: RunsStatus.CREATED,
+            type: undefined,
+            record: []
+        };
 
         // this.gameRun = {
         //     team: generateExamplePlayerTeam(),
@@ -85,15 +70,15 @@ export class RunManager {
         //     record: []
         // };
 
-        this.gameRun = {
-            team: generateExamplePlayerTeam(),
-            score: -1,
-            currentLevel: 3,
-            difficulty: Difficulty.EASY,
-            status: RunsStatus.IN_PROGRESS,
-            type: RunType.SINGLE_PLAYER,
-            record: [ResultGap.COMICAL, ResultGap.SMALL]
-        };
+        // this.gameRun = {
+        //     team: generateExamplePlayerTeam(),
+        //     score: -1,
+        //     currentLevel: 2,
+        //     difficulty: Difficulty.MEDIUM,
+        //     status: RunsStatus.IN_PROGRESS,
+        //     type: RunType.SINGLE_PLAYER,
+        //     record: [ResultGap.COMICAL, ResultGap.SMALL]
+        // };
     }
 
     public static getInstance(): RunManager {
@@ -186,22 +171,17 @@ export class RunManager {
             record: []
         };
     }
-
-    public getMatchTeams(): Team[] {
-        const playerTeam = this.getRun().team;
-        const enemyTeam = getEnemyTeam(this.getRun().difficulty as Difficulty, this.getCurrentLevel());
-        return [playerTeam, enemyTeam];
-    }
 }
 
-function generateExamplePlayerTeam(): Team {
-    const team = new Team('Your team', 0);
-    team.addCombatant(new Vanguard('Aragorn', { x: 3, y: 5}, team));
-    team.addCombatant(new Vanguard('Feloron', { x: 3, y: 5}, team));
-    team.addCombatant(new Vanguard('Orion', { x: 3, y: 5}, team));
-    team.addCombatant(new Vanguard('Ororo', { x: 3, y: 5}, team));
-    team.addCombatant(new Vanguard('Irenicus', { x: 3, y: 5}, team));
-    // team.addCombatant(new Dragon('Fafnir', { x: 3, y: 5}, team));
-    return team;
-}
+// function generateExamplePlayerTeam(): Team {
+//     const team = new Team('Your team', 0);
+//     team.addCombatant(new Defender('Aragorn', { x: 3, y: 5}, team));
+//     // team.addCombatant(new Defender('Aragorn', { x: 3, y: 5}, team));
+//     // team.addCombatant(new Defender('Feloron', { x: 3, y: 5}, team));
+//     // team.addCombatant(new Defender('Orion', { x: 3, y: 5}, team));
+//     // team.addCombatant(new Defender('Ororo', { x: 3, y: 5}, team));
+//     // team.addCombatant(new Defender('Irenicus', { x: 3, y: 5}, team));
+//     // team.addCombatant(new Dragon('Fafnir', { x: 3, y: 5}, team));
+//     return team;
+// }
 

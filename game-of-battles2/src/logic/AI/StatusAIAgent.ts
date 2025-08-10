@@ -3,7 +3,8 @@ import { ActionResult, getStandardActionResult } from "../attackResult";
 import { Board } from "../Board";
 import { Combatant } from "../Combatant";
 import { Game } from "../Game";
-import { AIAgent, AIAgentType } from "./AIAgent";
+import { AIAgentType, AIAgent } from "./AIAgent";
+import { agentMove } from "./AIUtils";
 import { checkIsSameCombatant, getClosestEnemy, getValidAttacks, getValidAttackWithSkillsIncluded, getValidMovePositions, getValidSupportSkills, moveTowards } from "./AIUtils";
 import { Position } from "../Position";
 import { Team } from "../Team";
@@ -19,7 +20,7 @@ export class StunLockedAIAgent implements AIAgent {
         this.stunLockCauseMessage = stunCauseMessage;
     }
 
-    playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
+    playTurn(combatant: Combatant, game: Game, board: Board): Promise<ActionResult | ActionResult[]> {
         const eventLogger = EventLogger.getInstance();
         eventLogger.logEvent({
             messageBody: `${combatant.name} is `,
@@ -27,7 +28,7 @@ export class StunLockedAIAgent implements AIAgent {
             actionType: PlayActionType.INACTION
         });
         game.executePassTurn();
-        return getStandardActionResult();
+        return Promise.resolve(getStandardActionResult());
     }
 
     getAIAgentType(): AIAgentType {
@@ -42,24 +43,24 @@ export class TauntedAIAgent implements AIAgent {
         this.offender = offender;
     }
 
-    playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
+    playTurn(combatant: Combatant, game: Game, board: Board): Promise<ActionResult | ActionResult[]> {
         const actionResult = this.chaseTheOffender(combatant, game, board, this.offender);
-        return actionResult;
+        return Promise.resolve(actionResult);
     }
 
     getAIAgentType(): AIAgentType {
         return AIAgentType.TAUNTED;
     }
 
-    private chaseTheOffender(combatant: Combatant, game: Game, board: Board, offender: Combatant): ActionResult {
+    private async chaseTheOffender(combatant: Combatant, game: Game, board: Board, offender: Combatant): Promise<ActionResult | ActionResult[]> {
 
         if(offender.isKnockedOut()) {
             combatant.removeStatusEffect(StatusEffectType.TAUNTED);
             const nextAgent = combatant.getAiAgent();
             if(nextAgent) {
-                return nextAgent.playTurn(combatant, game, board) as ActionResult;
+                return await nextAgent.playTurn(combatant, game, board);
             } else {
-                return getStandardActionResult();
+                return Promise.resolve(getStandardActionResult());
             }
         }
 
@@ -80,19 +81,22 @@ export class TauntedAIAgent implements AIAgent {
                 // can attack from new position
                 const validAttacks = getValidAttacks(Object.assign({}, combatant, { position, hasStatusEffect: combatant.hasStatusEffect }), board);
                 if(validAttacks.length > 0 && validAttacks.some((attack) => attack.x === offenderTarget.position.x && attack.y === offenderTarget.position.y)) {
-                    combatant.move(position, board);
+                    await agentMove(combatant, position, board);
                     return game.executeBasicAttack(combatant, offenderTarget.position, board);
                 }
             }
         }
-        moveTowards(combatant, offenderTarget.position, board);
+        const movedPosition = moveTowards(combatant, offenderTarget.position, board);
+        if(movedPosition !== undefined) {
+            await agentMove(combatant, movedPosition, board);
+        }
         game.executeSkipTurn();
         return getStandardActionResult();
     }       
 }
 
 export class PanickedAIAgent implements AIAgent {
-    playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
+    async playTurn(combatant: Combatant, game: Game, board: Board): Promise<ActionResult | ActionResult[]> {
         const eventLogger = EventLogger.getInstance();
         eventLogger.logEvent({
             messageBody: `${combatant.name} is`,
@@ -100,10 +104,10 @@ export class PanickedAIAgent implements AIAgent {
             actionType: PlayActionType.INACTION
         });
         const actionResult = this.runAway(combatant, game, board);
-        return actionResult;
+        return Promise.resolve(actionResult);
     }
 
-    runAway(combatant: Combatant, game: Game, board: Board): ActionResult {
+    async runAway(combatant: Combatant, game: Game, board: Board): Promise<ActionResult | ActionResult[]> {
         // Get the closest enemy position
         const closestEnemyPosition = getClosestEnemy(combatant, game, board);
         
@@ -130,11 +134,11 @@ export class PanickedAIAgent implements AIAgent {
         }, null as Position | null);
 
         if (furthestPosition) {
-            combatant.move(furthestPosition, board);
+            await agentMove(combatant, furthestPosition, board);
         }
         
         game.executeSkipTurn();
-        return getStandardActionResult();
+        return Promise.resolve(getStandardActionResult());
     }
 
     getAIAgentType(): AIAgentType {
@@ -143,7 +147,7 @@ export class PanickedAIAgent implements AIAgent {
 }
 
 export class EnragedAIAgent implements AIAgent {
-    playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
+    async playTurn(combatant: Combatant, game: Game, board: Board): Promise<ActionResult | ActionResult[]> {
         const eventLogger = EventLogger.getInstance();
         eventLogger.logEvent({
             messageBody: `${combatant.name} is`,
@@ -158,7 +162,7 @@ export class EnragedAIAgent implements AIAgent {
         return AIAgentType.ENRAGED;
     }
 
-    goBerserk(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
+    async goBerserk(combatant: Combatant, game: Game, board: Board): Promise<ActionResult | ActionResult[]> {
         const randomNumber = Math.floor(Math.random() * 1000) + 3;
         const enragedCombatant = Object.assign(
             {}, combatant,
@@ -181,7 +185,7 @@ export class EnragedAIAgent implements AIAgent {
         }
         if(skillAttacks && skillAttacks.targets.length > 0) {
             const randomTarget = skillAttacks.targets[Math.floor(Math.random() * skillAttacks.targets.length)];
-            return game.executeSkill(skillAttacks.skill, combatant, randomTarget, board);
+            return Promise.resolve(game.executeSkill(skillAttacks.skill, combatant, randomTarget, board));
         }
 
         let validAttacks = getValidAttacks(enragedCombatant, board);
@@ -190,7 +194,7 @@ export class EnragedAIAgent implements AIAgent {
         // can attack without moving
         if(validAttacks.length > 0) {
             const randomTarget = validAttacks[Math.floor(Math.random() * validAttacks.length)];
-            return [game.executeBasicAttack(combatant, randomTarget, board)];
+            return Promise.resolve([game.executeBasicAttack(combatant, randomTarget, board)]);
         } else {
             const validNewPositions = getValidMovePositions(enragedCombatant, board);
             for (let i = 0; i < validNewPositions.length; i++) {
@@ -206,32 +210,35 @@ export class EnragedAIAgent implements AIAgent {
                 }
 
                 if(skillAttacks && skillAttacks.targets.length > 0) {
-                    combatant.move(position, board);
+                    await agentMove(combatant, position, board);
                     const randomTarget = skillAttacks.targets[Math.floor(Math.random() * skillAttacks.targets.length)];
-                    return game.executeSkill(skillAttacks.skill, combatant, randomTarget, board);
+                    return Promise.resolve(game.executeSkill(skillAttacks.skill, combatant, randomTarget, board));
                 }
 
                 let validAttacks = getValidAttacks(Object.assign({}, enragedCombatant, { position, hasStatusEffect: enragedCombatant.hasStatusEffect, canUseSkill: enragedCombatant.canUseSkill }), board);
                 validAttacks = validAttacks.filter((attack) => !checkIsSameCombatant(combatant, attack, board));
                 if(validAttacks.length > 0) {
-                    combatant.move(position, board);
+                    await agentMove(combatant, position, board);
                     const randomTarget = validAttacks[Math.floor(Math.random() * validAttacks.length)];
-                    return [game.executeBasicAttack(combatant, randomTarget, board)];
+                    return Promise.resolve([game.executeBasicAttack(combatant, randomTarget, board)]);
                 }
             }
         }
 
         const closestEnemyPosition = getClosestEnemy(enragedCombatant, game, board);
-        moveTowards(combatant, closestEnemyPosition, board);
+        const movedPosition = moveTowards(combatant, closestEnemyPosition, board);
+        if(movedPosition !== undefined) {
+            await agentMove(combatant, movedPosition, board);
+        }
 
         // Try to use a self/ally skill instead of just skipping turn
         game.executeSkipTurn();
-        return [getStandardActionResult()];
+        return Promise.resolve([getStandardActionResult()]);
     }
 }   
 
 export class CharmedAIAgent implements AIAgent {
-    playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
+    playTurn(combatant: Combatant, game: Game, board: Board): Promise<ActionResult | ActionResult[]> {
         const eventLogger = EventLogger.getInstance();
         eventLogger.logEvent({
             messageBody: `${combatant.name} is`,
@@ -239,10 +246,10 @@ export class CharmedAIAgent implements AIAgent {
             actionType: PlayActionType.INACTION
         });
         const actionResult = this.doBetrayal(combatant, game, board);
-        return actionResult;
+        return Promise.resolve(actionResult);
     }
 
-    doBetrayal(combatant: Combatant, game: Game, board: Board): ActionResult[] {
+    async doBetrayal(combatant: Combatant, game: Game, board: Board): Promise<ActionResult | ActionResult[]> {
         const brainwashedCombatant = Object.assign(
             {}, combatant,
              { 
@@ -264,7 +271,7 @@ export class CharmedAIAgent implements AIAgent {
         }
         if(skillAttacks && skillAttacks.targets.length > 0) {
             const randomTarget = skillAttacks.targets[Math.floor(Math.random() * skillAttacks.targets.length)];
-            return game.executeSkill(skillAttacks.skill, combatant, randomTarget, board);
+            return Promise.resolve(game.executeSkill(skillAttacks.skill, combatant, randomTarget, board));
         }
 
         let validAttacks = getValidAttacks(brainwashedCombatant, board);
@@ -273,7 +280,7 @@ export class CharmedAIAgent implements AIAgent {
         // can attack without moving
         if(validAttacks.length > 0) {
             const randomTarget = validAttacks[Math.floor(Math.random() * validAttacks.length)];
-            return [game.executeBasicAttack(combatant, randomTarget, board)];
+            return Promise.resolve([game.executeBasicAttack(combatant, randomTarget, board)]);
         } else {
             const validNewPositions = getValidMovePositions(brainwashedCombatant, board);
             for (let i = 0; i < validNewPositions.length; i++) {
@@ -289,32 +296,35 @@ export class CharmedAIAgent implements AIAgent {
                 }
 
                 if(skillAttacks && skillAttacks.targets.length > 0) {
-                    combatant.move(position, board);
+                    await agentMove(combatant, position, board);
                     const randomTarget = skillAttacks.targets[Math.floor(Math.random() * skillAttacks.targets.length)];
-                    return game.executeSkill(skillAttacks.skill, combatant, randomTarget, board);
+                    return Promise.resolve(game.executeSkill(skillAttacks.skill, combatant, randomTarget, board));
                 }
 
                 let validAttacks = getValidAttacks(Object.assign({}, brainwashedCombatant, { position, hasStatusEffect: brainwashedCombatant.hasStatusEffect, canUseSkill: brainwashedCombatant.canUseSkill }), board);
                 validAttacks = validAttacks.filter((attack) => !checkIsSameCombatant(combatant, attack, board));
                 if(validAttacks.length > 0) {
-                    combatant.move(position, board);
+                    await agentMove(combatant, position, board);
                     const randomTarget = validAttacks[Math.floor(Math.random() * validAttacks.length)];
-                    return [game.executeBasicAttack(combatant, randomTarget, board)];
+                    return Promise.resolve([game.executeBasicAttack(combatant, randomTarget, board)]);
                 }
             }
         }
 
         const closestEnemyPosition = getClosestEnemy(brainwashedCombatant, game, board);
-        moveTowards(combatant, closestEnemyPosition, board);
+        const movedPosition = moveTowards(combatant, closestEnemyPosition, board);
+        if(movedPosition !== undefined) {
+            await agentMove(combatant, movedPosition, board);
+        }
 
         // Try to use a self/ally skill instead of just skipping turn
         const supportSkills = getValidSupportSkills(brainwashedCombatant, board);
         if(supportSkills) {
-            return game.executeSkill(supportSkills.skill, combatant, combatant.position, board);
+            return Promise.resolve(game.executeSkill(supportSkills.skill, combatant, combatant.position, board));
         } else {
             game.executeSkipTurn();
+            return Promise.resolve([getStandardActionResult()]);
         }
-        return [getStandardActionResult()];
     }
     
     getAIAgentType(): AIAgentType {

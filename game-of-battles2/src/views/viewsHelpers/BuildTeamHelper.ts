@@ -67,7 +67,7 @@ export function combatantsWithDescriptions(team: Team) {
         {
             id: 3,
             name: CombatantType.Wizard.toString(),
-            description: 'A powerful elemental damage dealer, both single and AOE',
+            description: 'A powerful elemental damage dealer, both single target and AOE',
             role: 'Magic DPS',
             easeOfUse: 'Moderate',
             pros: 'High damage, can deal deal several damage types, great utility',
@@ -89,11 +89,11 @@ export function combatantsWithDescriptions(team: Team) {
         {
             id: 5,
             name: CombatantType.Fool.toString(),
-            description: 'A jester whose unpredictable antics disorient foes. Provides unique crowd.',
+            description: 'A jester whose unpredictable antics disorient foes. Provides unique crowd control abilities.',
             role: 'Crowd control',
             easeOfUse: 'Moderate/Hard',
             pros: 'Has many unique crowd control abilities, capable of stopping even an entire team',
-            cons: 'No effective damage output',
+            cons: 'damage capabilities are almost non-existent',
             combatantType: CombatantType.Fool,
             combatantReference: getCombatantByType(CombatantType.Fool, team)
         },
@@ -101,7 +101,7 @@ export function combatantsWithDescriptions(team: Team) {
             id: 6,
             name: CombatantType.Artificer.toString(),
             description: 'An eccentric inventor able to deploy many useful machinations and aid his allies with mechanical upgrades.',
-            role: 'Support / Field control',
+            role: 'Support/Field control',
             easeOfUse: 'Hard',
             pros: 'Can build and create mechanical allies, while backing them with buffs and elemental attacks',
             cons: 'Low damage, costly skills deplete stamina fast',
@@ -111,18 +111,18 @@ export function combatantsWithDescriptions(team: Team) {
         {
             id: 7,
             name: CombatantType.Pikeman.toString(),
-            description: 'An unyielding elite warrior capable of inflicting great damage and apply afflictions.',
+            description: 'A well balanced melee warrior capable of countering enemy attacks, dealing great damage and applying debuffs.',
             role: 'Melee DPS/Disruption',
             easeOfUse: 'Easy',
             pros: 'Double melee range, many offenisve techniques that disrupt enemy plans',
-            cons: 'Weak to Crush damage',
+            cons: 'Melee combatant yet weak to Crush damage',
             combatantType: CombatantType.Pikeman,
             combatantReference: getCombatantByType(CombatantType.Pikeman, team)
         },
         {
             id: 8,
             name: CombatantType.Healer.toString(),
-            description: 'A divine healer protecting allies with graceful mercy. Crucial for team survival.',
+            description: 'A divine healer capable of supporting her allies with graceful mercy. Crucial for team survival.',
             role: 'Support/Healing',
             easeOfUse: 'Easy/Moderate',
             pros: 'Strong healing abilities, useful support skills',
@@ -133,8 +133,8 @@ export function combatantsWithDescriptions(team: Team) {
         {
             id: 9,
             name: CombatantType.FistWeaver.toString(),
-            description: 'A martial artist weaving magic into her strikes. Fast and versatile.',
-            role: 'Melee DPS',
+            description: 'A martial artist weaving elemental and and sacred magic into her strikes. Fast and versatile.',
+            role: 'Melee DPS/All rounder',
             easeOfUse: 'Moderate',
             pros: 'Fast movement, high agility and luck, useful self buff skills',
             cons: 'Offensive skills require careful planning to be most effective',
@@ -144,7 +144,7 @@ export function combatantsWithDescriptions(team: Team) {
         {
             id: 10,
             name: CombatantType.Witch.toString(),
-            description: 'a dark conjurer wielding forbidden elemental power. Devastating long-range spells.',
+            description: 'A sinsiter wielder of forbidden powers. Specializes in long range debuffs and dark type damage.',
             role: 'Debuffs',
             easeOfUse: 'Hard',
             pros: 'A myriad of debuff skills that further enhance her attacks',
@@ -155,7 +155,7 @@ export function combatantsWithDescriptions(team: Team) {
         {
             id: 11,
             name: CombatantType.Vanguard.toString(),
-            description: 'A savage warrior who charges into enemy lines, dealing damage left and right',
+            description: 'A savage warrior who excels at charging into enemy lines and wreaking havoc.',
             role: 'Melee DPS',
             easeOfUse: 'Easy',
             pros: 'Ridiculously high damage, very fast movement and high health',

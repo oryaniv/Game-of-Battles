@@ -54,7 +54,6 @@ export class Rogue extends Combatant {
             new SleepingDart(),
             new KarithrasBoon(),
             // new DanceOfDaggers(),
-            // new ForbiddenArt(),
             
           ], team
         );

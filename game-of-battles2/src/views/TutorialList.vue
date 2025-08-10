@@ -28,7 +28,7 @@ import DescriptionCloud from '@/components/DescriptionCloud.vue';
 import { useRouter } from 'vue-router';
 import { RunManager, RunType } from '@/GameData/RunManager';
 import { Team } from '@/logic/Team';
-import { Difficulty } from "../GameOverMessageProvider";
+import { Difficulty } from "../logic/Difficulty";
 
 export default defineComponent({
   name: 'TutorialList',
@@ -40,7 +40,7 @@ export default defineComponent({
     const tutorialManager = TutorialManager.getInstance();
     const description = ref('');
 
-    const selectTutorial = (index) => {
+    const selectTutorial = (index: number) => {
       RunManager.getInstance().createRun(new Team('Player Team', 0), 0, index, RunType.TUTORIAL, Difficulty.EASY);
       router.push(`/Match`);
     };

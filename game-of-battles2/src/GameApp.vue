@@ -404,8 +404,10 @@ import { AllOfThem, standardVsSetup, theATeam, theBTeam, allMilitiaSetup, theGor
  import { getCommentatorMessage, CommentatorMessage } from './CommentatorMessageProvider';
  import { getActionEffectIcon, ActionEffect, requireDamageSVG, getSkillEffectIcon, getShortDamageReactionText,
   getActionDescription, getStatusEffectDescription, requireStatusEffectSvg, delay,
-   statusNameToText, getGame, getRelevantDialogs, getStatusEffectIsVisible } from './UIUtils';
- import { Difficulty } from './GameOverMessageProvider';
+   statusNameToText, getGame, getRelevantDialogs, getStatusEffectIsVisible, playGameEffectSound, playRoundStartSound, 
+   playMissSound, playGameOverSound, playPlayerMoveSound, playCancelButtonSound, playActionButtonSound,
+   playMenuButtonSound } from './UIUtils';
+ import { Difficulty } from './logic/Difficulty';
  import { useRouter } from 'vue-router';
  import { RunManager, RunType } from './GameData/RunManager';
  import StatusDescriptionBox from './components/StatusDescriptionBox.vue';
@@ -420,6 +422,7 @@ import { AllOfThem, standardVsSetup, theATeam, theBTeam, allMilitiaSetup, theGor
  import { getEmptyAsType } from './logic/LogicFlags';
  import { TutorialManager, DialogStep, StepMode, stepType } from './GameData/TutorialManager';
  import { OptionsManager } from './GameData/OptionsManager';
+ import { SoundManager } from './GameData/SoundManager';
 
 export default defineComponent({
   components: {
@@ -514,6 +517,7 @@ export default defineComponent({
     }
 
     onMounted(() => {
+
       updateTurnMessage();
       actionsRemaining.value = currentTeam.value.combatants.length;
       emitter.on('trigger-method', (actionResultData:any) => {
@@ -521,7 +525,7 @@ export default defineComponent({
       });
 
       emitter.on('play-move-sound', () => {
-        playMoveSound();
+        // playMoveSound();
       });
 
       emitter.on('change-team', () => {
@@ -531,7 +535,7 @@ export default defineComponent({
       console.log('%c game app onMounted', 'color: blue; font-size: 16px; font-weight: bold;');
      
 
-      document.addEventListener('keydown', (event) => {
+      document.addEventListener('keydown', (event: KeyboardEvent) => {
         if(event.key === 'Escape') {
            escapeMenuVisible.value = !escapeMenuVisible.value;
            return;
@@ -613,6 +617,7 @@ export default defineComponent({
         updateHoveringMessage(getGameOverMessage(whiteTeam.value, blackTeam.value), false);
         endGame();
       } else {
+        playRoundStartSound();
         updateHoveringMessage(`${game.value.teams[(game.value as Game).getCurrentTeamIndex()].name}'s Turn`, true);
       }
     };
@@ -681,6 +686,7 @@ export default defineComponent({
     }
 
     const defend = () => {
+      playGameEffectSound(DamageType.None, StatusEffectType.DEFENDING);
       game.value.executeDefend();
       game.value.nextTurn();
       prepareNextTurn();
@@ -702,7 +708,7 @@ export default defineComponent({
         validMoves.value = [];
         hasMoved.value = true;
         moveMode.value = false;
-        // playMoveSound();
+        playPlayerMoveSound();
         if (actionsRemaining.value <= 0) {
           game.value.nextTurn();
           prepareNextTurn();
@@ -711,12 +717,13 @@ export default defineComponent({
       }
     };
 
-    const playMoveSound = () => {
-      const currentMoveSound = moveSounds[Math.floor(Math.random() * moveSounds.length)];
-      currentMoveSound && currentMoveSound.play();
-    }
+    // const playMoveSound = () => {
+    //   const currentMoveSound = moveSounds[Math.floor(Math.random() * moveSounds.length)];
+    //   currentMoveSound && currentMoveSound.play();
+    // }
 
     const showMoveOptions = () => {
+      playMenuButtonSound();
       if (currentCombatant.value) {
         validMoves.value = board.value.getValidMoves(currentCombatant.value);
         moveMode.value = true;
@@ -732,6 +739,7 @@ export default defineComponent({
     };
 
     const cancel = () => {
+      playCancelButtonSound();
       moveMode.value = false;
       attackMode.value = false;
       skillMode.value = false;
@@ -761,6 +769,7 @@ export default defineComponent({
     };
 
     const undoMove = () => {
+      playMenuButtonSound();
       if (previousPosition.value && currentCombatant.value) {
         // currentCombatant.value.hasMoved = false;
         currentCombatant.value.move(previousPosition.value, board.value as Board);
@@ -773,6 +782,7 @@ export default defineComponent({
 
 
     const showAttackOptions = () => {
+      playMenuButtonSound();
       if(!currentCombatant.value) {
         return;
       }
@@ -840,8 +850,10 @@ export default defineComponent({
               (e: any) => e.id !== effect.id
             );
           }, 1000);
-
-          playSound(actionResult.damage.type);
+          if(isMiss || isFumble) {
+            playMissSound();
+          }
+          playSound(actionResult.damage.type, actionResult.statusEffectType);
     };
 
     const applyCommentatorMessages = (actionResults: ActionResult[], team: Team) => {
@@ -849,11 +861,8 @@ export default defineComponent({
       commentatorMessages.value = messages;
     }
 
-    const playSound = (type: DamageType) => {
-      const sound = actionSounds[type];
-      if(sound) {
-        sound.play();
-      }
+    const playSound = (type: DamageType, statusEffectType: StatusEffectType | undefined) => {
+      playGameEffectSound(type, statusEffectType);
     }
 
     const actionSelected = (): boolean => {
@@ -908,8 +917,8 @@ export default defineComponent({
       const currentCombatant = game.value.getCurrentCombatant();
       const turnDelay = showHoveringMessage() ? 1500 : 1000;
       if(currentCombatant && currentCombatant.getAiAgent() !== undefined) {
-        setTimeout(() => {
-          playAiTurn(currentCombatant);
+        setTimeout(async () => {
+          await playAiTurn(currentCombatant);
         }, turnDelay);
       }
 
@@ -936,9 +945,10 @@ export default defineComponent({
       }
     }
 
-    const playAiTurn = (currentCombatant: Combatant) => {
+    const playAiTurn = async (currentCombatant: Combatant) => {
       const aiActionResult: ActionResult | ActionResult[] = 
-      currentCombatant.getAiAgent()!.playTurn(game.value.getCurrentCombatant(), game.value as Game, board.value as Board);
+      await currentCombatant.getAiAgent()!.playTurn(game.value.getCurrentCombatant(), game.value as Game, board.value as Board);
+
       if(Array.isArray(aiActionResult)) {
         aiActionResult.forEach((actionResult) => {
           actionResult.position && applyAttackEffects(actionResult, actionResult.position);
@@ -998,10 +1008,12 @@ export default defineComponent({
     };
 
     const showSpecialSkills = () => {
+      playActionButtonSound();
       showSkillsMenu.value = true;
     };
 
     const showCoopSkillMenu = () => {
+      playActionButtonSound();
       showCoopSkill.value = true;
     }
 
@@ -1316,57 +1328,6 @@ export default defineComponent({
       return !isTutorial && game.value.isGameOver();
     }
 
-    const actionSounds: { [key: string]: Howl } = {};
-    // const moveSounds = [];
-    let moveSound1: Howl | null = null;
-    let moveSound2: Howl | null = null;
-    let moveSound3: Howl | null = null;
-    let moveSounds: Howl[] = [];
-    const loadSounds = () => {
-      const allSounds = [
-        {name:'Blight', path:require('./sound/acid_splash_sound.mp3')},
-        {name:'Crush', path:require('./sound/fist_sound.mp3')},
-        {name:'Dark', path:require('./sound/dark_attack_sound.mp3')},
-        {name:'Fire', path:require('./sound/flame_sound.mp3')},
-        {name:'Healing', path:require('./sound/healing_sound.mp3')},
-        {name:'Holy', path:require('./sound/holy_attack_sound.mp3')},
-        {name:'Ice', path:require('./sound/Ice_sound.mp3')},
-        {name:'Pierce', path:require('./sound/pierce_attack_sound.mp3')},
-        {name:'Slash', path:require('./sound/sword_slash_sound.mp3')},
-        {name:'Lightning', path:require('./sound/thunder_sound.mp3')},
-      ];
-
-      allSounds.forEach((sound) => {
-         const newSound = new Howl({
-          src: [sound.path],
-          preload: true,
-          onload: () => {
-            console.log(sound +' sound preloaded!');
-          },
-        });
-        actionSounds[sound.name] = newSound;
-      })
-
-      moveSound1 = new Howl({
-        src: [require('./sound/move_sound_1.mp3')],
-        preload: true,
-      });
-
-      moveSound2 = new Howl({
-        src: [require('./sound/move_sound_2.mp3')],
-        preload: true,
-      });
-
-      moveSound3 = new Howl({
-        src: [require('./sound/move_sound_3.mp3')],
-        preload: true,
-      });
-
-      moveSounds = [moveSound1, moveSound2, moveSound3]
-    }
-
-    loadSounds();
-
     const showStatusPopup = ref(false);
     const examinedCombatantStatuses = ref<StatusEffectApplication[]>([]);
     const hideStatusPopup = () => {
@@ -1374,6 +1335,7 @@ export default defineComponent({
     };
 
     const examineCombatant = (position: Position) => {
+      playActionButtonSound();
       const combatant = board.value.getCombatantAtPosition(position);
       if(combatant) {
         combatantsForStatus.value = [];
@@ -1389,6 +1351,7 @@ export default defineComponent({
     }
 
     const showCombatantsForStatus = () => {
+      playMenuButtonSound();
       const allLivingNotEnemyCloakedCombatants = board.value.getAllCombatants()
                                             .filter((combatant) => !combatant.isKnockedOut())
                                             .filter((combatant) => !combatant.isCloaked() || 
@@ -1511,6 +1474,7 @@ export default defineComponent({
 
     const endGame = async () => {
       const playerSurvived = !game.value.teams.find((team) => team.isHumanPlayerTeam())?.isDefeated();
+      playGameOverSound(playerSurvived);
       const gameOverMessage = getGameResultMessage(whiteTeam.value, blackTeam.value);
       await delay(1500);
       startGameOverAnimation.value = true;

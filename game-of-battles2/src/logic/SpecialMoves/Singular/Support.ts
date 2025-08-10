@@ -1,5 +1,7 @@
 import { refreshCombatant } from "@/boardSetups";
 import { emitter } from "@/eventBus";
+import { SoundByte } from "@/GameData/SoundLibrary";
+import { SoundManager } from "@/GameData/SoundManager";
 import { ActionResult, AttackResult, getStatusEffectActionResult } from "@/logic/attackResult";
 import { getStandardActionResult } from "@/logic/attackResult";
 import { Board } from "@/logic/Board";
@@ -111,7 +113,7 @@ export class Purify implements SpecialMove {
         for(const statusEffect of negativeStatusEffects) {
             targetCombatant?.removeStatusEffect(statusEffect.name);
         }
-        return getStandardActionResult();
+        return getStatusEffectActionResult(StatusEffectType.REGENERATING, target, 1);
     };
     checkRequirements = undefined
     description = `Remove all negative status effects from an ally.`   
@@ -259,6 +261,10 @@ export class BuildWalls implements SpecialMove {
             board.placeCombatant(wall, currentTarget);
         }
 
+        if(getAllTargets.length > 0) {
+            SoundManager.getInstance().playSound(SoundByte.SMITH);
+        }
+
         return getStandardActionResult();
     };
     checkRequirements = undefined
@@ -292,6 +298,7 @@ export class BoomBoomJack implements SpecialMove {
         const bomb = new Bomb(`Bomb_${IdGenerator.generateId()}`, target, invokverTeam);
         invokverTeam.addCombatant(bomb);
         board.placeCombatant(bomb, target);
+        SoundManager.getInstance().playSound(SoundByte.SMITH);
         return getStandardActionResult();
     };
     checkRequirements = undefined

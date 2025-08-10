@@ -1,7 +1,7 @@
 <template>
   <div class="Game-Logo">
     <h1>
-      <span class="Game-Logo-Text">Di <span class="skull-icon"></span> F<div class="logo-outer-circle"><div class="logo-circle-inner"></div></div>r Me</span>
+      <span class="Game-Logo-Text">Di <span class="skull-icon"></span> F<div class="logo-outer-circle"><div class="logo-circle-inner"></div></div>r Me!</span>
     </h1>
   </div>
 </template>
@@ -38,7 +38,7 @@ export default defineComponent({});
 
 .Game-Logo h1 {
   font-size: 160px;
-  margin-top: 0.25em;
+  margin-top: 0;
 }
 
 .Game-Logo-Text {

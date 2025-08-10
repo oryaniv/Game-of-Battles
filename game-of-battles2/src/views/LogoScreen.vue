@@ -1,7 +1,7 @@
 <template>
   <div class="logo-screen">
     <Transition name="fade-in-out">
-      <img v-show="showLogo" src="../assets/Logo/FCOH_circle_without_50mt.png" class="COH-logo" />
+      <img v-show="showLogo" src="../assets/Logo/FCOH_without_50mt.png" class="COH-logo" />
     </Transition>
   </div>
 </template>
@@ -9,6 +9,8 @@
 <script lang="ts">
 import { defineComponent, ref, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
+import { SoundManager } from '../GameData/SoundManager';
+import { SoundByte } from '../GameData/SoundLibrary';
 
 export default defineComponent({
   name: 'LogoScreen',
@@ -18,6 +20,7 @@ export default defineComponent({
 
     setTimeout(() => {
       showLogo.value = true;
+      SoundManager.getInstance().playSound(SoundByte.FOOL_LAUGH);
     }, 300);
 
     setTimeout(() => {
@@ -28,7 +31,7 @@ export default defineComponent({
       router.push('/Intro');
     }, 5000);
 
-    const handleKeyPress = (event) => {
+    const handleKeyPress = (event: KeyboardEvent) => {
       if(event.key === 'Escape') {
         router.push('/Intro');
       }

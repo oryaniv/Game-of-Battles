@@ -9,7 +9,7 @@ import { SpecialMove, SpecialMoveAlignment, SpecialMoveTriggerType } from "../Sp
 import { CoopMove, CoopMoveWithPartners } from "../SpecialMoves/Coop/CoopMove";
 import { StatusEffectType } from "../StatusEffect";
 import { AIAgent, AIAgentType } from "./AIAgent";
-import { getValidAttacks, getValidMovePositions } from "./AIUtils";
+import { agentWait, getValidAttacks, getValidMovePositions } from "./AIUtils";
 
 interface RankedTurnPlay {
     play: TurnPlay;
@@ -43,16 +43,17 @@ export enum PlayActionType {
 }
 
 export abstract class HeuristicalAIAgent implements AIAgent {
-    playTurn(combatant: Combatant, game: Game, board: Board): ActionResult | ActionResult[] {
+    async playTurn(combatant: Combatant, game: Game, board: Board): Promise<ActionResult | ActionResult[]> {
         const bestPlay: TurnPlay = getHeuristicBestPlay(combatant, game, board, this.evaluationFunction, this.collectCoop);
         if(bestPlay.position !== combatant.position) {
             const shouldStop = combatant.move(bestPlay.position, board);
             if(shouldStop) {
-                return [getStandardActionResult()];
+                return Promise.resolve([getStandardActionResult()]);
             }
         } 
+        await agentWait(1000);
         const actionTarget = bestPlay.playAction.target || combatant.position;
-        return bestPlay.playAction.executionFunction(combatant, actionTarget, game, board);
+        return Promise.resolve(bestPlay.playAction.executionFunction(combatant, actionTarget, game, board));
     }
         
     getAIAgentType(): AIAgentType {
@@ -81,9 +82,6 @@ function getHeuristicBestPlay(combatant: Combatant, game: Game,
     });
     allActionsEvaluated.sort((a, b) => b.score - a.score);
     
-    // eslint-disable-next-line
-    // debugger;
-    // return allActionsEvaluated[0].play;
     return randomizedBestPlay(allActionsEvaluated);
 }
 

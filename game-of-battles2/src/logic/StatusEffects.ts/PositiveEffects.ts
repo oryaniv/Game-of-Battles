@@ -250,7 +250,7 @@ export class CircusDiaboliqueStatusEffect implements StatusEffect {
 
 export class CloakedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.CLOAKED;  
-    description: string = "Invisible to enemies, cannot be targeted, but can still be hit by AOE, or found if an enemy tries to move to your position. attacking and most skills break cloaking.";
+    description: string = "Invisible to enemies, cannot be targeted, but can still be hit by Area of Effect attacks. Can also be found if an enemy tries to move to their position. Attacking and most skills break cloaking.";
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
             caster.stats.attackPower += 30;

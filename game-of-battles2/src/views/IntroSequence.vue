@@ -13,6 +13,7 @@
     <!-- Game Logo -->
     <Transition name="fade-in-only">
       <div v-if="currentStep >= 3" class="logo-wrapper">
+        <h2 class="umbral-moon-title">Umbral Moon</h2>
         <GameLogo /> <!-- Your GameLogo component -->
       </div>
     </Transition>
@@ -29,6 +30,8 @@ import { defineComponent, ref, onMounted, onBeforeUnmount } from 'vue';
 // Assuming GameLogo.vue is in the same directory or correctly aliased
 import GameLogo from '../components/GameLogo.vue'; // Adjust path as needed
 import { useRouter } from 'vue-router'
+import { SoundManager } from '../GameData/SoundManager';
+import { SoundByte } from '../GameData/SoundLibrary';
 
 export default defineComponent({
   name: 'IntroSequence',
@@ -46,18 +49,21 @@ export default defineComponent({
       // Step 1: Show "You must rise to the challenge,"
       sequenceTimers.push(setTimeout(() => {
         currentStep.value = 1;
+        SoundManager.getInstance().playSound(SoundByte.BUFF);
       }, 500)); // Short delay before first text appears
 
       // Step 2: Show "Or else, you will..."
       sequenceTimers.push(setTimeout(() => {
         currentStep.value = 0; // Hide text1
         currentStep.value = 2; // Show text2
+        SoundManager.getInstance().playSound(SoundByte.DEBUFF);
       }, 500 + 2000)); // 0.5s initial + 2s display for text1
 
       // Step 3: Show GameLogo
       sequenceTimers.push(setTimeout(() => {
         currentStep.value = 0; // Hide text2
         currentStep.value = 3; // Show logo
+        SoundManager.getInstance().playSound(SoundByte.EVIL_LAUGH);
       }, 500 + 2000 + 2000)); // 0.5s initial + 2s text1 + 2s text2
 
       // Step 4: Show "Press any key to start"
@@ -144,7 +150,7 @@ export default defineComponent({
   color: white;
   text-align: center;
   text-shadow: 0 0 5px rgba(255, 255, 255, 0.5); /* Subtle white glow */
-  margin-top: 180px; /* Position below the logo */
+  margin-top: 240px; /* Position below the logo */
   position: absolute; /* Position relative to container */
 }
 
@@ -170,6 +176,20 @@ export default defineComponent({
 
 .fade-in-only-enter-from{
   opacity: 0;
+}
+
+.umbral-moon-title {
+  font-family: 'Cinzel Decorative';
+    font-size: 3.5em;
+    font-style: italic;
+    font-weight: bold;
+    text-align: center;
+    color: black;
+    text-shadow:
+    -1px -1px 0px #7A5B8C,
+    1px 1px 0px #5E3B68,
+    0 0 10px rgba(255, 215, 0, 0.4);
+    margin: 0; /* Remove default paragraph margins */
 }
 
 

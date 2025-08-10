@@ -6,6 +6,12 @@ import { Game } from "./logic/Game";
 import { getEmptyAsType } from "./logic/LogicFlags";
 import { RunManager, RunType } from "./GameData/RunManager";
 import { TutorialManager, DialogStep } from "./GameData/TutorialManager";
+import { SoundByte } from "./GameData/SoundLibrary";
+import { SoundManager } from "./GameData/SoundManager";
+import { playWalkingSound, playCancelSound } from "./GameData/SoundUtils";
+import { getEnemyTeam } from "./GameData/EnemyRepository";
+import { Difficulty } from "./logic/Difficulty";
+import { Team } from "./logic/Team";
 
 
 // Define the structure for a single dialog message
@@ -695,6 +701,126 @@ export function getActionEffectIcon(effect: ActionEffect) {
 }
 
 
+const damageSoundByteMap: { [key: string]: SoundByte } = {
+  'Blight': SoundByte.Blight,
+  'Crush': SoundByte.CRUSH,
+  'Dark': SoundByte.DARK,
+  'Fire': SoundByte.FIRE,
+  'Healing': SoundByte.HEALING,
+  'Holy': SoundByte.HOLY,
+  'Ice': SoundByte.ICE,
+  'Pierce': SoundByte.PIERCE,
+  'Slash': SoundByte.SLASH,
+  'Lightning': SoundByte.LIGHTNING,
+}
+
+const getStatusEffectSoundByte = (statusEffectType: StatusEffectType) => {
+  switch(statusEffectType) {
+    case StatusEffectType.STRENGTH_BOOST:
+    case StatusEffectType.MOBILITY_BOOST:
+    case StatusEffectType.RALLIED:
+    case StatusEffectType.ENCOURAGED:
+    case StatusEffectType.GUARDIAN:
+    case StatusEffectType.IDAI_NO_HADOU:
+    case StatusEffectType.SANCTUARY:
+      return SoundByte.BUFF;
+    case StatusEffectType.ARCANE_OVERCHARGE:
+      return SoundByte.LIGHTNING;
+    case StatusEffectType.ARCANE_CONDUIT:
+    case StatusEffectType.ARCANE_CHANNELING:
+    case StatusEffectType.ARCANE_BARRIER:
+      return SoundByte.ARCANE;
+    case StatusEffectType.SLOW:
+    case StatusEffectType.STRENGTH_DOWNGRADE:
+    case StatusEffectType.LUCK_DOWNGRADE:
+    case StatusEffectType.DIVINE_RETRIBUTION:
+    case StatusEffectType.MARKED_FOR_PAIN:
+    case StatusEffectType.MARKED_FOR_EXECUTION:
+    case StatusEffectType.MARKED_FOR_OBLIVION:
+    case StatusEffectType.MESMERIZED:
+      return SoundByte.DEBUFF;
+    case StatusEffectType.FORTIFIED:
+    case StatusEffectType.BLOCKING_STANCE:
+    case StatusEffectType.SHIELD_WALL:
+    case StatusEffectType.ARCANE_SHIELD_WALL:
+    case StatusEffectType.FULL_METAL_JACKET:
+    case StatusEffectType.DEFENDING:
+      return SoundByte.ARMOR;
+    case StatusEffectType.INGENIOUS_UPGRADE:
+      return SoundByte.SMITH;
+    case StatusEffectType.MESMERIZING:
+    case StatusEffectType.CHARMED:
+      return SoundByte.SEDUCE;
+    case StatusEffectType.TAUNTED:
+    case StatusEffectType.STUPEFIED:
+    case StatusEffectType.CIRCUS_DIABOLIQUE:
+      return SoundByte.FOOL_LAUGH_FASTER;
+    case StatusEffectType.NAUSEATED:
+      return SoundByte.COUGH;
+    case StatusEffectType.REGENERATING:
+      return SoundByte.HEALING;
+    case StatusEffectType.PANICKED:
+    case StatusEffectType.NIGHTMARE_LOCKED:
+      return SoundByte.SCREAM;
+    case StatusEffectType.SLEEPING:
+      return SoundByte.SNORING;
+    case StatusEffectType.FOCUS_AIM:
+      return SoundByte.AIM;
+    case StatusEffectType.CLOAKED:
+      return SoundByte.SHADOW_STEP;
+    case StatusEffectType.FRENZY:
+      return SoundByte.RAGE;
+  }
+}
+
+export function playGameEffectSound(effect: DamageType, statusEffectType: StatusEffectType | undefined) {
+  if(effect !== DamageType.None) {
+    const soundByte = damageSoundByteMap[effect.toString()];
+    if(soundByte !== undefined) {
+      SoundManager.getInstance().playSound(soundByte);
+    }
+  }
+  if(statusEffectType !== undefined) {
+    const soundByte = getStatusEffectSoundByte(statusEffectType);
+    if(soundByte !== undefined) {
+      SoundManager.getInstance().playSound(soundByte);
+    }
+  }
+}
+
+export function playGameOverSound(isPlayerWinner: boolean) {
+  if(isPlayerWinner) {
+    SoundManager.getInstance().playSound(SoundByte.TURN_START);
+  } else {
+    SoundManager.getInstance().playSound(SoundByte.DEFEAT_SOUND);
+    SoundManager.getInstance().playSound(SoundByte.EVIL_LAUGH);
+  }
+}
+
+export function playPlayerMoveSound() {
+  playWalkingSound();
+}
+
+export function playCancelButtonSound() {
+  playCancelSound();
+}
+
+export function playRoundStartSound() {
+  // SoundManager.getInstance().playSound(SoundByte.TURN_START);
+}
+
+export function playMissSound() {
+  SoundManager.getInstance().playSound(SoundByte.MISS);
+}
+
+export function playActionButtonSound() {
+  SoundManager.getInstance().playSound(SoundByte.ACTION_BUTTON_CLICK);
+}
+
+export function playMenuButtonSound() {
+  SoundManager.getInstance().playSound(SoundByte.MENU_BUTTON_CLICK);
+}
+
 export function getGame(): Game {
   const runManager = RunManager.getInstance();
   const runType = runManager.getRunType();
@@ -724,7 +850,7 @@ export function getSinglePlayerGame(): Game {
 
   const teams = [whiteTeam, blackTeam];
 
-  placeAllCombatants(whiteTeam, blackTeam, board);
+  // placeAllCombatants(whiteTeam, blackTeam, board);
 
   const game = new Game(teams, board);
   return game;
@@ -756,5 +882,11 @@ export function getRelevantDialogs(): DialogStep[] {
     return tutorial.steps;
   }
   return [];
+}
+
+function getMatchTeams(): Team[] {
+  const playerTeam = RunManager.getInstance().getRun().team;
+  const enemyTeam = getEnemyTeam(RunManager.getInstance().getRun().difficulty as Difficulty, RunManager.getInstance().getCurrentLevel());
+  return [playerTeam, enemyTeam];
 }
 

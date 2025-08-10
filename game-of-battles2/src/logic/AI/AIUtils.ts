@@ -4,6 +4,7 @@ import { Position } from "../Position";
 import { Game } from "../Game";
 import { SpecialMove, SpecialMoveAlignment, SpecialMoveAreaOfEffect, SpecialMoveTriggerType } from "../SpecialMove";
 import { DamageReaction } from "../Damage";
+import { playWalkingSound } from "../../GameData/SoundUtils";
 
 interface SkillTargeting {
     skill: SpecialMove;
@@ -45,7 +46,7 @@ export function getValidAttacks(combatant: Combatant, board: Board): Position[] 
 }
 
 
-export function moveTowards(combatant: Combatant, position: Position, board: Board): void {
+export function moveTowards(combatant: Combatant, position: Position, board: Board): Position | undefined {
     const validMoves = getValidMovePositions(combatant, board);
     if (validMoves.length === 0) return;
 
@@ -63,7 +64,9 @@ export function moveTowards(combatant: Combatant, position: Position, board: Boa
 
     if (closestPosition) {
         combatant.move(closestPosition, board);
+        return closestPosition;
     }
+    return undefined;
 }
 
 export function shuffleArray(array: any[]) {
@@ -290,4 +293,14 @@ export function checkIsSameCombatant(combatant1: Combatant, target: Position, bo
         return combatant1.name === combatant2.name && combatant1.getCombatantType() === combatant2.getCombatantType();
     }
     return false;
+}
+
+export function agentWait(ms: number = 1000) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export async function agentMove(combatant: Combatant, position: Position, board: Board) {
+    combatant.move(position, board);
+    playWalkingSound();
+    await agentWait();
 }

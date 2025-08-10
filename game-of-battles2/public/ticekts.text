@@ -33,6 +33,7 @@
     * ? to not be dead icon when skipping it V
     * effect for missing an ailment (optional) (mostly for fool) V
     * blocking stance not showing icon when applied (it's because the status effect is enum 0, annoying JS) V
+    * apply settings for post battle messages
 
     // Logic
     * devour divinity not working properly V
@@ -43,21 +44,27 @@
     * Veteran AI should not know to AOE target cloaked foes V
     * troll to use beast rage on round 2 instead of 1 V
     * rookie to use co ops (around 19% better than normal rookie!) V
+    * enemy turn - separate moving and acting for transparency sake - all relevant agents(kid, rookie, veteran, gorilla, troll, charmed, enraged, etc.) V
+    * enemy turns should go slower so the player can better track VX
     
 
     // sound
-    * sounds for logo screen, intro seq.
-    * new sounds for buffs and debuffs (generic for each type, not for every status)
-    * sounds for miss result (optional)
-    * sounds for moving, for pressing buttons.
-    * sounds for choosing combatants
+    * sound off/on to affect sound playing V
+    * sound volume widget to affect sound playing V
+    * sounds for logo screen, intro seq V
+    * sounds for miss result (optional) V
+    * apply settings for sounds V
+    * new sounds for buffs and debuffs (generic for each type, not for every status) V
+    * sounds for moving V
+    
+    * UI sounds - click button, open menu, cancel, choose skill
+    * sounds for choosing combatants (DEFENDER!)
+    * sounds for victory/defeat
     * sounds for joureny screen
+    * sounds for boss encounters
     * unique track for each difficulty + boss
-    * apply settings for sounds and for post battle messages
-
-    // later logic - requires infra work
-    * enemy turn - separate moving and acting for transparency sake - all relevant agents(kid, rookie, veteran, gorilla, troll, charmed, enraged, etc.)
-    * enemy turns should go slower so the player can better track
+    
+   
     
     // testing
     * make sure the UI doesn't break on larger screens(fullscreen/ large desktop)
@@ -66,7 +73,9 @@
 
     * LATER BUGS AND MINORS
       * lower the tutorial panel a bit, to match the main menu height
+      * build team screen - choosing another combatant when on stats panel should not revert to description panel
       * have red team members face the other direction (optional)
+      * sound section in the settings (we'll do when needed)
 
 
     // deployment
@@ -79,6 +88,7 @@
     * credits
         * any artists who own sounds/svg's/ images
     * take care of duel after sending for friend reviews
+    * find replacement for dark damage and buff, they are not free!
     * custom messages for bosses
     * custom end game messages for bosses
     * tooltips for stats in build team screen/ examine combatant screen
@@ -89,43 +99,3 @@
     * fill the about me screen
     * achievements screen and infra
     * maybe change the hard layout
-
-
-
-
-
-useful fonts for the future:
-
-Creepster (holy shit?)
-
-Nosifer (you died!)
-
-Metal Mania(insutls?)
-
-https://www.youtube.com/watch?v=pVeX4C9B1Lk - evil laugh sound - need 1.5X speed
-
-https://www.youtube.com/watch?v=fpalvmhf180 - fool laugh sound - need 1.5X speed
-
-click sound effects:
-
-https://www.youtube.com/watch?v=q8ZLBOFQ2g0 (2 and 9 best)
-
-https://www.youtube.com/results?search_query=button+click+sound+effect
-
-sword clash sound effect: 
-
-https://www.youtube.com/watch?v=8t3-s7HL360
-
-!-----------------------------------------------------------------------------!
-
-052 – 8997888 • noam.send@gmail.com •
-
-
-A pixel art portrait of the female jester character, "The Fool," from the user's game. The sprite should strictly match the pixel art style and level of detail of the existing combatant sprites, but focused on her head and upper torso.
-    Her head should be drawn at a 45-degree angle, with her winking eye (e.g., her right eye) further from the viewer, and her open eye (e.g., her left eye) closer to the viewer, making it more prominent.
-    She is smiling mischievously and winking with the eye further from the viewer.
-    Crucially, her open eye (the one closer to the viewer) must have a distinct, clearly visible "hex symbol inside a circle" drawn as makeup around it, replacing the usual black circle. This symbol should be precise and well-defined.
-    Her face is covered in white pixelated makeup. Her hair is split blonde/black. The overall feel should be whimsical, mischievous, and slightly eerie. The sprite should be isolated on a transparent background, approximately 64x64 pixels in resolution, rendered in crisp pixel art with no anti-aliasing artifacts.
-
-
-`A minimalist logo portrait of a female jester character, "The Fool." The style should be simple, clean, and highly effective, using only two colors: black and a vibrant yellow/gold. The image focuses on her head and upper torso. Her head should be drawn at a 45-degree angle. She has a mischievous smile. One eye is open and looking directly at the viewer, while the other eye is winking playfully. Her hair is styled in pigtails, split into two distinct colors (one black, one yellow/gold). The overall aesthetic is striking, iconic, and conveys her playful yet mysterious nature. The logo should be isolated on a transparent background, rendered in a clean, vector-like style (not pixel art).`

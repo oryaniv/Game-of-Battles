@@ -2,6 +2,7 @@
  <div class="esc-menu-overlay">
     <div class="esc-menu-container">
         <div class="esc-menu-content">
+            <h3 class="esc-menu-subtitle">Umbral Moon</h3>
             <h1 class="esc-menu-title">Di<img class="skull-icon" src="../assets/Skull_and_crossbones.svg" alt="Skull" /> For Me!</h1>
             <div class="esc-menu-options">
                 <button @click="dismissEscMenu" class="esc-menu-option">
@@ -118,6 +119,20 @@ h1.esc-menu-title {
     1px 1px 0px #8B7355,
     0 0 10px rgba(255, 215, 0, 0.4);
   text-align: center;
+}
+
+h3.esc-menu-subtitle {
+  font-family: 'Cinzel Decorative';
+  margin: -0.75em 0 1.5em 0;
+  font-size: 1em;
+  font-style: italic;
+  font-weight: bold;
+  text-align: center;
+  color: black;
+  text-shadow:
+    -1px -1px 0px #7A5B8C,
+    1px 1px 0px #5E3B68,
+    0 0 10px rgba(255, 215, 0, 0.4);
 }
 
 .esc-menu-overlay {
