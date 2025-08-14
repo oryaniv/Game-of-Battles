@@ -80,7 +80,7 @@ export class ArcaneChanneling implements SpecialMove {
 export class FocusAim implements SpecialMove {
     name: string = "Focus Aim";
     triggerType = SpecialMoveTriggerType.Active;
-    cost: number = 7;
+    cost: number = 5;
     turnCost: number = 1;
     range: SpecialMoveRange = {
         type: SpecialMoveRangeType.Self,

@@ -5,13 +5,13 @@
             <h3 class="esc-menu-subtitle">Umbral Moon</h3>
             <h1 class="esc-menu-title">Di<img class="skull-icon" src="../assets/Skull_and_crossbones.svg" alt="Skull" /> For Me!</h1>
             <div class="esc-menu-options">
-                <button @click="dismissEscMenu" class="esc-menu-option">
+                <button @mouseenter="playHoverSound" @click="dismissEscMenu" class="esc-menu-option">
                     Continue
                 </button>
-                <button @click="openSettingsMenu" class="esc-menu-option">
+                <button @mouseenter="playHoverSound" @click="openSettingsMenu" class="esc-menu-option">
                     Settings
                 </button>
-                <button @click="shouldReturnToMainMenu" class="esc-menu-option">
+                <button @mouseenter="playHoverSound" @click="shouldReturnToMainMenu" class="esc-menu-option">
                     Main Menu
                 </button>
             </div>
@@ -33,10 +33,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router'
+import { playMenuButtonClickSound, playPromptSound,
+ playCancelSound, playActionButtonClickSound, playHoverSound} from '@/GameData/SoundUtils';
 import GameMessagePrompt from './GameMessagePrompt.vue';
 import SettingsMenu from './SettingsMenu.vue';
+import { RunManager } from '@/GameData/RunManager';
 
 export default defineComponent({
     name: 'EscMenu',
@@ -56,15 +59,18 @@ export default defineComponent({
         }
 
         const shouldReturnToMainMenu = () => {
+            playPromptSound();
             showAreYouSurePopup.value = true;
         }
 
         const ReturnToMainMenu = () => {
+            RunManager.getInstance().clear();
             router.push("/MainMenu");
         }
 
         const openSettingsMenu = () => {
             showSettingsMenu.value = true;
+            playMenuButtonClickSound();
         }
 
         const showAreYouSurePopup = ref(false);
@@ -74,6 +80,8 @@ export default defineComponent({
             showAreYouSurePopup.value = false;
             if(confirm) {
                ReturnToMainMenu();
+            } else {
+               playCancelSound();
             }
         }
 
@@ -89,6 +97,10 @@ export default defineComponent({
         const yesButtonText = ref('Afraid so...');
         const noButtonText = ref('Hell No!');
 
+        onMounted(() => {
+          playActionButtonClickSound();
+        })
+
         return {
             dismissEscMenu,
             openSettingsMenu,
@@ -101,7 +113,8 @@ export default defineComponent({
             onOptionsSaved,
             onOptionsCanceled,
             yesButtonText,
-            noButtonText
+            noButtonText,
+            playHoverSound
         }
     }
 })

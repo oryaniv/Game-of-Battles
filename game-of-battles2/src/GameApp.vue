@@ -24,10 +24,12 @@
                     validSkillNeutral: isSkillTargetValid({ x: x - 1, y: y - 1 }) && isNeutral({ x: x , y: y  }),
                     validForCheckStatus: isTargetValidForCheckStatus({ x: x - 1, y: y - 1 }),
                     'aoe-highlight': isAoeHighlighted({ x: x - 1, y: y - 1 }),
+                    'move-highlight': isMoveHighlighted({ x: x - 1, y: y - 1 }),
+                    'attack-highlight': isAttackHighlighted({ x: x - 1, y: y - 1 }),
                     'strong-grid': !!showGridBars
            }"
           @click="performAction({ x: x - 1, y:  y - 1})"
-          @mouseover="showAoe({ x: x - 1, y: y - 1 })"
+          @mouseenter="hightLightChoice({ x: x - 1, y: y - 1 })"
           @mouseleave="hideAoe"
         >
           <!-- <div class="coordinates" style="font-size: 24px;">{{x -1}},{{y - 1}}</div> -->
@@ -119,20 +121,20 @@
 <div class="action-menu" v-if="showActionMenu() && !showHoveringMessage()">
   <div class="action-menu-button-container">
     <!-- Main central button (e.g., Attack or Use Skill) -->
-    <button class="action-menu-main-button" @mouseover="actionButtonHover('examine')" @mouseleave="actionButtonHover('')" v-show="!actionSelected()" @click="showCombatantsForStatus">e<span class="action-menu-button-highlight">X</span>amine</button>
+    <button class="action-menu-main-button" @mouseenter="actionButtonHover('examine')" @mouseleave="actionButtonHover('')" v-show="!actionSelected()" @click="showCombatantsForStatus">e<span class="action-menu-button-highlight">X</span>amine</button>
 
     <!-- Other action buttons, dynamically positioned -->
 
-    <button :disabled="!canMove()" class="action-menu-sub-button" @mouseover="actionButtonHover('move')" @mouseleave="actionButtonHover('')" v-show="!actionSelected()" v-if="!hasMoved" @click="showMoveOptions"><span class="action-menu-button-highlight">M</span>ove</button>
-    <button class="action-menu-sub-button" @mouseover="actionButtonHover('undo')" @mouseleave="actionButtonHover('')" v-show="!actionSelected()" v-if="hasMoved" @click="undoMove"><span class="action-menu-button-highlight">U</span>ndo</button>
-    <button :disabled="!hasActiveSpecialMoves()" class="action-menu-sub-button" @mouseover="actionButtonHover('skill')" @mouseleave="actionButtonHover('')" v-show="!actionSelected()" @click="showSpecialSkills"><span class="action-menu-button-highlight">S</span>kill</button>
-    <button :disabled="!hasAnyCoopMoves()" class="action-menu-sub-button" @mouseover="actionButtonHover('coop')" @mouseleave="actionButtonHover('')" v-show="!actionSelected()" @click="showCoopSkillMenu">Co <span class="action-menu-button-highlight">O</span>p</button>
+    <button :disabled="!canMove()" class="action-menu-sub-button" @mouseenter="actionButtonHover('move')" @mouseleave="actionButtonHover('')" v-show="!actionSelected()" v-if="!hasMoved" @click="showMoveOptions"><span class="action-menu-button-highlight">M</span>ove</button>
+    <button class="action-menu-sub-button" @mouseenter="actionButtonHover('undo')" @mouseleave="actionButtonHover('')" v-show="!actionSelected()" v-if="hasMoved" @click="undoMove"><span class="action-menu-button-highlight">U</span>ndo</button>
+    <button :disabled="!hasActiveSpecialMoves()" class="action-menu-sub-button" @mouseenter="actionButtonHover('skill')" @mouseleave="actionButtonHover('')" v-show="!actionSelected()" @click="showSpecialSkills"><span class="action-menu-button-highlight">S</span>kill</button>
+    <button :disabled="!hasAnyCoopMoves()" class="action-menu-sub-button" @mouseenter="actionButtonHover('coop')" @mouseleave="actionButtonHover('')" v-show="!actionSelected()" @click="showCoopSkillMenu">Co <span class="action-menu-button-highlight">O</span>p</button>
     
-    <button :disabled="!canDefend() || (hasMoved && !canDefendAndMove())" class="action-menu-sub-button" @mouseover="actionButtonHover('defend')" @mouseleave="actionButtonHover('')" v-show="!actionSelected()" @click="defend"><span class="action-menu-button-highlight">D</span>efend</button>
-    <button class="action-menu-sub-button" @mouseover="actionButtonHover('skip')" @mouseleave="actionButtonHover('')" v-show="!actionSelected()" @click="skip">s<span class="action-menu-button-highlight">K</span>ip</button>
+    <button :disabled="!canDefend() || (hasMoved && !canDefendAndMove())" class="action-menu-sub-button" @mouseenter="actionButtonHover('defend')" @mouseleave="actionButtonHover('')" v-show="!actionSelected()" @click="defend"><span class="action-menu-button-highlight">D</span>efend</button>
+    <button class="action-menu-sub-button" @mouseenter="actionButtonHover('skip')" @mouseleave="actionButtonHover('')" v-show="!actionSelected()" @click="skip">s<span class="action-menu-button-highlight">K</span>ip</button>
     
-    <button class="action-menu-sub-button" @mouseover="actionButtonHover('cancel')" @mouseleave="actionButtonHover('')" v-show="actionSelected()" @click="cancel"><span class="action-menu-button-highlight">C</span>ancel</button>
-    <button :disabled="!canAttack()" class="action-menu-sub-button" @mouseover="actionButtonHover('attack')" @mouseleave="actionButtonHover('')" v-show="!actionSelected()" @click="showAttackOptions"><span class="action-menu-button-highlight">A</span>ttack</button>
+    <button class="action-menu-sub-button" @mouseenter="actionButtonHover('cancel')" @mouseleave="actionButtonHover('')" v-show="actionSelected()" @click="cancel"><span class="action-menu-button-highlight">C</span>ancel</button>
+    <button :disabled="!canAttack()" class="action-menu-sub-button" @mouseenter="actionButtonHover('attack')" @mouseleave="actionButtonHover('')" v-show="!actionSelected()" @click="showAttackOptions"><span class="action-menu-button-highlight">A</span>ttack</button>
     <div class="action-menu-circle">
       <div class="action-menu-circle-inner"></div>
     </div>
@@ -167,7 +169,7 @@
               :class="{ disabled: !isSkillEnabled(skill.name) }"
               :disabled="!isSkillEnabled(skill.name)"
               @click="showSkillTargets(skill.name)"
-              @mouseover="showSkillDescription(skill.name)"
+              @mouseenter="showSkillDescription(skill.name)"
               @mouseleave="hideSkillDescription"
             >
               <span class="skill-icon">
@@ -201,7 +203,7 @@
             :class="{ disabled: !isSkillEnabled(skill.move.name, skill.partners) }"
             :disabled="!isSkillEnabled(skill.move.name, skill.partners)"
             @click="showCoopSkillTargets(skill.move.name)"
-            @mouseover="showCoopSkillDescription(skill.move.name, skill.partners)"
+            @mouseenter="showCoopSkillDescription(skill.move.name, skill.partners)"
             @mouseleave="hideCoopSkillDescription"
           >
             <span class="skill-icon">
@@ -317,7 +319,7 @@
             :key="effect.name"
             class="status-effect-item"
             :style="{ color: getStatusEffectColor(effect.type) }"
-            @mouseover="showStatusEffectDescription(effect, index)"
+            @mouseenter="showStatusEffectDescription(effect, index)"
             @mouseleave="hideStatusEffectDescription"
           >
             <StatusDescriptionBox v-if="statusDescriptionBox && statusDescriptionBoxIndex === index" :text="statusDescriptionBox" />
@@ -406,7 +408,7 @@ import { AllOfThem, standardVsSetup, theATeam, theBTeam, allMilitiaSetup, theGor
   getActionDescription, getStatusEffectDescription, requireStatusEffectSvg, delay,
    statusNameToText, getGame, getRelevantDialogs, getStatusEffectIsVisible, playGameEffectSound, playRoundStartSound, 
    playMissSound, playGameOverSound, playPlayerMoveSound, playCancelButtonSound, playActionButtonSound,
-   playMenuButtonSound } from './UIUtils';
+   playMenuButtonSound, playSkillSelectSound, playMenuScrollSound, playGamePromptSound, stopMatchMusic } from './UIUtils';
  import { Difficulty } from './logic/Difficulty';
  import { useRouter } from 'vue-router';
  import { RunManager, RunType } from './GameData/RunManager';
@@ -485,6 +487,8 @@ export default defineComponent({
     const selectedCoopSkillPartners = ref<Combatant[] | null>(null);
     const currentSkill = ref<SpecialMove | null>(null);
     const aoePositions = ref<Position[]>([]);
+    const moveHighlightedPositions = ref<Position[]>([]);
+    const attackHighlightedPositions = ref<Position[]>([]);
     const eventLogger = EventLogger.getInstance();
     let eventLogBody: HTMLElement | null = null;
     const actionDescription = ref<string | null>(null);
@@ -531,13 +535,16 @@ export default defineComponent({
       emitter.on('change-team', () => {
         updateTurnMessage();
       });
-
-      console.log('%c game app onMounted', 'color: blue; font-size: 16px; font-weight: bold;');
      
 
       document.addEventListener('keydown', (event: KeyboardEvent) => {
         if(event.key === 'Escape') {
-           escapeMenuVisible.value = !escapeMenuVisible.value;
+          if(!escapeMenuVisible.value) {
+            showEscapeMenu();
+          }
+          else {
+            dismissEscapeMenu();
+          }
            return;
         }
 
@@ -708,6 +715,7 @@ export default defineComponent({
         validMoves.value = [];
         hasMoved.value = true;
         moveMode.value = false;
+        moveHighlightedPositions.value = [];
         playPlayerMoveSound();
         if (actionsRemaining.value <= 0) {
           game.value.nextTurn();
@@ -717,13 +725,7 @@ export default defineComponent({
       }
     };
 
-    // const playMoveSound = () => {
-    //   const currentMoveSound = moveSounds[Math.floor(Math.random() * moveSounds.length)];
-    //   currentMoveSound && currentMoveSound.play();
-    // }
-
     const showMoveOptions = () => {
-      playMenuButtonSound();
       if (currentCombatant.value) {
         validMoves.value = board.value.getValidMoves(currentCombatant.value);
         moveMode.value = true;
@@ -736,6 +738,7 @@ export default defineComponent({
         moveMode.value = false;
         return;
       }
+      playMenuButtonSound();
     };
 
     const cancel = () => {
@@ -752,6 +755,8 @@ export default defineComponent({
       validTargetsForSkill.value = [];
       currentSkill.value = null;
       aoePositions.value = [];
+      moveHighlightedPositions.value = [];
+      attackHighlightedPositions.value = [];
       statusMode.value = false;
       combatantsForStatus.value = [];
       showStatusPopup.value = false;
@@ -782,7 +787,7 @@ export default defineComponent({
 
 
     const showAttackOptions = () => {
-      playMenuButtonSound();
+      
       if(!currentCombatant.value) {
         return;
       }
@@ -796,6 +801,7 @@ export default defineComponent({
         attackMode.value = false;
         return;
       }
+      playMenuButtonSound();
     };
 
     const isAttackValid = (position: Position): boolean => {
@@ -871,6 +877,9 @@ export default defineComponent({
     }
 
     const actionButtonHover = (action: string) => {
+      if(action !== '') {
+        playMenuScrollSound();
+      }
       actionDescription.value = getActionDescription(action);
     }
 
@@ -1078,6 +1087,7 @@ export default defineComponent({
     }
 
     const showSkillDescription = (skillName: string) => {
+      playMenuScrollSound();
       if (currentCombatant.value) {
         const skill = currentCombatant.value.specialMoves.find(
           (skill) => skill.name === skillName
@@ -1093,6 +1103,7 @@ export default defineComponent({
     };
 
     const showCoopSkillDescription = (skillName: string, partners: Combatant[]) => {
+      playMenuScrollSound();
       if (currentCombatant.value) {
         const skill = currentCombatant.value.specialMoves.find(
           (skill) => skill.name === skillName
@@ -1157,7 +1168,7 @@ export default defineComponent({
         selectedCoopSkillPartners.value = null;
         return;
       }
-
+ 
       showCoopSkill.value = false;
       coopSkillMode.value = true;
       currentSkill.value = skill;
@@ -1170,6 +1181,7 @@ export default defineComponent({
         coopSkillMode.value = false;
         return;
       }
+      playSkillSelectSound();
     }
 
     const showSkillTargets = (skillName: string) => {
@@ -1189,6 +1201,7 @@ export default defineComponent({
         return;
       }
 
+      
       showSkillsMenu.value = false;
       skillMode.value = true;
       currentSkill.value = skill;
@@ -1200,6 +1213,7 @@ export default defineComponent({
         skillMode.value = false;
         return;
       }
+      playSkillSelectSound();
     };
 
     const isSkillTargetValid = (position: Position): boolean => {
@@ -1292,7 +1306,7 @@ export default defineComponent({
       return '0px';
     }
 
-    const showAoe = (position: Position) => {
+    const hightLightChoice = (position: Position) => {
         if(currentSkill.value && currentCombatant.value && isSkillTargetValid(position)) {
           aoePositions.value = board.value.getAreaOfEffectPositions(
             currentCombatant.value,
@@ -1300,16 +1314,42 @@ export default defineComponent({
             currentSkill.value.range.areaOfEffect,
             currentSkill.value.range.align
           );
+        } else if(moveMode.value) {
+          moveHighlightedPositions.value =[position];
+        } else if(attackMode.value) {
+          attackHighlightedPositions.value =[position];
+        }
+
+        if(isMoveHighlighted(position) || isAttackHighlighted(position) || isAoeHighlighted(position)) {
+          playMenuScrollSound();
         }
     }
 
     const hideAoe = () => {
         aoePositions.value = [];
+        moveHighlightedPositions.value = [];
+        attackHighlightedPositions.value = [];
     }
 
     const isAoeHighlighted = (position: Position): boolean => {
       return aoePositions.value.some(
         (aoePosition) => aoePosition.x === position.x && aoePosition.y === position.y
+      );
+    }
+
+    const isMoveHighlighted = (position: Position): boolean => {
+      return moveHighlightedPositions.value.some(
+        (movePosition) => movePosition.x === position.x && movePosition.y === position.y
+      ) && validMoves.value.some(
+        (move) => move.x === position.x && move.y === position.y
+      );
+    }
+    
+    const isAttackHighlighted = (position: Position): boolean => {
+      return attackHighlightedPositions.value.some(
+        (attackPosition) => attackPosition.x === position.x && attackPosition.y === position.y
+      ) && validAttacks.value.some(
+        (attack) => attack.x === position.x && attack.y === position.y
       );
     }
 
@@ -1395,9 +1435,9 @@ export default defineComponent({
         case 'hp':
           return 150;
         case 'attackPower':
-          return 120;
+          return 150;
         case 'defensePower':
-          return 120;
+          return 150;
         case 'agility':
           return 20;
         case 'stamina':
@@ -1460,6 +1500,7 @@ export default defineComponent({
     const endTutorial = async (type: stepType) => {
       updateHoveringMessage(getTutorialCompleteMessage(type), false);
       const gameOverMessage = getTutorialResultMessage(type);
+      stopMatchMusic();
       await delay(1500);
       startGameOverAnimation.value = true;
       await delay(2500);
@@ -1475,6 +1516,7 @@ export default defineComponent({
     const endGame = async () => {
       const playerSurvived = !game.value.teams.find((team) => team.isHumanPlayerTeam())?.isDefeated();
       playGameOverSound(playerSurvived);
+      stopMatchMusic();
       const gameOverMessage = getGameResultMessage(whiteTeam.value, blackTeam.value);
       await delay(1500);
       startGameOverAnimation.value = true;
@@ -1493,6 +1535,7 @@ export default defineComponent({
       popupTitle.value = title;
       popupMessage.value = message;
       showErrorPopup.value = true;
+      playGamePromptSound();
     };
 
     const handlePopupDismissed = () => {
@@ -1554,6 +1597,7 @@ export default defineComponent({
     }
 
     const dismissEscapeMenu = () => {
+      playCancelButtonSound();
       escapeMenuVisible.value = false;
     }
 
@@ -1620,7 +1664,9 @@ export default defineComponent({
       getCombatantStatusEffects,
       getStatusEffectColor,
       isAoeHighlighted,
-      showAoe,
+      isMoveHighlighted,
+      isAttackHighlighted,
+      hightLightChoice,
       hideAoe,
       requireDamageSVG,
       playAiTurn,
@@ -1893,12 +1939,12 @@ button {
 }
 
 .validMove {
-  background-color: #e8ef8d;
+  background-color: rgba(232, 239, 141, 0.7);
   cursor: pointer;
 }
 
 .validAttack {
-  background-color:rgb(226, 83, 83);
+  background-color:rgba(226, 83, 83, 0.7);
   cursor: pointer;
 }
 
@@ -2139,7 +2185,7 @@ button {
 
 
 .action-description-container {
-   left: 4.5%;
+   left: 3.5%;
    position: absolute;
    top: 72%;
    text-align: center;
@@ -2485,6 +2531,15 @@ button {
 
 .aoe-highlight[data-alignment='Positive'] {
   background-color: rgba(0, 0, 255, 0.5); /* Light blue */
+}
+
+.move-highlight {
+  background-color: rgba(232, 239, 141, 1);
+  cursor: pointer;
+}
+
+.attack-highlight {
+  background-color:rgba(226, 83, 83, 1);
 }
 
 .damage-svg-enter-active,

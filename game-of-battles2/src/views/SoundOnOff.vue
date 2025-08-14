@@ -1,6 +1,6 @@
 <template>
   <div class="intro-view">
-
+    
     <!-- Sound Preference Popup Overlay -->
     <div v-if="showSoundPopup" class="popup-overlay">
       <div class="sound-popup-container">
@@ -10,6 +10,7 @@
           <div class="popup-buttons">
             <button @click="selectSoundPreference(true)" class="game-button">Hell yes!</button>
             <button @click="selectSoundPreference(false)" class="game-button">No...</button>
+            <button @click="goToMenu" class="game-button">Main Menu</button>
           </div>
         </div>
       </div>
@@ -34,6 +35,9 @@ export default defineComponent({
       this.showSoundPopup = false;
       this.$router.push("/LogoScreen");
     },
+    goToMenu() {
+      this.$router.push("/MainMenu");
+    }
   },
 });
 </script>

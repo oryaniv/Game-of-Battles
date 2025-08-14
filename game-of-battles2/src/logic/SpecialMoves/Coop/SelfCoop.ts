@@ -14,6 +14,8 @@ import { CombatMaster } from "@/logic/CombatMaster";
 import { StatusEffect, StatusEffectAlignment, StatusEffectType } from "@/logic/StatusEffect";
 import { Doll } from "@/logic/Combatants/Fool";
 import { emitter } from "@/eventBus";
+import { SoundManager } from "@/GameData/SoundManager";
+import { SoundByte } from "@/GameData/SoundLibrary";
 
 export class IdaiNoHadou extends CoopMove {
     name: string = "Idai no Hadou";
@@ -78,7 +80,7 @@ export class DiamondSupremacy extends CoopMove {
 
 export class Frenzy extends CoopMove {
     name: string = "Frenzy";
-    description: string = "Gain the Frenzy status for 3 rounds. While in frenzy, your attack power is increased, and you cannot die, but lose control over your actions.";
+    description: string = "Gain the Frenzy status for 3 rounds. While in frenzy, your attack power is increased, and you cannot die, but you lose control over your actions and attack the closest target, enemy or ally.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Witch, CombatantType.Vanguard, CombatantType.Fool, CombatantType.StandardBearer] },
     ];
@@ -124,6 +126,7 @@ export class NastyNastyDolly extends CoopMove {
         board.placeCombatant(doll, originalPosition);
         invoker.addRelatedCombatant("doll", doll);
         doll.addRelatedCombatant("doll_owner", invoker);
+        SoundManager.getInstance().playSound(SoundByte.FOOL_LAUGH);
         return getStandardActionResult(invoker.position, this.turnCost);
     };
     range: SpecialMoveRange = {

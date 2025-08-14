@@ -111,10 +111,10 @@ export function combatantsWithDescriptions(team: Team) {
         {
             id: 7,
             name: CombatantType.Pikeman.toString(),
-            description: 'A well balanced melee warrior capable of countering enemy attacks, dealing great damage and applying debuffs.',
+            description: 'A well balanced melee warrior with a long weapon. Capable of countering enemy attacks and applying varied debuffs.',
             role: 'Melee DPS/Disruption',
             easeOfUse: 'Easy',
-            pros: 'Double melee range, many offenisve techniques that disrupt enemy plans',
+            pros: 'Double melee range, several AOE and debuff inducing attacks.',
             cons: 'Melee combatant yet weak to Crush damage',
             combatantType: CombatantType.Pikeman,
             combatantReference: getCombatantByType(CombatantType.Pikeman, team)
@@ -133,7 +133,7 @@ export function combatantsWithDescriptions(team: Team) {
         {
             id: 9,
             name: CombatantType.FistWeaver.toString(),
-            description: 'A martial artist weaving elemental and and sacred magic into her strikes. Fast and versatile.',
+            description: 'A martial artist weaving elemental and sacred magic into her strikes. Fast and versatile.',
             role: 'Melee DPS/All rounder',
             easeOfUse: 'Moderate',
             pros: 'Fast movement, high agility and luck, useful self buff skills',
@@ -159,7 +159,7 @@ export function combatantsWithDescriptions(team: Team) {
             role: 'Melee DPS',
             easeOfUse: 'Easy',
             pros: 'Ridiculously high damage, very fast movement and high health',
-            cons: 'Low defence, low agility, reckless use leads to a quick death',
+            cons: 'Low defence, low agility, and weak to Pierce damage. Reckless use leads to a quick death',
             combatantType: CombatantType.Vanguard,
             combatantReference: getCombatantByType(CombatantType.Vanguard, team)
         },

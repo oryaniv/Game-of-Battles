@@ -122,8 +122,8 @@ export class StandUpComedyGoneWrong extends CoopMove {
 export class CircusDiabolique extends CoopMove {
     name: string = "Circus Diabolique";
     description: string = `Gain the Circus Diabolique status effect.
-    Enemies in a 2-tile radius nova around you may become Nightmare locked for 2 rounds.
-    They are unable to act, and suffer 10 blight damage every turn. Circus Diabolique will keep on as long as you skip your turn.`;
+    As long as it persists, at the end of your turn, enemies in a 2-tile radius nova around have a medium chance to become Nightmare locked for 2 rounds.
+    They are unable to act, and suffer 10 blight damage every turn. Circus Diabolique status will keep on as long as you skip your turn.`;
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Fool, CombatantType.Witch, CombatantType.Rogue, CombatantType.Artificer] },
         { combatantTypeOptions: [CombatantType.StandardBearer, CombatantType.Wizard, CombatantType.Defender] }
@@ -145,16 +145,16 @@ export class CircusDiabolique extends CoopMove {
         return getStandardActionResult(invoker.position);
     };
     checkRequirements = (self: Combatant) => {
-        return this.checkCoopRequirements(self);
+        return this.checkCoopRequirements(self) && !self.hasMoved;
     };
     turnCost: number = 3;
 }
 
 export class SleepingDart extends CoopMove {
     name: string = "Sleeping Dart";
-    description: string = "High chance to inflict sleep for 2 rounds. does not break cloaking";
+    description: string = "High chance to inflict sleep for 2 rounds. does not break cloaking.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
-        { combatantTypeOptions: [CombatantType.Fool, CombatantType.Artificer, CombatantType.Rogue] }
+        { combatantTypeOptions: [CombatantType.Fool, CombatantType.Artificer, CombatantType.Hunter] }
     ];
     damage: Damage = {
         amount: 0,

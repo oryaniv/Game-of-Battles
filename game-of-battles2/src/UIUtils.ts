@@ -8,10 +8,12 @@ import { RunManager, RunType } from "./GameData/RunManager";
 import { TutorialManager, DialogStep } from "./GameData/TutorialManager";
 import { SoundByte } from "./GameData/SoundLibrary";
 import { SoundManager } from "./GameData/SoundManager";
-import { playWalkingSound, playCancelSound } from "./GameData/SoundUtils";
+import { playWalkingSound, playCancelSound, playMenuButtonClickSound, 
+  playActionButtonClickSound, playHoverSound, playPromptSound, stopCurrentMusic } from "./GameData/SoundUtils";
 import { getEnemyTeam } from "./GameData/EnemyRepository";
 import { Difficulty } from "./logic/Difficulty";
 import { Team } from "./logic/Team";
+import { CombatantType } from "./logic/Combatants/CombatantType";
 
 
 // Define the structure for a single dialog message
@@ -790,7 +792,7 @@ export function playGameEffectSound(effect: DamageType, statusEffectType: Status
 
 export function playGameOverSound(isPlayerWinner: boolean) {
   if(isPlayerWinner) {
-    SoundManager.getInstance().playSound(SoundByte.TURN_START);
+    SoundManager.getInstance().playSound(SoundByte.VICTORY_SOUND);
   } else {
     SoundManager.getInstance().playSound(SoundByte.DEFEAT_SOUND);
     SoundManager.getInstance().playSound(SoundByte.EVIL_LAUGH);
@@ -814,11 +816,69 @@ export function playMissSound() {
 }
 
 export function playActionButtonSound() {
-  SoundManager.getInstance().playSound(SoundByte.ACTION_BUTTON_CLICK);
+  playActionButtonClickSound();
+}
+
+export function playSkillSelectSound() {
+  SoundManager.getInstance().playSound(SoundByte.SKILL_SELECT);
 }
 
 export function playMenuButtonSound() {
-  SoundManager.getInstance().playSound(SoundByte.MENU_BUTTON_CLICK);
+  playMenuButtonClickSound();
+}
+
+export function playMenuScrollSound() {
+  playHoverSound();
+}
+
+export function playGamePromptSound() {
+  playPromptSound();
+}
+
+export function stopMatchMusic() {
+  stopCurrentMusic();
+}
+
+
+export function playCombatantSelectSound(combatantType: CombatantType) {
+  switch(combatantType) {
+    case CombatantType.Defender:
+      SoundManager.getInstance().playSound(SoundByte.DEFENDER_SELECT);
+      break;
+    case CombatantType.StandardBearer:
+      SoundManager.getInstance().playSound(SoundByte.CHAMPION_SELECT);
+      break;
+    case CombatantType.Hunter:
+      SoundManager.getInstance().playSound(SoundByte.HUNTER_SELECT);
+      break;
+    case CombatantType.Vanguard:
+      SoundManager.getInstance().playSound(SoundByte.VANGUARD_SELECT);
+      break;
+    case CombatantType.Wizard:
+      SoundManager.getInstance().playSound(SoundByte.WIZARD_SELECT);
+      break;
+    case CombatantType.Artificer:
+      SoundManager.getInstance().playSound(SoundByte.ARTIFICER_SELECT);
+      break;
+    case CombatantType.Fool:
+      SoundManager.getInstance().playSound(SoundByte.FOOL_LAUGH);
+      break;
+    case CombatantType.Pikeman:
+      SoundManager.getInstance().playSound(SoundByte.PIKEMAN_SELECT);
+      break;
+    case CombatantType.Witch:
+      SoundManager.getInstance().playSound(SoundByte.WITCH_SELECT);
+      break;
+    case CombatantType.FistWeaver:
+      SoundManager.getInstance().playSound(SoundByte.FIST_WEAVER_SELECT);
+      break;
+    case CombatantType.Healer:
+      SoundManager.getInstance().playSound(SoundByte.HEALER_SELECT);
+      break;
+    case CombatantType.Rogue:
+      SoundManager.getInstance().playSound(SoundByte.ROGUE_SELECT);
+      break;
+  }
 }
 
 export function getGame(): Game {
@@ -843,7 +903,7 @@ export function getSinglePlayerGame(): Game {
 
   const matchTeams = playGroundTeams();
 
-  // const matchTeams = RunManager.getInstance().getMatchTeams();
+  // const matchTeams = getMatchTeams();// RunManager.getInstance().getMatchTeams();
 
   const whiteTeam = matchTeams[0];
   const blackTeam = matchTeams[1];

@@ -20,8 +20,6 @@ import { compileToFunction } from "vue";
 import { DragonOfChaos } from "./logic/Combatants/DragonOfChaos";
 import { Rogue } from "./logic/Combatants/Rogue";
 import { Artificer } from "./logic/Combatants/Artificer";
-import { Iskariot } from "./logic/Combatants/Iskariot";
-import { Myrmidon } from "./logic/Combatants/Myrmidon";
 import { DummyAIAgent, KidAIAgent, RookieAIAgent } from "./logic/AI/DeterministicAgents";
 import { VeteranAIAgent } from "./logic/AI/VeteranAIAgent";
 import { Troll } from "./logic/Combatants/Troll";
@@ -41,18 +39,23 @@ export function playGroundTeams(): Team[] {
     const rookieAIAgent = new RookieAIAgent();
     const rookieWithCoop = new RookieAIAgent();
     rookieWithCoop.setCollectCoop(true);
-    const whiteTeam = new Team('Blue Team', 0,rookieAIAgent);
-    const blackTeam = new Team('Red Team', 1 );
+    const whiteTeam = new Team('Blue Team', 0,);
+    const blackTeam = new Team('Red Team', 1, veternAIAgentWithCoop );
 
    
     // whiteTeam.addCombatant(new Vanguard('Layla', { x: 3, y: 0}, whiteTeam));
     // whiteTeam.addCombatant(new Defender('Dorgo', { x: 6, y: 5}, whiteTeam));
     // whiteTeam.addCombatant(new FistWeaver('P5', { x: 3, y: 7}, whiteTeam));
-    // whiteTeam.addCombatant(new Wizard('P9', { x: 5, y: 3}, whiteTeam));
-    whiteTeam.addCombatant(new Wizard('P11', { x: 3, y: 1}, whiteTeam));
+    whiteTeam.addCombatant(new Vanguard('P9', { x: 5, y: 3}, whiteTeam));
+    // whiteTeam.addCombatant(new Fool('P11', { x: 3, y: 1}, whiteTeam));
+    // whiteTeam.addCombatant(new Witch('P12', { x: 3, y: 2}, whiteTeam));
+    // whiteTeam.addCombatant(new Vanguard('P13', { x: 3, y: 3}, whiteTeam));
+    // whiteTeam.addCombatant(new Hunter('P14', { x: 3, y: 4}, whiteTeam));
+    // whiteTeam.addCombatant(new StandardBearer('P15', { x: 3, y: 5}, whiteTeam));
     
 
-    blackTeam.addCombatant(new Vanguard('Ragnar', { x: 3, y: 4}, blackTeam));
+    // blackTeam.addCombatant(new Dragon('Umbral', { x: 3, y: 1}, blackTeam));
+    blackTeam.addCombatant(new Wizard('Ragnar', { x: 3, y: 4}, blackTeam));
     // blackTeam.addCombatant(new Witch('Elena', { x: 3, y: 9}, blackTeam));
     // blackTeam.addCombatant(new Pikeman('Zhao', { x: 3, y: 8}, blackTeam));
     // blackTeam.addCombatant(new Hunter('Nina', { x: 4, y: 5}, blackTeam));
@@ -498,4 +501,14 @@ export function getCombatantByType(type: CombatantType, team: Team): Combatant {
         default:
             return new Militia(name, position, team);
     }
+}
+
+export function generateExamplePlayerTeam(): Team {
+        const team = new Team('Your team', 0);
+        team.addCombatant(new Defender('Aragorn', { x: 3, y: 5}, team));
+        team.addCombatant(new Wizard('Feloron', { x: 3, y: 6}, team));
+        team.addCombatant(new Hunter('Orion', { x: 3, y: 7}, team));
+        team.addCombatant(new FistWeaver('Ororo', { x: 3, y: 8}, team));
+        team.addCombatant(new Wizard('Irenicus', { x: 3, y: 9}, team));
+        return team;
 }

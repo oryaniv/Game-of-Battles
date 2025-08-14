@@ -2,8 +2,8 @@
   <div class="post-match-screen">
     <div class="message">{{ receivedMessage }}</div>
     <div class="button-container">
-      <button v-if="playerSurvived && !runCompleted" class="game-button" @click="continueToNextLevel">{{ nextMatchText() }}</button>
-      <button v-if="!playerSurvived || runCompleted" class="game-button" @click="returnToMenu">Main Menu</button>
+      <button v-if="playerSurvived && !runCompleted" class="game-button" @mouseenter="playHoverSound" @click="continueToNextLevel">{{ nextMatchText() }}</button>
+      <button v-if="!playerSurvived || runCompleted" class="game-button" @mouseenter="playHoverSound" @click="returnToMenu">Main Menu</button>
     </div>
   </div>
 </template>
@@ -16,6 +16,7 @@ import { TutorialManager } from '@/GameData/TutorialManager';
 import { OptionsManager } from '@/GameData/OptionsManager';
 import { getDifficulyLevelCount } from '@/GameData/EnemyRepository';
 import { refreshTeam } from '@/boardSetups';
+import { playHoverSound, playPostMatchMusic, stopCurrentMusic } from '@/GameData/SoundUtils';
 
 export default defineComponent({
   setup() {
@@ -28,6 +29,7 @@ export default defineComponent({
     const isPostBattleCommentDisabled = ref(optionsManager.getDisablePostBattleComments());
 
     const continueToNextLevel = () => {
+      stopCurrentMusic();
       if(runManager.getRunType() === RunType.TUTORIAL) {
         router.push('/Match');
       }
@@ -41,12 +43,14 @@ export default defineComponent({
 
     const returnToMenu = () => {
       runManager.clear();
+      stopCurrentMusic();
       router.push('/MainMenu');
     };
 
     onMounted(() => {      
       getStateParams();
       updateRun();
+      playPostMatchMusic(playerSurvived.value);
     });
 
     const getStateParams = () => {
@@ -115,7 +119,8 @@ export default defineComponent({
       returnToMenu,
       getStateParams,
       runCompleted,
-      nextMatchText
+      nextMatchText,
+      playHoverSound
     };
   }
 });

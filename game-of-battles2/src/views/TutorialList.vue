@@ -8,7 +8,7 @@
         :key="i"
         class="tutorial-button"
         @click="selectTutorial(i)"
-        @mouseover="showDescription(i)"
+        @mouseenter="showDescription(i); playHoverSound()"
         @mouseleave="hideDescription"
       >
         {{ tutorialManager.getTutorial(i)?.title }}
@@ -16,7 +16,7 @@
     </div>
    </div>
    <DescriptionCloud class="tutorial-description" v-if="description" :text="description" />
-   <button class="tutorial-back-button" @click="backToMainMenu">Back</button>
+   <button class="tutorial-back-button" @mouseenter="playHoverSound" @click="backToMainMenu">Back</button>
   </div>
   
 </template>
@@ -29,6 +29,7 @@ import { useRouter } from 'vue-router';
 import { RunManager, RunType } from '@/GameData/RunManager';
 import { Team } from '@/logic/Team';
 import { Difficulty } from "../logic/Difficulty";
+import { playHoverSound } from '@/GameData/SoundUtils';
 
 export default defineComponent({
   name: 'TutorialList',
@@ -62,7 +63,8 @@ export default defineComponent({
       description,
       showDescription,
       hideDescription,
-      backToMainMenu
+      backToMainMenu,
+      playHoverSound
     };
   }
 });

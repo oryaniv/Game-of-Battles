@@ -17,7 +17,7 @@
         <div class="options-list">
           <!-- Sound On Checkbox -->
           <label class="option-item" @mouseover="changeDescriptionText('Toggle sound on/off')" @mouseleave="changeDescriptionText('')">
-            <input type="checkbox" v-model="localOptions.soundOn"  />
+            <input type="checkbox" v-model="localOptions.soundOn" @change="playCheckboxSound"/>
             <span class="option-label">Sound On</span>
             <span class="custom-checkbox">
               <span v-if="localOptions.soundOn" class="checkbox-indicator">✔</span>
@@ -25,21 +25,21 @@
           </label>
 
           <!-- SFX Volume Slider -->
-          <label class="option-item" @mouseover="changeDescriptionText('Adjust SFX sound volume')" @mouseleave="changeDescriptionText('')">
+          <label class="option-item" @mouseenter="changeDescriptionText('Adjust SFX sound volume')" @mouseleave="changeDescriptionText('')">
             <span class="option-label">SFX Volume</span>
             <input type="range" v-model="localOptions.sfxVolume" min="0" max="1" step="0.1" />
             <span class="volume-value">{{ localOptions.sfxVolume * 100 }}</span>
           </label>
 
-          <label class="option-item" @mouseover="changeDescriptionText('Adjust Music volume')" @mouseleave="changeDescriptionText('')">
+          <label class="option-item" @mouseenter="changeDescriptionText('Adjust Music volume')" @mouseleave="changeDescriptionText('')">
             <span class="option-label">Music Volume</span>
             <input type="range" v-model="localOptions.musicVolume" min="0" max="1" step="0.1" />
             <span class="volume-value">{{ localOptions.musicVolume * 100 }}</span>
           </label>
 
           <!-- Show Grid Bars Checkbox -->
-          <label class="option-item" @mouseover="changeDescriptionText('Check in order to make board grid bars fully visible')" @mouseleave="changeDescriptionText('')">
-            <input type="checkbox" v-model="localOptions.showGridBars" />
+          <label class="option-item" @mouseenter="changeDescriptionText('Check in order to make board grid bars fully visible')" @mouseleave="changeDescriptionText('')">
+            <input type="checkbox" v-model="localOptions.showGridBars" @change="playCheckboxSound"/>
             <span class="option-label">Show Grid Bars</span>
             <span class="custom-checkbox">
               <span v-if="localOptions.showGridBars" class="checkbox-indicator">✔</span>
@@ -47,8 +47,8 @@
           </label>
 
           <!-- Disable Battle Comments Checkbox -->
-          <label class="option-item" @mouseover="changeDescriptionText('Check to disable side comments in battle')" @mouseleave="changeDescriptionText('')">
-            <input type="checkbox" v-model="localOptions.disableBattleComments" />
+          <label class="option-item" @mouseenter="changeDescriptionText('Check to disable side comments in battle')" @mouseleave="changeDescriptionText('')">
+            <input type="checkbox" v-model="localOptions.disableBattleComments" @change="playCheckboxSound"/>
             <span class="option-label">Disable In-Battle Comments</span>
             <span class="custom-checkbox">
               <span v-if="localOptions.disableBattleComments" class="checkbox-indicator">✔</span>
@@ -56,8 +56,8 @@
           </label>
 
           <!-- Disable Post Battle Comments Checkbox -->
-          <label class="option-item" @mouseover="changeDescriptionText('Check to stop the game from mocking the player for losing')" @mouseleave="changeDescriptionText('')">
-            <input type="checkbox" v-model="localOptions.disablePostBattleComments" />
+          <label class="option-item" @mouseenter="changeDescriptionText('Check to stop the game from mocking the player for losing')" @mouseleave="changeDescriptionText('')">
+            <input type="checkbox" v-model="localOptions.disablePostBattleComments" @change="playCheckboxSound"/>
             <span class="option-label">Disable Post-Battle Insults</span>
             <span class="custom-checkbox">
               <span v-if="localOptions.disablePostBattleComments" class="checkbox-indicator">✔</span>
@@ -139,6 +139,7 @@ export default defineComponent({
     },
     cancelOptions() {
       // Reset local options to initial state if cancelled
+      SoundManager.getInstance().playSound(SoundByte.CANCEL);
       this.localOptions = { ...this.initialOptions };
       this.$emit('options-canceled'); // Emit event
     },
@@ -158,10 +159,15 @@ export default defineComponent({
       console.log(tab);
     }
 
+    const playCheckboxSound = () => {
+      SoundManager.getInstance().playSound(SoundByte.CHECKBOX_CHECK);
+    }
+
     return {
       changeTab,
       changeDescriptionText,
       descriptionText,
+      playCheckboxSound,
     }
   }
 });

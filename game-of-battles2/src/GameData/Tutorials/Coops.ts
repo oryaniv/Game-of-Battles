@@ -27,9 +27,9 @@ export class Coops implements Tutorial {
         id: 1,
         text: [
             `Rise and shine, you lazy numbskull! Would you look at that, you clunks were clumsy
-            cleaning the place, and now we have goblin infestation!`,
+            tidying up the place, and now we have a goblin infestation!`,
             `I want you to get rid of them ASAP, I want them gone and their filth picked clean, I want
-            this place so clean and safe my grand-grandmother would be proud to go tour around.`,
+            this place so sanitary and safe my grand-grandmother would be proud to take a tour around.`,
             `Get moving trashead, double time!`
         ],
         stepType: stepType.REGULAR,

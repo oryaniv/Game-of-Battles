@@ -57,15 +57,22 @@
     * new sounds for buffs and debuffs (generic for each type, not for every status) V
     * sounds for moving V
     
-    * UI sounds - click button, open menu, cancel, choose skill
-    * sounds for choosing combatants (DEFENDER!)
-    * sounds for victory/defeat
-    * sounds for joureny screen
-    * sounds for boss encounters
-    * unique track for each difficulty + boss
+    * UI sounds - click button, open menu, cancel, choose skill V
+    * sounds for choosing combatants (DEFENDER!) V
+    * sounds for victory/defeat V
+    * sounds for joureny screen V
+
+    // music TICKETS
+    * stop the battle music when the fight ends, not when the screen goes out V
+    * new victory sound V
+    * make sure post match plays the right track V
+    * create the build team full track
+    * solve the audio exhaustion problem
+    * create the right loops for music tracks
+    * add final touch sounds (on choose single player, tower, team chosen, etc.)
+    * adjust the sounds according the to music so they are well heard
     
    
-    
     // testing
     * make sure the UI doesn't break on larger screens(fullscreen/ large desktop)
     * Wizard vetetran agent to be more aggressive (less barrier, overcharge instead of attacking)  - find it happening, then deal
@@ -76,6 +83,7 @@
       * build team screen - choosing another combatant when on stats panel should not revert to description panel
       * have red team members face the other direction (optional)
       * sound section in the settings (we'll do when needed)
+      
 
 
     // deployment
@@ -94,8 +102,10 @@
     * tooltips for stats in build team screen/ examine combatant screen
     * skill tab in build team screen
     * range and trajectory hints for skills
-    * after complete run "congratz" screen
+    * sounds for boss encounters
+    * after complete run "congratz" screens
     * high scores screen
     * fill the about me screen
     * achievements screen and infra
-    * maybe change the hard layout
+    * maybe change the hard frame and board to the umbral theme
+    

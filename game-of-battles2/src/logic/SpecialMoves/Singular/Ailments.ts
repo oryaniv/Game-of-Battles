@@ -120,8 +120,8 @@ export class LookeyHere implements SpecialMove {
     checkRequirements = (self: Combatant) => {
         return !self.hasMoved;
     };
-    description = `Enemies in a 2-tile radius nova around you may become mesmerized and unable to act for 1 round.
-    This will keep on as long as you skip your turn.`;
+    description = `Gain the mesmerizing status. As long as it persists, at the end of your turn, enemies in a 2-tile radius nova around you have a medium chance to become mesmerized and unable to act for 1 round.
+    Mesmerizing status will keep on as long as you skip your turn.`;
 }
 
 

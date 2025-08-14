@@ -3086,8 +3086,7 @@ class VeteranAIAgentArtificerPlayer extends VeteranAIAgentGenericPlayer {
         }
         const closestEnemy = getClosestEnemy(combatant, board, game);
         const hasLineOfSight = closestEnemy && board.hasLineOfSight(movePosition, closestEnemy.position, combatant);
-        // eslint-disable-next-line
-        debugger;
+
         if(closestEnemy && (hasLineOfSight || board.getDistanceBetweenPositions(target!, closestEnemy.position) <= 4)) {
             baseValue += 30;
         }

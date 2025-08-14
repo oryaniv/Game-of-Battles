@@ -200,7 +200,7 @@ export class AssassinsMark implements SpecialMove {
         };
     };
     checkRequirements = undefined;
-    description = `Apply mark on the target. Can be applied up to 3 times, each mark results in a bigger damage
+    description = `Apply mark on the target, stacks up to 3 times. Each mark results in a bigger damage
     multiplier when the mark is detonated by a rogue's attack. Can be used without breaking cloaking, and costs
     only half an action point.`;
     breaksCloaking = false;

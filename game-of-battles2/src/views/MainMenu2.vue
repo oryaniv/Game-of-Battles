@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen flex items-center justify-center p-4">
     <div class="main-menu-container-arc">
-      <h3 class="main-menu-subtitle-arc">Umbral Moon</h3>
+      <h3 v-if="!newGameMode" class="main-menu-subtitle-arc">Umbral Moon</h3>
       <h1 v-if="!newGameMode" class="main-menu-title-arc">Di<img class="skull-icon" src="../assets/Skull_and_crossbones.svg" alt="Skull" /> For Me!</h1>
 
       <h2 v-if="newGameMode" class="new-game-title">New Game</h2>
@@ -19,7 +19,7 @@
             :key="item.id"
             class="menu-option-panel-arc"
             @click="item.onPress()"
-            @mouseover="showDescription = true; description = item.description"
+            @mouseenter="showDescription = true; description = item.description; playHoverSound()"
             @mouseleave="showDescription = false; description = ''"
             :style="getArcButtonPosition(index, mainMenuItems.length)"
             >
@@ -33,7 +33,7 @@
             :key="item.id"
             class="menu-option-panel-arc"
             @click="item.onPress()"
-            @mouseover="showDescription = true; description = item.description"
+            @mouseenter="showDescription = true; description = item.description; playHoverSound()"
             @mouseleave="showDescription = false; description = ''"
             :style="getArcButtonPosition(index, newGameMenuItems.length)"
             >
@@ -55,6 +55,13 @@
       @dismissed="handlePopupDismissed"
     />
 
+    <GameMessagePopup v-if="showMessagePopup"
+      :show="showMessagePopup"
+      :title="messagePopupTitle"
+      :message="messagePopupMessage"
+      @dismissed="handleMessagePopupDismissed"
+    />
+
     <div class="circle-of-hex-logo">
        <img class="hex-logo" src="../assets/Logo/FCOH_circle_without_50mt.png" alt="Hex Logo" />
     </div>
@@ -67,9 +74,10 @@ import DescriptionCloud from '../components/DescriptionCloud.vue';
 import SettingsMenu from '../components/SettingsMenu.vue';
 import { useRouter } from 'vue-router'
 import GameMessagePrompt from '@/components/GameMessagePrompt.vue';
-import { SoundManager } from '@/GameData/SoundManager';
-import { Track } from '@/GameData/SoundLibrary';
-import { playMenuButtonSound } from '@/GameData/SoundUtils';
+import GameMessagePopup from '@/components/GameMessagePopup.vue';
+// import { SoundManager } from '@/GameData/SoundManager';
+//import { SoundByte, Track } from '@/GameData/SoundLibrary';
+import { playMenuButtonSound, playHoverSound } from '@/GameData/SoundUtils';
 
 
 
@@ -77,23 +85,24 @@ export default defineComponent({
   components: {
     DescriptionCloud,
     SettingsMenu, 
-    GameMessagePrompt
+    GameMessagePrompt,
+    GameMessagePopup
   },
   
   setup() {
     const router = useRouter();
     
     const mainMenuItems = ([
-      { id: 3, label: 'Credits', onPress: () => { showCredits(); }, description: 'Show game credits' },
+      { id: 3, label: 'Credits', onPress: () => { playMenuButtonSound(); showCredits(); }, description: 'Show game credits' },
       { id: 1, label: 'New Game', onPress: () => { playMenuButtonSound(); newGameMode.value = true; }, description: 'Play against the AI or another player' },
       { id: 2, label: 'Settings', onPress: () => { playMenuButtonSound(); optionsMode.value = true; }, description: 'Change game settings' },
-      { id: 4, label: 'About us', onPress: () => { playMenuButtonSound(); aboutMode.value = true; }, description: 'Learn about the developers' },
+      { id: 4, label: 'About us', onPress: () => { playMenuButtonSound(); showAboutUs(); aboutMode.value = true; }, description: 'Learn about the developers' },
     ]);
 
     const newGameMenuItems = ref([
       { id: 3, label: 'Tutorial', onPress: () => { playMenuButtonSound(); startTutorial(); }, description: 'Learn how to play' },
       { id: 1, label: 'Single Player',  onPress: () => { playMenuButtonSound(); startSinglePlayer(); }, description: 'Play against the AI' },
-      { id: 2, label: 'Showdown', onPress: () => { playMenuButtonSound();  }, description: 'Play against another player' },
+      { id: 2, label: 'Showdown', onPress: () => { playMenuButtonSound(); startShowdown(); }, description: 'Play against another player' },
       { id: 4, label: 'Back', onPress: () => { playMenuButtonSound(); newGameMode.value = false; }, description: 'Back to Main menu' }
     ]);
 
@@ -131,6 +140,12 @@ export default defineComponent({
     const aboutMode = ref(false);
     const showDescription = ref(false);
     const description = ref('');
+    const showMessagePopup = ref(false);
+    const messagePopupTitle = ref('');
+    const messagePopupMessage = ref('');
+    const handleMessagePopupDismissed = () => {
+      showMessagePopup.value = false;
+    };
 
 
     const onOptionsSaved = () => {
@@ -141,7 +156,10 @@ export default defineComponent({
     };
 
     const showCredits = () => {
-      router.push("/Credits");
+      showMessagePopup.value = true;
+      messagePopupTitle.value = 'One moment...';
+      messagePopupMessage.value = 'Credits are not available in this Beta.';
+      // router.push("/Credits");
     };
 
     const startSinglePlayer = () => {
@@ -156,14 +174,26 @@ export default defineComponent({
       router.push("/TutorialList");
     };
 
+    const startShowdown = () => {
+      showMessagePopup.value = true;
+      messagePopupTitle.value = 'One moment...';
+      messagePopupMessage.value = 'Showdown is not available in this Beta. Why don\'t you try single player or tutorial?';
+    };
+
+    const showAboutUs = () => {
+      showMessagePopup.value = true;
+      messagePopupTitle.value = 'Yeah, yeah...';
+      messagePopupMessage.value = 'Come on, you know me. I\'ll update this for those who don\'t when the game is released.';
+    };
+
     const suggestTutorial = () => {
       showTutorialPopup.value = true;
     };
 
-    let newPlayer = true;
+    let newPlayer = false;
 
     const showTutorialPopup = ref(false);
-    const popupTitle = ref('One moment...');
+    const popupTitle = ref('Hold on...');
     const popupMessage = ref('Looks like you are a new player. Care to try the tutorial first?');
     const handlePopupDismissed = (confirm: boolean) => {
       showTutorialPopup.value = false;
@@ -176,7 +206,8 @@ export default defineComponent({
     };
 
     onMounted(() => {
-      SoundManager.getInstance().playMusic(Track.MAIN_MENU);
+      // SoundManager.getInstance().playMusic(Track.MAIN_MENU);
+      // SoundManager.getInstance().playSound(SoundByte.WELCOME_TO_DIE_FOR_ME);
     });
 
     return {
@@ -195,7 +226,13 @@ export default defineComponent({
       showTutorialPopup,
       popupTitle,
       popupMessage,
-      handlePopupDismissed
+      handlePopupDismissed,
+      playHoverSound,
+      showMessagePopup,
+      handleMessagePopupDismissed,
+      messagePopupTitle,
+      messagePopupMessage,
+      showAboutUs
     };
   },
 });

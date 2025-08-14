@@ -10,6 +10,7 @@ import { CoopMove, CoopMoveWithPartners } from "../SpecialMoves/Coop/CoopMove";
 import { StatusEffectType } from "../StatusEffect";
 import { AIAgent, AIAgentType } from "./AIAgent";
 import { agentWait, getValidAttacks, getValidMovePositions } from "./AIUtils";
+import { playWalkingSound, playDefendSound } from "@/GameData/SoundUtils";
 
 interface RankedTurnPlay {
     play: TurnPlay;
@@ -50,6 +51,7 @@ export abstract class HeuristicalAIAgent implements AIAgent {
             if(shouldStop) {
                 return Promise.resolve([getStandardActionResult()]);
             }
+            playWalkingSound();
         } 
         await agentWait(1000);
         const actionTarget = bestPlay.playAction.target || combatant.position;
@@ -133,6 +135,7 @@ function getDefendPlays(combatant: Combatant, game: Game, board: Board, validNew
         position: combatant.position,
         playAction: {
             executionFunction: (combatant: Combatant, target: Position, game: Game, board: Board) => {
+                playDefendSound();
                 game.executeDefend();
                 return [getStandardActionResult()];
             },

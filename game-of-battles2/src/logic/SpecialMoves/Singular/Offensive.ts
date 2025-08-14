@@ -1235,6 +1235,9 @@ export class DieMortal implements SpecialMove {
         const combatMaster = CombatMaster.getInstance();
         const result = combatMaster.executeAttack(invoker, target, board, this.damage, true);
         if(result.attackResult === AttackResult.Hit || result.attackResult === AttackResult.CriticalHit) {
+            if(invoker.hasStatusEffect(StatusEffectType.DIVINE_RETRIBUTION)) {
+                invoker.takeDamage({amount: 450, type: DamageType.Unstoppable});
+            }
             return getDamageActionResult(this.damage, target, this.turnCost);
         }
         return result;

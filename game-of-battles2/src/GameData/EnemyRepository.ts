@@ -61,13 +61,11 @@ function getAiAgent(difficulty: Difficulty, level: number) {
 const enemyData = {
     Easy: [
         [
-          // CombatantType.Defender,
-          // CombatantType.Witch,
-          // CombatantType.Hunter,
-          // CombatantType.Healer,
-          // CombatantType.Vanguard,
+          CombatantType.Defender,
           CombatantType.Witch,
-          CombatantType.Witch
+          CombatantType.Hunter,
+          CombatantType.StandardBearer,
+          CombatantType.Vanguard,
         ], 
         [
           CombatantType.Pikeman,
@@ -82,13 +80,11 @@ const enemyData = {
     ],
     Normal: [
         [
-          // CombatantType.StandardBearer,
-          // CombatantType.Healer,
-          // CombatantType.Wizard,
-          // CombatantType.FistWeaver,
-          // CombatantType.Artificer
-          CombatantType.Witch,
-          CombatantType.Witch
+          CombatantType.StandardBearer,
+          CombatantType.Healer,
+          CombatantType.Wizard,
+          CombatantType.FistWeaver,
+          CombatantType.Artificer
         ],
         [
           CombatantType.Rogue,

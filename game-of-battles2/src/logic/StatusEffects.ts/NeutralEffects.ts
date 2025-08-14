@@ -355,8 +355,6 @@ export class PhysDuplicateStatusEffect implements StatusEffect {
     description = `Upon taking physical damage, this combatant duplicates itself to both left and right of itself, if possible.`;
     applicationHooks = {
         [StatusEffectHook.OnDamageTaken]: (self: Combatant, target: Combatant, damage: Damage, amount: number, board: Board) => {
-            // eslint-disable-next-line
-            debugger;
 
             if(damage.amount <= 0 || 
                 (damage.type !== DamageType.Crush &&
@@ -464,11 +462,6 @@ export class AlwaysByHitStatusEffect implements StatusEffect {
     description = `This combatant will always be hit normally.`;
     applicationHooks = {
         [StatusEffectHook.OnBeingAttacked]: (self: Combatant, attacker: Combatant, damage: Damage, attackCost: number) => {
-            // eslint-disable-next-line
-            debugger;
-            // const isWeakTo = self.resistances.find((r) => r.type === damage.type)?.reaction === DamageReaction.WEAKNESS;
-            // let damageAmount = isWeakTo ? damage.amount * 1.25 : damage.amount;
-            // damageAmount = attacker.hasStatusEffect(StatusEffectType.STRENGTH_BOOST) ? damageAmount * 1.30 : damageAmount;
             if(self.isDefending()) {
                 return ;
             }

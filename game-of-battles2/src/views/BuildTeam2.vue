@@ -11,7 +11,7 @@
         @click="selectCombatantForDetails(combatant)"
         @mouseenter="showDescription(combatant)"
         @mouseleave="hideDescription"
-        :class="{ 'selected-plaque': selectedCombatant?.id === combatant.id }"
+        :class="{ 'selected-plaque': selectedCombatantForChoice?.id === combatant.id }"
       >
 
         <div class="combatant-sprite-in-plaque"> 
@@ -24,6 +24,7 @@
       <button
         v-if="selectedCombatantForChoice && chosenTeam.length < 5"
         @click="addCombatantToTeam(selectedCombatantForChoice)"
+        @mouseenter="playHoverSound"
         class="game-button choose-button"
       >
         Add {{ selectedCombatantForChoice.name }}
@@ -91,14 +92,14 @@
         <template v-if="selectedCombatantForChoice || hoveredCombatant">
             <button
               v-if="selectedDescriptionView === 'description'"
-              @click="selectedDescriptionView = 'stats'"
+              @click="selectedDescriptionView = 'stats'; playMenuButtonClickSound();"
               class="game-button small-button"
             >
               Stats
             </button>
             <button
               v-else
-              @click="selectedDescriptionView = 'description'"
+              @click="selectedDescriptionView = 'description'; playMenuButtonClickSound();"
               class="game-button small-button"
             >
               Description
@@ -131,13 +132,13 @@
 
     <!-- Section 4: Action Buttons (Bottom Center) -->
     <div class="team-builder-actions">
-      <button @click="pickPremadeTeam" class="game-button">Pick For Me</button>
+      <button @click="pickPremadeTeam" class="game-button" @mouseenter="playHoverSound">Pick For Me</button>
       <!--<button @click="removeSelected" class="game-button" :disabled="!selectedCombatantForChoice || !chosenTeam.some(c => c.id === selectedCombatantForChoice.id)">Remove</button> -->
       <button @click="finishTeamBuilding" class="game-button" :disabled="chosenTeam.length !== 5">Finish</button>
     </div>
 
     <!-- Back Button (Bottom Right) -->
-    <button @click="goBack" class="game-button back-button">Back</button>
+    <button @click="goBack" @mouseenter="playHoverSound" class="game-button back-button">Back</button>
   </div>
 </template>
 
@@ -153,9 +154,11 @@ import { getNewCombatantName } from '@/CombatantNameProvider';
 import { Combatant } from '@/logic/Combatant';
 import { premadeTeams } from './viewsHelpers/BuildTeamHelper';
 import { combatantsWithDescriptions } from './viewsHelpers/BuildTeamHelper';
-import { getStatUiName, getStatusScale, getDamageSvg } from '@/UIUtils';
+import { getStatUiName, getStatusScale, getDamageSvg, playCombatantSelectSound } from '@/UIUtils';
 import { DamageType } from '../logic/Damage';
 import { RunManager, RunType } from '@/GameData/RunManager';
+// eslint-disable-next-line
+import { playHoverSound, playActionButtonClickSound, playCancelSound, playMenuButtonClickSound } from '@/GameData/SoundUtils';
 
 export default defineComponent({
   name: 'TeamBuilder',
@@ -185,20 +188,18 @@ export default defineComponent({
       chosenTeam.value.push(combatantToPush);
     };
 
-    // const getSpriteClass = (combatant: CombatantDescription) => {
-    //   return `sprite-${combatant.class.toLowerCase()} team-${combatant.teamIndex === 0 ? 'blue' : 'red'} facing-${combatant.facing}`;
-    // };
-
     // New: Handle clicking on a combatant plaque to show details consistently
     const selectCombatantForDetails = (combatant: CombatantDescription) => {
       selectedCombatantForChoice.value = combatant;
       // Also ensure description view is active when selected
       selectedDescriptionView.value = 'description'; 
+      playMenuButtonClickSound();
     };
 
     // New: Add combatant to team
     const addCombatantToTeam = (combatant: CombatantDescription) => {
       if (chosenTeam.value.length < 5) {
+        playCombatantSelectSound(combatant.combatantType);
         createCombatantFromType(combatant.combatantType);
         selectedCombatantForChoice.value = null; 
         hoveredCombatant.value = null; // Clear hover state
@@ -210,6 +211,7 @@ export default defineComponent({
         if (!selectedCombatantForChoice.value) {
             hoveredCombatant.value = combatant;
         }
+        playHoverSound();
     };
 
     const hideDescription = () => {
@@ -219,14 +221,6 @@ export default defineComponent({
         }
     };
 
-    // const pickRandomTeam = () => {
-    //   chosenTeam.value = [];
-    //   const shuffled = combatants.value.sort(() => 0.5 - Math.random());
-    //   chosenTeam.value = shuffled.slice(0, 5);
-    //   selectedCombatantForChoice.value = null; // Clear selected on random pick
-    //   hoveredCombatant.value = null; // Clear hovered on random pick
-    // };
-
     const pickPremadeTeam = () => {
       chosenTeam.value = [];
       const randomPremade = premadeTeamsForBuild[Math.floor(Math.random() * premadeTeamsForBuild.length)];
@@ -235,11 +229,13 @@ export default defineComponent({
       }
       selectedCombatantForChoice.value = null; 
       hoveredCombatant.value = null; 
+      playActionButtonClickSound();
     };
 
     const removeSelected = (slotIndex: number) => {
       if (chosenTeam.value[slotIndex]) {
         chosenTeam.value.splice(slotIndex, 1);
+        playCancelSound();
       }
     };
 
@@ -257,10 +253,6 @@ export default defineComponent({
       router.push("/MainMenu");
     };
 
-    // This computed property is now less relevant due to new selection flow
-    // const selectedCombatantInTeam = computed(() => {
-    //   return selectedCombatantForChoice.value && chosenTeam.value.some(c => c.id === selectedCombatantForChoice.value!.id);
-    // });
 
     const getStatsToDisplay = (combatant: CombatantDescription) => {
       return Object.entries(combatant.combatantReference.baseStats);
@@ -282,24 +274,25 @@ export default defineComponent({
       combatants,
       chosenTeam,
       hoveredCombatant,
-      selectedCombatantForChoice, // Export the new selected state
+      selectedCombatantForChoice,
       selectedDescriptionView,
       romanNumerals,
-      // getSpriteClass,
-      selectCombatantForDetails, // Use new handler for details display
-      addCombatantToTeam, // New handler for adding to team
+      selectCombatantForDetails,
+      addCombatantToTeam,
       showDescription,
       hideDescription,
-      // pickRandomTeam,
       pickPremadeTeam,
       removeSelected,
       finishTeamBuilding,
       goBack,
-      // selectedCombatantInTeam, // Kept for now, but its usage might change
       getStatsToDisplay,
       toStatUiName,
       toStatusScale,
-      showDamageSvg
+      showDamageSvg,
+      playHoverSound,
+      playActionButtonClickSound,
+      playCancelSound,
+      playMenuButtonClickSound
     };
   },
 });

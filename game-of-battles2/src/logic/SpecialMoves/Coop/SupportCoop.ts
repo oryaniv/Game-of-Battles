@@ -62,7 +62,7 @@ export class RainOfGrace extends CoopMove {
 
 export class RenewedStrength extends CoopMove {
     name: string = "Renewed Strength";
-    description: string = "Fill your allies with renewed vigor, restoring 15 stamina to each ally.";
+    description: string = "Restore a small amount of stamina to all allies in 1-tile radius nova.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Healer, CombatantType.StandardBearer, CombatantType.Witch] }
     ];
@@ -207,7 +207,7 @@ export class ArcaneShieldWall extends CoopMove {
 
 export class BloodRite extends CoopMove {
     name: string = "Blood Rite";
-    description: string = "Sacrifice yourself or an ally, and the blood of sacrifice shall feed your allies, healing them for the amount sacrificed.";
+    description: string = "Sacrifice yourself or an ally. Nearby allies are healed for the amount of health sacrificed.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Healer, CombatantType.Witch] },
     ];

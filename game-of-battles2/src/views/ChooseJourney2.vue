@@ -12,7 +12,7 @@
         class="difficulty-pyramid Easy"
         :class="{ 'selected-pyramid': selectedDifficulty === 'Easy' }"
         @click="selectDifficulty('Easy')"
-        @mouseenter="showDescription('Easy')"
+        @mouseenter="showDescription('Easy'); playHoverSound();"
         @mouseleave="hideDescription"
       >
         <div class="pyramid-block block-top">
@@ -37,7 +37,7 @@
         class="difficulty-pyramid Normal"
         :class="{ 'selected-pyramid': selectedDifficulty === 'Normal' }"
         @click="selectDifficulty('Normal')"
-        @mouseenter="showDescription('Normal')"
+        @mouseenter="showDescription('Normal'); playHoverSound();"
         @mouseleave="hideDescription"
       >
         <div class="pyramid-block block-top">
@@ -68,7 +68,7 @@
         class="difficulty-pyramid Hard"
         :class="{ 'selected-pyramid': selectedDifficulty === 'Hard' }"
         @click="selectDifficulty('Hard')"
-        @mouseenter="showDescription('Hard')"
+        @mouseenter="showDescription('Hard'); playHoverSound();"
         @mouseleave="hideDescription"
       >
         <div class="pyramid-block block-top">
@@ -130,6 +130,7 @@ import PyramidBlock from '../components/PyramidBlock.vue';
 import { getEnemyTeamCombatantTypes } from '../GameData/EnemyRepository';
 import { getCombatantByType } from '@/boardSetups';
 import { delay } from '@/UIUtils';
+import { playHoverSound, playTowerTraversalSound, playTowerAscendSound } from '@/GameData/SoundUtils';
 
 export default defineComponent({
   name: 'JourneyScreen',
@@ -231,6 +232,7 @@ export default defineComponent({
       selectedDifficulty.value = difficulty;
       animationPhase.value = 'zooming';
       playerPlaqueCurrentLevel.value = 0; // Start player plaque at level 0 (top)
+      playTowerTraversalSound();
 
       // Ensure DOM is updated for selected pyramid class before measurements
       await nextTick();
@@ -340,7 +342,7 @@ export default defineComponent({
     };
 
     const straightDescend = () => {
-
+      
       animationPhase.value = 'descending';
       if(!allBlocksElements.value || !selectedDifficulty.value) {
         return;
@@ -383,8 +385,6 @@ export default defineComponent({
         return;
       }
 
-      // eslint-disable-next-line
-      debugger;
       const combatantType = getEnemyTeamCombatantTypes(selectedDifficulty.value!, level)[0];
       const combatant = getCombatantByType(combatantType, enemyTeam.value);
       const currentEnemy = enemyData.value[selectedDifficulty.value][level - 1];
@@ -433,7 +433,7 @@ export default defineComponent({
       if (scrollContainer) {
         scrollContainer.scrollTo({ top: targetY - window.innerHeight + blockRects.height , behavior: 'auto' });
       }
-
+      playTowerAscendSound();
       await delay(1000);
 
       if(animationPhase.value === 'pre-ascending') {
@@ -447,6 +447,7 @@ export default defineComponent({
       }
 
       animationPhase.value = 'ascending';
+      
       const mutliplier = updatePlayerNextLevel();
       const block = allBlocksElements.value[selectedDifficulty.value][playerPlaqueCurrentLevel.value - 1];
       const blockRects = block.getBoundingClientRect();
@@ -457,14 +458,12 @@ export default defineComponent({
       setTimeout(() => {
         revealNextEnemy(playerPlaqueCurrentLevel.value);
         setTimeout(() => {
-          // nextFight();
-        }, 1000);
+          nextFight();
+        }, 1500);
       }, 2500);
     }
 
     const updatePlayerNextLevel = () => {
-      // eslint-disable-next-line
-      debugger;
        const nextEnemyData = enemyData.value[selectedDifficulty.value!][playerPlaqueCurrentLevel.value];
        if(nextEnemyData.isSecret && !runManager.getHasPerferctStreak()) {
          runManager.setCurrentLevel(playerPlaqueCurrentLevel.value + 2);
@@ -480,6 +479,7 @@ export default defineComponent({
     onMounted(() => {
       assignAllBlocksElements();
       placePlayerPlaque();
+      // playChooseJourneySound();
     });
 
     // --- Cleanup ---
@@ -520,7 +520,8 @@ export default defineComponent({
       nextFight,
       descriptionText,
       showDescription,
-      hideDescription
+      hideDescription,
+      playHoverSound
     };
   },
 });

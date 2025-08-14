@@ -1,6 +1,8 @@
 import { Team } from "../logic/Team";
 import { Difficulty, ResultGap } from "../logic/Difficulty";
-import { getEnemyTeam } from "./EnemyRepository";
+import { generateExamplePlayerTeam } from "@/boardSetups";
+
+
 
 
 export enum RunsStatus {
@@ -34,8 +36,7 @@ export class RunManager {
         this.gameRun = {
             team: new Team('Player Team', 0),
             score: -1,
-            currentLevel: 0,
-            difficulty: Difficulty.MEDIUM,
+            currentLevel: 1,
             status: RunsStatus.CREATED,
             type: undefined,
             record: []
@@ -79,6 +80,7 @@ export class RunManager {
         //     type: RunType.SINGLE_PLAYER,
         //     record: [ResultGap.COMICAL, ResultGap.SMALL]
         // };
+
     }
 
     public static getInstance(): RunManager {
@@ -159,6 +161,7 @@ export class RunManager {
         return this.gameRun;
     }
 
+
     // Clear run
     public clear(): void {
         this.gameRun = {
@@ -171,17 +174,14 @@ export class RunManager {
             record: []
         };
     }
-}
 
-// function generateExamplePlayerTeam(): Team {
-//     const team = new Team('Your team', 0);
-//     team.addCombatant(new Defender('Aragorn', { x: 3, y: 5}, team));
-//     // team.addCombatant(new Defender('Aragorn', { x: 3, y: 5}, team));
-//     // team.addCombatant(new Defender('Feloron', { x: 3, y: 5}, team));
-//     // team.addCombatant(new Defender('Orion', { x: 3, y: 5}, team));
-//     // team.addCombatant(new Defender('Ororo', { x: 3, y: 5}, team));
-//     // team.addCombatant(new Defender('Irenicus', { x: 3, y: 5}, team));
-//     // team.addCombatant(new Dragon('Fafnir', { x: 3, y: 5}, team));
-//     return team;
-// }
+    public isBossFight(): boolean {
+        return this.gameRun.type === RunType.SINGLE_PLAYER && 
+        (
+            (this.gameRun.difficulty === Difficulty.HARD && this.gameRun.currentLevel === 7) ||
+            (this.gameRun.difficulty === Difficulty.MEDIUM && this.gameRun.currentLevel === 5) ||
+            (this.gameRun.difficulty === Difficulty.EASY && this.gameRun.currentLevel === 3)
+        );
+    }
+}
 

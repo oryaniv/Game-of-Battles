@@ -53,7 +53,7 @@ const pikemanNames = [
 ];
 
 const vanguardNames = [
-    "Conan", "Cloud", "Robert", "Genghis", "Attila",
+    "Conan", "Cloud", "Robert", "Genghis", "Guts",
     "Ragnar", "Aragorn", "Ajax", "Samson", "Caramon"
 ];
 
@@ -63,8 +63,8 @@ const rogueNames = [
 ];
 
 const artificerNames = [
-    "Daedalus", "LD.Vinci", "Sokka", "Tesla", "Isaac",
-    "Tony", "Q", "Midas", "W.white", "MacGyver"
+    "Roark", "LD.Vinci", "Sokka", "Tesla", "Isaac",
+    "Tony.S", "Q", "Midas", "W.White", "MacGyver"
 ];
 
 const fistWeaverNames = [
@@ -73,7 +73,7 @@ const fistWeaverNames = [
 ];
 
 const twinBladesNames = [
-    "Henzel", "Gretel"
+    "Hansel", "Gretel"
 ];
 
 const gorillaNames = [
@@ -166,8 +166,6 @@ export function getRandomNameForCombatantType(type: CombatantType): string {
 }
 
 export function getNewCombatantName(type: CombatantType, existingCombatantNames: string[]): string {
-    // eslint-disable-next-line 
-    // debugger;
     const name = getRandomNameForCombatantType(type);
     if(existingCombatantNames.includes(name)) {
         return getNewCombatantName(type, existingCombatantNames);

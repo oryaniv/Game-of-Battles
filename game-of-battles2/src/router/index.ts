@@ -14,6 +14,9 @@ import GameApp from '../GameApp.vue'
 import PostMatch from '../views/PostMatch.vue'
 import LogoScreen from '../views/LogoScreen.vue'
 import { Route } from '@playwright/test'
+import { Track } from '@/GameData/SoundLibrary'
+import { getBattleTrack, playWelcomeToDieForMeSound, playChooseJourneySound, stopCurrentMusic } from '@/GameData/SoundUtils'
+import { SoundManager } from '@/GameData/SoundManager'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -79,5 +82,53 @@ const router = createRouter({
   history: createWebHistory(),
   routes
 })
+
+
+const routeToTrack = [
+  {path: '/MainMenu', track: Track.MAIN_MENU},
+  {path: '/TutorialList', track: Track.MAIN_MENU},
+  {path: '/Team', track: Track.BUILD_TEAM},
+  {path: '/Journey', track: Track.JOURNEY},
+  {path: '/Match', track: getBattleTrack},
+  // {path: '/PostMatch', track: getPostBattleTrack},
+]
+
+router.beforeEach((to, from, next) => {
+  if(from.path === '/Intro' || from.path === '/' && to.path === '/MainMenu') {
+    playWelcomeToDieForMeSound();
+  }
+  
+  if(from.path === '/Team' && to.path === '/Journey') {
+    playChooseJourneySound();
+  }
+  
+  const nextScreenTrack = routeToTrack.find(route => route.path === to.path);
+  if(!nextScreenTrack) {
+    stopCurrentMusic();
+    next();
+    return;
+  }
+
+  const prevScreenTrack = routeToTrack.find(route => route.path === from.path);
+  if(!prevScreenTrack) {
+    const trackResource = nextScreenTrack.track;
+    const trackToPlay = typeof trackResource === 'function' ? trackResource() : trackResource;
+    SoundManager.getInstance().playMusic(trackToPlay);
+    next();
+    return;
+  }
+
+  if(prevScreenTrack.track === nextScreenTrack.track) {
+    next();
+    return;
+  }
+
+  stopCurrentMusic();
+  const trackResource = nextScreenTrack.track;
+  const trackToPlay = typeof trackResource === 'function' ? trackResource() : trackResource;
+  SoundManager.getInstance().playMusic(trackToPlay);
+
+  next();
+});
 
 export default router

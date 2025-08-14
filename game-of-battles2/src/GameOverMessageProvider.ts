@@ -78,9 +78,11 @@ function getVitriolLevelForPVAI(team1: Team, team2: Team, isHumanWinner: boolean
     const resultGap = getResultGap(team1, team2);
     const difficulty = getDifficulty(team2);
     if(isHumanWinner) {
-        if(difficulty === Difficulty.HARD || (difficulty === Difficulty.MEDIUM && resultGap === ResultGap.SMALL)) {
+        if((difficulty === Difficulty.HARD && resultGap !== ResultGap.COMICAL) || (difficulty === Difficulty.MEDIUM && resultGap === ResultGap.SMALL)) {
             return VitriolLevel.LOW;
-        } else if(difficulty === Difficulty.MEDIUM || (difficulty === Difficulty.EASY && resultGap === ResultGap.SMALL)) {
+        } else if(difficulty === Difficulty.MEDIUM || 
+            (difficulty === Difficulty.EASY && resultGap === ResultGap.SMALL) ||
+            (difficulty === Difficulty.HARD && resultGap === ResultGap.COMICAL)) {
             return VitriolLevel.MEDIUM;
         } else {
             return VitriolLevel.HIGH;
@@ -193,7 +195,8 @@ const PVAI_MESSAGES = {
             "You are dead, dead, dead.",
             "life's hard, get over it!",
             "You went full retard",
-            "What a truly foolish end."
+            "What a truly foolish end.",
+            "Your luck finally ran out",
         ],
         [VitriolLevel.LOW]: [
             "You thought you were hot. Guess what? you're not!",
@@ -203,7 +206,9 @@ const PVAI_MESSAGES = {
             "You're playing with the big boys now...",
             "You are not worthy...",
             "God have mercy on your soul",
-            "Death comes to all"
+            "Death comes to all",
+            "In the end, even you failed",
+            "Anohter soul is lost"
         ],
     },
     [GameResult.WIN]: {

@@ -311,10 +311,10 @@ export class TrollAIAgent implements AIAgent {
     private async trollRampaging(combatant: Combatant, game: Game, board: Board): Promise<ActionResult | ActionResult[]> {
         const combatRound = game.getCurrentRound();
         const roundsToRage = [2, 5, 10, 15, 20];
-        
-        if(roundsToRage.includes(combatRound) && !this.beastRaged) {
+        const beastRage = combatant.specialMoves.find(move => move.name === "Beast Rage");
+        if(roundsToRage.includes(combatRound) && !this.beastRaged && combatant.canUseSkill(beastRage!)) {
             this.beastRaged = true;
-            return Promise.resolve(game.executeSkill(combatant.specialMoves.find(move => move.name === "Beast Rage")!, combatant, combatant.position, board));
+            return Promise.resolve(game.executeSkill(beastRage!, combatant, combatant.position, board));
         }
 
         if(!roundsToRage.includes(combatRound) && this.beastRaged) {
@@ -339,9 +339,9 @@ export class GorillaAIAgent implements AIAgent {
 
     private async gorillaAttacking(combatant: Combatant, game: Game, board: Board): Promise<ActionResult | ActionResult[]> {
         const adjacentEnemies = getAdjacentEnemies(combatant, board, game);
-        if(adjacentEnemies.length >= 3) {
-            return Promise.resolve(game.executeSkill(combatant.specialMoves
-                .find(move => move.name === "Gorilla Smash!")!, combatant, combatant.position, board));
+        const gorillaSmash = combatant.specialMoves.find(move => move.name === "Gorilla Smash!");
+        if(adjacentEnemies.length >= 3 && combatant.canUseSkill(gorillaSmash!)) {
+            return Promise.resolve(game.executeSkill(gorillaSmash!, combatant, combatant.position, board));
         }
 
         return await this.baseAgent.playTurn(combatant, game, board);

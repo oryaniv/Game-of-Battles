@@ -127,7 +127,7 @@ export class UltimateCurse extends CoopMove {
 
 export class DivineRetribution extends CoopMove {
     name: string = "Divine Retribution";
-    description: string = "Half of Any direct damage dealt by target enemy is dealt to them as well";
+    description: string = "Half of Any direct damage dealt by target enemy is dealt to them as well.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Vanguard, CombatantType.Hunter, CombatantType.Pikeman] }
     ];
