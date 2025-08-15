@@ -149,12 +149,6 @@ export default defineComponent({
   background-position: -182px -39px;
 }
 
-.sprite-container.hunter {
-  background-position: -24px -19px;
-  transform: scale(1.7);
-  background-image: url('@/assets/CombatantModels/Hunter1.png');
-}
-
 .sprite-container.ranger {
   background-position: -117px -72px;
   transform: scale(1.4);

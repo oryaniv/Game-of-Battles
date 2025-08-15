@@ -1746,26 +1746,6 @@ export default defineComponent({
   font-style: normal;
 }
 
-@font-face {
-  font-family: "Lora-Regular";
-  src: url("@/assets/fonts/Lora-Regular.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Nosifer-Regular";
-  src: url("@/assets/fonts/Nosifer-Regular.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Creepster-Regular";
-  src: url("@/assets/fonts/Creepster-Regular.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
-}
 
 @font-face {
   font-family: "MetalMania-Regular";
@@ -1773,7 +1753,6 @@ export default defineComponent({
   font-weight: normal;
   font-style: normal;
 }
-
 
 @font-face {
   font-family: "Exo2-Regular";
@@ -1883,7 +1862,7 @@ button {
 }
 
 .board-frame.forest { 
-  background-image: url('./assets/Frames/testFrame4.png');
+  background-image: url('./assets/Frames/jungleFrame.png');
 }
 
 .board-frame.cave {

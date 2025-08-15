@@ -25,12 +25,6 @@
   font-style: normal;
 }
 
-@font-face {
-  font-family: "Nosifer-Regular";
-  src: url("@/assets/fonts/Nosifer-Regular.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
-}
 
 #app {
   height: 100vh;
