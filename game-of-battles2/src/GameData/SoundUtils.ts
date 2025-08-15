@@ -124,3 +124,8 @@ export function stopCurrentMusic() {
     const soundManager = SoundManager.getInstance();
     soundManager.stopMusic();
 }
+
+export function playSwordClashSound() {
+    const soundManager = SoundManager.getInstance();
+    soundManager.playSound(SoundByte.TURN_START);
+}

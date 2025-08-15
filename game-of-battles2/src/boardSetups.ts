@@ -46,7 +46,7 @@ export function playGroundTeams(): Team[] {
     // whiteTeam.addCombatant(new Vanguard('Layla', { x: 3, y: 0}, whiteTeam));
     // whiteTeam.addCombatant(new Defender('Dorgo', { x: 6, y: 5}, whiteTeam));
     // whiteTeam.addCombatant(new FistWeaver('P5', { x: 3, y: 7}, whiteTeam));
-    whiteTeam.addCombatant(new Vanguard('P9', { x: 5, y: 3}, whiteTeam));
+    whiteTeam.addCombatant(new Wizard('P9', { x: 6, y: 4}, whiteTeam));
     // whiteTeam.addCombatant(new Fool('P11', { x: 3, y: 1}, whiteTeam));
     // whiteTeam.addCombatant(new Witch('P12', { x: 3, y: 2}, whiteTeam));
     // whiteTeam.addCombatant(new Vanguard('P13', { x: 3, y: 3}, whiteTeam));
@@ -55,7 +55,10 @@ export function playGroundTeams(): Team[] {
     
 
     // blackTeam.addCombatant(new Dragon('Umbral', { x: 3, y: 1}, blackTeam));
-    blackTeam.addCombatant(new Wizard('Ragnar', { x: 3, y: 4}, blackTeam));
+    blackTeam.addCombatant(new Militia('ffe', { x: 4, y: 4}, blackTeam));
+    blackTeam.addCombatant(new Militia('Rrr', { x: 3, y: 4}, blackTeam));
+    blackTeam.addCombatant(new Militia('fefe', { x: 2, y: 4}, blackTeam));
+    blackTeam.addCombatant(new Militia('ffeeee', { x:1, y: 4}, blackTeam));
     // blackTeam.addCombatant(new Witch('Elena', { x: 3, y: 9}, blackTeam));
     // blackTeam.addCombatant(new Pikeman('Zhao', { x: 3, y: 8}, blackTeam));
     // blackTeam.addCombatant(new Hunter('Nina', { x: 4, y: 5}, blackTeam));
@@ -80,10 +83,30 @@ export function playGroundTeams(): Team[] {
 
 
 
-    // whiteTeam.combatants[1].applyStatusEffect({
-    //     name: StatusEffectType.ARCANE_CHANNELING,
-    //     duration: 3,
-    // });
+    whiteTeam.combatants[0].applyStatusEffect({
+        name: StatusEffectType.ARCANE_CHANNELING,
+        duration: 3,
+    });
+
+    blackTeam.combatants[0].applyStatusEffect({
+        name: StatusEffectType.ALWAYS_BY_HIT,
+        duration: 3,
+    });
+
+    blackTeam.combatants[1].applyStatusEffect({
+        name: StatusEffectType.ALWAYS_BY_HIT,
+        duration: 3,
+    });
+
+    blackTeam.combatants[2].applyStatusEffect({
+        name: StatusEffectType.ALWAYS_BY_HIT,
+        duration: 3,
+    });
+
+    blackTeam.combatants[3].applyStatusEffect({
+        name: StatusEffectType.ALWAYS_BY_HIT,
+        duration: 3,
+    });
 
     // whiteTeam.combatants[0].applyStatusEffect({
     //     name: StatusEffectType.BLEEDING,
@@ -428,6 +451,7 @@ function generateRandomString(): string {
 export function refreshTeam(team: Team) {
     team.combatants = team.combatants.filter((combatant) => !combatant.isExpendable());
     team.combatants.forEach((combatant) => refreshCombatant(combatant, team));
+    team.setTurnOrderIndex(0);
 }
 
 export function refreshCombatant(combatant: Combatant, team: Team) {

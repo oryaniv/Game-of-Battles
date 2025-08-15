@@ -130,7 +130,7 @@ import PyramidBlock from '../components/PyramidBlock.vue';
 import { getEnemyTeamCombatantTypes } from '../GameData/EnemyRepository';
 import { getCombatantByType } from '@/boardSetups';
 import { delay } from '@/UIUtils';
-import { playHoverSound, playTowerTraversalSound, playTowerAscendSound } from '@/GameData/SoundUtils';
+import { playHoverSound, playTowerTraversalSound, playTowerAscendSound, playSwordClashSound } from '@/GameData/SoundUtils';
 
 export default defineComponent({
   name: 'JourneyScreen',
@@ -232,6 +232,7 @@ export default defineComponent({
       selectedDifficulty.value = difficulty;
       animationPhase.value = 'zooming';
       playerPlaqueCurrentLevel.value = 0; // Start player plaque at level 0 (top)
+      playSwordClashSound();
       playTowerTraversalSound();
 
       // Ensure DOM is updated for selected pyramid class before measurements

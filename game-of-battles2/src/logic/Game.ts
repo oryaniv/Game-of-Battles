@@ -370,6 +370,13 @@ export class Game {
       }
     }
 
+    public isAiTeamGoingFirst(): boolean {
+      const startingTeamIndex = this.startingTeamIndex;
+      return this.getRoundCount() === 1 && 
+             this.teams[startingTeamIndex].isAiTeam() && 
+             this.getCurrentTeamIndex() === startingTeamIndex;
+    }
+
     clear(): void {
       this.board = getEmptyAsType<Board>();
       this.teams = [];

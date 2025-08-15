@@ -739,7 +739,6 @@ const getStatusEffectSoundByte = (statusEffectType: StatusEffectType) => {
     case StatusEffectType.MARKED_FOR_PAIN:
     case StatusEffectType.MARKED_FOR_EXECUTION:
     case StatusEffectType.MARKED_FOR_OBLIVION:
-    case StatusEffectType.MESMERIZED:
       return SoundByte.DEBUFF;
     case StatusEffectType.FORTIFIED:
     case StatusEffectType.BLOCKING_STANCE:
@@ -751,6 +750,7 @@ const getStatusEffectSoundByte = (statusEffectType: StatusEffectType) => {
     case StatusEffectType.INGENIOUS_UPGRADE:
       return SoundByte.SMITH;
     case StatusEffectType.MESMERIZING:
+    case StatusEffectType.MESMERIZED:
     case StatusEffectType.CHARMED:
       return SoundByte.SEDUCE;
     case StatusEffectType.TAUNTED:

@@ -141,7 +141,7 @@
   </div>
 </div>
 
-<button v-if="!isGameOver()" @click="playAiTurn(currentCombatant)">AI Play</button>
+<!-- <button v-if="!isGameOver()" @click="playAiTurn(currentCombatant)">AI Play</button> -->
 <!-- <button @click="showDialog = true">show dialog</button>
 <button @click="changeDialog()">change dialog</button> -->
 
@@ -626,6 +626,12 @@ export default defineComponent({
       } else {
         playRoundStartSound();
         updateHoveringMessage(`${game.value.teams[(game.value as Game).getCurrentTeamIndex()].name}'s Turn`, true);
+        // only for the first round, we want to wait for the AI to start if they go first
+        if(game.value.isAiTeamGoingFirst()) {
+          setTimeout(async () => {
+            await playAiTurn(currentCombatant.value);
+          }, 1500);
+        }
       }
     };
 

@@ -14,6 +14,7 @@ export interface musicReference {
 export interface SoundAsset {
     name: SoundByte;
     asset: Howl;
+    standardVolume: number;
 }
 
 export interface MusicAsset {
@@ -25,7 +26,7 @@ const soundReferences: soundReference[] = [
     {name:SoundByte.Blight, path:require('.././sound/acid_splash_sound.mp3')},
     {name:SoundByte.CRUSH, path:require('.././sound/fist_sound.mp3')},
     {name:SoundByte.DARK, path:require('.././sound/dark_attack_sound.mp3')},
-    {name:SoundByte.FIRE, path:require('.././sound/flame_sound.mp3')},
+    {name:SoundByte.FIRE, path:require('.././sound/flame_sound_louder.mp3')},
     {name:SoundByte.HEALING, path:require('.././sound/healing_sound.mp3')},
     {name:SoundByte.HOLY, path:require('.././sound/holy_attack_sound.mp3')},
     {name:SoundByte.ICE, path:require('.././sound/Ice_sound.mp3')},
@@ -63,11 +64,11 @@ const soundReferences: soundReference[] = [
     {name:SoundByte.DEFEAT_SOUND, path:require('.././sound/crash_2_out.mp3')},
     {name:SoundByte.VICTORY_SOUND, path:require('.././sound/cheer.mp3')},
 
-    {name:SoundByte.CANCEL, path:require('.././sound/cancel_1_out.mp3')},
+    {name:SoundByte.CANCEL, path:require('.././sound/cancel_1_out_louder.mp3')},
     {name:SoundByte.ACTION_BUTTON_CLICK, path:require('.././sound/action_click_out.mp3')},
     {name:SoundByte.MENU_BUTTON_CLICK, path:require('.././sound/menu_click_3_fast.mp3')},
     {name:SoundByte.SKILL_SELECT, path:require('.././sound/choice_click.mp3')},
-    {name:SoundByte.MENU_SCROLL, path:require('.././sound/scroll_4_out.mp3')},
+    {name:SoundByte.MENU_SCROLL, path:require('.././sound/scroll_4_out_louder.mp3')},
     // {name:SoundByte.MENU_SCROLL_MINOR, path:require('.././sound/scroll_1_out.mp3')},
     {name:SoundByte.PROMPT, path:require('.././sound/prompt.mp3')},
     {name:SoundByte.CHECKBOX_CHECK, path:require('.././sound/menu_click_1_fast.mp3')},
@@ -120,9 +121,6 @@ export class SoundLoader {
                 preload: true,
                 volume: sfxVolume,
                 html5: false,
-                onload: () => {
-                    console.log(`${soundName} sound preloaded Boomboy!`);
-                }
             });
             soundTable[soundName] = soundAsset;
         }
@@ -143,5 +141,20 @@ export class SoundLoader {
             });
             musicTable[musicName] = musicAsset;
         }
+    }
+
+    public createMusicHowl(track: Track, musicVolume: number) {
+        const musicPath:string | undefined = musicReferences.find(musicReference => musicReference.name === track)?.path;
+        if(!musicPath) {
+            throw new Error(`Music path not found for ${track}`);
+        }
+
+        return new Howl({
+            src: [musicPath],
+            preload: true,
+            volume: musicVolume,
+            html5: false,
+            loop: true,
+        });
     }
 }

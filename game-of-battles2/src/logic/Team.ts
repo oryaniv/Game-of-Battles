@@ -71,4 +71,8 @@ export class Team {
         return this.aiAgent === undefined;
     }
 
+    isAiTeam(): boolean {
+        return this.aiAgent !== undefined;
+    }
+
   }
