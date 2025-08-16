@@ -1,8 +1,8 @@
 <template>
   <div class="tutorial-list-view">
-     <div class="tutorial-list-panel">
-    <h1>Choose Tutorial</h1>
-    <div class="tutorial-list-container">
+     <div class="tutorial-list-panel" :class="{'tutorial-list-panel-small': !suitableScreenSize()}">
+    <h1 class="tutorial-list-title">Choose Tutorial</h1>
+    <div class="tutorial-list-container" >
       <button 
         v-for="i in tutorialManager.getTutorialCount()" 
         :key="i"
@@ -15,7 +15,7 @@
       </button>
     </div>
    </div>
-   <DescriptionCloud class="tutorial-description" v-if="description" :text="description" />
+   <DescriptionCloud class="tutorial-description" v-if="description && suitableScreenSize()" :text="description" />
    <button class="tutorial-back-button" @mouseenter="playHoverSound" @click="backToMainMenu">Back</button>
   </div>
   
@@ -57,6 +57,10 @@ export default defineComponent({
       router.push('/MainMenu');
     };
 
+    const suitableScreenSize = () => {
+      return window.innerHeight > 800;
+    };
+
     return {
       tutorialManager,
       selectTutorial,
@@ -64,7 +68,8 @@ export default defineComponent({
       showDescription,
       hideDescription,
       backToMainMenu,
-      playHoverSound
+      playHoverSound,
+      suitableScreenSize
     };
   }
 });
@@ -103,14 +108,19 @@ export default defineComponent({
   
   max-width: 600px; /* Increased max width to accommodate arc */
   width: 90%; /* Responsive width */
-  min-height: 550px; /* Increased min height for arc space */
+  min-height: 550px;
   justify-content: flex-start; /* Align title to top */
   position: relative; /* For absolute positioning of arc container */
   margin-top: -40px;
 }
 
-h1 {
+.tutorial-list-panel.tutorial-list-panel-small {
+  transform: scale(0.9);
+}
+
+h1.tutorial-list-title {
   font-family: 'Cinzel Decorative';
+  margin:0;
   color: white;
   font-size: 2.5em;
   margin-bottom: 30px;
@@ -119,9 +129,10 @@ h1 {
 .tutorial-list-container {
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: clamp(10px, 4vh, 55px);
   width: 300px;
 }
+
 
 .tutorial-button {
   font-family: 'Exo 2', sans-serif;
@@ -158,7 +169,7 @@ h1 {
 
 .tutorial-description {
   position: absolute;
-  bottom: 4%;
+  bottom: clamp(10px, 4%, 50px);
   left: 50%;
   transform: translate(-50%, 0%);
   z-index: 100;
