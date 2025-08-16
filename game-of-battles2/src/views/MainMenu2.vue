@@ -6,7 +6,7 @@
 
       <h2 v-if="newGameMode" class="new-game-title">New Game</h2>
 
-      <div class="menu-arc-container">
+      <div class="menu-arc-container" :class="{'menu-arc-container-small': !suitableScreenSize()}">
         <!-- Central Glowing Arc/Moon Element -->
         <div class="central-glowing-arc">
           <div class="central-arc-inner"></div> <!-- For the crescent effect -->
@@ -44,7 +44,7 @@
       </div>
     </div>
 
-    <DescriptionCloud class="description-cloud" v-if="showDescription" :text="description" />
+    <DescriptionCloud class="description-cloud" v-if="showDescription && suitableScreenSize()" :text="description" />
 
     <SettingsMenu v-if="optionsMode" @options-saved="onOptionsSaved" @options-canceled="onOptionsCanceled" />
 
@@ -69,7 +69,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref,onMounted } from 'vue';
+import { defineComponent, ref } from 'vue';
 import DescriptionCloud from '../components/DescriptionCloud.vue';
 import SettingsMenu from '../components/SettingsMenu.vue';
 import { useRouter } from 'vue-router'
@@ -205,10 +205,9 @@ export default defineComponent({
       }
     };
 
-    onMounted(() => {
-      // SoundManager.getInstance().playMusic(Track.MAIN_MENU);
-      // SoundManager.getInstance().playSound(SoundByte.WELCOME_TO_DIE_FOR_ME);
-    });
+    const suitableScreenSize = () => {
+      return window.innerHeight > 800;
+    };
 
     return {
       mainMenuItems,
@@ -232,16 +231,34 @@ export default defineComponent({
       handleMessagePopupDismissed,
       messagePopupTitle,
       messagePopupMessage,
-      showAboutUs
+      showAboutUs,
+      suitableScreenSize
     };
   },
 });
 </script>
 
 <style scoped>
-/* Base container assumes full screen and black background from outside */
+
+/* html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; 
+  background-color: black; 
+}
+
 .min-h-screen {
-  min-height: 95vh;
+  width: 100vw; 
+  height: 100vh; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem; 
+  box-sizing: border-box; 
+  overflow: hidden; 
+  position: relative; 
 }
 .flex {
   display: flex;
@@ -254,7 +271,7 @@ export default defineComponent({
   justify-content: center;
 }
 .p-4 {
-  padding: 1rem; /* 16px */
+  padding: 1rem; 
 }
 
 .skull-icon {
@@ -263,42 +280,38 @@ export default defineComponent({
   vertical-align: middle;
 }
 
-/* Main Menu Container for Arc Concept */
 .main-menu-container-arc {
-  /* Using your established plum marble background */
-  background-color: #5E3B68; /* Plum background color (as fallback) */
+  background-color: #5E3B68;
   background-image: url('../assets/Menus/plumMarble3.png');
-  /* background-image: url('../assets/Menus/darkSlate1.png'); */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 
-  padding: 40px; /* Adjust padding to give space around the arc */
-  border-radius: 20px; /* Soft rounded corners for the entire menu block */
+  padding: 40px; 
+  border-radius: 20px; 
   
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center items horizontally */
+  align-items: center; 
   
-  /* Applying a border/frame similar to your sound popup */
   box-shadow:
-    0 0 0 5px #2F4F4F, /* Dark slate gray border */
-    0 0 0 7px #A17A50, /* Gold/bronze accent border */
-    0 0 20px rgba(0, 0, 0, 0.7); /* Outer shadow for depth */
+    0 0 0 5px #2F4F4F, 
+    0 0 0 7px #A17A50, 
+    0 0 20px rgba(0, 0, 0, 0.7); 
   
-  max-width: 600px; /* Increased max width to accommodate arc */
-  width: 90%; /* Responsive width */
-  min-height: 550px; /* Increased min height for arc space */
-  justify-content: flex-start; /* Align title to top */
-  position: relative; /* For absolute positioning of arc container */
+  max-width: 600px; 
+  width: 90%; 
+  min-height: 550px; 
+  justify-content: flex-start; 
+  position: relative; 
   margin-top: -40px;
 }
 
 .main-menu-title-arc {
-  font-family: 'Metal Mania', sans-serif; /* Your logo font for the title */
+  font-family: 'Metal Mania', sans-serif; 
   margin-top: -10px;
-  font-size: 5.5em; /* Large size for main title */
-  color: #7A5B8C; /* Your chosen brighter plum for the logo text */
+  font-size: 5.5em; 
+  color: #7A5B8C; 
   text-shadow:
     -1px -1px 0px #A17A50,
     1px 1px 0px #8B7355,
@@ -332,30 +345,28 @@ export default defineComponent({
 
 .menu-arc-container {
   position: absolute;
-  top: 60%; /* Adjust to position the center of the arc */
+  top: 60%; 
   left: 50%;
-  transform: translate(-50%, -50%); /* Center the arc container itself */
-  width: 400px; /* Define area for arc, adjust as needed */
-  height: 400px; /* Make it square */
+  transform: translate(-50%, -50%); 
+  width: 400px; 
+  height: 400px; 
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* Central Glowing Arc/Moon Element */
 .central-glowing-arc {
-  width: 80%; /* Size of the outer arc */
+  width: 80%; 
   height: 80%;
   border-radius: 50%;
-  /* background-image: url('../assets/Menus/plumMarble3.png'); */
   background-image: url('../assets/Menus/darkSlate1.png');
   background-color: #5E3B68;
   background-size: cover;
   background-position: center;
   position: absolute;
-  box-shadow: 0 0 25px 8px rgba(255, 215, 0, 0.8); /* Stronger gold glow */
-  overflow: hidden; /* Crucial for the crescent effect */
-  transform: rotate(-30deg); /* Rotate the moon if desired */
+  box-shadow: 0 0 25px 8px rgba(255, 215, 0, 0.8); 
+  overflow: hidden; 
+  transform: rotate(-30deg); 
 }
 
 .central-arc-inner {
@@ -372,17 +383,15 @@ export default defineComponent({
 
 .menu-option-panel-arc {
   font-family: 'Exo 2', sans-serif;
-  font-size: 1.2em; /* Slightly smaller font for arc placement */
+  font-size: 1.2em; 
   font-weight: bold;
   color: white;
   text-align: center;
-  padding: 10px 15px; /* Adjusted padding */
+  padding: 10px 15px; 
   border-radius: 10px;
   cursor: pointer;
 
-  /* Stone slab style from previous concept */
   background-color: #2F4F4F; 
-  /* background-color: #5E3B68; */
   border: none;
   box-shadow:
     inset 2px 2px 5px rgba(0, 0, 0, 0.6),
@@ -392,8 +401,8 @@ export default defineComponent({
     4px 4px 8px rgba(0, 0, 0, 0.5);
 
   transition: all 0.2s ease-in-out;
-  position: absolute; /* Crucial for arc positioning */
-  min-width: 120px; /* Ensure buttons have consistent width */
+  position: absolute; 
+  min-width: 120px; 
 }
 
 .menu-option-panel-arc:hover {
@@ -404,12 +413,12 @@ export default defineComponent({
     0 0 0 2px #FFD700,
     0 0 0 3px #CDAD00,
     5px 5px 10px rgba(0, 0, 0, 0.5);
-  transform: translateY(-2px); /* Maintain lift on hover */
+  transform: translateY(-2px); 
 }
 
 .description-cloud {
   position: absolute;
-  bottom: 4%;
+  bottom: clamp(50px, 4%, 150px);
   left: 50%;
   transform: translate(-50%, 0%);
   z-index: 100;
@@ -428,7 +437,200 @@ export default defineComponent({
 .hex-logo {
   width: 100%;
   height: 100%;
+} */
+
+/* ************************************************** */
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; 
+  background-color: black; 
 }
+
+.min-h-screen { 
+  width: 100vw; 
+  height: 100vh; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem; 
+  box-sizing: border-box; 
+  overflow: hidden; 
+  position: relative; 
+}
+
+.skull-icon {
+  width: clamp(40px, 6vw, 90px); 
+  height: auto; 
+  vertical-align: middle;
+}
+
+.main-menu-container-arc {
+  background-color: #5E3B68;
+  background-image: url('../assets/Menus/plumMarble3.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  padding: clamp(20px, 5vw, 40px); 
+  border-radius: 20px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; 
+  gap: clamp(10px, 2vh, 30px); 
+
+  box-shadow:
+    0 0 0 5px #2F4F4F,
+    0 0 0 7px #A17A50,
+    0 0 20px rgba(0, 0, 0, 0.7);
+
+  width: clamp(300px, 80vw, 600px); 
+  height: clamp(400px, 65vh, 700px); 
+  
+  position: relative; 
+}
+
+.main-menu-title-arc {
+  font-family: 'Metal Mania', sans-serif;
+  margin-top: 0; 
+  font-size: clamp(20px, 8vw, 5.5em); 
+  color: #7A5B8C;
+  text-shadow:
+    -1px -1px 0px #A17A50,
+    1px 1px 0px #8B7355,
+    0 0 10px rgba(255, 215, 0, 0.4);
+  text-align: center;
+  line-height: 1; 
+}
+
+.main-menu-subtitle-arc {
+    margin-top: 0.5em;
+    margin-bottom: 0;
+    
+    font-family: 'Cinzel Decorative';
+    font-size: clamp(16px, 3vw, 24px); 
+    font-style: italic;
+    font-weight: bold;
+    text-align: center;
+
+    color: black;
+    text-shadow:
+    -1px -1px 0px #7A5B8C,
+    1px 1px 0px #5E3B68,
+    0 0 10px rgba(255, 215, 0, 0.4);
+}
+
+.new-game-title {
+  font-family: 'Cinzel Decorative';
+  color: white;
+  font-size: clamp(1.5em, 4vw, 2.5em); 
+}
+
+.menu-arc-container {
+  position: absolute;
+  top: clamp(375px, 55%, 800px);
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: clamp(250px, 60vw, 400px); 
+  height: clamp(250px, 60vw, 400px); 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.menu-arc-container.menu-arc-container-small {
+  top: clamp(350px, 45%, 450px);
+  transform: translate(-50%, -50%) scale(0.9);
+}
+
+.central-glowing-arc {
+  width: 80%;
+  height: 80%;
+  border-radius: 50%;
+  background-image: url('../assets/Menus/darkSlate1.png');
+  background-color: #5E3B68;
+  background-size: cover;
+  background-position: center;
+  position: absolute;
+  box-shadow: 0 0 25px 8px rgba(255, 215, 0, 0.8);
+  overflow: hidden;
+  transform: rotate(-30deg);
+}
+
+.central-arc-inner {
+    background-color: black;
+    width: 86%;
+    height: 91%;
+    border-radius: 50%;
+    position: absolute;
+    top: 44%;
+    left: 63%;
+    transform: translate(-50%, -50%) translateX(-20%);
+}
+
+.menu-option-panel-arc {
+  font-family: 'Exo 2', sans-serif;
+  font-size: clamp(0.9em, 2vw, 1.2em); 
+  font-weight: bold;
+  color: white;
+  text-align: center;
+  padding: clamp(8px, 1.5vw, 10px) clamp(10px, 2vw, 15px); 
+  border-radius: 10px;
+  cursor: pointer;
+
+  background-color: #2F4F4F;
+  border: none;
+  box-shadow:
+    inset 2px 2px 5px rgba(0, 0, 0, 0.6),
+    inset -2px -2px 5px rgba(255, 255, 255, 0.1),
+    0 0 0 2px rgba(161, 122, 80, 0.7),
+    0 0 0 3px rgba(139, 115, 85, 0.5),
+    4px 4px 8px rgba(0, 0, 0, 0.5);
+
+  transition: all 0.2s ease-in-out;
+  position: absolute;
+  min-width: clamp(80px, 15vw, 120px); 
+}
+
+.menu-option-panel-arc:hover {
+  background-color: #3A5F5F;
+  box-shadow:
+    inset 1px 1px 2px rgba(255, 255, 255, 0.2),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.4),
+    0 0 0 2px #FFD700,
+    0 0 0 3px #CDAD00,
+    5px 5px 10px rgba(0, 0, 0, 0.5);
+  transform: translateY(-2px);
+}
+
+.description-cloud {
+  position: absolute;
+  bottom: clamp(2px, 4%, 50px); 
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  max-width: clamp(200px, 30vw, 300px); 
+  text-align: center; 
+}
+
+.circle-of-hex-logo {
+  position: absolute;
+  bottom: clamp(5px, 2vh, 10px); 
+  right: clamp(5px, 2vw, 10px); 
+  z-index: 100;
+  width: clamp(60px, 10vw, 100px); 
+  height: auto; 
+}
+
+.hex-logo {
+  width: 100%;
+  height: 100%;
+} 
 
 /* Ensure fonts are loaded if not globally */
 @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&family=Metal+Mania&display=swap');

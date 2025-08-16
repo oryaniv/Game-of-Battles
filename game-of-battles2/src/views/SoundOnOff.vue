@@ -10,7 +10,7 @@
           <div class="popup-buttons">
             <button @click="selectSoundPreference(true)" class="game-button">Hell yes!</button>
             <button @click="selectSoundPreference(false)" class="game-button">No...</button>
-            <button @click="goToMenu" class="game-button">Main Menu</button>
+            <!-- <button @click="goToMenu" class="game-button">Main Menu</button> -->
           </div>
         </div>
       </div>

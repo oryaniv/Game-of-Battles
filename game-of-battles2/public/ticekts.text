@@ -75,12 +75,294 @@
     
    
     // testing
-    * cleanup - commit and merge, take out not needed resources
-    * make sure the UI doesn't break on larger screens(fullscreen/ large desktop)
-    * Wizard vetetran agent to be more aggressive (less barrier, overcharge instead of attacking)  - find it happening, then deal
-    * play testing - all difficulties + tutorials
+    * cleanup - commit and merge, take out not needed resources V
+
+
+    *  UI on different screens
+    ---------------------------------------------------------------
+
+    * sound/on/off screen
+
+      ** pc normal screen
+
+        -none
+
+      ** pc full screen
+
+        -none
+
+      ** laptop normal screen
+
+        -none
+      
+      ** laptop full screen
+
+        -none
+
+      ** desktop normal screen
+
+          enlarge the panel a little(nth)
+
+      ** desktop full screen
+
+    * logo screen
+ 
+        ** pc normal screen
+         
+          -none
+
+        ** pc full screen
+
+          -none
+        
+        ** mac screen
+          
+           -none
+      
+        ** mac full screen
+
+           -none
+
+        ** desktop normal screen
+
+           -none
+
+        ** desktop full screen
+
+    * intro sequence screen
+
+        ** pc normal screen
+
+         -none
+
+        ** pc full screen
+
+          -none
+
+        ** mac normal screen
+
+          -none
+      
+        ** mac full screen
+
+          -none
+
+        ** desktop normal screen
+
+          -none
+
+        ** desktop full screen
+         
+          none
+
+    * main menu
+
+        ** pc normal screen
+
+        * scroll always appears(major)
+        * description cloud too high and clashes with the panel(blocker)
+
+        ** pc full screen
+
+        * scroll always appears(major)
+
+        ** mac normal screen
+
+          scrolling makes the scroll appear and disappear(minor)
+
+        ** mac full screen
+
+          description cloud too low, should be up a bit (major)
+          scrolling makes the scroll appear and disappear(minor)
+
+        ** desktop normal screen
+
+          * scroll always appears(major)
+          * description cloud too low(major)
+
+        ** desktop full screen
+
+          * scroll always appears(major)
+          * description cloud too low(major)
+
+    * settings
+
+        ** pc normal screen
+
+          * description cloud too low and dives below the toolbar(blocker)
+
+        ** pc full screen
+         
+          none
+
+        ** mac normal screen
+
+          none
+
+        ** mac full screen
+
+          none
+
+        ** desktop normal screen
+
+          none
+
+        ** desktop full screen
+
+          none
+
+    * tutorial list
+     
+        ** pc normal screen
+
+         * description cloud too high and clashes with the panel(blocker)
+
+        ** pc full screen
+
+         - none
+
+        ** mac normal screen
+
+          a bit lower than the main menu panel(minor)
+      
+        ** mac full screen
+
+          a bit lower than the main menu panel(minor)
+          * description cloud too low(major)
+
+        ** desktop normal screen
+
+          * description cloud too low(major)
+          * no scrollbars!(that's no bug, check how to fix others)
+
+        ** desktop full screen
+
+          * description cloud too low(major)
+          * no scrollbars!(that's no bug, check how to fix others)
+
+    * team build screen
+
+        ** pc normal screen
+         
+          * pick for me and finish buttons clash with the middle panel, they need to be smaller(blocker)
+          * vertical scrollbar appears(major)
+
+        ** pc full screen
+
+          -none
+
+        ** mac normal screen
+
+          none
+      
+        ** mac full screen
+
+          the 3 sections could be a little lowered (minor)
+
+        ** desktop normal screen
+          
+          could lower the panels a bit(minor)
+          could enlarge the panels, maybe just the "your team" and "combatant info" (nth)
+
+        ** desktop full screen
+
+          lower the panels, too much space(major)
+          could enlarge the panels (nth)
+
+    * journey screen
+
+        ** pc normal screen
+
+          vertical scroll sometimes pops for no reason when hovering on pyramids(minor)
+
+        ** pc full screen
+          
+          vertical scroll sometimes pops for no reason when hovering on pyramids(minor)
+
+        ** mac normal screen
+           
+          none
+      
+        ** mac full screen
+
+          none
+
+        ** desktop normal screen
+
+           vertical scroll sometimes pops for no reason when hovering on pyramids(minor)
+
+        ** desktop full screen
+           vertical scroll sometimes pops for no reason when hovering on pyramids(minor)
+
+
+    * match screen
+
+        ** pc normal screen
+
+         actions remaining falls below the viewport, scrollable
+
+        ** pc full screen
+
+         * action remaining widget almost too low(minor)
+         * scrollbars, even a little scrollable(major)
+
+        ** mac normal screen
+
+          none
+      
+        ** mac full screen
+
+          a bit too much space below the "actions remaining" widget (minor)
+
+        ** desktop normal screen
+
+          a bit too much space below the "actions remaining" widget (minor)
+          turn order widget items could be more spaced, also turned bigger(nth)
+          the action menu could be centered better, get more to the right (minor/major)
+          both horizontal and vertical scrollbars visible all the time (major)
+          the scrollbar in the skill menu looks really bad on windows (major)
+
+        ** desktop full screen
+          
+          TOO much space below the "actions remaining" widget (major)
+          turn order widget items could be more spaced, also turned bigger(nth)
+          the action menu could be centered better, get more to the right (minor/major)
+          both horizontal and vertical scrollbars visible all the time (major)
+          the scrollbar in the skill menu looks really bad on windows (major)
+
+    * post match screen
+
+        ** pc normal screen
+         
+         none
+
+        ** pc full screen
+
+         none
+
+        ** mac normal screen
+
+         none
+      
+        ** mac full screen
+
+         none
+
+        ** desktop normal screen
+
+         none
+
+        ** desktop full screen
+
+         none
+
+    --------------------------------------------------------
+    
+    * playtesting bugs
+     
 
     * LATER BUGS AND MINORS
+      * Wizard vetetran agent to be more aggressive (less barrier, overcharge instead of attacking)  - find it happening, then deal
       * player team turn order index to reset after a match V
       * AI team must start automaticall if they go first V
       * SFX when there is a stunlocked status 
