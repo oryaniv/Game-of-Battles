@@ -530,14 +530,14 @@ export default defineComponent({
 
 <style scoped>
 
-.bobobob {
-  position: fixed;
-  left: 0;
-  width: 200px;
-  height: 200px;
-  background-color: red;
-  color: white;
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; 
+  background-color: black; 
 }
+
 
 /* --- General Screen Layout --- */
 .journey-screen-container {
@@ -550,7 +550,7 @@ export default defineComponent({
   justify-content: flex-start;
   align-items: center;
   /* Changed overflow: hidden to overflow-y: auto for scrolling */
-  overflow-y: auto;
+  overflow-y: hidden;
   overflow-x: hidden; /* Keep horizontal hidden */
   /*padding-top: 50px;*/
   background-image: url('../assets/Backgrounds/Swirl2.png'); /* Placeholder for generated background */
