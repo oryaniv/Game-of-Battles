@@ -300,6 +300,15 @@ export default defineComponent({
 
 <style scoped>
 /* --- General Layout --- */
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; 
+  background-color: black; 
+}
+
 .team-builder-screen {
   position: relative;
   width: 95vw;
@@ -316,6 +325,8 @@ export default defineComponent({
   padding: 20px;
   padding-top: 100px; /* Space for the title at the top */
   gap: 30px; /* Space between main sections */
+  overflow: hidden; 
+  position: relative; 
 }
 
 .screen-title {
@@ -611,6 +622,46 @@ export default defineComponent({
   display: flex;
   gap: 15px;
   z-index: 10;
+}
+
+@media (max-height: 800px) {
+  .team-builder-actions {
+    position: absolute;
+    right: 20px;
+    left: auto;
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+ }
+
+  button.game-button.back-button {
+    position: absolute;
+    bottom: 20px;
+    right: 15px;
+    z-index: 10;
+  }
+}
+
+@media (min-height: 900px) {
+    .screen-title {
+      margin-top: clamp(50px, 10vh, 200px);
+    }
+
+    div.team-builder-screen {
+    position: relative;
+    width: 95vw;
+    height: 85vh;
+    background-color: black;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    padding: 20px;
+    padding-top: 100px;
+    gap: 30px; 
+    overflow: hidden; 
+    position: relative; 
+  }
 }
 
 /* Reusing .game-button from previous components */

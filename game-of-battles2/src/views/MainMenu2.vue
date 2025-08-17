@@ -6,7 +6,7 @@
 
       <h2 v-if="newGameMode" class="new-game-title">New Game</h2>
 
-      <div class="menu-arc-container" :class="{'menu-arc-container-small': !suitableScreenSize()}">
+      <div class="menu-arc-container">
         <!-- Central Glowing Arc/Moon Element -->
         <div class="central-glowing-arc">
           <div class="central-arc-inner"></div> <!-- For the crescent effect -->
@@ -44,7 +44,7 @@
       </div>
     </div>
 
-    <DescriptionCloud class="description-cloud" v-if="showDescription && suitableScreenSize()" :text="description" />
+    <DescriptionCloud class="description-cloud" v-if="showDescription" :text="description" />
 
     <SettingsMenu v-if="optionsMode" @options-saved="onOptionsSaved" @options-canceled="onOptionsCanceled" />
 
@@ -205,10 +205,6 @@ export default defineComponent({
       }
     };
 
-    const suitableScreenSize = () => {
-      return window.innerHeight > 800;
-    };
-
     return {
       mainMenuItems,
       handleMenuItemClick,
@@ -232,7 +228,6 @@ export default defineComponent({
       messagePopupTitle,
       messagePopupMessage,
       showAboutUs,
-      suitableScreenSize
     };
   },
 });
@@ -631,6 +626,17 @@ html, body {
   width: 100%;
   height: 100%;
 } 
+
+@media (max-height: 800px) {
+  .description-cloud {
+    display: none;
+  }
+
+  .menu-arc-container {
+    top: clamp(350px, 45%, 450px);
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+}
 
 /* Ensure fonts are loaded if not globally */
 @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&family=Metal+Mania&display=swap');

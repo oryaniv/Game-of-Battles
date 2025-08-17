@@ -1,6 +1,6 @@
 <template>
   <div class="tutorial-list-view">
-     <div class="tutorial-list-panel" :class="{'tutorial-list-panel-small': !suitableScreenSize()}">
+     <div class="tutorial-list-panel">
     <h1 class="tutorial-list-title">Choose Tutorial</h1>
     <div class="tutorial-list-container" >
       <button 
@@ -15,7 +15,7 @@
       </button>
     </div>
    </div>
-   <DescriptionCloud class="tutorial-description" v-if="description && suitableScreenSize()" :text="description" />
+   <DescriptionCloud class="tutorial-description" v-if="description" :text="description" />
    <button class="tutorial-back-button" @mouseenter="playHoverSound" @click="backToMainMenu">Back</button>
   </div>
   
@@ -82,6 +82,7 @@ export default defineComponent({
   align-items: center;
   height: 95vh;
 }
+
 .tutorial-list-panel {
   padding: 20px;
 
@@ -112,10 +113,6 @@ export default defineComponent({
   justify-content: flex-start; /* Align title to top */
   position: relative; /* For absolute positioning of arc container */
   margin-top: -40px;
-}
-
-.tutorial-list-panel.tutorial-list-panel-small {
-  transform: scale(0.9);
 }
 
 h1.tutorial-list-title {
@@ -196,6 +193,16 @@ h1.tutorial-list-title {
   background-color: #3A5F5F;
   box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.3), inset -1px -1px 2px rgba(0, 0, 0, 0.5), 0 0 0 2px #FFD700, 0 0 0 3px #CDAD00, 5px 5px 10px rgba(0, 0, 0, 0.5);
 
+}
+
+@media (max-height: 800px) {
+  .tutorial-list-panel {
+    transform: scale(0.9);
+  }
+    
+  .tutorial-description {
+    display: none;
+  }
 }
 
 
