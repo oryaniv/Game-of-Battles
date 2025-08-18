@@ -201,10 +201,9 @@ h1.tutorial-list-title {
   }
     
   .tutorial-description {
-    display: none;
+    
   }
 }
-
 
 
 </style>
