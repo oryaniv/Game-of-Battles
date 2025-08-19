@@ -490,7 +490,6 @@ export default defineComponent({
     const moveHighlightedPositions = ref<Position[]>([]);
     const attackHighlightedPositions = ref<Position[]>([]);
     const eventLogger = EventLogger.getInstance();
-    let eventLogBody: HTMLElement | null = null;
     const actionDescription = ref<string | null>(null);
     const commentatorMessages = ref<CommentatorMessage[]>([]);
 
@@ -920,9 +919,6 @@ export default defineComponent({
       hasMoved.value = false;
       previousPosition.value = null;
       removeTheDead();
-      if(eventLogBody) {
-        eventLogBody.scrollTop = eventLogBody.scrollHeight;
-      }
       if(isGameOver()) {
         updateTurnMessage();
         return;
