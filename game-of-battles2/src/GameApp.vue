@@ -110,8 +110,8 @@
     
 
     <!-- Actions Remaining indicator -->
-    <div v-if="actionsRemaining > 0" class="actions">
-      <span class="actions-remaining-label">Actions Remaining</span>
+    <div v-if="actionsRemaining > 0" class="actions-remaining-container" :class="{ 'actions-remaining-container-top': getCurrentTeamIndex() === 1  }">
+      <span class="actions-remaining-label">Actions:</span>
       <div  v-for="x in Math.floor(actionsRemaining)" class="turn-icon" :class="{ 'red': getCurrentTeamIndex() === 1 }" :key="x">
       </div>
       <div v-if="actionsRemaining !== Math.round(actionsRemaining)" class="half-turn-icon" :class="{ 'red': getCurrentTeamIndex() === 1 }" :key="x">
@@ -1777,11 +1777,23 @@ button {
   /* font-family: "eurostile"; */
 } 
 
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; 
+  background-color: black; 
+}
+
 .game-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   transition: opacity 2s ease-in-out;
+  overflow: hidden;
+  width: 98vw; 
+  height: 100vh; 
+  justify-content: center;
 }
 
 .game-container.game-over {
@@ -2016,14 +2028,25 @@ button {
   transform: scale(2.5);
 }
 
-.actions {
+.actions-remaining-container {
   margin-top: 20px;
+  /* position: absolute;
+  bottom: 3%;
+  top: auto;
+  left: 5%; */
   font-size: 20px;
+}
+
+.actions-remaining-container.actions-remaining-container-top {
+  bottom: auto;
+  top: 6%;
 }
 
 .action-menu {
   position: absolute;
-  left: 11%;
+  /*left: 11%; */
+  left: 17vw;
+  transform: translateX(-50%);
   top: 30%;
 }
 
@@ -2170,7 +2193,7 @@ button {
 
 
 .action-description-container {
-   left: 3.5%;
+   left: 3vw;
    position: absolute;
    top: 72%;
    text-align: center;
@@ -2551,7 +2574,70 @@ button {
 .white-team-turn-order-container, .black-team-turn-order-container {
     display: flex;
     max-width: 335px;
+    /* gap: clamp(5px, 1vw, 10px); */
     gap: 5px;
+}
+
+@media (min-width: 1700px) {
+
+  div.event-indicator-container {
+    right: 8%;
+  }
+
+  div.commentator-messages-container {
+    right: 8%;
+  }
+
+  div.white-team-turn-order-container, div.black-team-turn-order-container {
+    min-width: 500px;
+    gap: 25px;
+    right: 0;
+  }
+
+  div.action-menu {
+    left: 19vw;
+  }
+
+  div.action-description-container {
+    left: 8vw;
+  }
+}
+
+@media (max-height: 800px) {
+
+  div.event-indicator-container {
+    top: 25%;
+  }
+
+  div.commentator-messages-container {
+    top: 40%;
+  }
+
+  div.action-description-container {
+    top: 80%;
+  } 
+
+  div.panel {
+    width: 65px;
+    height: 65px;
+  }
+
+  div.board-frame {
+    padding: 15px;
+  }
+
+  .actions-remaining-container {
+    position: absolute;
+    bottom: 3%;
+    top: auto;
+    left: 5%; 
+    font-size: 20px;
+  }
+
+  .actions-remaining-container.actions-remaining-container-top {
+    bottom: auto;
+    top: 6%;
+  }
 }
 
 .white-team-turn-order-container {
@@ -2616,8 +2702,7 @@ button {
 .white-team-turn-order-container {
   position: absolute;
   bottom: 0;
-  right: 2%;
-  
+  right: 2%; 
 }
 
 

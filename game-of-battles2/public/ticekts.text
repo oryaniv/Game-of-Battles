@@ -365,16 +365,17 @@
       * Wizard vetetran agent to be more aggressive (less barrier, overcharge instead of attacking)  - find it happening, then deal
       * player team turn order index to reset after a match V
       * AI team must start automaticall if they go first V
-      * SFX when there is a stunlocked status 
       * change mesmerized sfx to that of mesmerizing V
-      * polish the effects of titanic fist (the clash, death, etc.)
-      * lower the tutorial panel a bit, to match the main menu height
-      * create custom loops for the music if the standard loops aren't exactly right
-      * build team screen - choosing another combatant when on stats panel should not revert to description panel
-      * have red team members face the other direction (optional)
+      * lower the tutorial panel a bit, to match the main menu height X (because of the screen fixes)
+      * create custom loops for the music if the standard loops aren't exactly right (I think it's fine for beta)
       * sound section in the settings (we'll do when needed)
-      
+      * SFX when there is a stunlocked status (need to test)
 
+      * build team screen - choosing another combatant when on stats panel should not revert to description panel
+      * polish the effects of titanic fist (the clash, death, etc.)
+      * have red team members face the other direction (optional)
+      
+      
 
     // deployment
     * deploy on vercel

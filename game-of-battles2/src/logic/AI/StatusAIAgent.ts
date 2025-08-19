@@ -11,6 +11,8 @@ import { Team } from "../Team";
 import { off } from "process";
 import { StatusEffectType } from "../StatusEffect";
 import { PlayActionType } from "./HeuristicalAgents";
+import { emitter } from "@/eventBus";
+import { getStatusEffectActionResult } from "@/logic/attackResult";
 
 
 export class StunLockedAIAgent implements AIAgent {
@@ -28,11 +30,32 @@ export class StunLockedAIAgent implements AIAgent {
             actionType: PlayActionType.INACTION
         });
         game.executePassTurn();
+        this.emitStatusEffect(combatant);
         return Promise.resolve(getStandardActionResult());
     }
 
     getAIAgentType(): AIAgentType {
         return AIAgentType.STUNLOCKED;
+    }
+
+    private emitStatusEffect(combatant: Combatant) {
+        switch(this.stunLockCauseMessage) {
+            case 'Frozen':
+                emitter.emit('trigger-method', getStatusEffectActionResult(StatusEffectType.FROZEN, combatant.position, 1));
+                break;
+            case 'Nauseated':
+                emitter.emit('trigger-method', getStatusEffectActionResult(StatusEffectType.NAUSEATED, combatant.position, 1));
+                break;
+            case 'Mesmerized':
+                emitter.emit('trigger-method', getStatusEffectActionResult(StatusEffectType.MESMERIZED, combatant.position, 1));
+                break;
+            case 'Nightmare Locked':
+                emitter.emit('trigger-method', getStatusEffectActionResult(StatusEffectType.NIGHTMARE_LOCKED, combatant.position, 1));
+                break;
+            case 'Sleeping':
+                emitter.emit('trigger-method', getStatusEffectActionResult(StatusEffectType.SLEEPING, combatant.position, 1));
+                break;
+        }
     }
 }
 

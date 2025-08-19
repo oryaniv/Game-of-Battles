@@ -441,6 +441,7 @@ export class WeaveEatingStatusEffect implements StatusEffect {
 export class AlwaysBlockStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.ALWAYS_BLOCK;
     description = `This combatant will always block all incoming damage.`;
+    isVisible?: boolean = false;
     applicationHooks = {
         [StatusEffectHook.OnBeingAttacked]: (self: Combatant, defender: Combatant, damage: Damage, attackCost: number) => {
             return {attackResult: AttackResult.Blocked, damage: {amount: 0, type: DamageType.Unstoppable}, cost: 2, reaction: DamageReaction.IMMUNITY, position: self.position};
@@ -452,6 +453,7 @@ export class AlwaysBlockStatusEffect implements StatusEffect {
 export class AlwaysBeCritStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.ALWAYS_BE_CRIT;
     description = `This combatant will always be hit with a critical.`;
+    isVisible?: boolean = false;
     applicationHooks = {
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;
@@ -460,6 +462,7 @@ export class AlwaysBeCritStatusEffect implements StatusEffect {
 export class AlwaysByHitStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.ALWAYS_BY_HIT;
     description = `This combatant will always be hit normally.`;
+    isVisible?: boolean = false;
     applicationHooks = {
         [StatusEffectHook.OnBeingAttacked]: (self: Combatant, attacker: Combatant, damage: Damage, attackCost: number) => {
             if(self.isDefending()) {

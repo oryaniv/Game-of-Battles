@@ -40,30 +40,28 @@ export function playGroundTeams(): Team[] {
     const rookieWithCoop = new RookieAIAgent();
     rookieWithCoop.setCollectCoop(true);
     const whiteTeam = new Team('Blue Team', 0,);
-    const blackTeam = new Team('Red Team', 1, veternAIAgentWithCoop );
+    const blackTeam = new Team('Red Team', 1 );
 
    
-    // whiteTeam.addCombatant(new Vanguard('Layla', { x: 3, y: 0}, whiteTeam));
-    // whiteTeam.addCombatant(new Defender('Dorgo', { x: 6, y: 5}, whiteTeam));
-    // whiteTeam.addCombatant(new FistWeaver('P5', { x: 3, y: 7}, whiteTeam));
+    whiteTeam.addCombatant(new Vanguard('Layla', { x: 3, y: 0}, whiteTeam));
+    whiteTeam.addCombatant(new Defender('Dorgo', { x: 6, y: 5}, whiteTeam));
+    whiteTeam.addCombatant(new FistWeaver('P5', { x: 3, y: 7}, whiteTeam));
     whiteTeam.addCombatant(new Wizard('P9', { x: 6, y: 4}, whiteTeam));
-    // whiteTeam.addCombatant(new Fool('P11', { x: 3, y: 1}, whiteTeam));
+    whiteTeam.addCombatant(new Fool('P11', { x: 3, y: 1}, whiteTeam));
     // whiteTeam.addCombatant(new Witch('P12', { x: 3, y: 2}, whiteTeam));
     // whiteTeam.addCombatant(new Vanguard('P13', { x: 3, y: 3}, whiteTeam));
     // whiteTeam.addCombatant(new Hunter('P14', { x: 3, y: 4}, whiteTeam));
     // whiteTeam.addCombatant(new StandardBearer('P15', { x: 3, y: 5}, whiteTeam));
     
 
-    // blackTeam.addCombatant(new Dragon('Umbral', { x: 3, y: 1}, blackTeam));
+    blackTeam.addCombatant(new Vanguard('Umbral', { x: 3, y: 1}, blackTeam));
     blackTeam.addCombatant(new Militia('ffe', { x: 4, y: 4}, blackTeam));
     blackTeam.addCombatant(new Militia('Rrr', { x: 3, y: 4}, blackTeam));
     blackTeam.addCombatant(new Militia('fefe', { x: 2, y: 4}, blackTeam));
     blackTeam.addCombatant(new Militia('ffeeee', { x:1, y: 4}, blackTeam));
-    // blackTeam.addCombatant(new Witch('Elena', { x: 3, y: 9}, blackTeam));
-    // blackTeam.addCombatant(new Pikeman('Zhao', { x: 3, y: 8}, blackTeam));
-    // blackTeam.addCombatant(new Hunter('Nina', { x: 4, y: 5}, blackTeam));
-    // blackTeam.addCombatant(new FistWeaver('Rina', { x: 4, y: 5}, blackTeam));
-    // 
+
+    // blackTeam.addCombatant(new Artificer('Rina', { x: 4, y: 5}, blackTeam));
+    // // 
     // // whiteTeam.addCombatant(new Vanguard('P9', { x: 3, y: 12}, whiteTeam));
     // whiteTeam.addCombatant(new StandardBearer('P10', { x: 3, y: 1}, whiteTeam)); 
     // whiteTeam.addCombatant(new Vanguard('P2', { x: 3, y: 4}, whiteTeam));
@@ -83,30 +81,30 @@ export function playGroundTeams(): Team[] {
 
 
 
-    whiteTeam.combatants[0].applyStatusEffect({
-        name: StatusEffectType.ARCANE_CHANNELING,
-        duration: 3,
-    });
+    // whiteTeam.combatants[0].applyStatusEffect({
+    //     name: StatusEffectType.ARCANE_CHANNELING,
+    //     duration: 3,
+    // });
 
-    blackTeam.combatants[0].applyStatusEffect({
-        name: StatusEffectType.ALWAYS_BY_HIT,
-        duration: 3,
-    });
+    // blackTeam.combatants[0].applyStatusEffect({
+    //     name: StatusEffectType.ALWAYS_BY_HIT,
+    //     duration: 3,
+    // });
 
-    blackTeam.combatants[1].applyStatusEffect({
-        name: StatusEffectType.ALWAYS_BY_HIT,
-        duration: 3,
-    });
+    // blackTeam.combatants[1].applyStatusEffect({
+    //     name: StatusEffectType.ALWAYS_BY_HIT,
+    //     duration: 3,
+    // });
 
-    blackTeam.combatants[2].applyStatusEffect({
-        name: StatusEffectType.ALWAYS_BY_HIT,
-        duration: 3,
-    });
+    // blackTeam.combatants[2].applyStatusEffect({
+    //     name: StatusEffectType.ALWAYS_BY_HIT,
+    //     duration: 3,
+    // });
 
-    blackTeam.combatants[3].applyStatusEffect({
-        name: StatusEffectType.ALWAYS_BY_HIT,
-        duration: 3,
-    });
+    // blackTeam.combatants[3].applyStatusEffect({
+    //     name: StatusEffectType.ALWAYS_BY_HIT,
+    //     duration: 3,
+    // });
 
     // whiteTeam.combatants[0].applyStatusEffect({
     //     name: StatusEffectType.BLEEDING,
