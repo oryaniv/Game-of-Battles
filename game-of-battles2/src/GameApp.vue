@@ -2624,6 +2624,7 @@ html, body {
 
   div.board-frame {
     padding: 15px;
+    margin-top: 0px;
   }
 
   .actions-remaining-container {
