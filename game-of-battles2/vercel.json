@@ -9,14 +9,5 @@
           }
         ]
       },
-      {
-        "source": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|mp3|ogg|wav))",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "public, max-age=31536000, immutable"
-          }
-        ]
-      }
     ]
   }
