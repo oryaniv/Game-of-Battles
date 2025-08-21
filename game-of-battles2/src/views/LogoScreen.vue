@@ -28,12 +28,13 @@ export default defineComponent({
     }, 3000);
 
     setTimeout(() => {
+      console.log(router);
       router.push('/Intro');
     }, 5000);
 
     const handleKeyPress = (event: KeyboardEvent) => {
       if(event.key === 'Escape') {
-        router.push('/Intro');
+        //router.push('/Intro');
       }
     }
     

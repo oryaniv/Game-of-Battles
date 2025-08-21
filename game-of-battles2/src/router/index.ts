@@ -13,10 +13,14 @@ import COHLogo from '../views/COHLogo.vue'
 import GameApp from '../GameApp.vue'
 import PostMatch from '../views/PostMatch.vue'
 import LogoScreen from '../views/LogoScreen.vue'
-import { Route } from '@playwright/test'
 import { Track } from '@/GameData/SoundLibrary'
 import { getBattleTrack, playWelcomeToDieForMeSound, playChooseJourneySound, stopCurrentMusic } from '@/GameData/SoundUtils'
 import { SoundManager } from '@/GameData/SoundManager'
+import { AssetPreloader } from '@/GameData/AssetPreloader'
+
+interface Route {
+  path: string;
+}
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -93,7 +97,29 @@ const routeToTrack = [
   // {path: '/PostMatch', track: getPostBattleTrack},
 ]
 
+const routeToPreloader = [
+  {path: '/', preloader: () => AssetPreloader.getInstance().preloadLogoScreen()},
+  {path: '/LogoScreen', preloader: () => AssetPreloader.getInstance().preloadMainMenu()},
+  {path: '/MainMenu', preloader: () => AssetPreloader.getInstance().preloadBuildTeam()},
+  {path: '/Team', preloader: () => AssetPreloader.getInstance().preloadJourney()},
+  {path: '/Journey', preloader: () => AssetPreloader.getInstance().preloadMatch()},
+  {path: '/TutorialList', preloader: () => AssetPreloader.getInstance().preloadMatch()},
+]
+
 router.beforeEach((to, from, next) => {
+  preloadAssets(to,from);
+  handleMusicChange(to, from);
+  next();
+});
+
+function preloadAssets(to: Route, from: Route) {
+   const routePreloader = routeToPreloader.find(route => route.path === to.path);
+   if(typeof routePreloader !== 'undefined') {
+    routePreloader.preloader();
+   }
+}
+
+function handleMusicChange(to: Route, from: Route) {
   if(from.path === '/Intro' || from.path === '/' && to.path === '/MainMenu') {
     playWelcomeToDieForMeSound();
   }
@@ -105,7 +131,6 @@ router.beforeEach((to, from, next) => {
   const nextScreenTrack = routeToTrack.find(route => route.path === to.path);
   if(!nextScreenTrack) {
     stopCurrentMusic();
-    next();
     return;
   }
 
@@ -114,12 +139,10 @@ router.beforeEach((to, from, next) => {
     const trackResource = nextScreenTrack.track;
     const trackToPlay = typeof trackResource === 'function' ? trackResource() : trackResource;
     SoundManager.getInstance().playMusic(trackToPlay);
-    next();
     return;
   }
 
   if(prevScreenTrack.track === nextScreenTrack.track) {
-    next();
     return;
   }
 
@@ -127,8 +150,7 @@ router.beforeEach((to, from, next) => {
   const trackResource = nextScreenTrack.track;
   const trackToPlay = typeof trackResource === 'function' ? trackResource() : trackResource;
   SoundManager.getInstance().playMusic(trackToPlay);
-
-  next();
-});
+}
 
 export default router
+

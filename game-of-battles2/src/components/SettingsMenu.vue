@@ -106,6 +106,13 @@ function saveOptions(options: GameOptions): void {
   optionsManager.setMusicVolume(options.musicVolume);
   SoundManager.getInstance().updateMusicVolume(options.musicVolume);
 
+  if(!options.soundOn) {
+    SoundManager.getInstance().updateMusicVolume(0);
+  } else {
+    SoundManager.getInstance().updateMusicVolume(options.musicVolume);
+  }
+
+
   SoundManager.getInstance().playSound(SoundByte.WRITING);
 }
 

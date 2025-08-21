@@ -2,6 +2,7 @@
   <div class="intro-view">
     
     <!-- Sound Preference Popup Overlay -->
+    <LoadingSpinner v-if="showLoadingSpinner" />
     <div v-if="showSoundPopup" class="popup-overlay">
       <div class="sound-popup-container">
         <!-- Popup Background with Marble Texture -->
@@ -19,25 +20,57 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
 import { OptionsManager } from '@/GameData/OptionsManager';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'SoundOnOff',
-  data() {
-    return {
-      showSoundPopup: true, // Set to true to show the popup initially
-    };
+  components: {
+      LoadingSpinner
   },
-  methods: {
-    selectSoundPreference(soundOn: boolean) {
+  setup() {
+    const router = useRouter();
+    const showLoadingSpinner = ref(true);
+    const showSoundPopup = ref(false);
+
+    
+
+    const selectSoundPreference = (soundOn: boolean) => {
       OptionsManager.getInstance().setSoundOn(soundOn);
-      this.showSoundPopup = false;
-      this.$router.push("/LogoScreen");
-    },
-    goToMenu() {
-      this.$router.push("/MainMenu");
-    }
+      showSoundPopup.value = false;
+      router.push("/LogoScreen");
+    };
+
+    const goToMenu = () => {
+      router.push("/MainMenu");
+    };
+
+    onMounted(() => {
+
+        const img = new Image();
+        img.src = require("@/assets/Menus/plumMarble3.png");
+
+        img.onload = () => {
+            setTimeout(() => {
+                showLoadingSpinner.value = false;
+                showSoundPopup.value = true;
+            }, 500);
+        };
+
+        img.onerror = () => {
+           showLoadingSpinner.value = false;
+           showSoundPopup.value = true; 
+        };
+    });
+   
+    return {
+      showLoadingSpinner,
+      showSoundPopup,
+      selectSoundPreference,
+      goToMenu,
+    };
   },
 });
 </script>
@@ -175,6 +208,4 @@ export default defineComponent({
   transform: translateY(1px);
 }
 
-/* Ensure Exo 2 is available if not globally imported */
-@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap');
 </style>
