@@ -17,6 +17,7 @@ interface AssetMap {
 export class AssetPreloader {
   private static instance: AssetPreloader;
   private loadedAssets: Set<string> = new Set();
+  private loadedFonts: Set<string> = new Set();
 
   private constructor() {
   }
@@ -84,6 +85,37 @@ export class AssetPreloader {
     });
   }
 
+  private preloadFont(family: string, url: string, descriptors?: FontFaceDescriptors): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (this.loadedFonts.has(family)) {
+        console.log(`Font already loaded: ${family}`);
+        resolve();
+        return;
+      }
+
+      // Check if FontFace API is supported
+      if (!('FontFace' in window)) {
+        console.warn('FontFace API not supported. Font preloading skipped.');
+        this.loadedFonts.add(family); // Mark as loaded to avoid repeated warnings
+        resolve();
+        return;
+      }
+
+      const font = new FontFace(family, `url(${url})`, descriptors);
+      font.load()
+        .then(() => {
+          document.fonts.add(font); // Add font to the document for use
+          this.loadedFonts.add(family);
+          console.log(`Loaded font: ${family} from ${url}`);
+          resolve();
+        })
+        .catch((error) => {
+          console.error(`Failed to load font: ${family} from ${url}`, error);
+          reject(new Error(`Failed to load font: ${family}`));
+        });
+    });
+  }
+
 //   public async preloadIntro(): Promise<void> {
 //     const assetsToLoad: Promise<void>[] = [];
 
@@ -121,6 +153,10 @@ export class AssetPreloader {
     for (const image of imagesToLoad) {
       assetsToLoad.push(this.preloadImage(image));
     } 
+
+    for (const font of screenAssets.mainMenu.fonts) {
+      assetsToLoad.push(this.preloadFont(font.family, font.url));
+    }
 
 
     try {
@@ -172,9 +208,25 @@ export class AssetPreloader {
     }
   }
 
-  public preloadMatch(): Promise<void> {
-    return new Promise((resolve) => {
-      resolve();
-    });
+  public async preloadMatch(): Promise<void> {
+    const assetsToLoad: Promise<void>[] = [];
+    console.log("preloading match");
+    const imagesToLoad: string[] = screenAssets.match.images;
+    for (const image of imagesToLoad) {
+      assetsToLoad.push(this.preloadImage(image));
+    } 
+
+    for (const svg of screenAssets.match.svgs) {
+      assetsToLoad.push(this.preloadSvg(svg));
+    }
+
+    try {
+        await Promise.all(assetsToLoad);
+        console.log("All Match assets preloaded successfully!"); 
+      } catch (error) {
+        console.error("Failed to preload some Match assets:", error);
+        throw error;
+    }
+
   }
 }

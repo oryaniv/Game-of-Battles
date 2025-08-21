@@ -636,6 +636,7 @@ html, body {
     top: clamp(350px, 45%, 450px);
     transform: translate(-50%, -50%) scale(0.9);
   }
+  
 }
 
 /* Ensure fonts are loaded if not globally */
