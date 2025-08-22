@@ -720,12 +720,14 @@ const getStatusEffectSoundByte = (statusEffectType: StatusEffectType) => {
   switch(statusEffectType) {
     case StatusEffectType.STRENGTH_BOOST:
     case StatusEffectType.MOBILITY_BOOST:
+      return SoundByte.BUFF;
     case StatusEffectType.RALLIED:
+      return SoundByte.VICTORY_SOUND;
     case StatusEffectType.ENCOURAGED:
     case StatusEffectType.GUARDIAN:
     case StatusEffectType.IDAI_NO_HADOU:
     case StatusEffectType.SANCTUARY:
-      return SoundByte.BUFF;
+      return SoundByte.HOLY_BUFF;
     case StatusEffectType.ARCANE_OVERCHARGE:
       return SoundByte.LIGHTNING;
     case StatusEffectType.ARCANE_CONDUIT:
@@ -901,16 +903,16 @@ export function getGame(): Game {
 export function getSinglePlayerGame(): Game {
   const board = new Board(10, 10);
 
-  const matchTeams = playGroundTeams();
+  // const matchTeams = playGroundTeams();
 
-  // const matchTeams = getMatchTeams();// RunManager.getInstance().getMatchTeams();
+  const matchTeams = getMatchTeams();// RunManager.getInstance().getMatchTeams();
 
   const whiteTeam = matchTeams[0];
   const blackTeam = matchTeams[1];
 
   const teams = [whiteTeam, blackTeam];
 
-  // placeAllCombatants(whiteTeam, blackTeam, board);
+  placeAllCombatants(whiteTeam, blackTeam, board);
 
   const game = new Game(teams, board);
   return game;

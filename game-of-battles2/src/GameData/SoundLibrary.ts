@@ -14,6 +14,7 @@ export enum SoundByte {
 
     BUFF,
     DEBUFF,
+    HOLY_BUFF,
 
     // round start
     TURN_START,

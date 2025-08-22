@@ -19,8 +19,9 @@ const soundTable: { [key in SoundByte]: SoundAsset } = {
     [SoundByte.LIGHTNING]: {name:SoundByte.LIGHTNING, asset: getEmptyAsType<Howl>(), standardVolume: 0.7},
 
     // buffs and debuffs
-    [SoundByte.BUFF]: {name:SoundByte.BUFF, asset: getEmptyAsType<Howl>(), standardVolume: 1            },
+    [SoundByte.BUFF]: {name:SoundByte.BUFF, asset: getEmptyAsType<Howl>(), standardVolume: 1 },
     [SoundByte.DEBUFF]: {name:SoundByte.DEBUFF, asset: getEmptyAsType<Howl>(), standardVolume: 1},
+    [SoundByte.HOLY_BUFF]: {name:SoundByte.HOLY_BUFF, asset: getEmptyAsType<Howl>(), standardVolume: 1},
     [SoundByte.TURN_START]: {name:SoundByte.TURN_START, asset: getEmptyAsType<Howl>(), standardVolume: 1},
     [SoundByte.FOOL_LAUGH_FASTER]: {name:SoundByte.FOOL_LAUGH_FASTER, asset: getEmptyAsType<Howl>(), standardVolume: 1},
     [SoundByte.SEDUCE]: {name:SoundByte.SEDUCE, asset: getEmptyAsType<Howl>(), standardVolume: 1},

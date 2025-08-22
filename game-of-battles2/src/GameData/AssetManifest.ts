@@ -14,6 +14,9 @@ export const screenAssets = {
             { family: 'Metal Mania', url: require("@/assets/fonts/MetalMania-Regular.ttf") },
             { family: 'Cinzel Decorative', url: require("@/assets/fonts/CinzelDecorative-Regular.ttf")},
         ],
+        audio: [
+            require("@/music/main_menu.mp3"),
+        ],
     },
     buildTeam: {
         images: [
@@ -48,6 +51,9 @@ export const screenAssets = {
             require("@/assets/Healing.svg"),
             require("@/assets/Unstoppable.svg"),
         ],
+        audio: [
+            require("@/music/build_team_full.mp3"),
+        ],
     },
     journey: {
         images: [
@@ -56,6 +62,9 @@ export const screenAssets = {
             require("@/assets/Backgrounds/cave3.png"),
             require("@/assets/Backgrounds/simpleLand5.png"),
             require("@/assets/Backgrounds/temple10.png"),
+        ],
+        audio: [
+            require("@/music/journey.mp3"),
         ],
     },
     match: {
@@ -152,7 +161,17 @@ export const screenAssets = {
 
         ],
         audio: [
-            
+            require("@/music/tutorial.mp3"),
+            require("@/music/easy_combat.mp3"),
+            require("@/music/normal_combat.mp3"),
+            require("@/music/hard_combat.mp3"),
+            require("@/music/boss_combat.mp3"),
+        ],
+    },
+    postMatch: {
+        audio: [
+            require("@/music/victory.mp3"),
+            require("@/music/game_over.mp3"),
         ],
     },
 }

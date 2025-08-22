@@ -104,6 +104,7 @@ const routeToPreloader = [
   {path: '/Team', preloader: () => AssetPreloader.getInstance().preloadJourney()},
   {path: '/Journey', preloader: () => AssetPreloader.getInstance().preloadMatch()},
   {path: '/TutorialList', preloader: () => AssetPreloader.getInstance().preloadMatch()},
+  {path: '/Match', preloader: () => AssetPreloader.getInstance().preloadPostMatch()},
 ]
 
 router.beforeEach((to, from, next) => {

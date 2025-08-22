@@ -9,6 +9,7 @@ declare module 'howler' {
       loop(loop: boolean): void;
       on(event: string, callback: () => void): void;
       unload(): void;
+      state(): string;
       // Add other methods you use
     }
   }

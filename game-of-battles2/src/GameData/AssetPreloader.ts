@@ -5,6 +5,7 @@
 // let journeyLoaded = false;
 // let matchLoaded = false;
 
+import { Howl } from "howler";
 import { screenAssets } from "./AssetManifest";
 
 interface AssetMap {
@@ -116,6 +117,35 @@ export class AssetPreloader {
     });
   }
 
+  private  preloadAudio(url: string): Promise<void> {
+      return new Promise((resolve, reject) => {
+        if (this.loadedAssets.has(url)) {
+          console.log(`Asset already loaded (audio): ${url}`);
+          resolve();
+          return;
+        }
+        const sound = new Howl({
+          src: [url],
+          preload: true,
+          onload: () => {
+            this.loadedAssets.add(url);
+            console.log(`Loaded audio: ${url}`);
+            resolve();
+          },
+          onloaderror: (id: any, error: any) => {
+            console.error(`Failed to load audio: ${url}`, error);
+            reject(new Error(`Failed to load audio: ${url}`));
+          }
+        });
+        // If the sound is already loaded (e.g., from a previous instance or direct play),
+        // Howler.js might not trigger onload. Check its state.
+        if (sound.state() === 'loaded') {
+            this.loadedAssets.add(url);
+            resolve();
+        }
+      });
+    }
+
 //   public async preloadIntro(): Promise<void> {
 //     const assetsToLoad: Promise<void>[] = [];
 
@@ -158,6 +188,10 @@ export class AssetPreloader {
       assetsToLoad.push(this.preloadFont(font.family, font.url));
     }
 
+    for (const audio of screenAssets.mainMenu.audio) {
+      assetsToLoad.push(this.preloadAudio(audio));
+    }
+
 
     try {
         await Promise.all(assetsToLoad);
@@ -180,6 +214,10 @@ export class AssetPreloader {
       assetsToLoad.push(this.preloadSvg(svg));
     }
 
+    for (const audio of screenAssets.buildTeam.audio) {
+        assetsToLoad.push(this.preloadAudio(audio));
+    }
+
 
     try {
         await Promise.all(assetsToLoad);
@@ -197,6 +235,10 @@ export class AssetPreloader {
     for (const image of imagesToLoad) {
       assetsToLoad.push(this.preloadImage(image));
     } 
+
+    for (const audio of screenAssets.journey.audio) {
+        assetsToLoad.push(this.preloadAudio(audio));
+    }
 
 
     try {
@@ -220,6 +262,10 @@ export class AssetPreloader {
       assetsToLoad.push(this.preloadSvg(svg));
     }
 
+    for (const audio of screenAssets.match.audio) {
+        assetsToLoad.push(this.preloadAudio(audio));
+    }
+
     try {
         await Promise.all(assetsToLoad);
         console.log("All Match assets preloaded successfully!"); 
@@ -227,6 +273,22 @@ export class AssetPreloader {
         console.error("Failed to preload some Match assets:", error);
         throw error;
     }
+  }
 
+  public async preloadPostMatch(): Promise<void> {
+    const assetsToLoad: Promise<void>[] = [];
+    console.log("preloading post match");
+
+    for (const audio of screenAssets.postMatch.audio) {
+        assetsToLoad.push(this.preloadAudio(audio));
+    }
+
+    try {
+        await Promise.all(assetsToLoad);
+        console.log("All Post Match assets preloaded successfully!"); 
+      } catch (error) {
+        console.error("Failed to preload some Post Match assets:", error);
+        throw error;
+    }
   }
 }

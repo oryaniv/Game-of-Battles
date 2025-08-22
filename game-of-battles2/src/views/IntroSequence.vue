@@ -49,7 +49,7 @@ export default defineComponent({
       // Step 1: Show "You must rise to the challenge,"
       sequenceTimers.push(setTimeout(() => {
         currentStep.value = 1;
-        SoundManager.getInstance().playSound(SoundByte.BUFF);
+        SoundManager.getInstance().playSound(SoundByte.HOLY_BUFF);
       }, 500)); // Short delay before first text appears
 
       // Step 2: Show "Or else, you will..."

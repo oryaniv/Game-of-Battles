@@ -101,8 +101,8 @@ const enemyData = {
         ],
         [
           CombatantType.Wizard,
-          CombatantType.Wizard,
-          CombatantType.Defender,
+          CombatantType.Pikeman,
+          CombatantType.Witch,
           CombatantType.Hunter,
           CombatantType.Vanguard
         ],
