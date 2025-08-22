@@ -53,7 +53,7 @@ const soundReferences: soundReference[] = [
     {name:SoundByte.RAGE, path:require('.././sound/rage.mp3')},
     {name:SoundByte.WRITING, path:require('.././sound/save.mp3')},
     {name:SoundByte.ARCANE, path:require('.././sound/arcane.mp3')},
-    {name:SoundByte.TELEPORTATION, path:require('.././sound/teleport.mp3')},
+    {name:SoundByte.TELEPORTATION, path:require('.././sound/teleportation.mp3')},
 
     {name:SoundByte.FOREST_WALK1, path:require('.././sound/forest_walk1.mp3')},
     {name:SoundByte.FOREST_WALK2, path:require('.././sound/forest_walk2.mp3')},
