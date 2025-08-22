@@ -354,7 +354,7 @@ export default defineComponent({
       
 
       playerPlaqueX.value = (blockRects.left + blockRects.width / 2) + playerPlaqueXOffset;
-      playerPlaqueY.value = (blockRects.top + blockRects.height / 2) - 95;
+      playerPlaqueY.value = (blockRects.top + blockRects.height / 2) - 85;
 
       // Scroll to keep the player plaque in view as it descends
       const scrollContainer = document.querySelector('.journey-screen-container') as HTMLElement;

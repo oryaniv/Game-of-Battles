@@ -1056,34 +1056,35 @@ class VeteranAIAgentWizardPlayer extends VeteranAIAgentGenericPlayer {
     }
 
     private evaluateTeleportation(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
-        let baseValue = 0;
-        baseValue += this.evaluateMovement(combatant, game, board, target!);
-        if(combatant.hasStatusEffect(StatusEffectType.ARCANE_OVERCHARGE)) {
-            const getAllTargets = board.getAreaOfEffectPositions(combatant, target!, SpecialMoveAreaOfEffect.Nova, SpecialMoveAlignment.All);
-            let burstValue = 0;
-            let totalEnemieshit = 0;
+        return -5;
+        // let baseValue = 0;
+        // baseValue += this.evaluateMovement(combatant, game, board, target!);
+        // if(combatant.hasStatusEffect(StatusEffectType.ARCANE_OVERCHARGE)) {
+        //     const getAllTargets = board.getAreaOfEffectPositions(combatant, target!, SpecialMoveAreaOfEffect.Nova, SpecialMoveAlignment.All);
+        //     let burstValue = 0;
+        //     let totalEnemieshit = 0;
             
-            getAllTargets.forEach(AOETarget => {
-                const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
-                if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
-                    return;
-                }
-                let burstTargetValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position, DamageType.Fire) + 10;
-                if(combatant.hasStatusEffect(StatusEffectType.ARCANE_OVERCHARGE)) {
-                    burstTargetValue += 6;
-                }
-                if(targetCombatant.team.getName() !== combatant.team.getName()) {
-                    totalEnemieshit += 1;
-                }
-                burstValue += targetCombatant.team.getName() !== combatant.team.getName() ? burstTargetValue : - burstTargetValue;
-            });
-            burstValue += totalEnemieshit === 0 ? -10 : 0;
-            baseValue += burstValue;
-        }
-        if(combatant.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING)) {
-            baseValue += this.evaluateArcaneBarrier(combatant, game, board, movePosition, target);
-        }
-        return normalizeCoopEvaluation(baseValue, 1);
+        //     getAllTargets.forEach(AOETarget => {
+        //         const targetCombatant: Combatant = getTargetCombatantForEvaluation(combatant, movePosition, AOETarget!, board);
+        //         if(!targetCombatant || isCloakedEnemy(combatant, targetCombatant)) {
+        //             return;
+        //         }
+        //         let burstTargetValue = this.evaluateBasicAttack(combatant, game, board, movePosition, targetCombatant.position, DamageType.Fire) + 10;
+        //         if(combatant.hasStatusEffect(StatusEffectType.ARCANE_OVERCHARGE)) {
+        //             burstTargetValue += 6;
+        //         }
+        //         if(targetCombatant.team.getName() !== combatant.team.getName()) {
+        //             totalEnemieshit += 1;
+        //         }
+        //         burstValue += targetCombatant.team.getName() !== combatant.team.getName() ? burstTargetValue : - burstTargetValue;
+        //     });
+        //     burstValue += totalEnemieshit === 0 ? -10 : 0;
+        //     baseValue += burstValue;
+        // }
+        // if(combatant.hasStatusEffect(StatusEffectType.ARCANE_CHANNELING)) {
+        //     baseValue += this.evaluateArcaneBarrier(combatant, game, board, movePosition, target);
+        // }
+        // return normalizeCoopEvaluation(baseValue, 1);
     }
 
     private evaluateCatastrophicCalamity(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {

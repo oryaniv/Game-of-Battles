@@ -194,13 +194,29 @@ export default defineComponent({
 
 .message-fade-slide-enter-from {
   opacity: 0;
-  transform: translateX(100%); /* Start off-screen to the right */
+  transform: translateX(10%); /* Start off-screen to the right */
 }
 
 .message-fade-slide-leave-to {
   opacity: 0;
-  transform: translateX(100%); /* Exit off-screen to the right */
+  transform: translateX(10%); /* Exit off-screen to the right */
 }
+
+@media (min-width: 1700px) {
+
+  .message-fade-slide-enter-from {
+    opacity: 0;
+    transform: translateX(50%); /* Start off-screen to the right */
+  }
+
+  .message-fade-slide-leave-to {
+    opacity: 0;
+    transform: translateX(50%); /* Exit off-screen to the right */
+  }
+
+}
+  
+
 
 /* Optional: To make old messages slide down as new ones come in */
 .message-fade-slide-move {
