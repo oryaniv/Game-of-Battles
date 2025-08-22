@@ -220,7 +220,7 @@ export function statusNameToText(statusName: StatusEffectType): string {
     case 26:
       return "Defense Downgrade";
     case 27:
-      return "Idai No Hadou";
+      return "Surge of Glory";
     case 28:
       return "Riposte";
     case 29:
@@ -512,7 +512,7 @@ export function getSkillEffectIcon(skillName: string) {
     case 'Whirlwind Attack':
       return require('./assets/statusIcons/SLASH.svg');
     case 'Wind Run Assault':
-    case 'Titanic Fist':
+    case 'Typhoon Fist':
     case 'Troll Kick':
     case 'Crush':
     case 'Mind Lash':
@@ -540,7 +540,7 @@ export function getSkillEffectIcon(skillName: string) {
     case 'Plague Arrow':
       return require('./assets/statusIcons/POISONED.svg');
     case 'Sacred Flame':
-    case 'Angelic Touch':
+    case 'Vengeful Angel':
     case 'Queen\'s Wrath, Mother\'s Love':
     case 'Moon Beam':
       return require('./assets/statusIcons/HOLY.svg');
@@ -595,7 +595,7 @@ export function getSkillEffectIcon(skillName: string) {
       return require('./assets/Babel.svg');
     case 'Ingenious Upgrade':
       return require('./assets/statusIcons/INGENIOUS_UPGRADE.svg');
-    case 'Idai no Hadou':
+    case 'Surge of Glory':
       return require('./assets/statusIcons/IDAI_NO_HADOU.svg');
     case 'Rally to the Banner':
       return require('./assets/statusIcons/RALLIED.svg');
@@ -646,7 +646,7 @@ export function getSkillEffectIcon(skillName: string) {
     case 'Slow':
       return require('./assets/statusIcons/SLOW.svg');
     case 'Siphon Energy':
-    case 'Catastrophic Calamity':
+    case 'Mass Destruction':
       return require('./assets/Unstoppable.svg');
     case 'Ultimate Curse':
       return require('./assets/statusIcons/NIGHTMARE_LOCKED.svg');
@@ -714,6 +714,7 @@ const damageSoundByteMap: { [key: string]: SoundByte } = {
   'Pierce': SoundByte.PIERCE,
   'Slash': SoundByte.SLASH,
   'Lightning': SoundByte.LIGHTNING,
+  'Unstoppable': SoundByte.UNSTOPPABLE,
 }
 
 const getStatusEffectSoundByte = (statusEffectType: StatusEffectType) => {

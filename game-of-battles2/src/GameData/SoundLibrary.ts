@@ -11,6 +11,7 @@ export enum SoundByte {
     PIERCE,
     SLASH,
     LIGHTNING,
+    UNSTOPPABLE,
 
     BUFF,
     DEBUFF,
@@ -34,6 +35,7 @@ export enum SoundByte {
     SHADOW_STEP,
     RAGE,
     ARCANE,
+    TELEPORTATION,
 
     FOREST_WALK1,
     FOREST_WALK2,

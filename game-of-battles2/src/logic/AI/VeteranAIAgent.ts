@@ -1011,7 +1011,7 @@ class VeteranAIAgentWizardPlayer extends VeteranAIAgentGenericPlayer {
             return this.evaluateTeleportation(combatant, game, board, movePosition, target);
         }
 
-        if(specialMove === "Catastrophic Calamity") {
+        if(specialMove === "Mass Destruction") {
             return this.evaluateCatastrophicCalamity(combatant, game, board, movePosition, target);
         }
 
@@ -2393,7 +2393,7 @@ class VeteranAIAgentFistWeaverPlayer extends VeteranAIAgentGenericPlayer {
             return this.evaluateWindRunAssault(combatant, game, board, movePosition, target);
         }
 
-        if(specialMove === "Titanic Fist") {
+        if(specialMove === "Typhoon Fist") {
             return this.evaluateTitanicFist(combatant, game, board, movePosition, target);
         }
 
@@ -2401,7 +2401,7 @@ class VeteranAIAgentFistWeaverPlayer extends VeteranAIAgentGenericPlayer {
             return this.evaluateMeditate(combatant, game, board, movePosition, target);
         }
 
-        if(specialMove === "Angelic Touch") {
+        if(specialMove === "Vengeful Angel") {
             return this.evaluateAngelicTouch(combatant, game, board, movePosition, target);
         }
 
@@ -2417,7 +2417,7 @@ class VeteranAIAgentFistWeaverPlayer extends VeteranAIAgentGenericPlayer {
             return this.evaluateLightningKicks(combatant, game, board, movePosition, target);
         }
 
-        if(specialMove === "Idai no Hadou") {
+        if(specialMove === "Surge of Glory") {
             return this.evaluateIdaiNoHadou(combatant, game, board, movePosition, target);
         }
 

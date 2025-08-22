@@ -146,18 +146,22 @@ export class AssetPreloader {
       });
     }
 
-//   public async preloadIntro(): Promise<void> {
-//     const assetsToLoad: Promise<void>[] = [];
+  public async preloadIntro(): Promise<void> {
+    const assetsToLoad: Promise<void>[] = [];
+    console.log("preloading intro");
 
+    for (const svg of screenAssets.intro.svgs) {
+      assetsToLoad.push(this.preloadSvg(svg));
+    }
 
-//     try {
-//         await Promise.all(assetsToLoad);
-//         console.log("All Intro assets preloaded successfully!");
-//       } catch (error) {
-//         console.error("Failed to preload some Intro assets:", error);
-//         throw error;
-//       }
-//   }
+    try {
+        await Promise.all(assetsToLoad);
+        console.log("All Intro assets preloaded successfully!"); 
+      } catch (error) {
+        console.error("Failed to preload some Intro assets:", error);
+        throw error;
+    }
+  }
 
   public async preloadLogoScreen(): Promise<void> {
     const assetsToLoad: Promise<void>[] = [];

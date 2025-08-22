@@ -17,6 +17,7 @@ const soundTable: { [key in SoundByte]: SoundAsset } = {
     [SoundByte.PIERCE]: {name:SoundByte.PIERCE, asset: getEmptyAsType<Howl>(), standardVolume: 1},
     [SoundByte.SLASH]: {name:SoundByte.SLASH, asset: getEmptyAsType<Howl>(), standardVolume: 1},
     [SoundByte.LIGHTNING]: {name:SoundByte.LIGHTNING, asset: getEmptyAsType<Howl>(), standardVolume: 0.7},
+    [SoundByte.UNSTOPPABLE]: {name:SoundByte.UNSTOPPABLE, asset: getEmptyAsType<Howl>(), standardVolume: 1},
 
     // buffs and debuffs
     [SoundByte.BUFF]: {name:SoundByte.BUFF, asset: getEmptyAsType<Howl>(), standardVolume: 1 },
@@ -36,6 +37,7 @@ const soundTable: { [key in SoundByte]: SoundAsset } = {
     [SoundByte.RAGE]: {name:SoundByte.RAGE, asset: getEmptyAsType<Howl>(), standardVolume: 1},
     
     [SoundByte.ARCANE]: {name:SoundByte.ARCANE, asset: getEmptyAsType<Howl>(), standardVolume: 1},
+    [SoundByte.TELEPORTATION]: {name:SoundByte.TELEPORTATION, asset: getEmptyAsType<Howl>(), standardVolume: 1},
 
     // walking sounds
     [SoundByte.FOREST_WALK1]: {name:SoundByte.FOREST_WALK1, asset: getEmptyAsType<Howl>(), standardVolume: 1},

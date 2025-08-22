@@ -7,7 +7,7 @@ module.exports = defineConfig({
       // Set Cache-Control for all assets served by the dev server
       // This tells the browser to cache aggressively for 1 year (31536000 seconds)
       // and not revalidate.
-      'Cache-Control': 'public, max-age=31536000',
+      'Cache-Control': 'public, max-age=0, must-revalidate',
     },
     // Optionally, if you only want to apply this to specific asset types:
     // You might need to use a custom middleware for more granular control,

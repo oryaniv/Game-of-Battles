@@ -1336,7 +1336,7 @@ export default defineComponent({
         case 26:
           return "Defense Downgrade";
         case 27:
-          return "Idai No Hadou";
+          return "Surge of Glory";
         case 28:
           return "Riposte";
         case 29:

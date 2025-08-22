@@ -98,7 +98,7 @@ const routeToTrack = [
 ]
 
 const routeToPreloader = [
-  {path: '/', preloader: () => AssetPreloader.getInstance().preloadLogoScreen()},
+  {path: '/', preloader: () => {AssetPreloader.getInstance().preloadLogoScreen(); AssetPreloader.getInstance().preloadIntro();}},
   {path: '/LogoScreen', preloader: () => AssetPreloader.getInstance().preloadMainMenu()},
   {path: '/MainMenu', preloader: () => AssetPreloader.getInstance().preloadBuildTeam()},
   {path: '/Team', preloader: () => AssetPreloader.getInstance().preloadJourney()},

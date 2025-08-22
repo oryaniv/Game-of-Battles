@@ -310,7 +310,7 @@ export class FullMetalJacketStatusEffect implements StatusEffect {
 
 export class IdaiNoHadouStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.IDAI_NO_HADOU;
-    description: string = "Increases agility, luck, and movement speed. Also allows the use of the Angelic touch skill";
+    description: string = "Increases agility, luck, and movement speed. Also allows the use of the Vengeful Angel skill";
     applicationHooks = {
         [StatusEffectHook.OnApply]: (caster: Combatant, target: Combatant) => {
             caster.stats.agility += 10;
@@ -595,6 +595,12 @@ export class DiamondHookedHoldingStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.DIAMOND_HOOKED_HOLDING;
     description = `This combatant holds an enemy captive with a diamnd hook, and will attack it if it tries to move or resist.`;
     applicationHooks = {
+        [StatusEffectHook.OnTurnStart ]: (self: Combatant) => {
+            const heldEnemy = self.getRelatedCombatants()['DIAMOND_HOOKED'];
+            if(!heldEnemy) {
+                self.removeStatusEffect(StatusEffectType.DIAMOND_HOOKED_HOLDING);
+            }
+        },
         [StatusEffectHook.OnMoving]: (self: Combatant) => {
             const heldEnemy = self.getRelatedCombatants()['DIAMOND_HOOKED'];
             if(heldEnemy) {

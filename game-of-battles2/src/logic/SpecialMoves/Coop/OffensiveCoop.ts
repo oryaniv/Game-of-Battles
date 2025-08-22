@@ -760,7 +760,7 @@ export class PlagueArrow extends CoopMove {
 }
 
 export class CatastrophicCalamity extends CoopMove {
-    name: string = "Catastrophic Calamity";
+    name: string = "Mass Destruction";
     description: string = "Massive Unstoppable damage to all targets in a 2-tile radius nova. Requires both Arcane Channeling and Arcane Overcharge.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.Wizard, CombatantType.Witch, CombatantType.Fool, CombatantType.Artificer] },

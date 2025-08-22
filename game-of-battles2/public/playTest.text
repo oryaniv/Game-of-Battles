@@ -3,11 +3,15 @@
 * scrollbars appearing on windows when game commentary appears (windows of any size) V
 * Wizard vetetran agent to be more aggressive (less barrier, overcharge instead of attacking)  - find it happening, then deal) VX
 * lower the player plaque a bit on journey descend when it finally stands V
-* add sound effect for unstoppable damage
-* polish the effects of titanic fist (the clash, death, etc.)
-* same for diamond hook
+* polish the effects of titanic fist (the clash, death, etc.) V
+* add sound effect for unstoppable damage V
+* add sound effect for teleportation V
+* preload skull icon V
 * scrollbars on windows in skill menu to look better
-* have red team members face the other direction (optional)
 * build team screen - choosing another combatant when on stats panel should not revert to description panel
+
+* same for diamond hook
+* diamond hook holding persists even after victim is dead
+* have red team members face the other direction (optional)
 * diamon hook usage slipped far. maybe make the action panel longer
 

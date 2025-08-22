@@ -926,6 +926,7 @@ export default defineComponent({
 
       // if the current combatant has an AI agent, let it play the turn
       const currentCombatant = game.value.getCurrentCombatant();
+      debugger;
       const turnDelay = showHoveringMessage() ? 1500 : 1000;
       if(currentCombatant && currentCombatant.getAiAgent() !== undefined) {
         setTimeout(async () => {
@@ -949,7 +950,7 @@ export default defineComponent({
             combatant.team.combatants.splice(combatantIndex, 1);
           }
         });
-      }, 1000);
+      }, 1500);
 
       function removeCombatantEffect(combatant: Combatant) {
         board.value.removeCombatant(combatant);
@@ -2367,6 +2368,43 @@ html, body {
 .skill-menu-body {
   flex: 1;
   overflow-y: auto;
+}
+
+/* For Webkit browsers (Chrome, Safari, Edge, Opera) */
+/* This targets the scrollbar itself */
+.skill-menu-body::-webkit-scrollbar {
+    width: 10px; /* Width of the vertical scrollbar */
+    height: 10px; /* Height of the horizontal scrollbar */
+}
+
+/* This targets the track (the background of the scrollbar) */
+.skill-menu-body::-webkit-scrollbar-track {
+    background: #7A5B8C; /* A light background for the track */
+    border-radius: 5px; /* Rounded corners for the track */
+}
+
+/* This targets the thumb (the draggable part of the scrollbar) */
+.skill-menu-body::-webkit-scrollbar-thumb {
+    background-color: #2F4F4F; /* Amethyst - your preferred color for the thumb */
+    border-radius: 5px; /* Rounded corners for the thumb */
+    border: 2px solid #7A5B8C; /* A border to make the thumb appear slightly thinner and raised */
+}
+
+/* This targets the thumb on hover */
+.skill-menu-body::-webkit-scrollbar-thumb:hover {
+    background-color: #2F4F4F; /* Dark Slate Gray - your preferred color on hover */
+}
+
+/* This targets the corner where two scrollbars meet */
+.skill-menu-body::-webkit-scrollbar-corner {
+    background: #7A5B8C; /* Match the track background */
+}
+
+/* For Firefox */
+/* Note: Firefox styling is less granular. */
+.skill-menu-body {
+    scrollbar-width: thin; /* "auto" (default), "thin", or "none" */
+    scrollbar-color: #2F4F4F #7A5B8C; /* thumb color, track color */
 }
 
 .skill-icon {

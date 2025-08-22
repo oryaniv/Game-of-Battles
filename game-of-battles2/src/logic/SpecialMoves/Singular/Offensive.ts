@@ -727,7 +727,7 @@ export class WindRunAssault implements SpecialMove {
 }
 
 export class TitanicFist implements SpecialMove {
-    name: string = "Titanic Fist";
+    name: string = "Typhoon Fist";
     triggerType = SpecialMoveTriggerType.Active;
     cost: number = 6;
     turnCost: number = 1;
@@ -752,14 +752,22 @@ export class TitanicFist implements SpecialMove {
             }
             if(getPushResult.moveTo) {
                 targetCombatant!.move(getPushResult.moveTo, board);
-            }
-            if(getPushResult.collisionObject) {
                 targetCombatant?.takeDamage({amount: 10, type: DamageType.Crush}, board);
                 const damageResult = getDamageActionResult({amount: 10, type: DamageType.Crush}, getPushResult.moveTo);
+                setTimeout(() => {
+                emitter.emit('trigger-method', damageResult);
+                }, 50);
+            } else {
+                targetCombatant?.takeDamage({amount: 10, type: DamageType.Crush}, board);
+                const damageResult = getDamageActionResult({amount: 10, type: DamageType.Crush}, getPushResult.moveTo);
+                emitter.emit('trigger-method', damageResult);
+            }
+            if(getPushResult.collisionObject) {
                 getPushResult.collisionObject?.takeDamage({amount: 10, type: DamageType.Crush}, board);
                 const damageResult2 = getDamageActionResult({amount: 10, type: DamageType.Crush}, getPushResult.collisionObject?.position);
-                emitter.emit('trigger-method', damageResult);
-                emitter.emit('trigger-method', damageResult2);
+                setTimeout(() => {    
+                    emitter.emit('trigger-method', damageResult2);
+                }, 60);
             }
         }
         return result;
@@ -770,7 +778,7 @@ export class TitanicFist implements SpecialMove {
 }
 
 export class AngelicTouch implements SpecialMove {
-    name: string = "Angelic Touch";
+    name: string = "Vengeful Angel";
     triggerType = SpecialMoveTriggerType.Active;
     cost: number = 8;
     turnCost: number = 1;
@@ -799,7 +807,7 @@ export class AngelicTouch implements SpecialMove {
     checkRequirements = (self: Combatant) => {
         return self.hasStatusEffect(StatusEffectType.IDAI_NO_HADOU);
     };
-    description = `High Holy damage to target, small chance to instant kill. Requires the Idai no Hadou status.`   
+    description = `High Holy damage to target, small chance to instant kill. Requires the Surge of Glory status.`   
 }   
 
 export class VipersKiss implements SpecialMove {

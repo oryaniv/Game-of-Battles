@@ -33,6 +33,7 @@ const soundReferences: soundReference[] = [
     {name:SoundByte.PIERCE, path:require('.././sound/pierce_attack_sound.mp3')},
     {name:SoundByte.SLASH, path:require('.././sound/sword_slash_sound.mp3')},
     {name:SoundByte.LIGHTNING, path:require('.././sound/thunder_sound.mp3')},
+    {name:SoundByte.UNSTOPPABLE, path:require('.././sound/unstoppable_sound.mp3')},
     {name:SoundByte.BUFF, path:require('.././sound/buff_2.mp3')},
     {name:SoundByte.DEBUFF, path:require('.././sound/debuff_sound.mp3')},
     {name:SoundByte.HOLY_BUFF, path:require('.././sound/holy_buff.mp3')},
@@ -52,6 +53,7 @@ const soundReferences: soundReference[] = [
     {name:SoundByte.RAGE, path:require('.././sound/rage.mp3')},
     {name:SoundByte.WRITING, path:require('.././sound/save.mp3')},
     {name:SoundByte.ARCANE, path:require('.././sound/arcane.mp3')},
+    {name:SoundByte.TELEPORTATION, path:require('.././sound/teleport.mp3')},
 
     {name:SoundByte.FOREST_WALK1, path:require('.././sound/forest_walk1.mp3')},
     {name:SoundByte.FOREST_WALK2, path:require('.././sound/forest_walk2.mp3')},

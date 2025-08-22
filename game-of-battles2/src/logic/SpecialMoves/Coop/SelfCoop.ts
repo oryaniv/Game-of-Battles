@@ -18,8 +18,8 @@ import { SoundManager } from "@/GameData/SoundManager";
 import { SoundByte } from "@/GameData/SoundLibrary";
 
 export class IdaiNoHadou extends CoopMove {
-    name: string = "Idai no Hadou";
-    description: string = "Resotre a small amount of health and stamina, and remove all negative status effects. Then gain the Idai no Hadou status for 3 rounds, which increases luck and agility and unlocks the angelic touch skill.";
+    name: string = "Surge of Glory";
+    description: string = "Resotre a small amount of health and stamina, and remove all negative status effects. Then gain the Surge of Glory status for 3 rounds, which increases luck and agility and unlocks the Vengeful Angel skill.";
     coopRequiredPartners: CoopPartnerRequirement[] = [
         { combatantTypeOptions: [CombatantType.FistWeaver, CombatantType.Vanguard, CombatantType.Defender] },
         { combatantTypeOptions: [CombatantType.Healer, CombatantType.StandardBearer, CombatantType.Fool] }
@@ -174,6 +174,7 @@ export class Teleportation extends CoopMove {
             invoker.removeStatusEffect(StatusEffectType.ARCANE_OVERCHARGE);
             return blastResults;
         }
+        SoundManager.getInstance().playSound(SoundByte.TELEPORTATION);
         return getStandardActionResult(invoker.position, this.turnCost);
     };
     range: SpecialMoveRange = {

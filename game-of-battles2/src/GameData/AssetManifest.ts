@@ -5,6 +5,11 @@ export const screenAssets = {
             require("@/assets/Logo/FCOH_without_50mt.png"),
         ],
     },
+    intro: {
+        svgs: [
+            require("@/assets/Skull_and_crossbones.svg"),
+        ],
+    },
     mainMenu: {
         images: [
             require("@/assets/Menus/plumMarble4.png"),
