@@ -295,7 +295,9 @@ export class FullMetalJacketStatusEffect implements StatusEffect {
             if([DamageType.Crush, DamageType.Pierce, DamageType.Slash].includes(target.basicAttack().type)) {
                 caster.stats.attackPower += STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 15 : 20;
             }
-            caster.specialMoves.push(new ReplacementPart());
+            if(caster.isOrganic()) {       
+                caster.specialMoves.push(new ReplacementPart());
+            }
         },
         [StatusEffectHook.OnRemove]: (caster: Combatant, target: Combatant) => {
             caster.stats.defensePower -= STAT_BUFF_INCREASE_ENABLED ? ATTACK_DEFENSE_INCREASE_AMOUNT + 15 : 20;

@@ -799,6 +799,7 @@ class VeteranAIAgentHealerPlayer extends VeteranAIAgentGenericPlayer {
     private evaluateSanctuary(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
         let baseValue = 4;
         const targetAlly = getTargetCombatantForEvaluation(combatant, movePosition, target!, board);
+        baseValue += targetAlly.hasStatusEffect(StatusEffectType.SANCTUARY) ? -10 : 0;
         baseValue += isSlightlyInjured(targetAlly) ? 1 : 0;
         baseValue += isInjured(targetAlly) ? 2 : 0;
         baseValue += isBadlyInjured(targetAlly) ? 3 : 0;
@@ -2844,7 +2845,7 @@ class VeteranAIAgentArtificerPlayer extends VeteranAIAgentGenericPlayer {
             return this.evaluateShockingGauntlet(combatant, game, board, movePosition, target);
         }
 
-        if(specialMove === "Full Metal Jacket") {
+        if(specialMove === "Full Metal Alchemy") {
             return this.evaluateFullMetalJacket(combatant, game, board, movePosition, target);
         }
 

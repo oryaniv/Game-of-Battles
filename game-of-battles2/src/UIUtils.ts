@@ -240,7 +240,7 @@ export function statusNameToText(statusName: StatusEffectType): string {
     case 36:
       return "Mark detonate";
     case 37:
-      return "Full Metal Jacket";
+      return "Full Metal Alchemy";
     case 38:
       return "Going Off";
     case 39:
@@ -567,7 +567,7 @@ export function getSkillEffectIcon(skillName: string) {
       return require('./assets/statusIcons/DEFENSE_DOWNGRADE.svg');
     case 'Focus Aim':
       return require('./assets/statusIcons/FOCUS_AIM.svg');
-    case 'Full Metal Jacket':
+    case 'Full Metal Alchemy':
       return require('./assets/statusIcons/FULL_METAL_JACKET.svg');
     case 'Divine Retribution':
       return require('./assets/statusIcons/DIVINE_RETRIBUTION.svg');

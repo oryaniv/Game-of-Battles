@@ -129,7 +129,7 @@ export class Encourage implements SpecialMove {
 }
 
 export class FullMetalJacket implements SpecialMove {
-    name: string = "Full Metal Jacket";
+    name: string = "Full Metal Alchemy";
     triggerType = SpecialMoveTriggerType.Active;
     cost: number = 5;
     turnCost: number = 1;
@@ -155,7 +155,7 @@ export class FullMetalJacket implements SpecialMove {
         return getStatusEffectActionResult(StatusEffectType.FULL_METAL_JACKET, target, 1);
     };
     checkRequirements = undefined;
-    description = `For 3 rounds, ally becomes a construct, gains defense boost, attack boost if their attacks are physical based,
+    description = `For 3 rounds, target ally becomes a construct, gains defense boost, attack boost if their attacks are physical based,
     becomes weak to lightning damage, and may unlock an additional skill.`       
 }
 

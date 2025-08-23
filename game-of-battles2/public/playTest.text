@@ -7,11 +7,19 @@
 * add sound effect for unstoppable damage V
 * add sound effect for teleportation V
 * preload skull icon V
-* scrollbars on windows in skill menu to look better
-* build team screen - choosing another combatant when on stats panel should not revert to description panel
+* scrollbars on windows in skill menu to look better V
+* healer using sanctuary on allies that already has it V
+* preload bomb, tower and ballista png's V
+* non organic getting replacement part V
+* fix unstoppable sound when it's not actually appropriate
 
+* build team screen - choosing another combatant when on stats panel should not revert to description panel
 * same for diamond hook
 * diamond hook holding persists even after victim is dead
 * have red team members face the other direction (optional)
 * diamon hook usage slipped far. maybe make the action panel longer
+
+* elusive bugs
+
+* froze burst didn't find no target on Hard
 

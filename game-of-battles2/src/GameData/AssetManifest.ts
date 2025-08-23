@@ -42,6 +42,7 @@ export const screenAssets = {
             require("@/assets/CombatantModels/captain_recolor.png"),
             require("@/assets/CombatantModels/Pikeman_blue_p10.png"),
             require("@/assets/CombatantModels/Pikeman_red_p10.png"),
+            
         ],
         svgs: [
             require("@/assets/Slash.svg"),
@@ -55,6 +56,7 @@ export const screenAssets = {
             require("@/assets/Pentagram.svg"),
             require("@/assets/Healing.svg"),
             require("@/assets/Unstoppable.svg"),
+
         ],
         audio: [
             require("@/music/build_team_full.mp3"),
@@ -82,7 +84,16 @@ export const screenAssets = {
             require("@/assets/CombatantModels/OozeGolem.png"),
             require("@/assets/CombatantModels/WeaveEater.png"),
             require("@/assets/statusIcons/TUTOR.png"),
-            require('@/assets/Crush2.png')
+            require('@/assets/Crush2.png'),
+            require("@/assets/CombatantModels/Ballista_Up.png"),
+            require("@/assets/CombatantModels/Ballista_Down.png"),
+            require("@/assets/CombatantModels/Blue_Bomb.png"),
+            require("@/assets/CombatantModels/Red_Bomb.png"),
+            require("@/assets/CombatantModels/BlueDeathTower.png"),
+            require("@/assets/CombatantModels/RedDeathTower.png"),
+
+            require("@/assets/CombatantModels/blue_brick.png"),
+            require("@/assets/CombatantModels/Goblin_no_back.png")
         ],
         svgs: [
            require("@/assets/statusIcons/ARCANE_CHANNELING.svg"),
@@ -162,7 +173,15 @@ export const screenAssets = {
            require("@/assets/Bomb.svg"),
            require("@/assets/Babel.svg"),
            require("@/assets/ACHILLES.svg"),
-
+           
+           require("@/assets/CombatantModels/PierceTarget.svg"),
+           require("@/assets/CombatantModels/NormalTarget.svg"),
+           require("@/assets/CombatantModels/CritTarget.svg"),
+           require("@/assets/CombatantModels/BlockTarget.svg"),
+           require("@/assets/CombatantModels/FireTarget.svg"),
+           require("@/assets/CombatantModels/IceTarget.svg"),
+           require("@/assets/CombatantModels/LightningTarget.svg"),
+           require("@/assets/CombatantModels/BlightTarget.svg"),
 
         ],
         audio: [

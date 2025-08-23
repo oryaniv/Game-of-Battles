@@ -950,7 +950,7 @@ export default defineComponent({
             combatant.team.combatants.splice(combatantIndex, 1);
           }
         });
-      }, 1500);
+      }, 1000);
 
       function removeCombatantEffect(combatant: Combatant) {
         board.value.removeCombatant(combatant);
