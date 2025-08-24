@@ -2483,7 +2483,7 @@ class VeteranAIAgentFistWeaverPlayer extends VeteranAIAgentGenericPlayer {
     private evaluateIdaiNoHadou(combatant: Combatant, game: Game, board: Board, movePosition: Position, target: Position | undefined): number {
 
         let baseValue = 0;
-        baseValue += combatant.hasStatusEffect(StatusEffectType.IDAI_NO_HADOU) ? -10 : 0;
+        baseValue += combatant.hasStatusEffect(StatusEffectType.IDAI_NO_HADOU) ? -20 : 0;
         baseValue += this.evaluateMeditate(combatant, game, board, movePosition, target);
         baseValue += isFatigued(combatant) ? 2 : 0;
         baseValue += isLowStamina(combatant) ? 3 : 0;

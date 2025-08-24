@@ -123,7 +123,7 @@ export class PanickedAIAgent implements AIAgent {
         const eventLogger = EventLogger.getInstance();
         eventLogger.logEvent({
             messageBody: `${combatant.name} is`,
-            actionPart: 'Panicked!',
+            actionPart: 'Panicking!',
             actionType: PlayActionType.INACTION
         });
         const actionResult = this.runAway(combatant, game, board);

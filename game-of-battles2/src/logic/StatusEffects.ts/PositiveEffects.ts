@@ -25,7 +25,17 @@ export class BlockingStanceStatusEffect implements StatusEffect {
 
             const roll = Math.random();
             if (roll <= 0.7) {
-                return {attackResult: AttackResult.Blocked, damage: {amount: 0, type: DamageType.Unstoppable}, cost: attackCost * 2, reaction: DamageReaction.IMMUNITY};
+                return {
+                    attackResult: AttackResult.Blocked,
+                    damage: {
+                        amount: 0,
+                        type: DamageType.None
+                    },
+                    cost: attackCost * 2,
+                    reaction: DamageReaction.IMMUNITY,
+                    position: defender.position,
+                    statusEffectType: StatusEffectType.BLOCKING_STANCE
+                };
             }
             return;
         },
@@ -154,10 +164,11 @@ export class EncouragedStatusEffect implements StatusEffect {
             if (roll <= extraActionChance) {
                 return {
                     attackResult: AttackResult.NotFound,
-                    damage: { amount: 0, type: DamageType.Unstoppable },
+                    damage: { amount: NaN, type: DamageType.None },
                     cost: -1, // Refund 1 action point
                     reaction: DamageReaction.NONE,
-                    position: caster.position
+                    position: caster.position,
+                    statusEffectType: StatusEffectType.ENCOURAGED
                 };
             }
             return undefined;
@@ -334,18 +345,20 @@ export class ShieldWallStatusEffect implements StatusEffect {
     applicationHooks = {
         [StatusEffectHook.OnAttacking]: (self: Combatant) => {
             self.removeStatusEffect(StatusEffectType.SHIELD_WALL);
-            removeShieldWallRelatedCombatants(self);
         },
         [StatusEffectHook.OnDefending]: (self: Combatant) => {
             self.removeStatusEffect(StatusEffectType.SHIELD_WALL);
-            removeShieldWallRelatedCombatants(self);
         },
         [StatusEffectHook.OnSkillUsed]: (self: Combatant) => {
             self.removeStatusEffect(StatusEffectType.SHIELD_WALL);
-            removeShieldWallRelatedCombatants(self);
         },
         [StatusEffectHook.OnMoving]: (self: Combatant) => {
             self.removeStatusEffect(StatusEffectType.SHIELD_WALL);
+        },
+        [StatusEffectHook.OnDeath]: (self: Combatant) => {
+            self.removeStatusEffect(StatusEffectType.SHIELD_WALL);
+        },
+        [StatusEffectHook.OnRemove]: (self: Combatant) => {
             removeShieldWallRelatedCombatants(self);
         }
     };
@@ -383,18 +396,21 @@ export class ArcaneShieldWallStatusEffect implements StatusEffect {
     applicationHooks = {
         [StatusEffectHook.OnAttacking]: (self: Combatant) => {
             self.removeStatusEffect(StatusEffectType.ARCANE_SHIELD_WALL);
-            removeArcaneShieldWallRelatedCombatants(self);
         },
         [StatusEffectHook.OnDefending]: (self: Combatant) => {
             self.removeStatusEffect(StatusEffectType.ARCANE_SHIELD_WALL);
-            removeArcaneShieldWallRelatedCombatants(self);
+
         },
         [StatusEffectHook.OnSkillUsed]: (self: Combatant) => {
             self.removeStatusEffect(StatusEffectType.ARCANE_SHIELD_WALL);
-            removeArcaneShieldWallRelatedCombatants(self);
         },
         [StatusEffectHook.OnMoving]: (self: Combatant) => {
             self.removeStatusEffect(StatusEffectType.ARCANE_SHIELD_WALL);
+        },
+        [StatusEffectHook.OnDeath]: (self: Combatant) => {
+            self.removeStatusEffect(StatusEffectType.ARCANE_SHIELD_WALL);
+        },
+        [StatusEffectHook.OnRemove]: (self: Combatant) => {
             removeArcaneShieldWallRelatedCombatants(self);
         }
     };
@@ -451,7 +467,18 @@ export class SanctuaryStatusEffect implements StatusEffect {
     description = `All attacks against this combatant are blocked, except unstoppable damage. Sanctuary is removed upon moving or attacking, including attack-based skills`;
     applicationHooks = {
         [StatusEffectHook.OnBeingAttacked]: (self: Combatant, defender: Combatant, damage: Damage, attackCost: number) => {
-            return {attackResult: AttackResult.Blocked, damage: {amount: 0, type: DamageType.Unstoppable}, cost: attackCost * 2, reaction: DamageReaction.IMMUNITY, position: self.position};
+            //return {attackResult: AttackResult.Blocked, damage: {amount: 0, type: DamageType.Unstoppable}, cost: attackCost * 2, reaction: DamageReaction.IMMUNITY, position: self.position};
+            return {
+                attackResult: AttackResult.Blocked,
+                damage: {
+                    amount: 0,
+                    type: DamageType.None
+                },
+                cost: attackCost * 2,
+                reaction: DamageReaction.IMMUNITY,
+                position: self.position,
+                statusEffectType: StatusEffectType.SANCTUARY
+            };
         },
         [StatusEffectHook.OnAttacking]: (caster: Combatant, target: Combatant) => {
             caster.removeStatusEffect(StatusEffectType.SANCTUARY);
@@ -598,33 +625,32 @@ export class DiamondHookedHoldingStatusEffect implements StatusEffect {
     description = `This combatant holds an enemy captive with a diamnd hook, and will attack it if it tries to move or resist.`;
     applicationHooks = {
         [StatusEffectHook.OnTurnStart ]: (self: Combatant) => {
-            const heldEnemy = self.getRelatedCombatants()['DIAMOND_HOOKED'];
+            const heldEnemy = self.getRelatedCombatants()['DIAMOND_HOOKED_HOLDING'];
             if(!heldEnemy) {
                 self.removeStatusEffect(StatusEffectType.DIAMOND_HOOKED_HOLDING);
             }
         },
         [StatusEffectHook.OnMoving]: (self: Combatant) => {
-            const heldEnemy = self.getRelatedCombatants()['DIAMOND_HOOKED'];
+            const heldEnemy = self.getRelatedCombatants()['DIAMOND_HOOKED_HOLDING'];
             if(heldEnemy) {
                 heldEnemy.removeStatusEffect(StatusEffectType.DIAMOND_HOOKED);
-                heldEnemy.removeRelatedCombatant('DIAMOND_HOOKED_HOLDING');
+                heldEnemy.removeRelatedCombatant('DIAMOND_HOOKED');
             }
             self.removeStatusEffect(StatusEffectType.DIAMOND_HOOKED_HOLDING);
         },
         [StatusEffectHook.OnDeath]: (self: Combatant) => {
-            const heldEnemy = self.getRelatedCombatants()['DIAMOND_HOOKED'];
+            const heldEnemy = self.getRelatedCombatants()['DIAMOND_HOOKED_HOLDING'];
             if(heldEnemy) {
                 heldEnemy.removeStatusEffect(StatusEffectType.DIAMOND_HOOKED);
-                heldEnemy.removeRelatedCombatant('DIAMOND_HOOKED_HOLDING');
+                heldEnemy.removeRelatedCombatant('DIAMOND_HOOKED');
             }
             self.removeStatusEffect(StatusEffectType.DIAMOND_HOOKED_HOLDING);
         },
         [StatusEffectHook.OnKilling]: (caster: Combatant, target: Combatant) => {
-            const heldEnemy = target.getRelatedCombatants()['DIAMOND_HOOKED'];
+            const heldEnemy = target.getRelatedCombatants()['DIAMOND_HOOKED_HOLDING'];
             if(heldEnemy && target.name === heldEnemy.name) {
                 caster.removeStatusEffect(StatusEffectType.DIAMOND_HOOKED_HOLDING);
                 caster.removeRelatedCombatant('DIAMOND_HOOKED');
-                caster.removeStatusEffect(StatusEffectType.DIAMOND_HOOKED_HOLDING);
                 caster.stats.hp = Math.min(caster.stats.hp + 20, caster.baseStats.hp);
                 caster.stats.stamina = Math.min(caster.stats.stamina + 10, caster.baseStats.stamina);
             }

@@ -75,12 +75,14 @@ export class FoolsLuckStatusEffect implements StatusEffect {
             if (random <= chanceToFumble) {
                 attacked.baseStats.luck += 1;
                 attacked.stats.luck += 1;
-                return {attackResult: AttackResult.Fumble, damage: {amount: 0, type: DamageType.Unstoppable}, cost: attackCost, reaction: DamageReaction.NONE, position: attacked.position};
+                emitter.emit('trigger-method', getStatusEffectActionResult(StatusEffectType.FOOLS_LUCK, attacked.position, 1));
+                return {attackResult: AttackResult.Fumble, damage: {amount: 0, type: DamageType.None}, cost: attackCost, reaction: DamageReaction.NONE, position: attacked.position};
             }
             if (random <= chanceToMiss) {
                 attacked.baseStats.luck += 2;
                 attacked.stats.luck += 2;
-                return {attackResult: AttackResult.Miss, damage: {amount: 0, type: DamageType.Unstoppable}, cost: attackCost, reaction: DamageReaction.NONE, position: attacked.position};
+                emitter.emit('trigger-method', getStatusEffectActionResult(StatusEffectType.FOOLS_LUCK, attacked.position, 1));
+                return {attackResult: AttackResult.Miss, damage: {amount: 0, type: DamageType.None}, cost: attackCost, reaction: DamageReaction.NONE, position: attacked.position};
             }
             return;
         },
@@ -444,7 +446,7 @@ export class AlwaysBlockStatusEffect implements StatusEffect {
     isVisible?: boolean = false;
     applicationHooks = {
         [StatusEffectHook.OnBeingAttacked]: (self: Combatant, defender: Combatant, damage: Damage, attackCost: number) => {
-            return {attackResult: AttackResult.Blocked, damage: {amount: 0, type: DamageType.Unstoppable}, cost: 2, reaction: DamageReaction.IMMUNITY, position: self.position};
+            return {attackResult: AttackResult.Fumble, damage: {amount: 0, type: DamageType.None}, cost: 2, reaction: DamageReaction.NONE, position: self.position};
         }
     };
     alignment: StatusEffectAlignment = StatusEffectAlignment.Permanent;

@@ -68,7 +68,7 @@ export function getMissActionResult(position?: Position, cost: number = 1): Acti
         attackResult: AttackResult.Miss,
         damage: {
             amount: 0,
-            type: DamageType.Unstoppable
+            type: DamageType.None
         },
         cost: cost,
         reaction: DamageReaction.NONE,

@@ -402,7 +402,7 @@ import { EventLogger } from './eventLogger';
 import { AllOfThem, standardVsSetup, theATeam, theBTeam, allMilitiaSetup, theGorillaTeam,
  generateRandomTeam, generateCombatantIdenticalTeam, placeAllCombatants, debugSetupWhiteTeam,
   debugSetupBlackTeam, playGroundTeams} from './boardSetups';
- import { getGameResultMessage, getGameOverMessage, getTutorialCompleteMessage, getTutorialResultMessage } from './GameOverMessageProvider';
+ import { getGameResultMessage, getGameOverMessage, getTutorialCompleteMessage, getTutorialResultMessage, getResultGap } from './GameOverMessageProvider';
  import { getCommentatorMessage, CommentatorMessage } from './CommentatorMessageProvider';
  import { getActionEffectIcon, ActionEffect, requireDamageSVG, getSkillEffectIcon, getShortDamageReactionText,
   getActionDescription, getStatusEffectDescription, requireStatusEffectSvg, delay,
@@ -607,6 +607,12 @@ export default defineComponent({
       setTimeout(() => {
         triggerDialog();
       }, 1000);
+
+      if(game.value.isAiTeamGoingFirst()) {
+          setTimeout(async () => {
+            await playAiTurn(currentCombatant.value);
+          }, 1500);
+        }
     });
 
     onUnmounted(() => {
@@ -626,11 +632,11 @@ export default defineComponent({
         playRoundStartSound();
         updateHoveringMessage(`${game.value.teams[(game.value as Game).getCurrentTeamIndex()].name}'s Turn`, true);
         // only for the first round, we want to wait for the AI to start if they go first
-        if(game.value.isAiTeamGoingFirst()) {
-          setTimeout(async () => {
-            await playAiTurn(currentCombatant.value);
-          }, 1500);
-        }
+        // if(game.value.isAiTeamGoingFirst()) {
+        //   setTimeout(async () => {
+        //     await playAiTurn(currentCombatant.value);
+        //   }, 1500);
+        // }
       }
     };
 
@@ -926,7 +932,6 @@ export default defineComponent({
 
       // if the current combatant has an AI agent, let it play the turn
       const currentCombatant = game.value.getCurrentCombatant();
-      debugger;
       const turnDelay = showHoveringMessage() ? 1500 : 1000;
       if(currentCombatant && currentCombatant.getAiAgent() !== undefined) {
         setTimeout(async () => {
@@ -963,11 +968,11 @@ export default defineComponent({
 
       if(Array.isArray(aiActionResult)) {
         aiActionResult.forEach((actionResult) => {
-          actionResult.position && applyAttackEffects(actionResult, actionResult.position);
+          actionResult.position && (actionResult.attackResult !== AttackResult.NotFound || actionResult.statusEffectType) && applyAttackEffects(actionResult, actionResult.position);
         });
         applyCommentatorMessages(aiActionResult, currentCombatant.team);
       } else {
-        aiActionResult.position && applyAttackEffects(aiActionResult, aiActionResult.position);
+        aiActionResult.position && (aiActionResult.attackResult !== AttackResult.NotFound || aiActionResult.statusEffectType) && applyAttackEffects(aiActionResult, aiActionResult.position);
         applyCommentatorMessages([aiActionResult], currentCombatant.team);
       }
       setTimeout(() => {
@@ -1518,6 +1523,7 @@ export default defineComponent({
 
     const endGame = async () => {
       const playerSurvived = !game.value.teams.find((team) => team.isHumanPlayerTeam())?.isDefeated();
+      const resultGap = getResultGap(whiteTeam.value, blackTeam.value);
       playGameOverSound(playerSurvived);
       stopMatchMusic();
       const gameOverMessage = getGameResultMessage(whiteTeam.value, blackTeam.value);
@@ -1528,7 +1534,8 @@ export default defineComponent({
         name: 'PostMatch',
         state: {
           postMatchMessage: gameOverMessage,
-          playerSurvived: playerSurvived
+          playerSurvived: playerSurvived,
+          resultGap: resultGap
         }
       });
     }
@@ -2277,6 +2284,10 @@ html, body {
   font-size: 20px;
   font-weight: bold;
   animation: floatUp 1s forwards;
+  display: flex;
+  align-items: center;
+  flex-direction: column-reverse;
+  gap: 5px;
 }
 
 .damage-icon {

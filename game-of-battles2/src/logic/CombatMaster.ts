@@ -88,13 +88,13 @@ export class CombatMaster {
 
         return attackResult === AttackResult.Miss ? {
             attackResult: AttackResult.Miss,
-            damage: {amount: 0, type: DamageType.Unstoppable},
+            damage: {amount: 0, type: DamageType.None},
             cost: turnCost,
             reaction: DamageReaction.NONE,
             position: position
         } : {
             attackResult: AttackResult.Fumble,
-            damage: {amount: 0, type: DamageType.Unstoppable},
+            damage: {amount: 0, type: DamageType.None},
             cost: turnCost * 2,
             reaction: DamageReaction.NONE,
             position: position

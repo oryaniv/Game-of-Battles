@@ -17,6 +17,7 @@ import { OptionsManager } from '@/GameData/OptionsManager';
 import { getDifficulyLevelCount } from '@/GameData/EnemyRepository';
 import { refreshTeam } from '@/boardSetups';
 import { playHoverSound, playPostMatchMusic, stopCurrentMusic } from '@/GameData/SoundUtils';
+import { ResultGap } from '@/logic/Difficulty';
 
 export default defineComponent({
   setup() {
@@ -24,6 +25,7 @@ export default defineComponent({
     const receivedMessage = ref('');
     const playerSurvived = ref(false);
     const runCompleted = ref(false);
+    const resultGap = ref(ResultGap.NONE);
     const runManager = RunManager.getInstance();
     const optionsManager = OptionsManager.getInstance();
     const isPostBattleCommentDisabled = ref(optionsManager.getDisablePostBattleComments());
@@ -64,6 +66,7 @@ export default defineComponent({
       } else {
         receivedMessage.value = window.history.state.postMatchMessage;
       }
+      resultGap.value = window.history.state.resultGap;
     }
 
     const updateRun = () => {
@@ -81,9 +84,13 @@ export default defineComponent({
 
 
     const updateSinglePlayerRun = () => {
-      runManager.setScore(100);
+      if(!playerSurvived.value) {
+        runManager.setStatus(RunsStatus.DIED);
+        return;
+      }
       const difficulty = runManager.getDifficulty();
       const difficultyLevelCount = getDifficulyLevelCount(difficulty!);
+      runManager.addResultGap(resultGap.value);
       if(runManager.getCurrentLevel() + 1 > difficultyLevelCount) {
         runCompleted.value = true;
         runManager.setStatus(RunsStatus.COMPLETED);

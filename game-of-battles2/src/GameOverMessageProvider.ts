@@ -48,9 +48,9 @@ export function getTutorialCompleteMessage(type: stepType) {
 
 export function getTutorialResultMessage(type: stepType) {
     if(type === stepType.COMPLETE) {
-        return 'Good boy, go on!';
+        return TUTORIAL_MESSAGES[stepType.COMPLETE][Math.floor(Math.random() * TUTORIAL_MESSAGES[stepType.COMPLETE].length)];
     }
-    return 'Dishonorably discharged';
+    return TUTORIAL_MESSAGES[stepType.FAIL][Math.floor(Math.random() * TUTORIAL_MESSAGES[stepType.FAIL].length)];
 }
 
 function isPvP(team1: Team, team2: Team): boolean {
@@ -120,7 +120,7 @@ function getDifficulty(aiTeam: Team): Difficulty {
     }
 }
 
-function getResultGap(team1: Team, team2: Team): ResultGap {
+export function getResultGap(team1: Team, team2: Team): ResultGap {
     const winnerTeam = determineWinner(team1, team2);
     const loserTeam = winnerTeam.getName() === team1.getName() ? team2 : team1;
     const winnerTeamCombatants = winnerTeam.combatants.filter(combatant => !combatant.isExpendable());
@@ -208,7 +208,8 @@ const PVAI_MESSAGES = {
             "God have mercy on your soul",
             "Death comes to all",
             "In the end, even you failed",
-            "Anohter soul is lost"
+            "Anohter soul is lost",
+            "Always a good time to get better."
         ],
     },
     [GameResult.WIN]: {
@@ -217,12 +218,14 @@ const PVAI_MESSAGES = {
             "GG, care for a rematch?",
             "That was fun, let's do it again!",
             "Outstanding. Think you can do this again?",
+            "Decisive victory, commander.",
+            "That's how it's done!"
         ],
         [VitriolLevel.MEDIUM]: [
             "Well done, but don't rest in your laurels yet",
             "Good, ready for a real challenge?",
             "Not bad, for a rookie",
-            "Not too shabby, I'll give you that"
+            "Not too shabby, I'll give you that",
         ],
         [VitriolLevel.HIGH]: [
             "You may have won that, but don't get cocky.",
@@ -233,3 +236,16 @@ const PVAI_MESSAGES = {
     },
 }
 
+const TUTORIAL_MESSAGES = {
+    [stepType.COMPLETE]: [
+        "Good work, private. know get you a** moving!",
+        "Get good sleep, soldier, I'm going to tear you down tomorrow!", 
+        "Not bad private player. You better graduate the next lesson as well!",
+    ],
+    [stepType.FAIL]: [
+        "Dishonorably discharged",
+        "What was that? what the HELL was that?",
+        "Get the hell out my sight!",
+        "I haven't seen such a pathetic display in a long time",
+    ] 
+}

@@ -585,7 +585,7 @@ export class Rampage implements SpecialMove {
             if (roll <= 0.25) {
                 rampageResults.push({
                     attackResult: AttackResult.Miss,
-                    damage: { amount: 0, type: DamageType.Unstoppable },
+                    damage: { amount: 0, type: DamageType.None },
                     cost: 1, // Refund 1 action point
                     reaction: DamageReaction.NONE,
                     position: target

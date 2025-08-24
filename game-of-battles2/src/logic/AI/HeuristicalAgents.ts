@@ -131,6 +131,10 @@ function getSkipPlays(combatant: Combatant, game: Game, board: Board, validNewPo
 function getDefendPlays(combatant: Combatant, game: Game, board: Board, validNewPositions: Position[]): TurnPlay[] {
     const allDefendActions: TurnPlay[] = [];
 
+    if(!combatant.isOrganic()) {
+        return allDefendActions;
+    }
+
     allDefendActions.push({
         position: combatant.position,
         playAction: {

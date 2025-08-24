@@ -250,7 +250,7 @@ export function statusNameToText(statusName: StatusEffectType): string {
     case 41:  
       return "Life Drinker";
     case 42:
-      return "Panicked";
+      return "Panicking";
     case 43:
       return "Diamond Supremacy";
     case 44:  
@@ -698,7 +698,10 @@ export function getActionEffectIcon(effect: ActionEffect) {
   if (effect.statusEffectType !== undefined) {
     return requireStatusEffectSvg(effect.statusEffectType);
   }
-  alert('No icon found for action effect');
+  if(effect.type !== DamageType.None) {
+    alert('No icon found for action effect');
+  }
+  
   return '';
 }
 

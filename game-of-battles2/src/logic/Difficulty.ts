@@ -5,6 +5,7 @@ export enum Difficulty {
 }
 
 export const enum ResultGap {
+    NONE,
     SMALL,
     MEDIUM,
     LARGE,

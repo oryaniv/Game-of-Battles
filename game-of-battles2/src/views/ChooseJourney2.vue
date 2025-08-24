@@ -29,7 +29,7 @@
           <PyramidBlock v-if="enemyPlaques[0]" :enemyPlaque="enemyPlaques[0]" 
           :playerPlaqueCurrentLevel="playerPlaqueCurrentLevel" :difficulty="selectedDifficulty" />
         </div>
-        <p v-if="animationPhase === 'idle'" class="pyramid-label">Easy</p>
+        <p v-if="animationPhase === 'idle'" class="pyramid-label">Rookie</p>
       </div>
 
       <!-- Normal Pyramid -->
@@ -60,7 +60,7 @@
           <PyramidBlock v-if="enemyPlaques[0]" :enemyPlaque="enemyPlaques[0]" 
           :playerPlaqueCurrentLevel="playerPlaqueCurrentLevel" :difficulty="selectedDifficulty" />
         </div>
-        <p v-if="animationPhase === 'idle'" class="pyramid-label">Normal</p>
+        <p v-if="animationPhase === 'idle'" class="pyramid-label">Veteran</p>
       </div>
 
       <!-- Hard Pyramid -->
@@ -99,7 +99,7 @@
           <PyramidBlock v-if="enemyPlaques[0]" :enemyPlaque="enemyPlaques[0]" 
           :playerPlaqueCurrentLevel="playerPlaqueCurrentLevel" :difficulty="selectedDifficulty" />
         </div>
-        <p v-if="animationPhase === 'idle'" class="pyramid-label">Hard</p>
+        <p v-if="animationPhase === 'idle'" class="pyramid-label">Tactician</p>
       </div>
     </div>
 
@@ -492,13 +492,13 @@ export default defineComponent({
 
     const showDescription = (difficulty: string) => {
       if(difficulty === 'Easy') {
-        descriptionText.value = 'Easy AI is basic and forgiving, but don\'t let your guard down.';
+        descriptionText.value = 'Rookie AI is basic and forgiving, but don\'t let your guard down.';
       }
       if(difficulty === 'Normal') {
-        descriptionText.value = "Normal AI will exploit your mistakes, yet won't play optimally.";
+        descriptionText.value = "Veteran AI will exploit your mistakes, yet won't play optimally.";
       }
       if(difficulty === 'Hard') {
-        descriptionText.value = "Hard AI doesn't pull any punches. You must know the game and plan ahead.";
+        descriptionText.value = "Tactician AI won't pull any punches. You must know the game and plan ahead.";
       }
     }
     const hideDescription = () => {

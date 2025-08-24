@@ -39,26 +39,31 @@ export function playGroundTeams(): Team[] {
     const rookieAIAgent = new RookieAIAgent();
     const rookieWithCoop = new RookieAIAgent();
     rookieWithCoop.setCollectCoop(true);
-    const whiteTeam = new Team('Blue Team', 0,);
+    const whiteTeam = new Team('Blue Team', 0 );
     const blackTeam = new Team('Red Team', 1 );
 
    
-    whiteTeam.addCombatant(new Vanguard('Layla', { x: 3, y: 0}, whiteTeam));
-    whiteTeam.addCombatant(new Defender('Dorgo', { x: 6, y: 5}, whiteTeam));
-    whiteTeam.addCombatant(new FistWeaver('P5', { x: 3, y: 7}, whiteTeam));
-    whiteTeam.addCombatant(new Wizard('P9', { x: 6, y: 4}, whiteTeam));
-    whiteTeam.addCombatant(new Fool('P11', { x: 3, y: 1}, whiteTeam));
-    // whiteTeam.addCombatant(new Witch('P12', { x: 3, y: 2}, whiteTeam));
-    // whiteTeam.addCombatant(new Vanguard('P13', { x: 3, y: 3}, whiteTeam));
-    // whiteTeam.addCombatant(new Hunter('P14', { x: 3, y: 4}, whiteTeam));
-    // whiteTeam.addCombatant(new StandardBearer('P15', { x: 3, y: 5}, whiteTeam));
+    // whiteTeam.addCombatant(new Witch('Layla', { x: 3, y: 0}, whiteTeam));
+    // whiteTeam.addCombatant(new Wizard('Dorgo', { x: 6, y: 5}, whiteTeam));
+    // whiteTeam.addCombatant(new Wizard('P5', { x: 4, y: 7}, whiteTeam));
+    // whiteTeam.addCombatant(new Wizard('P5', { x: 3, y: 7}, whiteTeam));
+    // whiteTeam.addCombatant(new Wizard('P9', { x: 6, y: 4}, whiteTeam));
+    // whiteTeam.addCombatant(new Wizard('P11', { x: 3, y: 1}, whiteTeam));
+    // whiteTeam.addCombatant(new Vanguard('P12', { x: 8, y: 5}, whiteTeam));
+    whiteTeam.addCombatant(new Wizard('P13', { x: 4, y: 4}, whiteTeam));
+    // whiteTeam.addCombatant(new BabyBabel('P14', { x: 6, y: 4}, whiteTeam));
+    whiteTeam.addCombatant(new Defender('P14', { x: 3, y: 4}, whiteTeam));
+    whiteTeam.addCombatant(new StandardBearer('P15', { x: 2, y: 4}, whiteTeam));
     
 
-    blackTeam.addCombatant(new Vanguard('Umbral', { x: 3, y: 1}, blackTeam));
-    blackTeam.addCombatant(new Militia('ffe', { x: 4, y: 4}, blackTeam));
-    blackTeam.addCombatant(new Militia('Rrr', { x: 3, y: 4}, blackTeam));
-    blackTeam.addCombatant(new Militia('fefe', { x: 2, y: 4}, blackTeam));
-    blackTeam.addCombatant(new Militia('ffeeee', { x:1, y: 4}, blackTeam));
+    // blackTeam.addCombatant(new Healer('Umbral', { x: 8, y: 5}, blackTeam));
+    // blackTeam.addCombatant(new Artificer('ffe', { x: 5, y: 6}, blackTeam));
+    // blackTeam.addCombatant(new Defender('nono', { x: 7, y: 7}, blackTeam));
+    // blackTeam.addCombatant(new OozeGolem('nono', { x: 4, y: 8}, blackTeam));
+    blackTeam.addCombatant(new Wizard('Rrr', { x: 3, y: 8}, blackTeam));
+    //blackTeam.addCombatant(new Wizard('fefe', { x: 3, y: 8}, blackTeam));
+    // blackTeam.addCombatant(new Healer('ffeeee', { x:7, y: 9}, blackTeam));
+    // blackTeam.addCombatant(new Healer('Rrr', { x: 6, y: 9}, blackTeam));
 
     // blackTeam.addCombatant(new Artificer('Rina', { x: 4, y: 5}, blackTeam));
     // // 
@@ -66,7 +71,7 @@ export function playGroundTeams(): Team[] {
     // whiteTeam.addCombatant(new StandardBearer('P10', { x: 3, y: 1}, whiteTeam)); 
     // whiteTeam.addCombatant(new Vanguard('P2', { x: 3, y: 4}, whiteTeam));
     
-    // blackTeam.addCombatant(new Witch('W1', { x: 3, y: 5}, blackTeam));
+    // blackTeam.addCombatant(new Wizard('W1', { x: 3, y: 5}, blackTeam));
     
 
     // blackTeam.addCombatant(new TwinBlade('V3', { x: 5, y: 6}, blackTeam));
@@ -78,16 +83,22 @@ export function playGroundTeams(): Team[] {
     // blackTeam.addCombatant(new WeaveEater('V5', { x: 5, y: 8}, blackTeam));
     // blackTeam.addCombatant(new WeaveEater('V6', { x: 5, y: 9}, blackTeam));
 
-
-
+    whiteTeam.combatants[1].stats.hp = 1;
+    // blackTeam.combatants[1].stats.hp = 60;
+    // blackTeam.combatants[1].stats.hp = 10;
 
     // whiteTeam.combatants[0].applyStatusEffect({
-    //     name: StatusEffectType.ARCANE_CHANNELING,
+    //     name: StatusEffectType.ENCOURAGED,
     //     duration: 3,
     // });
 
-    // blackTeam.combatants[0].applyStatusEffect({
-    //     name: StatusEffectType.ALWAYS_BY_HIT,
+    // whiteTeam.combatants[3].applyStatusEffect({
+    //     name: StatusEffectType.ARCANE_OVERCHARGE,
+    //     duration: 3,
+    // });
+
+    // blackTeam.combatants[1].applyStatusEffect({
+    //     name: StatusEffectType.BLOCKING_STANCE,
     //     duration: 3,
     // });
 

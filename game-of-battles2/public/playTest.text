@@ -1,7 +1,7 @@
 **********************
 
 * scrollbars appearing on windows when game commentary appears (windows of any size) V
-* Wizard vetetran agent to be more aggressive (less barrier, overcharge instead of attacking)  - find it happening, then deal) VX
+* Wizard vetetran agent to be more aggressive (less barrier, overcharge instead of attacking)  - find it happening, then deal) V
 * lower the player plaque a bit on journey descend when it finally stands V
 * polish the effects of titanic fist (the clash, death, etc.) V
 * add sound effect for unstoppable damage V
@@ -11,7 +11,18 @@
 * healer using sanctuary on allies that already has it V
 * preload bomb, tower and ballista png's V
 * non organic getting replacement part V
-* fix unstoppable sound when it's not actually appropriate
+* ai plays twice on 2nd round when it starts V
+* hellscream does unstoppale damage icon on the vangaurd V
+* fistweaver does surge of glory twice  V
+* encourage + turn does unstoppable instead of eagle V
+* diamond hook disappearing for no reason?  V
+* tower defending V
+* fix unstoppable sound when it's not actually appropriate (ongoing) VX
+
+* yo mama at nobody?
+* normalize the order of stats/weaknesses on all combatants V
+* make sure ? battles are unlockable V
+* shield wall should disappear when the defender is dead V
 
 * build team screen - choosing another combatant when on stats panel should not revert to description panel
 * same for diamond hook
@@ -19,7 +30,13 @@
 * have red team members face the other direction (optional)
 * diamon hook usage slipped far. maybe make the action panel longer
 
-* elusive bugs
 
-* froze burst didn't find no target on Hard
+********** tutorial issues **********
+
+
+
+********** elusive bugs ***********
+
+* froze burst didn't find no target on Hard (so far not reproducing)
+* a crash at the endagame (happened only once in many runs)
 

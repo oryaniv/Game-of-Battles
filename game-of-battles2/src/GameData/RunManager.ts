@@ -48,7 +48,7 @@ export class RunManager {
         //     currentLevel: 1,
         //     difficulty: Difficulty.MEDIUM,
         //     status: RunsStatus.IN_PROGRESS,
-        //     type: RunType.SINGLE_PLAYER
+        //     type: RunType.SINGLE_PLAYER,
         //     record: []
         // };
 
@@ -143,6 +143,10 @@ export class RunManager {
 
     public setRunType(type: RunType): void {
         this.gameRun.type = type;
+    }
+
+    public addResultGap(resultGap: ResultGap): void {
+        this.gameRun.record.push(resultGap);
     }
 
     // Create new run
