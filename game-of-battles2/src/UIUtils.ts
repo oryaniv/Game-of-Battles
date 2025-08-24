@@ -151,6 +151,8 @@ export const getShortDamageReactionText = (reaction: DamageReaction): string => 
         return require('./assets/Pentagram.svg');
       case DamageType.Healing:
         return require('./assets/Healing.svg');
+      case DamageType.Stamina:
+        return require('./assets/statusIcons/REGEN_STAMINA.svg');
       case DamageType.Unstoppable:
         return require('./assets/Unstoppable.svg');
       // ... other cases
@@ -341,6 +343,8 @@ export function requireStatusEffectSvg(effectType: StatusEffectType): string {
       return require('./assets/statusIcons/FORTIFIED.svg');
     case StatusEffectType.REGENERATING:
       return require('./assets/statusIcons/REGENERATING.svg');
+    case StatusEffectType.REGEN_STAMINA:
+      return require('./assets/statusIcons/REGEN_STAMINA.svg');
     case StatusEffectType.IMMOBILIZED:
       return require('./assets/statusIcons/IMMOBILIZED.svg');
     case StatusEffectType.FROZEN:
@@ -556,10 +560,11 @@ export function getSkillEffectIcon(skillName: string) {
     case 'Reinforce Construct':
     case 'Meditate':
     case 'Blood Rite':
-    case 'Renewed Strength':
     case 'Devour Divinity':
     case 'Replacement Part':
       return require('./assets/statusIcons/REGENERATING.svg');
+    case 'Renewed Strength':
+      return require('./assets/statusIcons/REGEN_STAMINA.svg');
     case 'Arcane Channeling':
       return require('./assets/statusIcons/ARCANE_CHANNELING.svg');
     case 'Shield Breaker':
@@ -682,6 +687,8 @@ export function requireDamageSVG(type: DamageType): string {
       return require('./assets/Pentagram.svg');
     case DamageType.Healing:
       return require('./assets/Healing.svg');
+    case DamageType.Stamina:
+      return require('./assets/statusIcons/REGEN_STAMINA.svg');
     case DamageType.Unstoppable:
       return require('./assets/Unstoppable.svg');
     // ... other cases
@@ -712,6 +719,7 @@ const damageSoundByteMap: { [key: string]: SoundByte } = {
   'Dark': SoundByte.DARK,
   'Fire': SoundByte.FIRE,
   'Healing': SoundByte.HEALING,
+  'Stamina': SoundByte.HEALING,
   'Holy': SoundByte.HOLY,
   'Ice': SoundByte.ICE,
   'Pierce': SoundByte.PIERCE,

@@ -50,9 +50,9 @@ export function playGroundTeams(): Team[] {
     // whiteTeam.addCombatant(new Wizard('P9', { x: 6, y: 4}, whiteTeam));
     // whiteTeam.addCombatant(new Wizard('P11', { x: 3, y: 1}, whiteTeam));
     // whiteTeam.addCombatant(new Vanguard('P12', { x: 8, y: 5}, whiteTeam));
-    whiteTeam.addCombatant(new Wizard('P13', { x: 4, y: 4}, whiteTeam));
+    // whiteTeam.addCombatant(new Wizard('P13', { x: 4, y: 4}, whiteTeam));
     // whiteTeam.addCombatant(new BabyBabel('P14', { x: 6, y: 4}, whiteTeam));
-    whiteTeam.addCombatant(new Defender('P14', { x: 3, y: 4}, whiteTeam));
+    whiteTeam.addCombatant(new Witch('P14', { x: 3, y: 4}, whiteTeam));
     whiteTeam.addCombatant(new StandardBearer('P15', { x: 2, y: 4}, whiteTeam));
     
 
@@ -60,7 +60,7 @@ export function playGroundTeams(): Team[] {
     // blackTeam.addCombatant(new Artificer('ffe', { x: 5, y: 6}, blackTeam));
     // blackTeam.addCombatant(new Defender('nono', { x: 7, y: 7}, blackTeam));
     // blackTeam.addCombatant(new OozeGolem('nono', { x: 4, y: 8}, blackTeam));
-    blackTeam.addCombatant(new Wizard('Rrr', { x: 3, y: 8}, blackTeam));
+    blackTeam.addCombatant(new Wizard('Rrr', { x: 3, y: 5}, blackTeam));
     //blackTeam.addCombatant(new Wizard('fefe', { x: 3, y: 8}, blackTeam));
     // blackTeam.addCombatant(new Healer('ffeeee', { x:7, y: 9}, blackTeam));
     // blackTeam.addCombatant(new Healer('Rrr', { x: 6, y: 9}, blackTeam));
@@ -84,6 +84,7 @@ export function playGroundTeams(): Team[] {
     // blackTeam.addCombatant(new WeaveEater('V6', { x: 5, y: 9}, blackTeam));
 
     whiteTeam.combatants[1].stats.hp = 1;
+    whiteTeam.combatants[1].stats.stamina = 10;
     // blackTeam.combatants[1].stats.hp = 60;
     // blackTeam.combatants[1].stats.hp = 10;
 

@@ -107,6 +107,14 @@ export class RegeneratingStatusEffect implements StatusEffect {
     alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
 }
 
+export class RegeneratingStaminaStatusEffect implements StatusEffect {
+    name: StatusEffectType = StatusEffectType.REGEN_STAMINA;
+    description: string = "Regenerates a small amount of stamina at the start of each turn.";
+    applicationHooks = {
+
+    };
+    alignment: StatusEffectAlignment = StatusEffectAlignment.Positive;
+}
 export class FortifiedStatusEffect implements StatusEffect {
     name: StatusEffectType = StatusEffectType.FORTIFIED;
     description: string = "Increases defense considerably";

@@ -136,7 +136,7 @@ export class SiphonEnergy implements SpecialMove {
             name: StatusEffectType.ENERGY_ABSORB,
             duration: 2,
         });  
-        return getDamageActionResult({amount: staminaToSiphon, type: DamageType.Unstoppable}, invoker.position);
+        return getDamageActionResult({amount: staminaToSiphon, type: DamageType.Stamina}, invoker.position);
     };
     checkRequirements = (self: Combatant) => {
         return !self.hasStatusEffect(StatusEffectType.ENERGY_ABSORB);

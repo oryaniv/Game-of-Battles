@@ -72,8 +72,10 @@ export class RenewedStrength extends CoopMove {
         const renewedStrengthResults = getAllTargets.map(AOETarget => {
             const targetCombatant = board.getCombatantAtPosition(AOETarget);
             if(targetCombatant) {
-                targetCombatant.stats.stamina = Math.min(targetCombatant.stats.stamina + 15, targetCombatant.baseStats.stamina);
-                return getStandardActionResult(AOETarget, this.turnCost);
+                const newStamina = Math.min(targetCombatant.stats.stamina + 15, targetCombatant.baseStats.stamina);
+                const staminaGain = newStamina - targetCombatant.stats.stamina;
+                targetCombatant.stats.stamina = newStamina;
+                return getDamageActionResult({amount: staminaGain, type: DamageType.Stamina}, AOETarget);
             }
             return getStandardActionResult(AOETarget, this.turnCost);
         });

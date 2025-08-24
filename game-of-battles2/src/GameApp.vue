@@ -1019,6 +1019,8 @@ export default defineComponent({
           return 'black';
         case DamageType.Healing:
           return 'lightgreen';
+        case DamageType.Stamina:
+          return '#42A5F5';
         default:
           return 'white';
       }

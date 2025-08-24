@@ -34,7 +34,7 @@ export class RunManager {
 
     private constructor() {
         this.gameRun = {
-            team: new Team('Player Team', 0),
+            team: new Team('Your Team', 0),
             score: -1,
             currentLevel: 1,
             status: RunsStatus.CREATED,
